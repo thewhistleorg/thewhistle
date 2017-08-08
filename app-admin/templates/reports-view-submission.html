@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>{{reportDescription}}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        h1 { border-bottom: none; }
+    </style>
+</head>
+<body>
+
+<header>
+{{>navpartial}}
+</header>
+
+<main>
+
+<div class="export float-right">
+    <span>Export: PDF </span>
+    <a href="{{exportPdf}}" title="Save as PDF" class="fa fa-file-pdf-o"></a>
+</div>
+
+<h1>{{reportDescription}}</h1>
+
+<nav class="tabs">
+    <ul>
+        <li><a href="/reports/{{_id}}">Metadata</a></li>
+        <li class="active"><a href="/reports/{{_id}}/submission">Submission</a></li>
+        <li><a href="/reports/{{_id}}/files" {{#unless files}}class="disabled"{{/unless}}>Documents</a></li>
+        <li><a href="/reports/{{_id}}/commentary">Commentary</a></li>
+        <li><a href="/reports/{{_id}}/location">Location</a></li>
+    </ul>
+</nav>
+<div class="tab-content">
+  {{>errpartial}}
+
+  <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p>
+
+  <h2>Submitted Incident Report</h2>
+  {{{reportHtml}}}
+
+  <p><i>Note the contents of the incident report will vary according to the organisation/project the
+      report is submitted for.</i></p>
+</div>
+</main>
+
+</body>
+</html>

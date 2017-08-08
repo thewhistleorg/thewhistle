@@ -1,0 +1,9 @@
+.env
+static/*
+!static/map/marker-blue.png
+!static/map/marker-blue-outline.png
+!static/map/marker-red.png
+!static/map/marker-red-outline.png
+node_modules
+package-lock.json
+coverage/

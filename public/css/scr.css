@@ -1,0 +1,70 @@
+/* Stylesheet for scr (survivor-centred reporting) section */
+
+body {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+    background: white;
+    color: #444444;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    max-width: 48em;
+}
+
+h1           { color: #888888; font-size: 2.4em; font-weight: normal; line-height: 1; }
+main h1      { margin: 0 0; max-width: 48em; }
+h3           { font-style: italic; }
+
+a            { color: #33a0c0; }
+
+main         { max-width: 48em; }
+
+a, a:visited { color: #33a0c0; }
+a.grey       { color: #999999; }
+
+.green       { color: #006600; }
+.red         { color: #660000; }
+
+
+form li.nav {
+    clear: both;
+}
+button.nav {
+    background: none;
+    border: none;
+    color: #009900;
+    float: right;
+    font-weight: bold;
+    margin-top: 1em;
+    cursor: pointer;
+}
+button.prev {
+    float: left;
+}
+button.next {
+    float: right;
+}
+
+label {
+    margin-top: 1em;
+    width: auto;
+}
+input, textarea {
+}
+input[type=date], input[type=time] {
+    width: auto;
+}
+
+table.progress {
+    border-collapse: collapse;
+    float: right;
+    font-size: 80%;
+}
+table.progress td {
+    border: 1px solid #009900;
+    min-width: 3em;
+    padding: 0.1em 0.25em;
+    text-align: center;
+}
+table.progress td.current {
+    background-color: #009900;
+    color: #ffffff;
+}

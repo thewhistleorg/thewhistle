@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Users | The Whistle</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        form { margin: 0; }
+        td, th { min-width: 1em; }
+        button.fa-trash { background: none; border: none; color: #990000; padding: 1px; }
+        button.fa-trash:hover { cursor: pointer; }
+    </style>
+    <script>
+        'use strict';
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // show/hide delete button on hover over user tr
+            document.querySelectorAll('tr.user').forEach(tr => tr.onmouseenter = async function showDeleteButton() {
+                this.querySelector('button').classList.remove('hide');
+                this.querySelector('a').classList.remove('hide');
+            });
+            document.querySelectorAll('tr.user').forEach(tr => tr.onmouseleave = async function hideDeleteButton() {
+                this.querySelector('button').classList.add('hide');
+                this.querySelector('a').classList.add('hide');
+            });
+
+            // report deletion confirmation pop-up
+            document.querySelectorAll('form.delete').forEach(form => form.onsubmit = function confirmDelete() {
+                return confirm('Are you sure you want to delete this report?');
+            });
+
+        });
+    </script>
+</head>
+<body>
+
+<header>
+
+{{>navpartial}}
+
+</header>
+
+<main>
+
+<h1>Users</h1>
+
+{{>errpartial}}
+
+<table>
+    <tr>
+        <th colspan="2">Name</th>
+        <th>E-mail</th><th>Username</th>
+        <th>Roles</th><th>Databases</th>
+        <th></th>
+        <th><a href="/users/add" title="Add new user" class="fa fa-plus green"></a></th>
+    </tr>
+    {{#users}}
+    <tr id="{{_id}}" class="user">
+        <td>{{firstname}}</td>
+        <td>{{lastname}}</td>
+        <td>{{email}}</td>
+        <td>{{username}}</td>
+        <td>{{roles}}</td>
+        <td>{{databases}}</td>
+        <td><a href="/users/{{_id}}/edit" title="Edit user" class="fa fa-pencil grey hide"></a></td>
+        <td><form action="/users/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" title="Delete user" class="fa fa-trash hide"></button></form></td>
+    </tr>
+    {{/users}}
+</table>
+
+</main>
+
+</body>
+</html>

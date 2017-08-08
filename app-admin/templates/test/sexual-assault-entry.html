@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>The Whistle / Global Rights Nigeria Incident Report</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        label { display: block; font-style: normal; font-weight: bold; width: auto; }
+        label div { color: #999999; font-size: 80%; font-style: italic; font-weight: normal; }
+        input + label { display: inline-block; font-weight: normal; } /* eg radio/checkbox labels */
+        button.nav {
+            background: none;
+            border: none;
+            color: #009900;
+            float: right;
+            font-weight: bold;
+            margin-top: 1em;
+            cursor: pointer;
+        }
+        button.prev {
+            float: left;
+        }
+        button.next {
+            float: right;
+        }
+        li.nav { padding-bottom: 4em; }
+        output { border: 1px solid #999999; display: inline-block;  font-weight: bold; min-width: 8em; padding: 0 0.4em; }
+        button#get-alt-name { margin-left: 1em;  margin-top: 1em; }
+        .name-available { font-weight: bold; margin-top: 1em; }
+        #name-ok { color: #009900; }
+        #name-nok { color: #990000; }
+        .expire-notice { color: #990000; }
+        /* override pure form checkbox labels */
+        .pure-form-aligned .pure-control-group input + label {
+            width: auto;
+        }
+    </style>
+    <script defer src="/js/report.js"></script>
+    <script>
+        'use strict';
+
+        // use ajax to fill in name so that no special treatment is required within handlers
+
+        document.addEventListener('DOMContentLoaded', async function() {
+
+            // if we have no name on opening page, fetch a random one
+            if (document.querySelector('#generated-name').value == '') generateName();
+
+            if (document.querySelector('#existing-name').value.trim() != '') {
+                await verifyExistingName(document.querySelector('#existing-name').value);
+            }
+
+            // listener for 'get alternative' name button
+            document.querySelector('#get-alt-name').onclick = generateName;
+
+            // check entered existing name letter-by-letter
+            document.querySelector('#existing-name').oninput = async function() {
+                await verifyExistingName(this.value);
+            };
+
+        });
+
+        async function generateName() {
+            const headers = { Accept: 'application/json' };
+            const credentials = 'same-origin';
+            const response = await fetch('/ajax/report/test/names/new', { method: 'GET', headers, credentials });
+            const body = await response.json();
+            if (response.ok) {
+                document.querySelector('#generated-name').value = body.name;
+                document.querySelector('input[name=generated-name]').value = body.name;
+                //await verifyExistingName(body.name);
+            } else {
+                alert(body.message);
+            }
+        }
+
+        async function verifyExistingName(name) {
+            if (name.trim() == '') {
+                document.querySelector('#existing-name').setCustomValidity('');
+                document.querySelector('#name-ok').classList.add('hide');
+                document.querySelector('#name-nok').classList.add('hide');
+                document.querySelector('#generated-name').classList.remove('hide');
+                return;
+            }
+            const headers = { Accept: 'application/json' };
+            const credentials = 'same-origin';
+            const response = await fetch('/ajax/report/test/names/'+name, { method: 'GET', headers, credentials });
+            const body = await response.json();
+            switch (response.status) {
+                case 200: // name exists
+                    document.querySelector('#existing-name').setCustomValidity('');
+                    document.querySelector('#name-ok').classList.remove('hide');
+                    document.querySelector('#name-nok').classList.add('hide');
+                    document.querySelector('#generated-name').classList.add('hide');
+                    document.querySelector('#get-alt-name').classList.add('hide');
+                    break;
+                case 404: // name not found
+                    const err = 'Name not found';
+                    document.querySelector('#existing-name').setCustomValidity(err);
+                    document.querySelector('#name-ok').classList.add('hide');
+                    document.querySelector('#name-nok').classList.remove('hide');
+                    document.querySelector('#generated-name').classList.remove('hide');
+                    document.querySelector('#get-alt-name').classList.remove('hide');
+                    break;
+                default: // ?? eg 500?
+                    alert(response.body);
+                    break;
+            }
+        }
+    </script>
+    <script>
+        'use strict';
+
+        document.addEventListener('DOMContentLoaded', async function() {
+
+            document.querySelector('input[type=file]').onchange = cloneFileInput; // change handler for initial file input
+
+            function cloneFileInput(event) {
+                const fileInputs = document.querySelectorAll('input[type=file]');
+                const el = event.target;
+                // if we already have a 'no file chosen' input, don't clone another
+                for (var i of fileInputs) if (i.files.length==0) return;
+                // if same file has already been chosen, clear the filename & don't clone
+                const inputsWithThisName = [...fileInputs].filter(f => f.files[0].name==el.files[0].name)
+                if (inputsWithThisName.length > 1) { el.value = ''; return; }
+                const copy = el.cloneNode(true);
+                copy.onchange = cloneFileInput;
+                copy.value = '';
+                copy.id = 'document'+(fileInputs.length);
+                el.insertAdjacentElement('afterend', copy)
+            }
+        });
+    </script>
+</head>
+<body>
+
+<header>
+
+{{>navpartial}}
+
+</header>
+
+<main>
+
+<ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+<p class="expire-notice">{{expire}}</p>
+
+<form method="post" enctype="multipart/form-data" class="pure-form pure-form-aligned">
+
+    <h1>New Case Intake</h1>
+
+    <fieldset>
+        <legend>Person(s) seeking assistance</legend>
+        <ul>
+            <li class="pure-control-group">
+                <label for="name">Name
+                    <div>If offered</div>
+                </label>
+                <input type="text" name="name" id="name" value="{{name}}" autofocus class="w16">
+            </li>
+            <li class="pure-control-group">
+                {{#checked survivor-gender}}
+                <label>Gender</label>
+                <input type="radio" name="survivor-gender" id="survivor-gender-m" value="m"> <label for="survivor-gender-m">Male</label>
+                <input type="radio" name="survivor-gender" id="survivor-gender-f" value="f"> <label for="survivor-gender-f">Female</label>
+                {{/checked}}
+            </li>
+            <li class="pure-control-group">
+                <label for="survivor-age">Age
+                    <div class="note"></div></label>
+                <input type="number" name="survivor-age" id="survivor-age" value="{{survivor-age}}" class="w4">
+            </li>
+            <li class="pure-control-group">
+                <label for="employment">Employment</label>
+                <input type="text" name="employment" id="employment" value="{{employment}}" class="w16">
+            </li>
+        </ul>
+    </fieldset>
+
+    <fieldset>
+        <legend>Client</legend>
+        <ul>
+            <li class="pure-control-group">
+                <label for="client-contact">Contact information</label>
+                <input type="text" name="client-contact" id="client-contact" value="{{client-contact}}" class="w24">
+            </li>
+            <li class="pure-control-group">
+                <label for="assistance-sought-elsewhere">Has client sought assistance elsewhere?
+                    <div>If so, where?</div></label>
+                <input type="text" name="assistance-sought-elsewhere" id="assistance-sought-elsewhere" value="{{assistance-sought-elsewhere}}" class="w24">
+            </li>
+            <li class="pure-control-group">
+                <label for="problem-summary">Summary of problem</label>
+                <textarea name="problem-summary" id="problem-summary" class="w24">{{problem-summary}}</textarea>
+            </li>
+            <li class="pure-control-group">
+                <label for="desired-outcome">Goals / desired outcome</label>
+                <textarea tname="desired-outcome" id="desired-outcome" class="w24">{{desired-outcome}}</textarea>
+            </li>
+        </ul>
+    </fieldset>
+
+    <h2>Interview questions</h2>
+
+    <fieldset>
+        <legend>Victim</legend>
+        <ul>
+            <li class="pure-control-group">
+                <label>Auto-generated identifier name
+                    <div>Used to refer back to person seeking assistance in future</div></label>
+                <output id="generated-name">{{generated-name}}</output>
+                <button type="button" id="get-alt-name">get alternative name</button>
+                <input type="hidden" name="generated-name" value="{{generated-name}}">
+            </li>
+            <li class="pure-control-group">
+                <label for="existing-name">...or existing identifier name
+                    <div>If this person has previously submitted an incident report</div></label>
+                <input type="text" name="existing-name" id="existing-name" value="{{existing-name}}" autocomplete="off">
+                <span id="name-ok" title="name available" class="name-available hide">✓</span>
+                <span id="name-nok" title="name not available" class="name-available hide">✗</span>
+            </li>
+        </ul>
+    </fieldset>
+
+    <fieldset>
+        <legend>Event</legend>
+        <ul>
+            <li class="pure-control-group">
+                <label for="nature-of-assault">Nature of assault</label>
+                <input type="text" name="nature-of-assault" id="nature-of-assault" value="{{nature-of-assault}}" class="w24">
+            </li>
+            <li class="pure-control-group">
+                <label for="date">Date of event</label>
+                <input type="date" name="date" id="date" value="{{date}}" required>
+            </li>
+            <li class="pure-control-group">
+                <label for="time">Time of event</label>
+                <input type="time" name="time" id="time" value="{{time}}" required>
+            </li>
+            <li class="pure-control-group">
+                <label for="brief-description">Brief description of event</label>
+                <textarea name="brief-description" id="brief-description" cols="48" rows="8" required>{{brief-description}}</textarea>
+            </li>
+            <li class="pure-control-group">
+                <label for="location-address">Location address
+                    <div>In a form suitable for geocoding</div></label>
+                <input type="text" name="location-address" id="location-address" value="{{location-address}}" required class="w24">
+            </li>
+            <li class="pure-control-group">
+                <label for="location-description">Full description of location
+                    <div>To complement the geocoding address</div></label>
+                <textarea name="location-description" id="location-description" class="w24">{{location-description}}</textarea>
+            </li>
+        </ul>
+    </fieldset>
+
+    <fieldset>
+        <legend>Perpetrator(s)</legend>
+        <ul>
+            <li class="pure-control-group">
+                <label for="perpetrator-identity">Identity of perpetrator
+                    <div>If known – otherwise a brief description</div></label>
+                <input type="text" name="perpetrator-identity" id="perpetrator-identity" value="{{perpetrator-identity}}" class="w24">
+            </li>
+            <li class="pure-control-group">
+                <label for="perpetrator-relationship">Relationship with perpetrator</label>
+                <input type="text" name="perpetrator-relationship" id="perpetrator-relationship" value="{{perpetrator-relationship}}" class="w24">
+            </li>
+            <li class="pure-control-group">
+                <label for="perpetrator-age">Age of perpetrator
+                    <div>If known</div></label>
+                <input type="text" name="perpetrator-age" id="perpetrator-age" value="{{perpetrator-age}}" class="w24">
+            </li>
+            <li class="pure-control-group">
+                {{#checked perpetrator-gender}}
+                <label>Gender of perpetrator(s)</label>
+                <input type="radio" name="perpetrator-gender" id="perpetrator-gender-m" value="m"> <label for="perpetrator-gender-m">Male</label>
+                <input type="radio" name="perpetrator-gender" id="perpetrator-gender-f" value="f"> <label for="perpetrator-gender-f">Female</label>
+                {{/checked}}
+            </li>
+        </ul>
+    </fieldset>
+
+    <fieldset>
+        <legend>Action</legend>
+        <ul>
+            <li class="pure-control-group">
+                <label for="action-taken">Action taken so far</label>
+                <input type="text" name="action-taken" id="action-taken" value="{{action-taken}}" class="w24">
+            </li>
+            <li class="pure-control-group">
+                <label for="assistance-requested">Type of assistance requested/required</label>
+                <input type="text" name="assistance-requested" id="assistance-requested" value="{{assistance-requested}}" class="w24">
+            </li>
+        </ul>
+    </fieldset>
+
+    <h2>Photos / documents</h2>
+
+    <ul>
+        <li class="pure-control-group">
+            <label for="document0">Upload photos / videos / documents documenting the incident
+                {{#if files}}<span class="note">note: please reselect {{#each files}}{{this.name}}{{#unless @last}}, {{/unless}}{{/each}} if you wish to submit them</span>{{/if}}</label>
+            <input type="file" name="documents" value="0" id="document0">
+        </li>
+    </ul>
+
+    <ul>
+        <li class="nav">
+            <button type="submit" name="nav-next" value="next" accesskey="n" class="nav next pure-button pure-button-primary"><u>N</u>ext ⇒</button>
+        </li>
+    </ul>
+
+</form>
+
+</main>
+
+</body>
+</html>

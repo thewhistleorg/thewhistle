@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>User {{firstname}} {{lastname}} | The Whistle</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        a.tag { border: 1px solid #999999; border-radius: 8px; padding: 1px 4px; }
+        td { min-width: 2em; }
+    </style>
+</head>
+<body>
+
+<header>
+
+{{>navpartial}}
+
+</header>
+
+<main>
+
+<h1>{{firstname}} {{lastname}} (@{{username}})</h1>
+
+{{>errpartial}}
+
+<h2>Unassigned reports</h2>
+
+<table>
+    {{#reportsUnassigned}}
+    <tr><td><a href="/reports/{{_id}}">{{reported}}</a></td><td>@{{reportedBy}}</td><td>{{name}}</td><td>{{summary}}</td></tr>
+    {{/reportsUnassigned}}
+</table>
+
+<h2>Active reports</h2>
+
+<h3>{{firstname}}’s active reports</h3>
+<table>
+    {{#reportsUser}}
+    <tr><td><a href="/reports/{{_id}}">{{reported}}</a></td><td>@{{reportedBy}}</td><td>{{name}}</td><td>{{summary}}</td><td>{{newlyAssigned}}</td></tr>
+    {{/reportsUser}}
+</table>
+
+<h3>Tags in {{firstname}}’s reports</h3>
+    <div style="padding: 0 25px">
+        {{#tags}}
+        <a href="/reports?tag={{tagHref}}" class="tag">{{tag}}</a>
+        {{/tags}}
+    </div>
+
+<h3>Commentaries mentioning @{{username}}</h3>
+<table>
+    {{#reportsReferencingUser}}
+    <tr><td><a href="/reports/{{_id}}/commentary">{{reported}}</a></td><td>@{{reportedBy}}</td><td>{{name}}</td><td>{{summary}}</td><td>{{newlyMentioned}}</td></tr>
+    {{/reportsReferencingUser}}
+</table>
+
+<h3>Recent activity</h3>
+<table>
+    <tr>
+        <th>Update on</th>
+        <th class="grey">report</th>
+        <th class="grey">by</th>
+        <th class="grey">from</th>
+        <th class="grey">assigned to</th>
+        <th class="grey">summary</th>
+        <th>Update</th>
+    </tr>
+    {{#updates}}
+    <tr>
+        <td>{{onFull}}</td>
+        <td class="align-right"><a href="/reports/{{report._id}}" title="{{report.reportedOnFull}}">{{report.reportedOnDay}}</a></td>
+        <td class="grey">@{{report.reportedBy}}</td>
+        <td class="grey">{{report.name}}</td>
+        <td class="grey">{{#if report.assignedTo}}@{{report.assignedTo}}{{/if}}</td>
+        <td class="grey">{{report.summary}}</td>
+        <td>{{description}}</td>
+    </tr>
+    {{/updates}}
+</table>
+
+</main>
+
+</body>
+</html>

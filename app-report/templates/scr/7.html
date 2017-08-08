@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>The Whistle Eyewitness Report</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/scr.css">
+    <style>
+        .note { color: #999999; font-size: 90%; }
+        label { min-width: 12em; }
+        input + label { min-width: auto; }
+    </style>
+    <script defer src="/js/report.js"></script>
+</head>
+<body>
+
+<main>
+
+<table class="progress"><tr><td>TBC</td></tr></table>
+
+<h1>Survivor-centred response form</h1>
+<h2>Alleged perpetrator(s)</h2>
+
+<form method="post">
+    <ul>
+        {{#checked perpetrators-number}}
+        <li>
+            <label>Number of alleged perpetrator(s)</label>
+            <input type="radio" name="perpetrators-number" id="perpetrators-number-1" value="1" autofocus> <label for="perpetrators-number-1">1</label>
+            <input type="radio" name="perpetrators-number" id="perpetrators-number-2" value="2"> <label for="perpetrators-number-2">2</label>
+            <input type="radio" name="perpetrators-number" id="perpetrators-number-3" value="3"> <label for="perpetrators-number-3">3</label>
+            <input type="radio" name="perpetrators-number" id="perpetrators-number-4+" value="4+"> <label for="perpetrators-number-4+">More than 3</label>
+            <input type="radio" name="perpetrators-number" id="perpetrators-number-unknown" value="unknown"> <label for="perpetrators-number-unknown">Unknown</label>
+        </li>
+        {{/checked}}
+    </ul>
+    <ul>
+        {{#checked perpetrators-gender}}
+        <li>
+            <label>Gender of alleged perpetrator(s)</label>
+            <input type="radio" name="perpetrators-gender" id="perpetrators-gender-female" value="female"> <label for="perpetrators-gender-female">Male</label>
+            <input type="radio" name="perpetrators-gender" id="perpetrators-gender-male" value=male> <label for="perpetrators-gender-male">Male</label>
+            <input type="radio" name="perpetrators-gender" id="perpetrators-gender-both" value="both"> <label for="perpetrators-gender-both">Both</label>
+        </li>
+        {{/checked}}
+    </ul>
+    <ul>
+        {{#checked perpetrators-gender}}
+        <li>
+            <label>Age of alleged perpetrator(s)</label>
+            <input type="radio" name="perpetrators-age" id="perpetrators-age-adult" value="adult"> <label for="perpetrators-age-adult">Adult</label>
+            <input type="radio" name="perpetrators-age" id="perpetrators-age-minor" value=minor> <label for="perpetrators-age-minor">Minor</label>
+            <input type="radio" name="perpetrators-age" id="perpetrators-age-adult+minor" value="adult+minor"> <label for="perpetrators-age-adult+minor">Adult &amp; minor</label>
+        </li>
+        {{/checked}}
+    </ul>
+    <ul>
+        <li class="nav">
+            <button type="submit" name="nav-prev" value="prev" class="nav prev">⇐ Previous</button>
+            <button type="submit" name="nav-next" value="next" class="nav next">Next ⇒</button>
+        </li>
+    </ul>
+</form>
+
+
+</main>
+
+</body>
+</html>

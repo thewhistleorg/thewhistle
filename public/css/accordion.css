@@ -1,0 +1,37 @@
+ul.accordion {
+    list-style: none;
+    padding-left: 0;
+}
+ul.accordion li {
+    margin-bottom: 1px;
+    width: 100%;
+}
+ul.accordion input {
+    display: none;
+}
+ul.accordion label {
+    color: #ffffff;
+    position: relative;
+    display: block;
+    padding-left: 1em;
+    background: #406591;
+    line-height: 2;
+    cursor: pointer;
+}
+ul.accordion input + label ~ * {
+    display: none;
+    transition: all .35s;
+}
+ul.accordion input:checked ~ * {
+    display: inherit;
+    transition: all .35s;
+}
+ul.accordion label::after {
+    content: "\25BC"; /* ▼ */
+    position: absolute;
+    right: 0;
+    margin-right: 1em;
+}
+ul.accordion input:checked + label::after {
+    transform: rotateX(180deg);
+}

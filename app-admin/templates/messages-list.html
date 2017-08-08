@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Messages</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        td, th { padding: 0.2em 0.4em 0 0; }
+        label { width: auto; }
+        .notes { color: #999999; font-size: 80%; }
+    </style>
+    <script>
+        'use strict';
+        document.addEventListener('DOMContentLoaded', async function() {
+
+            setInterval(async function() {
+                const headers = { Accept: 'application/json' };
+                const credentials = 'same-origin';
+                const response = await fetch('/ajax/messages/latest-timestamp', { method: 'GET', headers, credentials });
+                const body = await response.json();
+                if (response.ok) {
+                    if (body.latest.timestamp > {{latest}}) window.location.reload();
+                } else {
+                    alert(body.message);
+                }
+            }, 5000);
+
+        });
+    </script>
+</head>
+<body>
+
+<header>
+{{>navpartial}}
+</header>
+
+<main>
+
+<h1>Messages{{h1}}</h1>
+
+{{>errpartial}}
+
+<p>This page lists messages sent to 01702 683045.</p>
+
+{{#if messages}}
+{{#unless filtered}}
+<p>To reply to a message, click the sender phone number. This will restrict the list to messages
+    from that number, and provide a field to type a response in.</p>
+{{/unless}}
+{{/if}}
+
+<table>
+    {{#messages}}
+    <tr id="{{MessageSid}}">
+        <td>{{timestampIso}}</a></td>
+        <td>{{dirn}}</a></td>
+        <td><a href="?number={{fromEscaped}}">{{fromFormatted}}</a></td>
+        <td>{{Body}}</a></td>
+    </tr>
+    {{/messages}}
+</table>
+
+{{#if filtered}}
+<form method="post" class="pure-form pure-form-aligned">
+    <label for="message">Send message</label>
+    <input name="message" id="message" required class="w36">
+    <button type="submit" class="pure-button pure-button-primary">Send</button>
+</form>
+{{/if}}
+
+<p class="notes">Possible developments</p>
+<ul class="notes">
+    <li>group messages from single sender by topic (esp withheld number!)</li>
+    <li>group messages from multiple senders by topic</li>
+    <li>hierarchy of administrative user permissions?</li>
+    <li>grant visibility to external agents (e.g. NGOs)</li>
+    <li>generate publicly available synthetic reports</li>
+    <li>facilitate replies/responses (advice, resources)</li>
+    <li>internationalisation/localisation features</li>
+    <li>static (CMS) parts of website for advice, resources</li>
+    <li>Facebook Messenger / iMessage / Snapchat as sources?</li>
+</ul>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Activity (general) | The Whistle</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/accordion.css">
+    <link rel="stylesheet" href="/css/activity.css">
+    <script src="/js/reports.js"></script>
+    <script>
+        'use strict';
+        document.addEventListener('DOMContentLoaded', async function() {
+
+            setInterval(async function refreshListOfReports() {
+                const headers = { Accept: 'application/json' };
+                const credentials = 'same-origin';
+                try {
+                    const response = await fetch('/ajax/dashboard/reports/latest-timestamp', { method: 'GET', headers, credentials });
+                    const body = await response.json();
+                    if (response.ok) {
+                        if (body.latest.timestamp > '{{latest}}') window.location.reload();
+                    } else {
+                        document.querySelector('#notification').textContent = body.message;
+                    }
+                } catch (e) {
+                    document.querySelector('#notification').textContent = e.message;
+                }
+            }, 5e3);
+
+        });
+    </script>
+</head>
+<body>
+
+<header>
+
+{{>navpartial}}
+
+</header>
+
+<main class="activity-page">
+
+<h1>Activity</h1>
+
+<div id="notification"></div>
+
+{{>errpartial}}
+
+<nav class="tabs">
+    <ul>
+        <li><a href="/dashboard/{{username}}">@{{username}}</a></li>
+        <li class="active"><a href="/dashboard/*">general</a></li>
+    </ul>
+</nav>
+
+<ul class="accordion">
+    <li class="width-100">
+        <input id="unassigned-reports" type="radio" name="new-events" checked>
+        <label for="unassigned-reports" title="reports needing to be assigned">Unassigned reports</label>
+        <table>
+            <tr>
+                <th class="align-right">submitted</th>
+                <th>by</th>
+                <th>name</th>
+                <th>summary</th>
+                <th></th>
+            </tr>
+            {{#reportsUnassigned}}
+            <tr>
+                <td class="align-right" title="{{reportedFull}}">{{reportedPretty}}</td>
+                <td>{{reportedBy}}</td>
+                <td>{{name}}</td>
+                <td>{{summary}}</td>
+                <td><a href="/reports/{{_id}}" title="view report" class="fa fa-search"></a></td>
+            </tr>
+            {{/reportsUnassigned}}
+        </table>
+    </li>
+    <li class="width-100">
+        <input id="recent-activity" type="radio" name="new-events">
+        <label for="recent-activity" title="Recent activity across the full team">Recent activity</label>
+        <table>
+            <tr>
+                <th>Update</th>
+                <th>by</th>
+                <th class="grey align-right">submitted</th>
+                <th class="grey">assigned to</th>
+                <th class="grey">summary</th>
+                <th>Description</th>
+            </tr>
+            {{#updates}}
+            <tr>
+                <td class="align-right" title="{{updatedFull}}">{{updatedAgo}}</td>
+                <td>{{by}}</td>
+                <td class="grey align-right" title="{{report.reportedFull}}">{{report.reportedPretty}}</td>
+                <td class="grey">{{report.assignedTo}}</td>
+                <td class="grey">{{report.summary}}</td>
+                <td>{{description}}</td>
+                <td><a href="/reports/{{report._id}}" title="view report" class="fa fa-search"></a></td>
+            </tr>
+            {{/updates}}
+        </table>
+    </li>
+</ul>
+
+</main>
+
+</body>
+</html>

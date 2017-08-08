@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            color: #333333;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            font-size: 40%;  /* !! - phantomjs? */
+            line-height: 1.6;
+            margin: 8em;
+        }
+        table {
+            border-collapse: collapse;
+            border-spacing: 0 0;
+        }
+        td, th {
+            border: none !important;
+            vertical-align: top;
+        }
+        th {
+            text-align: left;
+            font-style: italic;
+            font-weight: normal;
+        }
+        h2 {
+            padding-top: 2em;
+        }
+        .nowrap {
+            white-space: nowrap;
+        }
+        .align-right {
+            text-align: right;
+        }
+        span.tag, a.tag {
+            background: #ffffff;
+            border: 1px solid #ebebeb;
+            border-radius: 8px;
+            padding: 0 4px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<main>
+
+<h1>The Whistle submitted incident report</h1>
+
+<p>As at {{nowFull}}.</p>
+
+{{#reports}}
+
+<h2>{{reportedDate}} {{reportedTime}} {{summaryQuoted}}</h2>
+
+{{#if geocode}}
+<div>{{geocode.formattedAddress}}</div>
+{{/if}}
+
+<h3>Administrative details</h3>
+<table class="metadata">
+    <tr><th>Assigned to:</th><td>{{assignedTo}}</td></tr>
+    <tr><th>Last update:</th><td>{{updatedDate}} {{updatedTime}} {{updatedBy}}</td></tr>
+    <tr><th>Status:</th><td>{{status}}</td></tr>
+    <tr><th>Tags:</th><td>{{#tags}}{{{this}}} {{/tags}}</td></tr>
+</table>
+
+<h3>Submitted incident report</h3>
+{{{reportHtml}}}
+
+{{#if comments.length}}
+<h3>Commentary</h3>
+<table class="commentary">
+    {{#comments}}
+    <tr>
+        <td class="align-right nowrap"><p>{{onDate}}</p></td>
+        <td class="nowrap"><p>{{onTime}}</p></td>
+        <td class="nowrap"><p>{{byName}}</p></td>
+        <td>{{{comment}}}</td>
+    </tr>
+    {{/comments}}
+</table>
+{{/if}}
+
+{{/reports}}
+
+</main>
+
+</body>
+</html>

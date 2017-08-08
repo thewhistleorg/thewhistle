@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>The Whistle / Global Rights Nigeria Incident Report | Survivor</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/grn.css">
+    <style>
+    </style>
+    <script defer src="/js/report.js"></script>
+</head>
+<body>
+
+<header>
+    <nav class="pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"><img src="../img/logo-32.png"></li>
+            <li class="pure-menu-item">The Whistle | Global Rights Nigeria Incident Report</li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+<table class="progress"><tr><td>p{{p}}/{{n}}</td></tr></table>
+
+<h1>Survivor</h1>
+
+<ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+
+<form method="post" class="pure-form pure-form-aligned">
+    <ul>
+        <li>
+            <label for="survivor-age">Your age</label>
+            <input type="number" name="survivor-age" id="survivor-age" value="{{survivor-age}}" autofocus>
+        </li>
+        <ul>
+            {{#checked survivor-gender}}
+            <li>
+                <label>Your gender</label>
+                <input type="radio" name="survivor-gender" id="survivor-gender-m" value="m"> <label for="survivor-gender-m">Male</label>
+                <input type="radio" name="survivor-gender" id="survivor-gender-f" value="f"> <label for="survivor-gender-f">Female</label>
+
+            </li>
+            {{/checked}}
+        </ul>
+        <li class="nav">
+            <button type="submit" name="nav-prev" value="prev" accesskey="p" class="nav prev">⇐ <u>P</u>revious</button>
+            <button type="submit" name="nav-next" value="next" accesskey="n" class="nav next"><u>N</u>ext ⇒</button>
+        </li>
+    </ul>
+</form>
+
+</main>
+
+</body>
+</html>

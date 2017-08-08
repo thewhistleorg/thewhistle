@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Rape crisis centres | The Whistle</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        form { margin: 0; }
+        td, th { min-width: 1em; }
+        button.fa-trash { background: none; border: none; color: #990000; padding: 1px; }
+        button.fa-trash:hover { cursor: pointer; }
+        #map { margin-top: 4em; height: 400px; width: 100%; }
+    </style>
+    <script src="//maps.googleapis.com/maps/api/js?callback=initMap&key=AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw" defer></script>
+    <script>
+        'use strict';
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // show/hide delete button on hover over centre tr
+            document.querySelectorAll('tr.centre').forEach(tr => tr.onmouseenter = async function showDeleteButton() {
+                this.querySelector('button').classList.remove('hide');
+                this.querySelector('a').classList.remove('hide');
+            });
+            document.querySelectorAll('tr.centre').forEach(tr => tr.onmouseleave = async function hideDeleteButton() {
+                this.querySelector('button').classList.add('hide');
+                this.querySelector('a').classList.add('hide');
+            });
+
+            // report deletion confirmation pop-up
+            document.querySelectorAll('form.delete').forEach(form => form.onsubmit = function confirmDelete() {
+                return confirm('Are you sure you want to delete this centre?');
+            });
+
+        });
+    </script>
+    <script>
+        'use strict';
+        const centres = [
+            {{#each centres}}
+            { centreId: '{{_id}}', lat: {{lat}}, lng: {{lon}}, name: '{{name}}' },
+            {{/each}}
+        ];
+        function initMap() {
+
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 20,
+                center: { lat: 0, lng: 0 }
+            });
+
+            const markers = centres.map(function(centre, i) {
+                const m = new google.maps.Marker({
+                    position: centre,
+                    icon:     '/map-marker/red/100',
+                    label:    centre.name,
+                    map:      map,
+                });
+                return m;
+            });
+            const bounds = new google.maps.LatLngBounds();
+            for (const m of markers) bounds.extend(m.getPosition());
+            map.initialZoom = true;
+            map.fitBounds(bounds);
+        }
+
+    </script>
+</head>
+<body>
+
+<header>
+
+{{>navpartial}}
+
+</header>
+
+<main>
+
+<h1>Rape crisis centres</h1>
+
+{{>errpartial}}
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+        <th></th>
+        <th><a href="/centres/add" title="Add new centre" class="fa fa-plus green"></a></th>
+    </tr>
+    {{#centres}}
+    <tr id="{{_id}}" class="centre">
+        <td>{{name}}</td>
+        <td>{{description}}</td>
+        <td class="align-right">{{lat}}</td>
+        <td class="align-right">{{lon}}</td>
+        <td><a href="/centres/{{_id}}/edit" title="Edit centre" class="fa fa-pencil grey hide"></a></td>
+        <td><form action="/centres/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" title="Delete centre" class="fa fa-trash hide"></button></form></td>
+    </tr>
+    {{/centres}}
+</table>
+
+<div id="map"></div>
+
+</main>
+
+</body>
+</html>

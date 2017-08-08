@@ -1,0 +1,33 @@
+{{#if @koa.state.user}}
+<nav class="pure-menu pure-menu-horizontal">
+    <ul class="pure-menu-list">
+        <li class="pure-menu-item"><a href="/" class="pure-menu-link logo-container"></a></li>
+        <li class="pure-menu-item"><a href="/reports" class="pure-menu-link">reports</a></li>
+        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+            <a href="#" class="pure-menu-link">analysis</a>
+            <ul class="pure-menu-children">
+                <li class="pure-menu-item"><a href="#" class="pure-menu-link">TBC</a></li>
+            </ul>
+        </li>
+        {{#if @koa.state.user.isAdmin}}
+        <li class="pure-menu-item"><a href="/users" class="pure-menu-link">users</a></li>
+        <li class="pure-menu-item"><a href="/centres" class="pure-menu-link">resources</a></li>
+        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+            <a href="#" class="pure-menu-link">notes</a>
+            <ul class="pure-menu-children">
+                <li class="pure-menu-item"><a href="/readme" class="pure-menu-link">readme</a></li>
+                <li class="pure-menu-item"><a href="/notes" class="pure-menu-link">developer notes</a></li>
+            </ul>
+        </li>
+        {{/if}}
+        <li class="pure-menu-item"><a href="/logout" class="pure-menu-link">logout</a></li>
+    </ul>
+</nav>
+{{else}}
+<nav class="pure-menu pure-menu-horizontal">
+    <ul class="pure-menu-list">
+        <li class="pure-menu-item"><a href="/" class="pure-menu-link logo-container"></a></li>
+        <li class="pure-menu-item"><a href="/login" class="pure-menu-link">login</a></li>
+    </ul>
+</nav>
+{{/if}}

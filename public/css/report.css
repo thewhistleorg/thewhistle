@@ -1,0 +1,74 @@
+
+/* list of reports */
+
+table {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  min-width: 400px;
+}
+
+td, th {
+  border: 1px solid #eeeeee;
+  min-width: 2em;
+  padding: 0.2em 0.4em;
+}
+
+td form {
+  margin: 0;
+}
+
+td a.fa-stack-text {
+  color: #999999;
+}
+
+th span[data-sort] {
+  color: #cccccc;
+  padding-left: 0.4em;
+  padding-top: 0.5ex;
+  vertical-align: bottom;
+}
+
+
+/* TODO: probably won't want to keep delete function on this page, but useful for testing */
+
+button.fa-trash {
+  background: none;
+  border: none;
+  color: #990000;
+}
+
+button.fa-trash:hover {
+  cursor: pointer;
+}
+
+td.action, th.action {
+  border: none;
+}
+
+td.assigned, span.tag {
+  color: #406591;
+  cursor: pointer;
+}
+
+
+/* map */
+
+#map {
+  height: 400px;
+  width: 100%;
+}
+
+
+/* TODO: probably won't want to keep delete function on this page, but useful for testing */
+
+/*submission date UI fix - workaround
+TODO:this much be handled properly */
+
+.tooltip.tooltip-main.top {
+    margin-top: -28px;
+    background: #fff;
+    border: 1px solid #ebebeb;
+    font-size: 1.2em;
+    padding: 0px 17px;
+    margin-left: 0px!important;
+}

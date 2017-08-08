@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>{{reportDescription}}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        h1 { border-bottom: none; }
+        #map { height: 400px; width: 400px; }
+        p.note { color: #999999; font-size: 80%; }
+    </style>
+    <script src="//maps.googleapis.com/maps/api/js?callback=initMap&key=AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw" defer></script>
+    <script>
+        const reports = {
+            '{{_id}}': { lat: {{lat}}, lng: {{lng}}, date: '{{reportedOnDay}}', highlight: {{highlight}}, name: '{{name}}' },
+        };
+        function initMap() {
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom:   14,
+                center: { lat: {{lat}}, lng: {{lng}} }
+            });
+            map.greatestExtent = new google.maps.LatLngBounds(map.getCenter(), map.getCenter());
+            const marker = new google.maps.Marker({
+                position: { lat: {{lat}}, lng: {{lng}} },
+                icon:     '/map-marker/red/{{highlight}}',
+                label:    '{{name}}',
+                title:    '{{reportedOnFull}}', // TODO: use info window for status, etc
+                url:      '/reports/{{_id}}',
+                map:      map,
+            });
+
+            google.maps.event.addListener(map, 'idle', async function() {
+                // no need to fetch new reports if we haven't extended bounds beyond previous extent
+                const bounds = new google.maps.LatLngBounds(map.greatestExtent.getSouthWest(), map.greatestExtent.getNorthEast());
+                const newBounds = map.getBounds();
+                const sw = newBounds.getSouthWest();
+                const ne = newBounds.getNorthEast();
+                bounds.extend(sw).extend(ne);
+                if (bounds.equals(map.greatestExtent)) return; // still within previously checked bounds
+                map.greatestExtent = bounds;
+
+                try {
+                    const headers = { Accept: 'application/json' };
+                    const credentials = 'same-origin';
+                    const url = `/ajax/reports/within/${sw.lat()},${sw.lng()}:${ne.lat()},${ne.lng()}`;
+                    const response = await fetch(url, { method: 'GET', headers, credentials });
+                    const body = await response.json();
+                    if (response.ok) {
+                        for (const report of body.reports) {
+                            if (reports[report._id] == undefined) {
+                                reports[report._id] = report;
+                                const marker = new google.maps.Marker({
+                                    position: { lat: report.lat, lng: report.lng },
+                                    icon:     '/map-marker/blue/'+report.highlight,
+                                    title:    report.reported + ' ' + report.name + ' ' + report.summary, // TODO: use info window for status, etc?
+                                    url:      '/reports/'+report._id+'/location',
+                                    map:      map,
+                                });
+                                google.maps.event.addListener(marker, 'click', function() {
+                                    window.location.href = marker.url;
+                                });
+                            }
+                        }
+                    } else {
+                        alert(body.message);
+                    }
+                } catch (e) {
+                    alert(e.message);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+
+<header>
+{{>navpartial}}
+</header>
+
+<main>
+
+<div class="export float-right">
+    <span>Export: PDF </span>
+    <a href="{{exportPdf}}" title="Save as PDF" class="fa fa-file-pdf-o"></a>
+</div>
+
+<h1>{{reportDescription}}</h1>
+
+<nav class="tabs">
+    <ul>
+        <li><a href="/reports/{{_id}}">Metadata</a></li>
+        <li><a href="/reports/{{_id}}/submission">Submission</a></li>
+        <li><a href="/reports/{{_id}}/files" {{#unless files}}class="disabled"{{/unless}}>Documents</a></li>
+        <li><a href="/reports/{{_id}}/commentary">Commentary</a></li>
+        <li class="active"><a href="/reports/{{_id}}/location">Location</a></li>
+    </ul>
+</nav>
+<div class="tab-content">
+  {{>errpartial}}
+
+  <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p>
+
+  <div id="map"></div>
+
+  <h2>Geocoding <a href="https://maps.google.com/maps/search/{{formattedAddress}}" class="fa fa-globe"></a></h2>
+  {{{geocodeHtml}}}
+</div>
+</main>
+
+</body>
+</html>

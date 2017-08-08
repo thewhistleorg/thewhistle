@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>{{reportDescription}}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        h1 { border-bottom: none; }
+        button { background: none; border: none; padding: 4px; }
+    </style>
+    <script> /* auto-submit on change to summary/assigned/status/archive */
+        'use strict';
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('#summary').onchange = function submitSummary() {
+                this.form.submit();
+            };
+            document.querySelector('#assigned-to').onchange = function submitAssignedTo() {
+                this.form.submit();
+            };
+            document.querySelector('#status').onchange = function submitStatus() {
+                // TODO: trigger interactive validation? pattern="(?!\*)" seems to prevent datalist...
+                this.form.submit();
+            };
+            document.querySelectorAll('[name=archived]').forEach(el => el.onchange = function submitArchived() {
+                this.form.submit();
+            });
+        });
+    </script>
+    <script> /* tags */
+        'use strict';
+        document.addEventListener('DOMContentLoaded', function() {
+            const credentials = 'same-origin';
+
+            document.querySelector('#tag-add').onclick = openTagInputs;
+            document.querySelector('#tag-save').onclick = saveTag;
+            document.querySelector('#tag-cancel').onclick = cancelEntry;
+            document.querySelectorAll('.tag-del').forEach(el => el.onclick = deleteTag);
+            window.onkeydown = function(event) { if (event.key == 'Escape') cancelEntry() };
+
+            function openTagInputs() {
+                document.querySelector('#tag-add').classList.add('hide');
+                document.querySelector('#new-tag').classList.remove('hide');
+                document.querySelector('#tag').focus();
+            }
+
+            async function saveTag() {
+                const newTagDiv = document.querySelector('#new-tag');
+                const tag = newTagDiv.querySelector('#tag').value.toLowerCase();
+                if (tag == '') {
+                    document.querySelector('#tag-add').classList.remove('hide');
+                    document.querySelector('#new-tag').classList.add('hide');
+                    return;
+                }
+
+                const values = JSON.stringify({ tag: tag });
+                const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+                const response = await fetch('/ajax/reports/{{_id}}/tags', { method: 'POST', body: values, headers, credentials });
+                const body = await response.json();
+                if (response.ok) {
+                    // create new tag span
+                    const tagDelBtn = '<button title="remove tag" class="tag-del hide fa fa-trash red"></button>';
+                    const newTag = document.createElement('span');
+                    newTag.classList.add('tag');
+                    newTag.innerHTML = `${tag} ${tagDelBtn}`;
+                    newTag.onmouseenter = function() { this.querySelector('button').classList.remove('hide'); };
+                    newTag.onmouseleave = function() { this.querySelector('button').classList.add('hide'); };
+                    newTag.querySelector('button').onclick = deleteTag;
+                    // and add it into document before 'add-tag' button
+                    const addTagBtn = document.querySelector('#tag-add');
+                    addTagBtn.parentNode.insertBefore(newTag, addTagBtn);
+                    newTagDiv.querySelector('#tag').value = ''; // reset input
+                    document.querySelector('#tag-add').classList.remove('hide');
+                    document.querySelector('#new-tag').classList.add('hide');
+                } else {
+                    alert(response.status+': '+body.message);
+                }
+            }
+
+            async function deleteTag() {
+                const tagSpan = this.closest('span');
+                const tag = encodeURIComponent(tagSpan.textContent.replace(/ $/, ''));
+                const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+                const response = await fetch('/ajax/reports/{{_id}}/tags/'+tag, { method: 'DELETE', headers, credentials });
+                const body = await response.json();
+                if (response.ok) {
+                    tagSpan.remove();
+                } else {
+                    alert(body.message);
+                }
+            }
+
+            function cancelEntry(event) {
+                document.querySelector('#tag').value = '';
+                document.querySelector('#new-tag').classList.add('hide');
+                document.querySelector('#tag-add').classList.remove('hide');
+            }
+
+            document.querySelectorAll('span.tag').forEach(span => span.onmouseenter = function showDeleteButton() {
+                this.querySelector('button').classList.remove('hide');
+            });
+            document.querySelectorAll('span.tag').forEach(span => span.onmouseleave = function hideDeleteButton() {
+                this.querySelector('button').classList.add('hide');
+            });
+        });
+    </script>
+</head>
+<body>
+
+<header>
+{{>navpartial}}
+</header>
+
+<main>
+
+<div class="export float-right">
+    <span>Export: PDF </span>
+    <a href="{{exportPdf}}" title="Save as PDF" class="fa fa-file-pdf-o"></a>
+</div>
+
+<h1>{{reportDescription}}</h1>
+
+<nav class="tabs">
+    <ul>
+        <li class="active"><a href="/reports/{{_id}}">Metadata</a></li>
+        <li><a href="/reports/{{_id}}/submission">Submission</a></li>
+        <li><a href="/reports/{{_id}}/files" {{#unless files}}class="disabled"{{/unless}}>Documents</a></li>
+        <li><a href="/reports/{{_id}}/commentary">Commentary</a></li>
+        <li><a href="/reports/{{_id}}/location">Location</a></li>
+    </ul>
+</nav>
+<div class="tab-content">
+
+  {{>errpartial}}
+  <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p>
+
+  <form method="post" class="pure-form pure-form-aligned">
+      <div class="pure-control-group">
+          <label for="summary">Summary</label>
+          <input name="summary" id="summary" value="{{summary}}" class="w24">
+      </div>
+  </form>
+
+  <form method="post" class="pure-form pure-form-aligned">
+      <div class="pure-control-group">
+          <label for="assigned-to">Assigned to:</label>
+          <select name="assigned-to" id="assigned-to">
+              {{#selected assignedTo}}
+              <option value="">&nbsp;</option>
+              {{#users}}
+              <option value="{{_id}}">{{firstname}} {{lastname}}</option>
+              {{/users}}
+              {{/selected}}
+          </select>
+      </div>
+  </form>
+
+  <form method="post" class="pure-form pure-form-aligned">
+      <div class="pure-control-group">
+          <label for="status" title="any status values can be used to suit your workflow">Status:</label>
+          <input name="status" id="status" value="{{status}}" list="statuses">
+          <datalist id="statuses">
+              {{#statuses}}
+              <option>{{this}}</option>
+              {{/statuses}}
+          </datalist>
+      </div>
+  </form>
+
+  <form method="post" class="pure-form pure-form-aligned">
+      <div class="pure-control-group">
+          {{#checked archived}}
+          <label>Archive</label>
+          <input type="radio" name="archived" id="archived-n" value="n"> <label for="archived-n">Active</label>
+          <input type="radio" name="archived" id="archived-y" value="y"> <label for="archived-y">Archived</label>
+          {{/checked}}
+      </div>
+  </form>
+
+  <div id="tag-list">Tags:
+      {{#tags}}
+      <span class="tag">{{this}} <button title="remove tag" class="tag-del hide fa fa-trash red"></button></span>
+      {{/tags}}
+      <button id="tag-add" title="add tag" class="fa fa-plus green"></button></div>
+  <div id="new-tag" class="hide">
+      <span class="grey">#</span><input name="tag" id="tag" list="tags" placeholder="enter tag">
+      <button id="tag-save" title="add tag" class="fa fa-check green"></button>
+      <button id="tag-cancel" title="cancel" class="fa fa-times red"></button>
+  </div>
+  <datalist id="tags">
+      {{#tagList}}
+      <option value="{{this}}">
+      {{/tagList}}
+  </datalist>
+
+      {{#if otherReports}}
+  <p>Other reports by {{by}}:</p>
+  <table>
+      {{#otherReports}}
+      <tr><td></td><td><a href="/reports/{{_id}}">{{reported}}</a></td><td>{{name}}</td><td>{{summary}}</td></tr>
+      {{/otherReports}}
+  </table>
+  {{/if}}
+
+  <p><i>The contents of the incident report will vary according to the organisation/project the report
+      is submitted for.</i></p>
+
+  <h2>Audit trail</h2>
+
+  <table id="updates">
+      {{#updates}}
+      <tr id="{{_id}}">
+          <td>{{onFull}}</td>
+          <td>@{{by}}</td>
+          <td>{{description}}</td>
+      </tr>
+      {{/updates}}
+  </table>
+</div>
+</main>
+
+</body>
+</html>

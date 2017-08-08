@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>The Whistle / Global Rights Nigeria Incident Report | Report Submitted</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        #map { margin-top: 4em; height: 400px; width: 100%; }
+    </style>
+    <script src="//maps.googleapis.com/maps/api/js?callback=initMap&key=AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw" defer></script>
+    <script defer src="/js/report.js"></script>
+    <script>
+        'use strict';
+        const report = { lat: {{report.lat}}, lng: {{report.lon}} };
+        const centres = [
+            {{#each centres}}
+            { centreId: '{{_id}}', lat: {{location.coordinates.[1]}}, lng: {{location.coordinates.[0]}}, name: '{{name}}' },
+            {{/each}}
+        ];
+        function initMap() {
+
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 20,
+                center: { lat: 0, lng: 0 }
+            });
+
+            const markers = centres.map(function(centre, i) {
+                const m = new google.maps.Marker({
+                    position: centre,
+                    icon:     '/map-marker/blue/100',
+                    label:    centre.name,
+                    map:      map,
+                });
+                return m;
+            });
+            markers.push(new google.maps.Marker({
+                    position: report,
+                    icon:     '/map-marker/red/100',
+                    map:      map,
+                }))
+            const bounds = new google.maps.LatLngBounds();
+            for (const m of markers) bounds.extend(m.getPosition());
+            map.initialZoom = true;
+            map.fitBounds(bounds);
+        }
+
+    </script>
+</head>
+<body>
+
+<header>
+
+{{>navpartial}}
+
+</header>
+
+<main>
+
+<h1>Report Submitted</h1>
+
+{{>errpartial}}
+
+<p>This page will have information about support which may be available, including support centres
+    close to the location of the reported incident.</p>
+
+<h2>Rape crisis centres</h2>
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Distance</th>
+    </tr>
+    {{#centres}}
+    <tr id="{{_id}}" class="centre">
+        <td>{{name}}</td>
+        <td>{{description}}</td>
+        <td class="align-right">{{distance}} km</td>
+    </tr>
+    {{/centres}}
+</table>
+
+<div id="map"></div>
+
+</main>
+
+</body>
+</html>

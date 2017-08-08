@@ -1,0 +1,154 @@
+{
+  "name": "thewhistle",
+  "description": "The Whistle prototype",
+  "author": "Chris Veness",
+  "license": "Proprietory",
+  "version": "0.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "forever --minUptime 1000 --spinSleepTime 1000 app.js",
+    "start-dev": "nodemon -e js,json,html --ignore db/reports.json --ignore static/report-docs/ app.js",
+    "start-devtools": "nodemon --inspect -e js,json,html app.js",
+    "test": "mocha test/*.js",
+    "lint": "eslint --ignore-pattern app-api/apidoc .",
+    "cover": "istanbul cover node_modules/.bin/_mocha test/",
+    "apidoc": "apidoc -i app-api -o app-api/apidoc/apidoc"
+  },
+  "engines": {
+    "node": "^8.1.2"
+  },
+  "dependencies": {
+    "bunyan": "^1.8.9",
+    "child-process-promise": "^2.2.0",
+    "chrono-node": "^1.3.5",
+    "dateformat": "^2.0.0",
+    "debug": "^2.6.1",
+    "dotenv": "^4.0.0",
+    "forever": "^0.15.3",
+    "fs-extra": "^4.0.1",
+    "google-libphonenumber": "^3.0.0",
+    "handlebars": "^4.0.8",
+    "html-pdf": "^2.1.0",
+    "html-to-text": "^3.2.0",
+    "isemail": "^3.0.0",
+    "jimp": "^0.2.27",
+    "js-yaml": "^3.8.2",
+    "jsdom": "^11.0.0",
+    "json2csv": "^3.7.3",
+    "jsonwebtoken": "^7.3.0",
+    "koa": "^2.0.1",
+    "koa-body": "^2.1.0",
+    "koa-bunyan": "^1.0.0",
+    "koa-compose": "^4.0.0",
+    "koa-compress": "^2.0.0",
+    "koa-convert": "^1.2.0",
+    "koa-flash": "^1.0.0",
+    "koa-handlebars": "^2.0.0",
+    "koa-lusca": "^2.2.0",
+    "koa-router": "^7.0.1",
+    "koa-send": "^4.0.0",
+    "koa-session": "^5.2.0",
+    "koa-static": "^4.0.1",
+    "markdown-it": "^8.3.0",
+    "markdown-it-anchor": "^4.0.0",
+    "mongodb": "^2.2.28",
+    "mv": "^2.1.1",
+    "mz": "^2.6.0",
+    "node-fetch": "^1.7.2",
+    "node-geocoder": "^3.16.0",
+    "nodejs-info": "^1.0.1",
+    "nodemailer": "^4.0.1",
+    "scrypt": "^6.0.3",
+    "slug": "^0.9.1",
+    "twilio": "^3.6.1",
+    "useragent": "^2.1.13",
+    "xmldom": "^0.1.27",
+    "xmlify": "^1.1.0"
+  },
+  "devDependencies": {
+    "apidoc": "^0.17.5",
+    "base-64": "^0.1.0",
+    "chai": "^4.0.2",
+    "eslint": "^4.0.0",
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^3.2.0",
+    "nodemon": "^1.11.0",
+    "npm-check": "^5.4.0",
+    "npm-check-updates": "^2.11.3",
+    "supertest": "^3.0.0"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": true,
+      "mocha": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2017
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+      "array-bracket-spacing": [
+        "error",
+        "always",
+        {
+          "singleValue": false
+        }
+      ],
+      "comma-dangle": [
+        "error",
+        "always-multiline"
+      ],
+      "curly": [
+        "error",
+        "multi-line"
+      ],
+      "indent": [
+        "error",
+        4,
+        {
+          "SwitchCase": 1
+        }
+      ],
+      "key-spacing": [
+        "error",
+        {
+          "align": "value"
+        }
+      ],
+      "no-case-declarations": "off",
+      "no-console": [
+        "warn",
+        {
+          "allow": [
+            "error",
+            "info"
+          ]
+        }
+      ],
+      "no-redeclare": "warn",
+      "no-shadow": "warn",
+      "no-unused-vars": "warn",
+      "no-var": "error",
+      "object-curly-spacing": [
+        "error",
+        "always"
+      ],
+      "prefer-const": "error",
+      "quotes": [
+        "error",
+        "single",
+        "avoid-escape"
+      ],
+      "require-await": "error",
+      "semi": [
+        "error",
+        "always"
+      ],
+      "strict": [
+        "error",
+        "global"
+      ]
+    }
+  }
+}

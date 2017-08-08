@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>The Whistle Eyewitness Report</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/wwww.css">
+    <style>
+    </style>
+    <script defer src="/js/report.js"></script>
+</head>
+<body>
+
+<main>
+
+<table class="progress"><tr><td>What</td><td class="current">Where</td><td>When</td><td>Who</td><td>Submit</td></tr></table>
+
+<h1>Where</h1>
+
+
+<p><i>Knowing where the incident happened allows us to cross-reference your report with other
+    reports and is key to making a case for courts or advocacy.</i></p>
+
+<form method="post">
+    <ul>
+        <li>
+            <label for="closestCity">What is the closest city or town to the incident?</label>
+            <input type="text" name="closestCity" id="closestCity" value="{{closestCity}}" required autofocus>
+        </li>
+        <li>
+            <label for="closestLandmark">Please describe the closest significant landmark</label>
+            <textarea name="closestLandmark" id="closestLandmark" required>{{closestLandmark}}</textarea>
+        </li>
+        <li>
+            <label for="address">What is the address of the incident?</label>
+            <input type="text" name="address" id="address" value="{{address}}">
+        </li>
+        <li>
+            <label>If you are at the scent of the incident, please upload a photo of it now, at the time of your report</label>
+            TBC
+        </li>
+        <li>
+            <button type="submit" name="nav-what" value="what" class="nav prev">⇐ What</button>
+            <button type="submit" name="nav-when" value="when" class="nav next">When ⇒</button>
+        </li>
+    </ul>
+</form>
+
+</main>
+
+</body>
+</html>

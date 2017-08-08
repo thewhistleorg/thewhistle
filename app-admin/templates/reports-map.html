@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/report.css">
+
+    <link rel="stylesheet" href="/css/reports-filter.css">
+    <style>
+
+    </style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/qs/6.4.0/qs.min.js" integrity="sha256-Epo8Yj1phr7IExs51UisfSWpmD5bmSf/DMeCcIUoBbM=" crossorigin="anonymous"></script>
+    <script src="//unpkg.com/dateformat@2.0.0/lib/dateformat.js"></script>
+    <script src="/js/report.js"></script>
+    <script src="/js/reports.js"></script>
+    <script src="/js/reports-filter.js"></script>
+    <script src="//maps.googleapis.com/maps/api/js?callback=initMap&key=AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw" defer></script>
+    <script src="//developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+    <script>
+        const reports = [
+            {{#each reports}}
+            { rptId: '{{_id}}', lat: {{lat}}, lng: {{lon}}, date: '{{date}}', highlight: {{highlight}}, assigned: '{{assignedTo}}', summary: '{{summary}}', status: '{{status}}' },
+            {{/each}}
+        ];
+        function initMap() {
+
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 20,
+                center: { lat: 0, lng: 0 }
+            });
+
+            const markers = reports.map(function(report, i) {
+                const m = new google.maps.Marker({
+                    position: report,
+                    icon:     '/map-marker/red/'+report.highlight,
+                    label:    report.summary,
+                    title:    report.date + ' @' + report.assigned + ' ' + report.status, // TODO: use info window for status, etc
+                    url:      '/reports/'+report.rptId,
+                    map:      map,
+                });
+                return m;
+            });
+            const bounds = new google.maps.LatLngBounds();
+            for (m of markers) bounds.extend(m.getPosition());
+            for (m of markers) google.maps.event.addListener(m, 'click', function() {
+                window.location.href = this.url;
+            });
+            google.maps.event.addListener(map, 'zoom_changed', function() { // http://stackoverflow.com/questions/2989858
+                zoomChangeBoundsListener =
+                        google.maps.event.addListener(map, 'bounds_changed', function(event) {
+                            if (this.getZoom() > 16 && this.initialZoom == true) {
+                                // Change max/min zoom here
+                                this.setZoom(16);
+                                delete this.initialZoom;
+                            }
+                            google.maps.event.removeListener(zoomChangeBoundsListener);
+                        });
+            });
+            map.initialZoom = true;
+            map.fitBounds(bounds);
+            // add a marker clusterer to manage the markers; github.com/googlemaps/v3-utility-library/tree/master/markerclusterer
+            const markerImagePath = 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m';
+            const markerCluster = new MarkerClusterer(map, markers, { imagePath: markerImagePath });
+        }
+
+    </script>
+    <script src="//www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+
+            const reports = [
+                [ { label: 'Date', type: 'date' }, { label: 'Count' }, { role: 'style' } ],
+                {{#each reportsByDay}}
+                [ new Date('{{@key}}'), {{this}}, "#3992ab" ],
+                {{/each}}
+            ];
+
+            // ensure chart is at least 6 days wide TODO: doesn't work for single report?
+            const minDate = reports.reduce((prev, curr) => curr[0] < prev ? curr[0] : prev, new Date());
+            const maxDate = reports.reduce((prev, curr) => curr[0] > prev ? curr[0] : prev, new Date('1970-01-01'));
+            const minAxis = new Date(maxDate.valueOf() - 1000*60*60*24*3);
+            const maxAxis = new Date(minDate.valueOf() + 1000*60*60*24*3);
+
+            const data = google.visualization.arrayToDataTable(reports);
+
+            const view = new google.visualization.DataView(data);
+
+            const options = {
+                title:       'Incidents by day',
+                'chartArea': { width: '90%', height: '75%' },
+                vAxis:       { gridlines: { count: {{maxReportsByDay}} } },
+                hAxis:       { minValue: minAxis, maxValue: maxAxis },
+                width:       document.getElementById('map').offsetWidth,
+                height:      120,
+                bar:         { groupWidth: '95%' },
+                legend:      { position: 'none' },
+            };
+            const chart = new google.visualization.ColumnChart(document.getElementById("chart"));
+            chart.draw(view, options);
+        }
+    </script>
+</head>
+<body>
+
+<header>
+    {{>navpartial}}
+</header>
+
+<main>
+
+<div class="export float-right">
+  <span>Export: </span>
+  <a href="{{exportPdf}}" title="Save as PDF" class="fa fa-file-pdf-o"></a>
+  <span>/</span>
+  <a href="{{exportCsv}}" title="Save as CSV" class="fa fa-file-excel-o"></a>
+</div>
+
+<h1>Reports</h1>
+
+{{>errpartial}}
+
+{{>filterpartial}}
+
+<nav class="tabs">
+    <ul>
+        <li><a href="/reports{{@koa.request.search}}">List</a></li>
+        <li class="active"><a href="/reports-map">Map ({{count}})</a></li>
+    </ul>
+</nav>
+
+<div id="map"></div>
+
+<div id="chart" style="clear:both"></div>
+<p class="grey">Time-based chart could be switchable grouping by day/week/month. Would be good to have rollover
+    info on which reports, and perhaps clickable links. Would  be nice if rollover map marker could
+    highlight report on time chart, and vice-versa.</p>
+
+<p class="grey"><b>Notes</b></p>
+<p class="grey"><i>Updated</i> filter: the <i>updated</i> column shows 'ago' vaues: should the
+    <i>updated</i> filter also be by 'ago' values, or by dates?</p>
+<p class="grey">Formatting issues to be addressed on <i>submitted</i> range filter.</p>
+<p class="grey">Interaction for <i>summary</i> was designed before I came up with the 'enter-in-place'
+    mechanism for <i>report fields</i> – perhaps the <i>report fields</i> approach would be better for
+    <i>summary</i> also (though that would imply no drop-down arrow against summary, so I'm not
+    entirely sure).</p>
+<p class="grey">If number of <i>report fields</i> is likely to be very large, perhaps that should be
+    implemented using some form of autocomplete.</p>
+<p class="grey">Think about use of history.</p>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Edit Centre {{name}} | The Whistle</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+    </style>
+</head>
+<body>
+
+<header>
+
+{{>navpartial}}
+
+</header>
+
+<main>
+
+<h1>Edit centre {{name}}</h1>
+
+{{>errpartial}}
+
+<form method="post" class="pure-form pure-form-aligned">
+    <ul>
+        <li class="pure-control-group">
+            <label for="name">Name</label>
+            <input type="text" name="name" id="name" value="{{name}}" required autofocus class="w24">
+        </li>
+        <li class="pure-control-group">
+            <label for="description">Description</label>
+            <input type="text" name="description" id="description" value="{{description}}" required class="w48">
+        </li>
+        <li class="pure-control-group">
+            <label for="lat">Latitude</label>
+            <input type="number" name="lat" id="lat" min="-90" max="90" step="any" value="{{location.coordinates.[1]}}" required>
+        </li>
+        <li class="pure-control-group">
+            <label for="lon">Longitude</label>
+            <input type="number" name="lon" id="lon" min="-180" max="180" step="any" value="{{location.coordinates.[0]}}" required>
+        </li>
+
+        <li class="pure-control-group">
+            <label></label>
+            <button type="submit" class="pure-button pure-button-primary">Update centre</button>
+        </li>
+    </ul>
+</form>
+
+</main>
+
+</body>
+</html>

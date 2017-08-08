@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Login</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .pure-form-aligned .pure-control-group label {
+            vertical-align: baseline;
+        }
+        .pure-form .pure-form-message-inline {
+            vertical-align: baseline;
+        }
+    </style>
+    {{#unless user}}
+    <script>
+        'use strict';
+        document.addEventListener('DOMContentLoaded', async function() {
+            document.querySelector('#username').onchange = async function() {
+                const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+                const credentials = 'same-origin';
+                const response = await fetch('/ajax/login/databases?user='+this.value, { method: 'GET', headers, credentials });
+                const body = await response.json();
+                if (response.ok) {
+                    const li = document.querySelector('#database');
+                    if (body.databases.length > 1) {
+                        li.querySelectorAll('input+label').forEach(el => li.removeChild(el));
+                        li.querySelectorAll('input').forEach(el => li.removeChild(el));
+                        for (const db of body.databases) {
+                            const input = `<input type="radio" name="database" id="database-${db}" value="${db}" required>
+                                           <label for="database-${db}">${db}</label>`;
+                            li.insertAdjacentHTML('beforeend', input);
+                        }
+                        li.classList.remove('hide');
+                    } else {
+                        li.classList.add('hide');
+                    }
+                } else {
+                    alert(response.status+': '+body.message);
+                }
+            }
+            document.querySelector('#remember-me').onchange = function() {
+                this.parentElement.querySelector('span.pure-form-message-inline').classList.toggle('hide', !this.checked);
+            }
+        });
+    </script>
+    {{/unless}}
+</head>
+<body>
+
+<header>
+
+{{>navpartial}}
+{{>errpartial}}
+
+</header>
+
+<main>
+
+<h1>Login</h1>
+
+{{#if user}}
+
+<p>You are currently logged in as {{user.firstname}} {{user.lastname}}
+    (with {{user.roles}} privileges).</p>
+
+<p><a href="/password/reset-request">Password reset</a></p>
+
+{{else}}
+
+<form method="post" class="pure-form pure-form-aligned">
+    <ul>
+        <li class="pure-control-group">
+            <label for="username">E-mail</label>
+            <input name="username" id="username" type="email" value="{{username}}" required autofocus>
+        </li>
+        <li class="pure-control-group">
+            <label for="password">Password</label>
+            <input name="password" id="password" type="password" required>
+        </li>
+        <li id="database" class="pure-control-group {{#unless databases.length}}hide{{/unless}}">
+            <label>Database</label>
+            {{#databases}}
+            <input type="radio" name="database" id="database-{{this}}" value="{{this}}" required> <label for="database-{{this}}">{{this}}</label>
+            {{/databases}}
+        </li>
+        <li class="pure-control-group">
+            <label></label>
+            <input type="checkbox" name="remember-me" id="remember-me">
+            <label for="remember-me" title="for up to 7 days inactivity" class="grey">remember me</label>
+            <span class="pure-form-message-inline hide">only use the ‘remember me’ in a secure environment, and never on shared computers or internet cafes!</span>
+        </li>
+        <li class="pure-control-group">
+            <label></label>
+            <button type="submit" title="Login" class="pure-button pure-button-primary">Login</button>
+            {{#if @koa.flash.loginfailmsg}}<span class="error-msg">{{@koa.flash.loginfailmsg}}</span>{{/if}}
+        </li>
+    </ul>
+</form>
+
+<p><a href="/password/reset-request">Forgotten password</a></p>
+
+{{/if}}
+
+</main>
+
+</body>
+</html>

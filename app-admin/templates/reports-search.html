@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        button { margin-left: 1em; }
+        a.fa-stack-text { color: #999999; }
+    </style>
+    <script>
+        'use strict';
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('select').forEach(el => el.onchange = function() {
+                addFilter(this);
+            });
+
+            function addFilter(select) {
+                if (select.value == '') { // remove this filter
+                    select.parentNode.remove();
+                    return;
+                }
+
+                if (select.dataset.prev) { // re-using select: remove the adjacent <input> and the final <li>
+                    select.parentNode.querySelector('input').remove();
+                    select.parentNode.parentNode.querySelector('li:last-of-type').remove();
+                }
+
+                // clone the current <li> (containing the <select>)
+                const li = select.parentNode.cloneNode(true);
+                li.querySelector('select').dataset.prev = '';
+                li.querySelector('select').onchange = function() { addFilter(this); };
+                // insert it at the end of the filters
+                select.parentNode.insertAdjacentElement('afterend', li);
+                // add in the <input> search field
+                const input = `<input type="search" name="${select.value}" list="${select.value}-list">`;
+                select.parentNode.insertAdjacentHTML('beforeend', input);
+                // record the current value
+                select.dataset.prev = select.value;
+
+                // leave cursor in search field
+                select.parentNode.querySelector('input').focus();
+            }
+        });
+    </script>
+</head>
+<body>
+
+<header>
+    {{>navpartial}}
+</header>
+
+<main>
+
+<h1>Reports filter/search</h1>
+
+{{>errpartial}}
+
+<p>Use this page to filter or search by individual fields in submitted incident reports.</p>
+
+<ul>
+    <li>to list all reports with a specified field filled in with any value, leave the search text blank</li>
+    <li>to list reports with fields matching a text, enter the search text into the input field</li>
+</ul>
+
+<form method="get">
+    <ul>
+        {{#each q}}
+        <li>
+            <select data-prev="{{@key}}">
+                {{#selected @key}}
+                <option value="">&nbsp;</option>
+                {{#../fields}}
+                <option>{{this}}</option>
+                {{/../fields}}
+                {{/selected}}
+            </select>
+            <input name="{{@key}}" list="{{@key}}-list" value="{{this}}">
+        </li>
+        {{/each}}
+        <li>
+            <select>
+                <option value="">&nbsp;</option>
+                {{#fields}}
+                <option>{{this}}</option>
+                {{/fields}}
+            </select>
+        </li>
+    </ul>
+    <button type="submit" class="fa fa-search"></button>
+
+    {{#each fieldValues}}
+    <datalist id="{{@key}}-list">
+        {{#this}}
+        <option value="{{this}}">
+        {{/this}}
+    </datalist>
+    {{/each}}
+
+</form>
+
+{{#if reports}}<p>{{reports.length}} matching reports:</p>
+<table>
+    <tr>
+        <th>Submitted on</th>
+        <th>by</th>
+        <th>from</th>
+        <th>assigned to</th>
+        <th>summary</th>
+        <th></th>
+        <th></th>
+    </tr>
+    {{#reports}}
+    <tr id="{{_id}}">
+        <td class="align-right"><a href="/reports/{{_id}}" title="{{reportedOnFull}}">{{reportedOnDay}}</a></td>
+        <td>@{{by}}</td>
+        <td>{{name}}</td>
+        <td>{{#if assignedTo}}@{{assignedTo}}{{/if}}</td>
+        <td>{{summary}}</td>
+        <td class="small grey">{{#if comments.length}}<span class="fa-stack fa-1x"><span class="fa fa-comment-o fa-stack-2x"></span><a href="/reports/{{_id}}/commentary" class="fa-stack-1x fa-stack-text fa-inverse">{{comments.length}}</a></span>{{/if}}</td>
+        <td><form action="/reports/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" class="fa fa-trash hide"></button></form></td>
+    </tr>
+    {{/reports}}
+</table>
+{{/if}}
+
+<hr>
+<p class="note">Note: what about active/archived?</p>
+
+</main>
+
+</body>
+</html>

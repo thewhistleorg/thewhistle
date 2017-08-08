@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>{{reportDescription}}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        h1 { border-bottom: none; }
+        div.comment { border: 1px solid #ebebeb; margin: 0.5em 0;  max-width: 640px;  }
+        div.comment div { padding: 0.5em }
+        div.comment .by { background: #f9f9f9; }
+        div.comment p { margin: 0.5em 0; }
+        div.by a { color: #333333; }
+        div.by button { background: none; border: none; color: #999999; }
+        div.by button:hover { color: #3992ab; cursor: pointer; }
+        #div-add-comment { padding: 0.5em;  max-width: calc(640px - 1em); }
+        textarea { display: block; height: 8em; margin-bottom: 0.5em; padding: 0.5em; width: 96%; }
+    </style>
+    <script>
+        'use strict';
+        document.addEventListener('DOMContentLoaded', function() {
+            const credentials = 'same-origin';
+
+            document.querySelector('#add-comment').onclick = postComment;
+            document.querySelectorAll('div.by button.edit').forEach(btn => btn.onclick = edit);
+            document.querySelectorAll('div.by button.delete').forEach(btn => btn.onclick = confirmDelete);
+
+            async function postComment() {
+                const comment = document.querySelector('#comment').value;
+                const values = JSON.stringify({ comment });
+
+                const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+                const response = await fetch('/ajax/reports/{{_id}}/comments', { method: 'POST', body: values, headers, credentials });
+                const body = await response.json();
+
+                if (response.ok) {
+                    const username = '{{@koa.state.user.name}}';
+                    const div = document.querySelector('#div-add-comment');
+                    const html = `<div class="comment" id="${body.id}">
+                                    <div class="by"><b><a href="/users/${username}">${username}</a></b> commented <a href="#${body.id}">${body.onPretty}</a>
+                                      <button class="float-right fa fa-times delete"></button>
+                                      <button class="float-right fa fa-pencil edit">
+                                    </div>
+                                    <div>${body.comment}</div>
+                                  </div>`;
+                    div.insertAdjacentHTML('beforebegin', html);
+                    document.querySelectorAll('div.by button.delete').forEach(btn => btn.onclick = confirmDelete);
+                    div.querySelector('#comment').value = '';
+                } else {
+                    alert(response.status+': '+body.message);
+                }
+            }
+
+
+            async function edit() {
+                alert('Comment edit function TBC');
+            }
+
+
+            async function confirmDelete() {
+                if (confirm('Are you sure you want to delete this comment?')) {
+                    const commentDiv = this.closest('main > div');
+
+                    const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+                    const response = await fetch(`/ajax/reports/{{_id}}/comments/${commentDiv.id}`, { method: 'DELETE', headers, credentials });
+
+                    if (response.ok) {
+                        commentDiv.remove();
+                    } else {
+                        const body = await response.text();
+                        alert(response.status+': '+body);
+                    }
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+
+<header>
+{{>navpartial}}
+</header>
+
+<main>
+
+<div class="export float-right">
+    <span>Export: PDF </span>
+    <a href="{{exportPdf}}" title="Save as PDF" class="fa fa-file-pdf-o"></a>
+</div>
+
+<h1>{{reportDescription}}</h1>
+
+<nav class="tabs">
+    <ul>
+        <li><a href="/reports/{{_id}}">Metadata</a></li>
+        <li><a href="/reports/{{_id}}/submission">Submission</a></li>
+        <li><a href="/reports/{{_id}}/files" {{#unless files}}class="disabled"{{/unless}}>Documents</a></li>
+        <li class="active"><a href="/reports/{{_id}}/commentary">Commentary</a></li>
+        <li><a href="/reports/{{_id}}/location">Location</a></li>
+    </ul>
+</nav>
+<div class="tab-content">
+
+  {{>errpartial}}
+
+  <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p>
+
+
+  <h2>Commentary</h2>
+
+  {{#comments}}
+  <div class="comment" id="{{id}}">
+      <div class="by"><b><a href="/users/{{byName}}">{{byName}}</a></b> commented <a href="#{{id}}" title="{{onFull}}">{{onPretty}}</a>
+          <button class="float-right fa fa-times delete"></button>
+          {{#if owner}}<button class="float-right fa fa-pencil edit"></button>{{/if}}
+      </div>
+      <div>{{{comment}}}</div>
+  </div>
+  {{/comments}}
+
+  <div class="comment" id="div-add-comment">
+      <textarea name="comment" id="comment" placeholder="Add a comment"></textarea>
+      <button id="add-comment" class="pure-button pure-button-primary">Add comment</button>
+      <span class="small grey">
+          <svg aria-hidden="true" class="align-middle" height="12" version="1.1" viewBox="0 0 16 16" width="16">
+              <path fill-rule="evenodd" d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.92 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z"></path>
+          </svg>
+          Styling with <a href="https://daringfireball.net/projects/markdown/">Markdown</a> is supported; @mentions and #tags can be used
+      </span>
+  </div>
+</div>
+</main>
+
+</body>
+</html>

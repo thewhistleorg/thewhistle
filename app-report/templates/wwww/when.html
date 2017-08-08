@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>The Whistle Eyewitness Report</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/wwww.css">
+    <style>
+    </style>
+    <script defer src="/js/report.js"></script>
+</head>
+<body>
+
+<main>
+
+<table class="progress"><tr><td>What</td><td>Where</td><td class="current">When</td><td>Who</td><td>Submit</td></tr></table>
+
+<h1>When</h1>
+
+<p><i>Knowing where the incident happened allows us to cross-reference your report with other
+    reports and is key to making a case for courts or advocacy.</i></p>
+
+<form method="post">
+    <ul>
+        <li>
+            <label for="date">What date did the incident occur?</label>
+            <input type="date" name="date" id="date" value="{{date}}" required autofocus>
+        </li>
+        <li>
+            <label for="time">What time was it when the incident took place</label>
+            <input type="time" name="time" id="time" value="{{time}}" required>
+        </li>
+        <li>
+            <label for="before">What happened just before the incident took place?</label>
+            <textarea name="before" id="before">{{before}}</textarea>
+        </li>
+        <li>
+            <label for="after">What happened just after the incident took place?</label>
+            <textarea name="after" id="after">{{after}}</textarea>
+        </li>
+        <li class="nav">
+            <button type="submit" name="nav-where" value="where" class="nav prev">⇐ Where</button>
+            <button type="submit" name="nav-who" value="who" class="nav next">Who ⇒</button>
+        </li>
+    </ul>
+</form>
+
+</main>
+
+</body>
+</html>

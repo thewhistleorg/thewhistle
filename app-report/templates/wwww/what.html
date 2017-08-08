@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>The Whistle Eyewitness Report</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/wwww.css">
+    <style>
+        span.note { color: #990000; }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            'use strict';
+            const doc = document; doc.qrySel = doc.querySelector; doc.qrySelAll = doc.querySelectorAll;
+
+            doc.qrySel('input[type=file]').onchange = cloneFileInput;
+
+            function cloneFileInput(event) {
+                const el = event.target;
+                const copy = el.cloneNode(true);
+                copy.onchange = cloneFileInput;
+                copy.value = '';
+                copy.id = 'document'+(doc.qrySelAll('input[type=file]').length);
+                el.insertAdjacentElement('afterend', copy)
+            }
+        });
+    </script>
+    <script defer src="/js/report.js"></script>
+</head>
+<body>
+
+<main>
+
+<table class="progress"><tr><td class="current">What</td><td>Where</td><td>When</td><td>Who</td><td>Submit</td></tr></table>
+
+<h1>What</h1>
+
+<p><i>Knowing what happened is crucial to the report. Please provide as much detail as possible.</i></p>
+
+<form method="post" enctype="multipart/form-data">
+    <ul>
+        <li>
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title" placeholder="short title for report" value="{{title}}" required autofocus>
+        </li>
+        <li>
+            <label for="description">Description</label>
+            <textarea name="description" id="description" placeholder="short description including chronological detail" required>{{description}}</textarea>
+        </li>
+        <li>
+            <label for="howKnow">How do you know?</label>
+            <input type="text" name="howKnow" id="howKnow" placeholder="e.g. eyewitness, friend’s report, ..." value="{{howKnow}}" required>
+        </li>
+        <li>
+            <label for="whyThere">Why were you there?</label>
+            <input type="text" name="whyThere" id="whyThere" value="{{whyThere}}" required>
+        </li>
+        <li>
+            <label for="whereThere">Where were you there?</label>
+            <input type="text" name="whereThere" id="whereThere" value="{{whereThere}}" required>
+        </li>
+        <li>
+            <label for="document0">Upload photos / videos / documents documenting the incident
+                {{#if files}}<span class="note">note: please reselect {{#each files}}{{this.name}}{{#unless @last}}, {{/unless}}{{/each}} if you wish to submit them</span>{{/if}}</label>
+            <input type="file" name="document[]" value="0" id="document0">
+        </li>
+        <li class="nav">
+            <button type="submit" class="nav next">Where ⇒</button>
+        </li>
+    </ul>
+</form>
+
+</main>
+
+</body>
+</html>

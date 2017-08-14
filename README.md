@@ -8,6 +8,19 @@ developed as part of the [ChainReact](http://chainreact.org/) project within the
 For further information on aims and objectives, please refer to The Whistle 
 [website](http://thewhistle.org).
 
+Current prototypes
+------------------
+
+There are still some early investigations which are retained for reference, but are not relevant
+to immediate development. These will be tidied up in time, but for the moment the relevant prototypes
+are:
+
+- Global Rights Nigeria public incident report submission:
+  [report.thewhistle.org/grn](http://report.thewhistle.org/grn)
+- Dashboard for admin/management: [admin.thewhistle.org](http://admin.thewhistle.org)
+- Single-page incident report submission form (for GRN staff / paralegals):
+  [admin.thewhistle.org/report/sexual-assault](http://admin.thewhistle.org/report/sexual-assault)
+
 
 Architecture
 ------------

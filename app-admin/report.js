@@ -14,7 +14,7 @@ const Geocoder = require('node-geocoder'); // library for geocoding and reverse 
 const Centre = require('../models/centre.js');
 const Report = require('../models/report.js');
 
-const generate         = require('../lib/adjective-animal.js');
+const autoIdentifier   = require('../lib/auto-identifier.js');
 const jsObjectToHtml   = require('../lib/js-object-to-html.js');
 const validationErrors = require('../lib/validation-errors.js');
 const useragent        = require('../lib/user-agent.js');
@@ -201,7 +201,7 @@ class IncidentReport {
      * GET /ajax/report/names/new - Generate a random adjective-noun name..
      */
     static async getGenerateNewName(ctx) {
-        const name = await generate(12);
+        const name = await autoIdentifier(12);
         // TODO: verify not already used
 
         ctx.body = { name: name };

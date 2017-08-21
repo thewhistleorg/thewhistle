@@ -332,13 +332,16 @@ class Report {
 
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
+        // delete audit trail
+        Update.deleteForReport(db, id);
+
+        // delete report
         const reports = global.db[db].collection('reports');
         await reports.deleteOne({ _id: id });
 
+        // delete uploaded files
         const dir = `static/grn/${dateFormat('yyyy-mm')}/${id}/`;
         await fs.remove(dir);
-
-        // TODO: audit trail
     }
 
 

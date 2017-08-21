@@ -12,8 +12,8 @@
 
 'use strict';
 
-const Report   = require('../models/report.js');
-const generate = require('../lib/adjective-animal.js');
+const Report         = require('../models/report.js');
+const autoIdentifier = require('../lib/auto-identifier.js');
 
 const handler = {};
 
@@ -24,7 +24,7 @@ const handler = {};
 handler.getGenerateNewName = async function(ctx) {
     let name = null;
     do {
-        name = await generate(12);
+        name = await autoIdentifier(12);
     } while (name.length > 12); // avoid excessively long names
     ctx.body = { name: name };
     ctx.body.root = 'generateName';

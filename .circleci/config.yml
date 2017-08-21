@@ -4,6 +4,8 @@ jobs:
   build:
     docker:
       - image: node:8.0
+    environment:
+      - NODE_ENV: development
     steps:
       - checkout
       - run: npm test

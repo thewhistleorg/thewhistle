@@ -1,12 +1,10 @@
-# Javascript Node CircleCI 2.0 configuration file
-    version: 2
-    jobs:
-      build:
-        docker:
-          - image: circleci/node:latest
-        environment:
-          - NODE_ENV: development
-        steps:
-          - checkout
-          - run: npm install
-          - run: npm test
+# JavaScript Node.js CircleCI 2.0 configuration file
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:latest
+    steps:
+      - checkout
+      - run: npm install
+      - run: npm test

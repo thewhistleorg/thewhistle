@@ -3,15 +3,10 @@
     jobs:
       build:
         docker:
-          - image: node:8.0
+          - image: circleci/node:latest
         environment:
           - NODE_ENV: development
         steps:
           - checkout
-          - run:
-              name: "Checking Versions"
-              command: |
-                node --version
-                npm --version
           - run: npm install
           - run: npm test

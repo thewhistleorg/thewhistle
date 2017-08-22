@@ -1,12 +1,17 @@
 # Javascript Node CircleCI 2.0 configuration file
-version: 2
-jobs:
-  build:
-    docker:
-      - image: node:8.0
-    environment:
-      - NODE_ENV: development
-    steps:
-      - checkout
-      - run: npm install
-      - run: npm test
+    version: 2
+    jobs:
+      build:
+        docker:
+          - image: node:8.0
+        environment:
+          - NODE_ENV: development
+        steps:
+          - checkout
+          - run:
+              name: "Checking Versions"
+              command: |
+                node --version
+                npm --version
+          - run: npm install
+          - run: npm test

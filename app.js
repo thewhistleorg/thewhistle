@@ -94,9 +94,15 @@ app.use(async function composeSubapp(ctx) { // note no 'next' after composed sub
         case 'report': await compose(require('./app-report/app-report.js').middleware)(ctx); break;
         case 'twilio': await compose(require('./app-twilio/app-twilio.js').middleware)(ctx); break;
         case 'textit': await compose(require('./app-textit/app-textit.js').middleware)(ctx); break;
-        default: // no (recognised) subdomain? canonicalise host to report.host
-            // note switch must include all registered subdomains to avoid potential redirect loop
-            ctx.redirect(ctx.protocol+'://'+'report.'+ctx.host+ctx.path+ctx.search);
+        default: // no recognised subdomain
+            if (process.env.SUBAPP) {
+                // eg for Heroku review apps where subdomain cannot be supplied, take subapp from env
+                const subapp = process.env.SUBAPP;
+                await compose(require(`./app-${subapp}/app-${subapp}.js`).middleware)(ctx); break;
+            }
+            if (ctx.state.subapp == 'localhost') { ctx.status = 403; break; } // avoid redirect loop
+            // otherwise redirect to www static site (which should not be this app)
+            ctx.redirect(ctx.protocol+'://'+'www.'+ctx.host+ctx.path);
             break;
     }
 });

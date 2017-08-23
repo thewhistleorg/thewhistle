@@ -62,7 +62,7 @@ report they made.
 
 To this end, they could be allocated a random identifier such as with 
 [adjective-adjective-animal](https://www.npmjs.com/package/adjective-adjective-animal). This might 
-have to be used in conjuction with a password, to avoid abuse?
+have to be used in conjunction with a password, to avoid abuse?
 
 If *The Whistle* wanted to be able to contact victims/survivors, we would have to collect either a 
 telephone number or an e-mail. This would be entirely at the discretion of the victim/survivor.

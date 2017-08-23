@@ -66,7 +66,7 @@ Git repository.
 ### Anonymity
 
 While victims’ / survivors’ contact details may optionally be stored if required, the normal way of 
-identifying victims / survivors is by auto-generated (adjective-animal) identifying names.
+identifying victims / survivors is by auto-generated identifying names.
  
 ### Security
 
@@ -129,7 +129,7 @@ complex structures).
 
 When incident reports are submitted, some items of information are expected to be transferred to
 report metadata:
-- name: the auto-generated ‘adjective-animal’ identifier name
+- name: the auto-generated identifier name
 - geocode: the results of Google Maps API geocoding
 - files: any images or documents uploaded as part of the incident report submission.
 

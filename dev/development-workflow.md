@@ -74,13 +74,23 @@ variable will have to be set to either _admin_ or _report_ as appropriate.
 
     $ heroku config:set SUBAPP=report --app thewhistle-staging-pr-99
 
-...and similarly for DB\_USERS and DB\_TEST environment variables.
+...and similarly for `DB_USERS` and `DB_TEST` environment variables.
 
 Current values can be obtained from
 
     $ heroku config --app thewhistle-staging
 
-GitHub pull request comments can be used for discussion about the proposed development. 
+GitHub pull request comments can be used for discussion about the proposed development.
+
+#### Review cycle
+
+If changes are made as a result of reviews, the procedure for deploying them to the review app 
+(after having committed changes to the topic branch) is
+
+    $ git checkout master && git pull --rebase origin && git rebase master my-new-development
+    $ git push origin my-new-development
+
+Pushing to the topic branch will automatically deploy the new version to the review app.
 
 #### Merge to master
 

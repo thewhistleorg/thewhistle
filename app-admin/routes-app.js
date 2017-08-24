@@ -94,7 +94,7 @@ router.get('/ajax/messages/latest-timestamp', messages.ajaxMessageLatestTimestam
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/*  Route to handle notes pages                                                                   */
+/*  Route to handle dev-notes pages                                                               */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 const fs  = require('mz/fs');              // 'modernised' node api
@@ -103,16 +103,21 @@ const mda = require('markdown-it-anchor'); // header anchors for markdown-it
 
 md.use(mda);
 
-router.get('/readme', async function getReadMePage(ctx) {
+router.get('/dev-notes/readme', async function getReadMePage(ctx) {
     const readme = await fs.readFile('README.md', 'utf8');
     const content = md.render(readme);
     await ctx.render('notes', { content });
 });
 
-router.get('/notes', async function getNotesPage(ctx) {
-    const notes = await fs.readFile('app-admin/templates/notes.md', 'utf8');
-    const content = md.render(notes);
-    await ctx.render('notes', { content });
+router.get('/dev-notes/:notes', async function getNotesPage(ctx) {
+    const notesFile = `dev/${ctx.params.notes}.md`;
+    try {
+        const notesMarkdown = await fs.readFile(notesFile, 'utf8');
+        const content = md.render(notesMarkdown);
+        await ctx.render('notes', { content });
+    } catch (e) {
+        ctx.throw(404, 'Notes not found');
+    }
 });
 
 

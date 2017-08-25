@@ -78,6 +78,8 @@ describe('Admin app'+' ('+app.env+')', function() {
 
     describe('incident report', function() {
         let reportId = null;
+        let imgFldr = 'test/img/';
+        let imgFile = 's_gps.jpg';
         it('submits incident report', async function() {
             const values = {
                 'generated-name':    'testy-tiger',
@@ -86,10 +88,19 @@ describe('Admin app'+' ('+app.env+')', function() {
                 'brief-description': 'test',
                 'location-address':  'Mill Lane, Cambridge',
             };
-            const responseEnter = await request.post('/report/sexual-assault').set(headers).send(values);
+            // sadly, it seems that superagent doesn't allow request.attach() to be used with
+            // request.send(), so instead we need to use request.field()
+            const responseEnter = await request.post('/report/sexual-assault').set(headers)
+                .field('generated-name', 'testy-tiger')
+                .field('date', dateFormat('yyyy-mm-dd'))
+                .field('time', dateFormat('HH:MM'))
+                .field('brief-description', 'test')
+                .field('location-address', 'Mill Lane, Cambridge')
+                .attach('documents', imgFldr+imgFile);
             expect(responseEnter.status).to.equal(302, responseEnter.text);
             const koaSession = base64.decode(responseEnter.headers['set-cookie'][0].match(/^koa:sess=([a-zA-Z0-9=.]+);.+/)[1]);
             expect(responseEnter.headers.location).to.equal('/report/sexual-assault/submit', koaSession); // koaSession['koa-flash'] fails??
+
             const responseSubmit = await request.post('/report/sexual-assault/submit').set(headers).send();
             expect(responseSubmit.status).to.equal(302, responseEnter.text);
             reportId = responseSubmit.headers['x-insert-id'];
@@ -104,6 +115,16 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(response.status).to.equal(200, response.text);
             const document = new JsDom(response.text).window.document;
             expect(document.getElementById(reportId).querySelector('a').href).to.equal(`/reports/${reportId}`);
+        });
+
+        it('sees uploaded image in report/documents page', async function() {
+            const response = await request.get('/reports/'+reportId+'/files').set(headers);
+            expect(response.status).to.equal(200, response.text);
+            const document = new JsDom(response.text).window.document;
+            console.log(document.getElementById(imgFile).querySelector('td a').href)
+            const src = `/test/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
+            expect(document.getElementById(imgFile).querySelector('td a').href).to.equal(src);
+            expect(document.getElementById(imgFile).querySelector('td img').src).to.equal(src);
         });
 
         it('gets timestamp of new report (ajax)', async function() {

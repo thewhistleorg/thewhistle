@@ -22,8 +22,10 @@ const ObjectId    = require('mongodb').ObjectId;
 const app = new Koa(); // admin app
 
 
-// serve static files (html, css, js); allow browser to cache for 1 hour (note css/js req'd before login)
-const maxage = app.env=='development' ? 1000 : 1000*60*60;
+// serve static files (html, css, js); allow browser to cache for 1 day (note css/js req'd before login)
+// note that these files held in /public are included in the repository and served without constraint,
+// as opposed to files in /static which are outside the repository and may be large and/or sensitive
+const maxage = app.env=='production' ? 1000*60*60*24 : 1000;
 app.use(serve('public', { maxage: maxage }));
 
 

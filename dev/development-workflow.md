@@ -66,17 +66,17 @@ The review app is named after the GitHub pull request number: for e.g. pull requ
 app would be named `thewhistle-staging-pr-99`. This would be available at 
 http://thewhistle-staging-pr-99.herokuapp.com.
 
-The review app will require the `DB_USERS` and `DB_TEST` environment variables set, and potentially 
-the `SMTP_*` environment variables, if e-mails are to be sent from the review app. 
+The review app **must** have NODE_ENV set to _development_ (the Heroku default is production); it 
+will also require the `DB_USERS` and `DB_TEST` environment variables set, and potentially the 
+`SMTP_*` environment variables, if e-mails are to be sent from the review app. 
 
 Also since a subdomain cannot be specified when running the review app, the `SUBAPP` environment 
 variable will have to be set to either _admin_ or _report_ as appropriate.
 
+    $ heroku config:set NODE_ENV=development --app thewhistle-staging-pr-99
     $ heroku config:set SUBAPP=report --app thewhistle-staging-pr-99
 
-...and similarly for `DB_USERS` and `DB_TEST` environment variables.
-
-Current values can be obtained from
+...and similarly for `DB_USERS` and `DB_TEST` environment variables; values can be obtained from
 
     $ heroku config --app thewhistle-staging
 

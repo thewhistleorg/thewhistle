@@ -31,7 +31,6 @@ const validator = { $and: [ // TODO: validation for string or null
     { by:         { $type: 'objectId',               } }, // user entering incident report
     { name:       { $type: 'string',   $exists: true } }, // auto-generated name of victim/survivor
     { geocode:    { $type: 'object',                 } }, // google geocoding data
-    { files:      { $type: 'array',                  } }, // array of formidable File objects (with patched path+name)
     { location:   { $type: 'object',   $exists: true } }, // GeoJSON (with spatial index)
     { summary:    { $type: 'string',                 } }, // single-line summary for identification
     { assignedTo: { $type: 'objectId',               } }, // user report is assigned to
@@ -236,7 +235,7 @@ class Report {
      * @param   {string}   name - Generated name used to refer to victim/survivor.
      * @param   {Object}   report - Report details (values depend on project).
      * @param   {string}   project - Project report is part of.
-     * @param   {Object[]} files - Uploaded files (patched formidable Files objects).
+     * @param   {Object[]} files - Uploaded files ('formidable' File objects).
      * @param   {Object}   geocode - Google geocoding results.
      * @returns {ObjectId} New report id.
      * @throws  Error on validation or referential integrity errors.
@@ -248,7 +247,7 @@ class Report {
 
         const reports = global.db[db].collection('reports');
 
-        // record report first, so that file move issues don't cause us to lose it
+        // record report first, so that any file move issues don't cause us to lose it
 
         const values = {
             project:    project,
@@ -256,7 +255,6 @@ class Report {
             name:       name,
             report:     report,
             geocode:    geocode || {},
-            files:      files || [],
             location:   {},
             summary:    undefined,
             assignedTo: undefined,
@@ -265,6 +263,9 @@ class Report {
             comments:   [],
             archived:   false,
         };
+
+        // record uploaded files within the submitted report object
+        values.report.files = files || [];
 
         if (geocode) {
             values.location = {
@@ -276,19 +277,21 @@ class Report {
         //values._id = ObjectId(Math.floor(Date.now()/1000 - Math.random()*60*60*24*365).toString(16)+(Math.random()*2**64).toString(16)); // random date in past year
         const { insertedId } = await reports.insertOne(values);
 
-        // move uploaded files from /tmp into ./static TODO: use persistent file storage (AWS?)
+        // move uploaded files from /tmp into ./static [note: NOT ./public!]
+        // TODO: use persistent file storage (AWS?)
 
         if (files) {
-            const dir = `${db}/${dateFormat('yyyy-mm')}/${insertedId}/`;
+            const dir = `${db}/${project}/${dateFormat('yyyy-mm')}/${insertedId}/`;
             for (const file of files) {
                 if (file.size > 0) {
                     const src = file.path;
                     const dst = slug(file.name, { lower: true, remove: null });
                     // fs.rename doesn't work across devices, so use node-mv instead for Heroku /tmp
                     mv(src, './static/'+dir+dst, { mkdirp: true }, function(err) { if (err) console.error(err); });
-                    // replace path and name fields with saved file location TODO: fix!
-                    const filter = { _id: insertedId, 'files.path': src };
-                    const path = { 'files.$.name': dst, 'files.$.path': dir };
+
+                    // replace path field with saved file location
+                    const filter = { _id: insertedId, 'report.files.path': src };
+                    const path = { 'report.files.$.path': dir };
                     await reports.updateOne(filter, { $set: path });
                 }
             }
@@ -321,7 +324,7 @@ class Report {
 
 
     /**
-     * Delete entire Report.
+     * Delete entire Report. Normally only for testing purposes.
      *
      * @param  {string}   db - Database to use.
      * @param  {ObjectId} id - Report id.
@@ -332,6 +335,9 @@ class Report {
 
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
+        // retrieve report to determine project, in case there are persistent files to delete
+        const report = await Report.get(db, id);
+
         // delete audit trail
         Update.deleteForReport(db, id);
 
@@ -339,8 +345,8 @@ class Report {
         const reports = global.db[db].collection('reports');
         await reports.deleteOne({ _id: id });
 
-        // delete uploaded files
-        const dir = `static/grn/${dateFormat('yyyy-mm')}/${id}/`;
+        // delete any uploaded files
+        const dir = `static/${db}/${report.project}/${dateFormat(id.getTimestamp(), 'yyyy-mm')}/${id}/`;
         await fs.remove(dir);
     }
 
@@ -459,7 +465,7 @@ class Report {
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
 
         const reports = global.db[db].collection('reports');
-        const user = User.get(userId);
+        const user = await User.get(userId);
         await reports.updateOne({ _id: id }, { $push: { comments: { byId: userId, byName: user.username, on: new Date(), comment } } });
 
         await Update.insert(db, id, userId, { push: { comments: comment } }); // audit trail

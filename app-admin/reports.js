@@ -700,7 +700,7 @@ class ReportsHandlers {
 
 
     /**
-     * GET /reports/:id - Render view-report page showing management tab.
+     * GET /reports/:id - Render view-report page showing metadata tab.
      */
     static async viewReport(ctx) {
         const db = ctx.state.user.db;
@@ -734,11 +734,11 @@ class ReportsHandlers {
             reportedOnFull: dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
             reportedOnTz:   dateFormat(report.reported, 'Z'),
             reportedBy:     report.by ? '@'+(await User.get(report.by)).username : report.name,
-            users:          users,        // for select
-            statuses:       statuses,     // for datalist
+            users:          users,               // for select
+            statuses:       statuses,            // for datalist
             otherReports:   otherReports,
-            tagList:        tagList,      // for autocomplete datalist
-            files:          report.files, // for tabs
+            tagList:        tagList,             // for autocomplete datalist
+            files:          report.report.files, // for tabs
             updates:        updates,
             exportPdf:      ctx.request.href.replace('/reports', '/reports/export-pdf'),
         };
@@ -802,7 +802,7 @@ class ReportsHandlers {
         extra.reportDescription = report.summary
             ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`
             : `Report by ${extra.reportedBy}, ${extra.reportedOnDay}`;
-        for (const file of report.files) file.isImage = file.type.slice(0, 5) == 'image';
+        for (const file of report.report.files) file.isImage = file.type.slice(0, 5) == 'image';
 
         await ctx.render('reports-view-files', Object.assign(report, extra));
         Report.flagView(db, ctx.params.id, ctx.state.user.id);

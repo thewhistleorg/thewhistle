@@ -119,19 +119,6 @@ class IncidentReport {
             delete body.files;
         }
 
-        if (body.fields) {
-            // multipart/form-data: move body.fields.* to body.* to match
-
-            // file input fields are named 'documents'; move File objects up to be immediately under 'files'
-            // TODO: move out of 'report' sub-document to new 'files' sub-document?
-            // TODO: implement persistent file storage eg AWS
-            body.files = body.files['documents'];
-            // normalise files to be array of File objects (koa-body does not provide array if just 1 file uploaded)
-            if (!Array.isArray(body.files)) body.files = [body.files];
-            // strip out any 0-size files
-            for (let f=0; f<body.files.length; f++) if (body.files[f].size == 0) body.files.splice(f, 1);
-        }
-
         if (body['existing-name'] != null) {
             // verify existing name does exist
             const reports = await Report.getBy('test', 'report.name', body['existing-name']);

@@ -47,12 +47,12 @@
 
   <h2>Uploaded images / documents</h2>
   <table>
-      {{#files}}
-      <tr>
+      {{#report.files}}
+      <tr id="{{name}}">
           <td><a href="/{{path}}{{name}}">{{name}}</a></td>
-          <td>{{#if isImage}}<img src="/{{path}}{{name}}">{{/if}}</td>
+          <td>{{#if isImage}}<img src="/{{path}}{{name}}" alt="{{name}}">{{/if}}</td>
       </tr>
-      {{/files}}
+      {{/report.files}}
   </table>
 </div>
 </main>

@@ -98,7 +98,7 @@
     <ul>
         <li><a href="/reports/{{_id}}">Metadata</a></li>
         <li><a href="/reports/{{_id}}/submission">Submission</a></li>
-        <li><a href="/reports/{{_id}}/files" {{#unless files}}class="disabled"{{/unless}}>Documents</a></li>
+        <li><a href="/reports/{{_id}}/files" {{#unless report.files}}class="disabled"{{/unless}}>Documents</a></li>
         <li class="active"><a href="/reports/{{_id}}/commentary">Commentary</a></li>
         <li><a href="/reports/{{_id}}/location">Location</a></li>
     </ul>

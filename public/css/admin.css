@@ -13,40 +13,40 @@ main {
 
 h1 {
     border-bottom: 1px solid #ebebeb;
-    color: #406591;
+    color: #033549;
     font-size: 3em;
     font-weight: 300;
     margin-top: 0.2em;
 }
 
 h2 {
-    color: #406591;
+    color: #033549;
     font-size: 2em;
     font-weight: normal;
 }
 
 h3 {
-    color: #406591;
+    color: #033549;
     font-size: 1.2em;
     font-weight: bold;
     font-style: italic;
 }
 
 h4 {
-    color: #406591;
+    color: #033549;
     font-size: 1em;
     font-weight: bold;
     font-style: normal;
 }
 
 .logo-container {
-    content: url(../img/logo-32.png);
+    content: url(../img/logo-128x22.png);
     /*margin-left: 40px;*/
     /*padding: 0 1em;*/
 }
 
 header nav {
-    background: #406591;
+    background: #033549;
     font: 300 1.2em 'Open Sans';
     margin: 0;
     /*padding-top: 0.4em*/
@@ -254,7 +254,7 @@ textarea           { width: 24em; }
     border-top: 1px solid #ebebeb;
 }
 
-a, a:visited { color: #406591; }
+a, a:visited { color: #033549; }
 a.grey       { color: #999999; }
 .green       { color: #006600; }
 .red         { color: #660000; }

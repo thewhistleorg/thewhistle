@@ -16,6 +16,9 @@ const json2csv   = require('json2csv');    // converts json into csv
 const pdf        = require('html-pdf');    // HTML to PDF converter
 const fs         = require('fs-extra');    // fs with extra functions & promise interface
 const handlebars = require('handlebars');  // logicless templating language
+const LatLon     = require('geodesy').LatLonSpherical; // spherical earth geodesy functions
+const Dms        = require('geodesy').Dms; // degrees/minutes/seconds conversion routines
+const moment     = require('moment');      // date library for manipulating dates
 const ObjectId   = require('mongodb').ObjectId;
 
 const Report = require('../models/report.js');
@@ -802,7 +805,23 @@ class ReportsHandlers {
         extra.reportDescription = report.summary
             ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`
             : `Report by ${extra.reportedBy}, ${extra.reportedOnDay}`;
-        for (const file of report.report.files) file.isImage = file.type.slice(0, 5) == 'image';
+        const incidentLocn = new LatLon(report.geocode.latitude, report.geocode.longitude)
+        const incidentTime = new Date(report.report.date+' '+report.report.time);
+        const submissionTime = report._id.getTimestamp();
+        for (const file of report.analysis.files) {
+            file.isImage = file.type.slice(0, 5) == 'image';
+            if (file.exif) {
+                const d = incidentLocn.distanceTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
+                file.distance = d > 1e3 ? Number(d.toPrecision(2))/1e3 + ' km' : Number(d.toPrecision(2)) + ' metres';
+                file.bearing = incidentLocn.bearingTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
+                file.direction = Dms.compassPoint(file.bearing);
+                const date = file.exif.CreateDate;
+                file.time = new Date(Date.UTC(date.year, date.month-1, date.day, date.hour, date.minute - date.tzoffsetMinutes)); // TODO: exif tz?
+                if (file.time) file.timeDesc = !isNaN(incidentTime)
+                    ? moment(file.time).from(incidentTime)+' from incident'
+                    : moment(file.time).from(submissionTime)+' from submission'
+            }
+        }
 
         await ctx.render('reports-view-files', Object.assign(report, extra));
         Report.flagView(db, ctx.params.id, ctx.state.user.id);

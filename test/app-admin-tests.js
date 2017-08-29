@@ -1,5 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Admin app integration/acceptance tests                                                         */
+/*                                                                                                */
+/* Note that running this test will contribute to Weather Underground API invocation limits       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 // TODO: modularise this? How to handle login/logout if so?
@@ -115,6 +117,14 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(response.status).to.equal(200, response.text);
             const document = new JsDom(response.text).window.document;
             expect(document.getElementById(reportId).querySelector('a').href).to.equal(`/reports/${reportId}`);
+        });
+
+        it('sees weather conditions in report/location page', async function() {
+            const response = await request.get('/reports/'+reportId+'/location').set(headers);
+            expect(response.status).to.equal(200, response.text);
+            const document = new JsDom(response.text).window.document;
+            const iconRe = new RegExp('/img/weather/underground/icons/black/png/32x32/[a-z]+.png')
+            expect(document.querySelector('#weather table tr td img').src).to.match(iconRe);
         });
 
         it('sees uploaded image in report/documents page', async function() {

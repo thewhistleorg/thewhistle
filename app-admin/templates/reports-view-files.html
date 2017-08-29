@@ -47,12 +47,13 @@
 
   <h2>Uploaded images / documents</h2>
   <table>
-      {{#report.files}}
+      {{#analysis.files}}
       <tr id="{{name}}">
           <td><a href="/{{path}}{{name}}">{{name}}</a></td>
           <td>{{#if isImage}}<img src="/{{path}}{{name}}" alt="{{name}}">{{/if}}</td>
+          <td class="exif">{{distance}} {{direction}} from incident location<div title="{{time}}">{{timeDesc}}</div></td>
       </tr>
-      {{/report.files}}
+      {{/analysis.files}}
   </table>
 </div>
 </main>

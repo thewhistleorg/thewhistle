@@ -68,7 +68,8 @@ http://thewhistle-staging-pr-99.herokuapp.com.
 
 The review app **must** have NODE_ENV set to _development_ (the Heroku default is production); it 
 will also require the `DB_USERS` and `DB_TEST` environment variables set, and potentially the 
-`SMTP_*` environment variables, if e-mails are to be sent from the review app. 
+`WUNDERGROUND_API_KEY` if weather conditions are to be fetched, and  `SMTP_*` environment variables 
+if e-mails are to be sent from the review app. 
 
 Also since a subdomain cannot be specified when running the review app, the `SUBAPP` environment 
 variable will have to be set to either _admin_ or _report_ as appropriate.

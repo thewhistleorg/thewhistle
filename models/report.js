@@ -12,6 +12,7 @@ const slug       = require('slug');       // make strings url-safe
 const dateFormat = require('dateformat'); // Steven Levithan's dateFormat()
 const ObjectId   = require('mongodb').ObjectId;
 
+const Weather = require('../lib/weather.js');
 // const Update = require('./update.js'); !! this is done at the bottom of the file to resolve Node cyclic references!
 
 /*
@@ -230,6 +231,10 @@ class Report {
     /**
      * Creates new Report record.
      *
+     * In addition to creating MongoDB record, this moves uploaded files from /tmp to ./static (and
+     * patches the path in the 'formidable' objects), and fetches weather conditions for the given
+     * location and date.
+     *
      * @param   {string}   db - Database to use.
      * @param   {ObjectId} [by] - User recording incident report (undefined for public submission).
      * @param   {string}   name - Generated name used to refer to victim/survivor.
@@ -256,6 +261,7 @@ class Report {
             report:     report,
             geocode:    geocode || {},
             location:   {},
+            analysis:   {},
             summary:    undefined,
             assignedTo: undefined,
             status:     undefined,
@@ -267,12 +273,17 @@ class Report {
         // record uploaded files within the submitted report object
         values.report.files = files || [];
 
+        // if successful geocode, record (geoJSON) location for (indexed) geospatial queries
         if (geocode) {
             values.location = {
                 type:        'Point',
                 coordinates: [ Number(geocode.longitude), Number(geocode.latitude) ],
             };
         }
+
+        // record weather conditions at location & date of incident
+        const incidentOn = new Date(report.date+' '+report.time);
+        values.analysis.weather = await Weather.fetchWeatherConditions(geocode.latitude, geocode.longitude, incidentOn);
 
         //values._id = ObjectId(Math.floor(Date.now()/1000 - Math.random()*60*60*24*365).toString(16)+(Math.random()*2**64).toString(16)); // random date in past year
         const { insertedId } = await reports.insertOne(values);

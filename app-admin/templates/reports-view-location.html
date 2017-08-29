@@ -100,15 +100,35 @@
     </ul>
 </nav>
 <div class="tab-content">
-  {{>errpartial}}
+    {{>errpartial}}
 
-  <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p>
+    <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p>
 
-  <div id="map"></div>
+    <div id="map"></div>
 
-  <h2>Geocoding <a href="https://maps.google.com/maps/search/{{formattedAddress}}" class="fa fa-globe"></a></h2>
-  {{{geocodeHtml}}}
+    {{#if analysis.weather}}
+    <div id="weather">
+        <h2>Weather <img src="/img/wundergroundLogo_4c_horz.jpg" alt="Weather Underground" style="width:90px"></h2>
+        {{analysis.weather.city}}, {{analysis.weather.country}}
+        <table>
+            <tr>
+                {{#analysis.weather.observations}}
+                <td title="{{date.year}}-{{date.mon}}-{{date.mday}}">{{date.hour}}:{{date.min}}</td>
+                {{/analysis.weather.observations}}
+            </tr>
+            <tr>
+                {{#analysis.weather.observations}}
+                <td title="{{conds}}"><img src="/img/weather/underground/icons/black/png/32x32/{{icon}}.png" alt="{{conds}}"></td>
+                {{/analysis.weather.observations}}
+            </tr>
+        </table>
+    </div>
+    {{/if}}
+
+    <h2>Geocoding <a href="https://maps.google.com/maps/search/{{formattedAddress}}" class="fa fa-globe"></a></h2>
+    {{{geocodeHtml}}}
 </div>
+
 </main>
 
 </body>

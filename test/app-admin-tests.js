@@ -123,7 +123,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             const response = await request.get('/reports/'+reportId+'/location').set(headers);
             expect(response.status).to.equal(200, response.text);
             const document = new JsDom(response.text).window.document;
-            const iconRe = new RegExp('/img/weather/underground/icons/black/png/32x32/[a-z]+.png')
+            const iconRe = new RegExp('^/img/weather/underground/icons/black/png/32x32/[a-z]+.png$')
             expect(document.querySelector('#weather table tr td img').src).to.match(iconRe);
         });
 
@@ -134,6 +134,15 @@ describe('Admin app'+' ('+app.env+')', function() {
             const src = `/test/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
             expect(document.getElementById(imgFile).querySelector('td a').href).to.equal(src);
             expect(document.getElementById(imgFile).querySelector('td img').src).to.equal(src);
+        });
+
+        it('sees uploaded image exif metadata in report/documents page', async function() {
+            const response = await request.get('/reports/'+reportId+'/files').set(headers);
+            expect(response.status).to.equal(200, response.text);
+            const document = new JsDom(response.text).window.document;
+            const src = `/test/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
+            const distRe = new RegExp('^340 km NNW from incident location')
+            expect(document.getElementById(imgFile).querySelector('td.exif').textContent).to.match(distRe);
         });
 
         it('gets timestamp of new report (ajax)', async function() {

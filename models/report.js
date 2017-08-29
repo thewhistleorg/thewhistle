@@ -6,10 +6,10 @@
 
 'use strict';
 
-const fs         = require('fs-extra');   // fs with extra functions & promise interface
-const mv         = require('mv');         // fs cannot do cross-device rename as req'd on Heroku moving from /tmp
-const slug       = require('slug');       // make strings url-safe
-const dateFormat = require('dateformat'); // Steven Levithan's dateFormat()
+const fs         = require('fs-extra');          // fs with extra functions & promise interface
+const slug       = require('slug');              // make strings url-safe
+const dateFormat = require('dateformat');        // Steven Levithan's dateFormat()
+const exiftool   = require('exiftool-vendored'); // cross-platform Node.js access to ExifTool
 const ObjectId   = require('mongodb').ObjectId;
 
 const Weather = require('../lib/weather.js');
@@ -288,22 +288,37 @@ class Report {
         //values._id = ObjectId(Math.floor(Date.now()/1000 - Math.random()*60*60*24*365).toString(16)+(Math.random()*2**64).toString(16)); // random date in past year
         const { insertedId } = await reports.insertOne(values);
 
-        // move uploaded files from /tmp into ./static [note: NOT ./public!]
-        // TODO: use persistent file storage (AWS?)
-
         if (files) {
+            // move uploaded files from /tmp into ./static [note: NOT ./public!]
             const dir = `${db}/${project}/${dateFormat('yyyy-mm')}/${insertedId}/`;
             for (const file of files) {
                 if (file.size > 0) {
                     const src = file.path;
                     const dst = slug(file.name, { lower: true, remove: null });
-                    // fs.rename doesn't work across devices, so use node-mv instead for Heroku /tmp
-                    mv(src, './static/'+dir+dst, { mkdirp: true }, function(err) { if (err) console.error(err); });
 
-                    // replace path field with saved file location
+                    // move from tmp to static
+                    await fs.copy(src, './static/'+dir+dst); // TODO: use AWS for persistent file storage
+                    await fs.remove(src);
+                    file.name = dst;
+                    file.path = dir;
+
+                    // replace name with slug & path with saved file location
                     const filter = { _id: insertedId, 'report.files.path': src };
-                    const path = { 'report.files.$.path': dir };
+                    const path = { 'report.files.$.name': dst, 'report.files.$.path': dir };
                     await reports.updateOne(filter, { $set: path });
+
+                    // augment files object with EXIF metadata & save in analysis
+
+                    // extract EXIF metadata from files
+                    const exif = await exiftool.exiftool.read('./static/'+dir+dst);
+                    file.exif = {
+                        GPSLatitude:  exif.GPSLatitude,
+                        GPSLongitude: exif.GPSLongitude,
+                        CreateDate:   exif.CreateDate, // TODO: JS Date object?
+                    };
+
+                    await reports.updateOne({ _id: insertedId }, { $push: { 'analysis.files': file } });
+
                 }
             }
         }

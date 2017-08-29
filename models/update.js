@@ -7,7 +7,6 @@
 'use strict';
 
 const fs         = require('fs-extra');   // fs with extra functions & promise interface
-const mv         = require('mv');         // fs cannot do cross-device rename as req'd on Heroku moving from /tmp
 const slug       = require('slug');       // make strings url-safe
 const dateFormat = require('dateformat'); // Steven Levithan's dateFormat()
 const ObjectId   = require('mongodb').ObjectId;

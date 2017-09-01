@@ -1,0 +1,22 @@
+<form method="post" class="pure-form pure-form-aligned">
+    {{> back}}{{> step}}
+
+    <div class="pure-u">
+        <h1>Where did it happen?</h1>
+        <p class="hint-text">This can be a specific address, city, state or country</p>
+        <ul class="validation-errors">{{#@koa.flash.validation}} <li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+        <ul>
+            <li>
+                <input type="radio" name="where" id="remember" value="at-place"> <label for="remember">At:</label>
+                <input type="text" name="location-address" id="location-address" value="{{location-address}}">
+            </li>
+            <li>
+                <input type="radio" name="where" id="dont-remember" value="dont-remember"> <label for="dont-remember">I don't exactly remember</label>
+            </li>
+            <li>
+                <input type="radio" name="where" id="dont-know" value="dont-know"> <label for="dont-know">I don't know where it happened</label>
+            </li>
+        </ul>
+        {{> continue}}
+    </div>
+</form>

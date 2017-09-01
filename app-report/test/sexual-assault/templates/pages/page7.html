@@ -1,0 +1,52 @@
+<form method="post" class="pure-form pure-form-aligned">
+    {{> back}}{{> step}}
+
+    <script>
+        'use strict';
+        // use ajax to fill in name so that no special treatment is required within handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            // if we have no name on opening page, fetch a random one
+            if (document.querySelector('#generated-name').textContent == '') generateName();
+        });
+        function generateName() {
+            var request = new XMLHttpRequest();
+            request.open("GET", '/ajax/test/names/new');
+            request.onreadystatechange = function() {
+                if (request.status == 200 && request.responseText) { // request has succeeded and returned a response
+                    var data = JSON.parse(request.responseText);
+                    document.querySelector('#generated-name').textContent = data.name;
+                    document.querySelector('input[name=generated-name]').value = data.name;
+                }
+            };
+            request.send();
+        }
+    </script>
+
+    <div class="pure-u">
+        <h1>Have you used this anonymous reporting service before?</h1>
+        <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+        <ul>
+            <li>
+                <label for="reporting-yes" class="pure-radio greyed-out-unless-checked">
+                    <input type="radio" name="have-you-used-before" id="reporting-yes" value="y">
+                    <label class="black-text">Yes</label>
+                    <label for="existing-name">Enter your anonymous name</label>
+                    <input type="text" name="existing-name" id="existing-name" value="{{existing-name}}">
+                </label>
+            </li>
+            <li>
+                <label for="reporting-no" class="pure-radio greyed-out-unless-checked">
+                    <input type="radio" name="have-you-used-before" id="reporting-no" value="n" checked>
+                    <label class="black-text">No</label><br>
+                    <p>We make sure that your report is anonymous by creating a random identification
+                        name.</p>
+                    <p>If you want to follow up, use the anonymous name below so we can access any relevant information.</p>
+                    <p>This report will use <strong><output id="generated-name">{{generated-name}}</output></strong>
+                        <input type="hidden" name="generated-name" value="{{generated-name}}"></p>
+                    <button type="button" id="get-alt-name" class="inline-link" onclick="generateName();">Generate another random name</button>
+                </label>
+            </li>
+        </ul>
+        {{> continue}}
+    </div>
+</form>

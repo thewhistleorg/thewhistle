@@ -29,6 +29,7 @@ handler.getGenerateNewName = async function(ctx) {
     ctx.body = { name: name };
     ctx.body.root = 'generateName';
     ctx.status = 200; // Ok
+    ctx.set('Cache-Control', 'no-cache'); // stop IE cacheing generated names.
 };
 
 

@@ -8,11 +8,12 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/admin.css">
-    <link rel="stylesheet" href="/css/report.css">
-
     <link rel="stylesheet" href="/css/reports-filter.css">
     <style>
-
+        #map {
+            height: 400px;
+            width: 100%;
+        }
     </style>
     <script src="//cdnjs.cloudflare.com/ajax/libs/qs/6.4.0/qs.min.js" integrity="sha256-Epo8Yj1phr7IExs51UisfSWpmD5bmSf/DMeCcIUoBbM=" crossorigin="anonymous"></script>
     <script src="//unpkg.com/dateformat@2.0.0/lib/dateformat.js"></script>
@@ -116,7 +117,7 @@
 
 <main>
 
-<div class="export float-right">
+<div class="float-right">
   <span>Export: </span>
   <a href="{{exportPdf}}" title="Save as PDF" class="fa fa-file-pdf-o"></a>
   <span>/</span>

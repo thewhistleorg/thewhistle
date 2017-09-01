@@ -703,7 +703,7 @@ class ReportsHandlers {
 
 
     /**
-     * GET /reports/:id - Render view-report page showing metadata tab.
+     * GET /reports/:id - Render view-report page.
      */
     static async viewReport(ctx) {
         const db = ctx.state.user.db;
@@ -727,119 +727,6 @@ class ReportsHandlers {
         }
 
         // list of all available tags (for autocomplete input)
-        const tagList = await Report.tags(db);
-
-        // audit trail
-        const updates = await Update.getByReport(db, ctx.params.id);
-
-        const extra = {
-            reportedOnDay:  dateFormat(report.reported, 'd mmm yyyy'),
-            reportedOnFull: dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
-            reportedOnTz:   dateFormat(report.reported, 'Z'),
-            reportedBy:     report.by ? '@'+(await User.get(report.by)).username : report.name,
-            users:          users,               // for select
-            statuses:       statuses,            // for datalist
-            otherReports:   otherReports,
-            tagList:        tagList,             // for autocomplete datalist
-            files:          report.report.files, // for tabs
-            updates:        updates,
-            exportPdf:      ctx.request.href.replace('/reports', '/reports/export-pdf'),
-        };
-        extra.reportDescription = report.summary
-            ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`
-            : `Report by ${extra.reportedBy}, ${extra.reportedOnDay}`;
-
-        await ctx.render('reports-view-report', Object.assign(report, extra));
-        Report.flagView(db, ctx.params.id, ctx.state.user.id);
-    }
-
-
-    /**
-     * GET /reports/:id/submission - Render view-report-submission tab.
-     */
-    static async viewSubmission(ctx) {
-        const db = ctx.state.user.db;
-
-        // report details
-        const report = await Report.get(db, ctx.params.id);
-        if (!report) ctx.throw(404, 'Report not found');
-
-        report.reported = dateFormat(report._id.getTimestamp(), 'yyyy-mm-dd HH:MM');
-
-        const extra = {
-            reportedOnDay:  dateFormat(report.reported, 'd mmm yyyy'),
-            reportedOnFull: dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
-            reportedOnTz:   dateFormat(report.reported, 'Z'),
-            reportedBy:     report.by ? '@'+(await User.get(report.by)).username : report.name,
-            reportHtml:     jsObjectToHtml(report.report),
-            exportPdf:      ctx.request.href.replace('/reports', '/reports/export-pdf').replace('/files', ''),
-        };
-        extra.reportDescription = report.summary
-            ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`
-            : `Report by ${extra.reportedBy}, ${extra.reportedOnDay}`;
-
-        await ctx.render('reports-view-submission', Object.assign(report, extra));
-        Report.flagView(db, ctx.params.id, ctx.state.user.id);
-    }
-
-
-    /**
-     * GET /reports/:id/files - Render view-report-files tab.
-     */
-    static async viewFiles(ctx) {
-        const db = ctx.state.user.db;
-
-        // report details
-        const report = await Report.get(db, ctx.params.id);
-        if (!report) ctx.throw(404, 'Report not found');
-
-        report.reported = dateFormat(report._id.getTimestamp(), 'yyyy-mm-dd HH:MM');
-
-        const extra = {
-            reportedOnDay:  dateFormat(report.reported, 'd mmm yyyy'),
-            reportedOnFull: dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
-            reportedOnTz:   dateFormat(report.reported, 'Z'),
-            reportedBy:     report.by ? '@'+(await User.get(report.by)).username : report.name,
-            exportPdf:      ctx.request.href.replace('/reports', '/reports/export-pdf').replace('/files', ''),
-        };
-        extra.reportDescription = report.summary
-            ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`
-            : `Report by ${extra.reportedBy}, ${extra.reportedOnDay}`;
-        const incidentLocn = new LatLon(report.geocode.latitude, report.geocode.longitude)
-        const incidentTime = new Date(report.report.date+' '+report.report.time);
-        const submissionTime = report._id.getTimestamp();
-        for (const file of report.analysis.files) {
-            file.isImage = file.type.slice(0, 5) == 'image';
-            if (file.exif) {
-                const d = incidentLocn.distanceTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
-                file.distance = d > 1e3 ? Number(d.toPrecision(2))/1e3 + ' km' : Number(d.toPrecision(2)) + ' metres';
-                file.bearing = incidentLocn.bearingTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
-                file.direction = Dms.compassPoint(file.bearing);
-                const date = file.exif.CreateDate;
-                file.time = new Date(Date.UTC(date.year, date.month-1, date.day, date.hour, date.minute - date.tzoffsetMinutes)); // TODO: exif tz?
-                if (file.time) file.timeDesc = !isNaN(incidentTime)
-                    ? moment(file.time).from(incidentTime)+' from incident'
-                    : moment(file.time).from(submissionTime)+' from submission'
-            }
-        }
-
-        await ctx.render('reports-view-files', Object.assign(report, extra));
-        Report.flagView(db, ctx.params.id, ctx.state.user.id);
-    }
-
-
-    /**
-     * GET /reports/:id/commentary - Render view-report-commentary tab.
-     */
-    static async viewCommentary(ctx) {
-        // qv similar code in ajax.js / reportPostComment()
-        const db = ctx.state.user.db;
-
-        // report details
-        const report = await Report.get(db, ctx.params.id);
-        if (!report) ctx.throw(404, 'Report not found');
-
-        const users = await User.getAll();
         const tagList = await Report.tags(db);
 
         // convert @mentions & #tags to links, and add various useful properties to comments
@@ -867,36 +754,8 @@ class ReportsHandlers {
             };
         });
 
-        report.reported = dateFormat(report._id.getTimestamp(), 'yyyy-mm-dd HH:MM');
-
-        const extra = {
-            reportedOnDay:  dateFormat(report.reported, 'd mmm yyyy'),
-            reportedOnFull: dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
-            reportedOnTz:   dateFormat(report.reported, 'Z'),
-            reportedBy:     report.by ? '@'+(await User.get(report.by)).username : report.name,
-            comments:       comments,
-            exportPdf:      ctx.request.href.replace('/reports', '/reports/export-pdf').replace('/commentary', ''),
-        };
-        extra.reportDescription = report.summary
-            ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`
-            : `Report by ${extra.reportedBy}, ${extra.reportedOnDay}`;
-
-        await ctx.render('reports-view-commentary', Object.assign(report, extra));
-        Report.flagView(db, ctx.params.id, ctx.state.user.id);
-    }
-
-
-    /**
-     * GET /reports/:id/location - Render view-report-location tab.
-     */
-    static async viewLocation(ctx) {
-        const db = ctx.state.user.db;
-
-        // report details
-        const report = await Report.get(db, ctx.params.id);
-        if (!report) ctx.throw(404, 'Report not found');
-
-        report.reported = dateFormat(report._id.getTimestamp(), 'yyyy-mm-dd HH:MM');
+        // audit trail
+        const updates = await Update.getByReport(db, ctx.params.id);
 
         const y = 1000*60*60*24*365;
         const extra = {
@@ -904,18 +763,47 @@ class ReportsHandlers {
             reportedOnFull:   dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
             reportedOnTz:     dateFormat(report.reported, 'Z'),
             reportedBy:       report.by ? '@'+(await User.get(report.by)).username : report.name,
+            reportHtml:       jsObjectToHtml(report.report), // submitted incident report
             geocodeHtml:      jsObjectToHtml(report.geocode),
             formattedAddress: encodeURIComponent(report.geocode.formattedAddress),
-            lat:              report.geocode ? report.geocode.latitude : null,
+            lat:              report.geocode ? report.geocode.latitude  : null,
             lng:              report.geocode ? report.geocode.longitude : null,
             highlight:        Math.max(Math.round(100 * (report._id.getTimestamp() - new Date() + y) / y), 0),
-            exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf').replace('/location', ''),
+            comments:         comments,
+            users:            users,               // for select
+            statuses:         statuses,            // for datalist
+            otherReports:     otherReports,
+            tagList:          tagList,             // for autocomplete datalist
+            files:            report.report.files, // for tabs
+            updates:          updates,
+            exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
         };
         extra.reportDescription = report.summary
             ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`
             : `Report by ${extra.reportedBy}, ${extra.reportedOnDay}`;
 
-        await ctx.render('reports-view-location', Object.assign(report, extra));
+        // uploaded files
+        if (report.analysis.files) {
+            const incidentLocn = new LatLon(report.geocode.latitude, report.geocode.longitude);
+            const incidentTime = new Date(report.report.date+' '+report.report.time);
+            const submissionTime = report._id.getTimestamp();
+            for (const file of report.analysis.files) {
+                file.isImage = file.type.slice(0, 5) == 'image';
+                if (file.exif) {
+                    const d = incidentLocn.distanceTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
+                    file.distance = d > 1e3 ? Number(d.toPrecision(2))/1e3 + ' km' : Number(d.toPrecision(2)) + ' metres';
+                    file.bearing = incidentLocn.bearingTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
+                    file.direction = Dms.compassPoint(file.bearing);
+                    const date = file.exif.CreateDate;
+                    file.time = new Date(Date.UTC(date.year, date.month-1, date.day, date.hour, date.minute - date.tzoffsetMinutes)); // TODO: exif tz?
+                    if (file.time) file.timeDesc = !isNaN(incidentTime)
+                        ? moment(file.time).from(incidentTime)+' from incident'
+                        : moment(file.time).from(submissionTime)+' from submission'
+                }
+            }
+        }
+
+        await ctx.render('reports-view', Object.assign(report, extra));
         Report.flagView(db, ctx.params.id, ctx.state.user.id);
     }
 

@@ -214,12 +214,6 @@ span.tag, a.tag {
     white-space: nowrap;
 }
 
-.export {
-    font-size: 1em;
-    margin-top: 2.4em;
-    margin-left: 0.4em;
-}
-
 /* override pure form checkbox labels */
 
 .pure-form-aligned .pure-control-group input+label {

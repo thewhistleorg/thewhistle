@@ -82,6 +82,8 @@ class Update {
         for (const u of upd) {
             u.on = u._id.getTimestamp();
             u.onFull = dateFormat(u.on, 'd mmm yyyy HH:MM');
+            u.onDate = dateFormat(u.on, 'd mmm yyyy');
+            u.onTime = dateFormat(u.on, 'HH:MM');
             u.by = names.get(u.userId.toString())
             u.report = await Report.get(db, u.reportId); // note if report gets deleted this will be null!
             u.description = Update.updateDescription(u.update, names);
@@ -149,10 +151,13 @@ class Update {
 
         const names = await User.names(); // note names is a Map
 
+        // TODO: right place to be doing this?
         for (const u of upd) {
             u.by = names.get(u.userId.toString());
             u.on = u._id.getTimestamp();
             u.onFull = dateFormat(u.on, 'd mmm yyyy HH:MM');
+            u.onDate = dateFormat(u.on, 'd mmm yyyy');
+            u.onTime = dateFormat(u.on, 'HH:MM');
             u.description = Update.updateDescription(u.update, names);
         }
 

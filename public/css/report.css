@@ -1,74 +1,270 @@
+/* Stylesheet for public/civilian reporting app */
 
-/* list of reports */
-
-table {
-  margin-top: 1em;
-  margin-bottom: 1em;
-  min-width: 400px;
+body {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    background: white;
+    color: #444444;
+    padding: 0;
 }
 
-td, th {
-  border: 1px solid #eeeeee;
-  min-width: 2em;
-  padding: 0.2em 0.4em;
+main {
+    margin: 0 auto;
+    max-width: 48em;
+    padding: 0 1em;
 }
 
-td form {
-  margin: 0;
+h1 {
+    font-size: 1.5em;
+    font-weight: 300;
+    line-height: 1;
+    margin: 0 0 0.75em 0;
 }
 
-td a.fa-stack-text {
-  color: #999999;
+a            { color: #033549; }
+a, a:visited { color: #033549; }
+a.grey       { color: #999999; }
+.green       { color: #006600; }
+.red         { color: #660000; }
+
+
+form li {
+    clear: both;
+    margin: 1.5em 1em;
 }
 
-th span[data-sort] {
-  color: #cccccc;
-  padding-left: 0.4em;
-  padding-top: 0.5ex;
-  vertical-align: bottom;
+button.nav {
+    background: none;
+    border: none;
+    color: #033549;
+    float: right;
+    font-weight: bold;
+    margin-top: 1em;
+    cursor: pointer;
+}
+
+input[type=file].upload-file {
+    background: none;
+    border: none;
+    color: #406591;
+    font-weight: bold;
+    margin-top: 1em;
+    cursor: pointer;
+}
+
+label {
+    margin-top: 1em;
+    width: auto;
+}
+input[type=date], input[type=time] {
+    width: auto;
+}
+input[type=number] {
+    width: auto;
+}
+input[type=radio] {
+    float: none;
+    width: auto;
+}
+
+table.progress {
+    border-collapse: collapse;
+    float: right;
+    font-size: 80%;
+}
+table.progress td {
+    border: 1px solid #033549;
+    min-width: 3em;
+    padding: 0.1em 0.25em;
+    text-align: center;
+}
+table.progress td.current {
+    background-color: #009900;
+    color: #ffffff;
+}
+
+ul.validation-errors {
+    list-style: none;
+    color: #990000;
 }
 
 
-/* TODO: probably won't want to keep delete function on this page, but useful for testing */
-
-button.fa-trash {
-  background: none;
-  border: none;
-  color: #990000;
-}
-
-button.fa-trash:hover {
-  cursor: pointer;
-}
-
-td.action, th.action {
-  border: none;
-}
-
-td.assigned, span.tag {
-  color: #406591;
-  cursor: pointer;
-}
-
-
-/* map */
-
-#map {
-  height: 400px;
-  width: 100%;
-}
-
-
-/* TODO: probably won't want to keep delete function on this page, but useful for testing */
-
-/*submission date UI fix - workaround
-TODO:this much be handled properly */
-
-.tooltip.tooltip-main.top {
-    margin-top: -28px;
-    background: #fff;
-    border: 1px solid #ebebeb;
+header {
+    background: #033549;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
     font-size: 1.2em;
-    padding: 0px 17px;
-    margin-left: 0px!important;
+    font-weight: 300;
+    padding: 0.2em 0 0.1em 0.4em;
+    margin: 0 0 2em 0;
+    /*padding-top: 0.4em*/
+}
+
+button.inline-link {
+    background: none;
+    border: none;
+    color: #406591;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+@media (max-width: 400px) {
+    header {
+        font-size: 0.9em;
+    }
+}
+
+header {
+    color: #ffffff;
+}
+
+.logo-container {
+    content: url(../img/logo-128.png);
+}
+
+.progress-bar {
+    margin-bottom: 1em;
+}
+
+header nav img {
+    margin: 7px 0 0 15px;
+}
+
+/* Pure CSS enhancements, for the sake of Progress Bar */
+
+.pure-u-2-8 {
+    width: 25%;
+}
+
+.pure-u-4-8 {
+    width: 50%;
+}
+
+.pure-u-6-8 {
+    width: 75%;
+}
+
+.pure-form select {
+    height: auto;
+}
+
+input[type="checkbox"] {
+    margin-right: 0.5em;
+}
+
+.nav-action-button {
+    color:white;
+    background-color: #416dbc;
+    margin-top: 1em;
+    font-weight: bold;
+    padding: 4px 20px 4px 20px;
+    border-radius: 5px;
+    border-width: 0;
+}
+
+ul.with-bullets li {
+    list-style-type: disc;
+    margin: 0 0 0 1em;
+}
+
+ul.with-margin li {
+    margin: 0 0 1em 1em;
+}
+
+.width-2chars {
+    width: 2.5em;
+}
+.width-4chars {
+    width: 5em;
+}
+
+div.bumper {
+    width: 1.5em;
+    min-height: 1px;
+}
+
+p {
+    margin-top: 0;
+}
+
+ul {
+    margin: 0;
+}
+
+.special-intro {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.hint-text {
+    font-size: 13px;
+    color: #767676;
+}
+
+.greyed, .greyed button.inline-link {
+    color: #888888;
+}
+
+.black-text {
+    color: #000000;
+}
+
+.compact {
+    font-size: 9pt;
+    margin: 2px 0 0.9em 2px;
+}
+
+.tick {
+    width: 27px;
+    height: 22px;
+}
+
+.banner {
+    width: 100%;
+    height: 50px;
+    background-color: #0f2533;
+    text-align: center;
+    margin-bottom: 2em;
+    padding-top: 2em;
+}
+
+.banner h1 {
+    color: #ffffff;
+    font-weight: 500;
+    font-size: 2em;
+}
+
+.radio-margin {
+    margin-left: 2em;
+}
+
+table.inline {
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+tr.field-label {
+    font-size: 8pt;
+    color: #999999;
+}
+
+label.inline {
+    display: inline;
+}
+
+@media screen and (max-width: 480px) {
+    header img {
+        width: 140px;
+        height: 16px;
+    }
+}
+
+header .pure-menu-horizontal ul.pure-menu-list {
+    /*
+     Max width is 40em so that the header appears the same width as the body, which is defined as max width 48em.
+     The difference is something to do with the ratio between the two font sizes.
+    */
+    max-width: 40em;
+    margin: 0 auto;
+    display: block;
 }

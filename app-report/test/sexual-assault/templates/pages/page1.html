@@ -1,0 +1,19 @@
+<form method="post" class="pure-form pure-form-aligned">
+    {{> back}}{{> step}}
+
+    <div class="pure-u">
+        <h1>Are you reporting on behalf of yourself or someone else?</h1>
+        <ul class="validation-errors">{{#@koa.flash.validation}}
+            <li>{{this}}</li>{{/@koa.flash.validation}}
+        </ul>
+        <ul>
+            <li>
+                <input type="radio" name="on-behalf-of" id="myself" value="myself"> <label for="myself">Me</label>
+            </li>
+            <li>
+                <input type="radio" name="on-behalf-of" id="someone-else" value="someone-else"> <label for="someone-else">Someone else</label>
+            </li>
+        </ul>
+        {{> continue}}
+    </div>
+</form>

@@ -14,7 +14,6 @@ const serve      = require('koa-static');     // static file serving middleware
 const convert    = require('koa-convert');    // tmp for koa-flash, koa-lusca
 const bunyan     = require('bunyan');         // logging
 const koaLogger  = require('koa-bunyan');     // logging
-const document   = new (require('jsdom')).JSDOM().window.document; // DOM Document interface in Node!
 
 
 const app = new Koa(); // report app

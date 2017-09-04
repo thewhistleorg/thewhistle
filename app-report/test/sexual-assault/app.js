@@ -13,6 +13,7 @@
 const Koa         = require('koa');                 // koa framework
 const handlebars  = require('koa-handlebars');      // handlebars templating
 const MongoClient = require('mongodb').MongoClient; // official MongoDB driver for Node.js
+const document   = new (require('jsdom')).JSDOM().window.document; // DOM Document interface in Node!
 
 
 const app = new Koa(); // report app

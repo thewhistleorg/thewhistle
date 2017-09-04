@@ -1,14 +1,14 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* WWW handlers (invoked by router to render templates)                                           */
+/* Handlers: test/scr (survivor-centred response                                                  */
 /*                                                                                                */
 /* All functions here either render or redirect, or throw.                                        */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';
 
-const Report = require('../models/report.js');
+const Report = require('../../../models/report.js');
 
-class Scr {
+class Handlers {
 
     static async getPage(ctx) {
         const page = ctx.params.num;
@@ -17,7 +17,7 @@ class Scr {
 
         const context = { ['xxx']: 'checked' }; // TODO: ???
 
-        await ctx.render('scr/'+page, ctx.session.report);
+        await ctx.render('page'+page, ctx.session.report);
     }
 
     static postPage(ctx) {
@@ -28,21 +28,21 @@ class Scr {
         delete ctx.request.body['nav-next'];
 
         ctx.session.report = Object.assign(ctx.session.report, ctx.request.body);
-        ctx.redirect('/scr/'+(go<=7 ? go : 'submit'));
+        ctx.redirect('/test/scr/'+(go<=7 ? go : 'submit'));
     }
 
     // ---- submit
 
     static async getSubmit(ctx) {
-        await ctx.render('scr/submit', ctx.session.report.submit);
+        await ctx.render('submit', ctx.session.report.submit);
     }
 
     static async postSubmit(ctx) {
         // record this report
         delete ctx.request.body['submit'];
-        await Report.insert('test', ctx.session.report);
+        await Report.insert('test', undefined, '—', ctx.session.report, 'scr', ctx.session.files);
         ctx.session = null;
-        ctx.redirect('/scr/');
+        ctx.redirect('/test/scr');
     }
 
 }
@@ -50,4 +50,4 @@ class Scr {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = Scr;
+module.exports = Handlers;

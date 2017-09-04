@@ -74,17 +74,16 @@ class LoginHandlers {
 
         let [user] = await User.getBy('email', body.username); // lookup user
 
-        if (user) {
-            // verify password matches
-            try {
-                const match = await scrypt.verifyKdf(Buffer.from(user.password, 'base64'), body.password);
-                if (!match) user = null; // bad password
-            } catch (e) {
-                user = null; // e.g. "data is not a valid scrypt-encrypted block"
-            }
+        // always invoke verifyKdf (whether email found or not) to mitigate against timing attacks on login function
+        const userPassword = user ? user.password : Math.random().toString();
+        let passwordMatch = null;
+        try {
+            passwordMatch = await scrypt.verifyKdf(Buffer.from(user.password, 'base64'), body.password);
+        } catch (e) {
+            user = null; // e.g. "data is not a valid scrypt-encrypted block"
         }
 
-        if (!user) {
+        if (!user || !passwordMatch) {
             // login failed: redisplay login page with login fail message
             const loginfailmsg = 'E-mail / password not recognised';
             ctx.flash = { formdata: body, loginfailmsg: loginfailmsg };

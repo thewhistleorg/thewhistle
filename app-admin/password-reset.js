@@ -47,7 +47,6 @@ class PasswordResetHandlers {
         const email = ctx.request.body.email;
 
         const [user] = await User.getBy('email', email);
-        if (!user) { ctx.redirect('/password/reset-request-confirm'); return; }
 
         // current timestamp for token expiry in base36
         const now = Math.floor(Date.now()/1000).toString(36);
@@ -56,6 +55,9 @@ class PasswordResetHandlers {
         const hash = crypto.createHash('sha256').update(Math.random().toString());
         const rndHash = parseInt(hash.digest('hex'), 16).toString(36).slice(0,8);
         const token = now+'-'+rndHash; // note use timestamp first so it is easier to identify old tokens in db
+
+        // note: do createHash() before checking if user exists to mitigate against timing attacks
+        if (!user) { ctx.redirect('/password/reset-request-confirm'); return; }
 
         // record reset request in db
         await User.update(user._id, { passwordResetRequest: token });

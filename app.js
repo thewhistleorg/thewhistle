@@ -15,6 +15,7 @@ const body        = require('koa-body');       // body parser
 const compose     = require('koa-compose');    // middleware composer
 const compress    = require('koa-compress');   // HTTP compression
 const session     = require('koa-session');    // session for flash messages
+const dateFormat  = require('dateformat');     // Steven Levithan's dateFormat()
 const MongoClient = require('mongodb').MongoClient;
 const fs          = require('mz/fs');          // 'modernised' node api
 const debug       = require('debug')('app');   // small debugging utility
@@ -62,8 +63,10 @@ app.use(async function robots(ctx, next) {
 app.use(body({ multipart: true }));
 
 
-// set signed cookie keys for JWT cookie & session cookie
-app.keys = ['koa-sample-app'];
+// set signed cookie keys for JWT cookie & session cookie; keys are rotated monthly with 3-month
+// lifetime, stem is taken from environment variable to protect against source code leak; note keys
+// are set on app startup, which on Heroku happens at least daily
+app.keys = [ 0, 1, 2 ].map(x => process.env.COOKIE_KEY + dateFormat(new Date(new Date().getFullYear(), new Date().getMonth()-x, 1), '-yyyy-mm'));
 
 // session for flash messages (uses signed session cookies, with no server storage)
 app.use(session(app));

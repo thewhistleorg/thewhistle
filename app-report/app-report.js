@@ -15,7 +15,6 @@ const convert    = require('koa-convert');    // tmp for koa-flash, koa-lusca
 const bunyan     = require('bunyan');         // logging
 const koaLogger  = require('koa-bunyan');     // logging
 const document   = new (require('jsdom')).JSDOM().window.document; // DOM Document interface in Node!
-const MongoClient = require('mongodb').MongoClient;
 
 
 const app = new Koa(); // report app
@@ -33,22 +32,6 @@ app.use(handlebars({
     viewsDir:    'app-report/templates',
     partialsDir: 'app-report/templates/partials',
 }));
-
-
-// get database connection if not already available TODO: get database from URL component
-app.use(async function getDbConnection(ctx, next) {
-    if (!global.db['test']) {
-        try {
-            const connectionString = process.env['DB_TEST'];
-            global.db['test'] = await MongoClient.connect(connectionString);
-        } catch (e) {
-            const context500 = app.env=='production' ? {} : { e: e };
-            await ctx.render('500-internal-server-error', context500);
-            return;
-        }
-    }
-    await next();
-});
 
 
 // handle thrown or uncaught exceptions anywhere down the line

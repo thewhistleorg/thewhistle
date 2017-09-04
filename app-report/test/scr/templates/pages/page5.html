@@ -1,36 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <title>The Whistle Eyewitness Report</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-    <link rel="stylesheet" href="/css/base.css">
-    <link rel="stylesheet" href="/css/scr.css">
-    <style>
-        .note { color: #999999; font-size: 90%; }
-        label { min-width: 12em; }
-        input + label { min-width: auto; }
-        p.note { clear: both; } /* for nav buttons */
-    </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            if (document.querySelector('#type-penetration-involved').defaultChecked) {
-                document.querySelector('#penetration-ul').classList.remove('hide');
-            }
-            document.querySelectorAll('input[name=type]').forEach(i => i.onchange = function() {
-                if (this.value == 'penetration-involved') {
-                    document.querySelector('#penetration-ul').classList.remove('hide');
-                } else {
-                    document.querySelector('#penetration-ul').classList.add('hide');
-                }
-            });
-        });
-    </script>
-    <script defer src="/js/report.js"></script>
-</head>
-<body>
-
 <main>
 
 <table class="progress"><tr><td>TBC</td></tr></table>
@@ -106,6 +73,3 @@
 <p class="note">[note: penetration could be on same page as here, or on subsequent page controlled by conditional logic]</p>
 
 </main>
-
-</body>
-</html>

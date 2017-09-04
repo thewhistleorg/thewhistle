@@ -13,7 +13,7 @@
 const Koa         = require('koa');                 // koa framework
 const handlebars  = require('koa-handlebars');      // handlebars templating
 const MongoClient = require('mongodb').MongoClient; // official MongoDB driver for Node.js
-const document   = new (require('jsdom')).JSDOM().window.document; // DOM Document interface in Node!
+const document    = new (require('jsdom')).JSDOM().window.document; // DOM Document interface in Node!
 
 
 const app = new Koa(); // report app
@@ -24,7 +24,7 @@ app.use(async function getDbConnection(ctx, next) {
     if (!global.db[ctx.params.database]) {
         try {
             const connectionString = process.env['DB_'+ctx.params.database.toUpperCase()];
-            global.db[ctx.params] = await MongoClient.connect(connectionString);
+            global.db[ctx.params.database] = await MongoClient.connect(connectionString);
         } catch (e) {
             app.throw(e);
         }

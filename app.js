@@ -79,6 +79,22 @@ app.use(async function(ctx, next) {
 });
 
 
+// get database connection to 'users' database if not already available (only done on first request
+// after app startup)
+global.db = {}; // initialise global.db to empty object on app startup
+app.use(async function(ctx, next) {
+    if (!global.db.users) {
+        try {
+            global.db.users = await MongoClient.connect(process.env.DB_USERS);
+        } catch (e) {
+            console.error('Mongo connection error', e.toString());
+            process.exit(1);
+        }
+    }
+    await next();
+});
+
+
 // select sub-app (admin/api) according to host subdomain (could also be by analysing request.url);
 // separate sub-apps can be used for modularisation of a large system, for different login/access
 // rights for public/protected elements, and also for different functionality between api & web
@@ -111,22 +127,10 @@ app.use(async function composeSubapp(ctx) { // note no 'next' after composed sub
 });
 
 
-/* connect to mongodb & create server  - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/* create server - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-
-// As MongoDB connection is asynchronous, we have to connect with a promise and initialise the app
-// on return. Connections to (per-organisation) reports databases are made as required, in
-// app-admin.js.
-MongoClient.connect(process.env['DB_USERS'])
-    .then(database => {
-        global.db = { users: database };
-        app.listen(process.env.PORT || 3000);
-        console.info(`${process.version} listening on port ${process.env.PORT || 3000} (${app.env})`);
-    })
-    .catch(e => {
-        console.error('Mongo connection error', e.toString());
-        process.exit(1);
-    });
+app.listen(process.env.PORT || 3000);
+console.info(`${process.version} listening on port ${process.env.PORT || 3000} (${app.env})`);
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

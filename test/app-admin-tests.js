@@ -11,7 +11,6 @@
 const supertest   = require('supertest');   // SuperAgent driven library for testing HTTP servers
 const expect      = require('chai').expect; // BDD/TDD assertion library
 const JsDom       = require('jsdom').JSDOM; // JavaScript implementation of DOM and HTML standards
-const MongoClient = require('mongodb').MongoClient;
 const ObjectId    = require('mongodb').ObjectId;
 const dateFormat  = require('dateformat');  // Steven Levithan's dateFormat()
 const base64      = require('base-64');     // base64 encoder/decoder
@@ -22,23 +21,9 @@ const testuser = process.env.TESTUSER;
 const testpass = process.env.TESTPASS;
 
 
-let request = null;
+const request = supertest.agent(app.listen());
 
 const headers = { Host: 'admin.localhost:3000' }; // set host header
-
-before(function(done) {
-    this.timeout(10e3); // 10 sec
-    MongoClient.connect(process.env['DB_USERS'])
-        .then(function(database) {
-            global.db = { users: database };
-            request = supertest.agent(app.listen());
-            done();
-        })
-        .catch(function(err) {
-            console.error(err.toString());
-            process.exit(1);
-        });
-});
 
 // note that document.querySelector() works with CSS ids which are more restrictive than HTML5 ids,
 // so getElementById() has to be used to find ObjectId ids instead of querySelector()

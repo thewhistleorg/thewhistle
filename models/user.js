@@ -30,7 +30,7 @@ class User {
      * @returns {Object}   User details.
      */
     static async get(id) {
-        const users = global.db['users'].collection('users');
+        const users = global.db.users.collection('users');
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
         const user = await users.findOne(id);
         return user;
@@ -43,7 +43,7 @@ class User {
      * @returns {Object[]} Users details.
      */
     static async getAll() {
-        const users = global.db['users'].collection('users');
+        const users = global.db.users.collection('users');
         const usrs = await users.find({}).toArray();
         return usrs;
     }
@@ -57,7 +57,7 @@ class User {
      * @returns {Object[]}      Users details.
      */
     static async getBy(field, value) {
-        const users = global.db['users'].collection('users');
+        const users = global.db.users.collection('users');
         const usrs = await users.find({ [field]: value }).toArray();
         return usrs;
     }
@@ -71,7 +71,7 @@ class User {
      * @throws  Error on validation or referential integrity errors.
      */
     static async insert(values) {
-        const users = global.db['users'].collection('users');
+        const users = global.db.users.collection('users');
         try {
             const { insertedId } = await users.insertOne(values);
             return insertedId;
@@ -93,7 +93,7 @@ class User {
      * @throws Error on referential integrity errors.
      */
     static async update(id, values) {
-        const users = global.db['users'].collection('users');
+        const users = global.db.users.collection('users');
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
         await users.updateOne({ _id: id }, { $set: values });
     }
@@ -106,7 +106,7 @@ class User {
      * @throws Error
      */
     static async delete(id) {
-        const users = global.db['users'].collection('users');
+        const users = global.db.users.collection('users');
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
         await users.deleteOne({ _id: id });
     }
@@ -118,7 +118,7 @@ class User {
      * @returns {Map} User details indexed by id.
      */
     static async details() {
-        const users = global.db['users'].collection('users');
+        const users = global.db.users.collection('users');
         const usrs = await users.find({}).toArray();
         const map = new Map;
         usrs.forEach(u => map.set(u._id.toString(), u));
@@ -132,7 +132,7 @@ class User {
      * @returns {Map} User names indexed by id.
      */
     static async names() {
-        const users = global.db['users'].collection('users');
+        const users = global.db.users.collection('users');
         const usrs = await users.find({}).toArray();
         const map = new Map;
         usrs.forEach(u => map.set(u._id.toString(), u.username));

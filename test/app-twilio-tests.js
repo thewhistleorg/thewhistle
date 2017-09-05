@@ -7,7 +7,6 @@
 const supertest   = require('supertest');   // SuperAgent driven library for testing HTTP servers
 const expect      = require('chai').expect; // BDD/TDD assertion library
 const JsDom       = require('jsdom').JSDOM; // JavaScript implementation of DOM and HTML standards
-const MongoClient = require('mongodb').MongoClient;
 
 const app = require('../app.js');
 
@@ -15,21 +14,7 @@ const testuser = process.env.TESTUSER;
 const testpass = process.env.TESTPASS;
 
 
-let request = null;
-
-before(function(done) {
-    this.timeout(5e3); // 5 sec
-    MongoClient.connect(process.env['DB_USERS'])
-        .then(function(database) {
-            global.db = { users: database };
-            request = supertest.agent(app.listen());
-            done();
-        })
-        .catch(function(err) {
-            console.error(err.toString());
-            process.exit(1);
-        });
-});
+const request = supertest.agent(app.listen());
 
 describe('Twilio app'+' ('+app.env+')', function() {
     this.timeout(5e3); // 5 sec

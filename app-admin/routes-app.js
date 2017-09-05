@@ -152,18 +152,18 @@ router.post('/users/:id/delete', users.processDelete); // process delete user
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/*  Centres routes                                                                                */
+/*  Resources routes                                                                              */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const centres = require('./centres.js');
+const resources = require('./resources.js');
 
-router.get('/centres',             centres.list);          // render list centres page
-router.get('/centres/add',         centres.add);           // render add centre page
-router.get('/centres/:id/edit',    centres.edit);          // render edit centre page
+router.get('/resources',             resources.list);          // render list resources page
+router.get('/resources/add',         resources.add);           // render add resource page
+router.get('/resources/:id/edit',    resources.edit);          // render edit resource page
 
-router.post('/centres/add',        centres.processAdd);    // process add centre
-router.post('/centres/:id/edit',   centres.processEdit);   // process edit centre
-router.post('/centres/:id/delete', centres.processDelete); // process delete centre
+router.post('/resources/add',        resources.processAdd);    // process add resource
+router.post('/resources/:id/edit',   resources.processEdit);   // process edit resource
+router.post('/resources/:id/delete', resources.processDelete); // process delete resource
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

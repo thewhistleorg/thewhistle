@@ -9,9 +9,9 @@
 const scrypt = require('scrypt');       // scrypt library
 const jwt    = require('jsonwebtoken'); // JSON Web Token implementation
 
-const Centre = require('../models/centre.js');
-const Report = require('../models/report.js');
-const User   = require('../models/user.js');
+const User     = require('../models/user.js');
+const Report   = require('../models/report.js');
+const Resource = require('../models/resource.js');
 
 const MongoClient = require('mongodb').MongoClient;
 
@@ -125,7 +125,7 @@ class LoginHandlers {
 
         // init db in case this is first time db is used
         await Report.init(db);
-        await Centre.init(db);
+        await Resource.init(db);
 
         // submitted credentials validate: create JWT & record it in a cookie to 'log in' user
 

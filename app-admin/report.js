@@ -11,8 +11,8 @@
 
 const Geocoder = require('node-geocoder'); // library for geocoding and reverse geocoding
 
-const Centre = require('../models/centre.js');
-const Report = require('../models/report.js');
+const Report   = require('../models/report.js');
+const Resource = require('../models/resource.js');
 
 const autoIdentifier   = require('../lib/auto-identifier.js');
 const jsObjectToHtml   = require('../lib/js-object-to-html.js');
@@ -82,18 +82,18 @@ class IncidentReport {
         report.lat = report.location.coordinates[1];
         report.lon = report.location.coordinates[0];
 
-        const centres = await Centre.getNear('test', report.lat, report.lon, 10e3);
-        centres.forEach(centre => {
+        const resources = await Resource.getNear('test', report.lat, report.lon, 10e3);
+        resources.forEach(resource => {
             const lat1 = report.lat;
             const lon1 = report.lon;
-            const lat2 = centre.location.coordinates[1];
-            const lon2 = centre.location.coordinates[0];
+            const lat2 = resource.location.coordinates[1];
+            const lon2 = resource.location.coordinates[0];
             const φ1 = lat1*Math.PI/180, φ2 = lat2*Math.PI/180, Δλ = (lon2-lon1)*Math.PI/180, R = 6371e3;
             const d = Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
-            centre.distance = (d/1000).toPrecision(2);
+            resource.distance = (d/1000).toPrecision(2);
         })
 
-        await ctx.render(ctx.state.user.db+'/'+ctx.params.project+'-confirm', { report, centres });
+        await ctx.render(ctx.state.user.db+'/'+ctx.params.project+'-confirm', { report, resources });
     }
 
 

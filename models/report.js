@@ -283,7 +283,9 @@ class Report {
 
         // record weather conditions at location & date of incident
         const incidentOn = new Date(report.date+' '+report.time);
-        values.analysis.weather = await Weather.fetchWeatherConditions(geocode.latitude, geocode.longitude, incidentOn);
+        if (incidentOn.getTime() && geocode) {
+            values.analysis.weather = await Weather.fetchWeatherConditions(geocode.latitude, geocode.longitude, incidentOn);
+        }
 
         //values._id = ObjectId(Math.floor(Date.now()/1000 - Math.random()*60*60*24*365).toString(16)+(Math.random()*2**64).toString(16)); // random date in past year
         const { insertedId } = await reports.insertOne(values);

@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Centres handlers - manage adding, editing, deleting rape/crisis centres.                       */
+/* Resources handlers - manage adding, editing, deleting rape/crisis resources.                   */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */
@@ -9,7 +9,7 @@
 
 'use strict';
 
-const Centre = require('../models/centre.js');
+const Resource = require('../models/resource.js');
 
 const validationErrors = require('../lib/validation-errors.js');
 
@@ -20,43 +20,43 @@ const validation = {
     lon:  'type=number required',
 };
 
-class CentresHandlers {
+class ResourcesHandlers {
 
     /**
-     * GET /centres/add - Render add centre page.
+     * GET /resources/add - Render add resource page.
      */
     static async add(ctx) {
-        const availableDatabases = Object.keys(global.db).filter(db => db!='centres');
+        const availableDatabases = Object.keys(global.db).filter(db => db!='resources');
         const context = Object.assign({ availableDatabases }, ctx.flash.formdata);
-        await ctx.render('centres-add', context);
+        await ctx.render('resources-add', context);
     }
 
 
     /**
-     * GET /centres - Render list centres page.
+     * GET /resources - Render list resources page.
      */
     static async list(ctx) {
         const db = ctx.state.user.db;
 
-        const centres = await Centre.getAll(db);
-        centres.forEach(c => {
+        const resources = await Resource.getAll(db);
+        resources.forEach(c => {
             c.lat = c.location.coordinates[1].toFixed(4);
             c.lon = c.location.coordinates[0].toFixed(4);
         });
-        centres.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1);
-        await ctx.render('centres-list', { centres });
+        resources.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1);
+        await ctx.render('resources-list', { resources });
     }
 
 
     /**
-     * GET /centres/edit - Render edit centre page.
+     * GET /resources/edit - Render edit resource page.
      */
     static async edit(ctx) {
         const db = ctx.state.user.db;
-        const centre = await Centre.get(db, ctx.params.id);
+        const resource = await Resource.get(db, ctx.params.id);
 
-        const context = Object.assign(centre, ctx.flash.formdata);
-        await ctx.render('centres-edit', context);
+        const context = Object.assign(resource, ctx.flash.formdata);
+        await ctx.render('resources-edit', context);
     }
 
 
@@ -66,7 +66,7 @@ class CentresHandlers {
 
 
     /**
-     * POST /centres/add - Process add centre.
+     * POST /resources/add - Process add resource.
      */
     static async processAdd(ctx) {
         const db = ctx.state.user.db;
@@ -78,11 +78,11 @@ class CentresHandlers {
 
         try {
 
-            const id = await Centre.insert(db, ctx.request.body);
+            const id = await Resource.insert(db, ctx.request.body);
             ctx.set('X-Insert-Id', id); // for integration tests
 
-            // return to list of centres
-            ctx.redirect('/centres');
+            // return to list of resources
+            ctx.redirect('/resources');
 
         } catch (e) {
             // stay on same page to report error (with current filled fields)
@@ -95,17 +95,17 @@ class CentresHandlers {
 
 
     /**
-     * POST /centres/:centrename/edit - Process edit centre.
+     * POST /resources/:resourcename/edit - Process edit resource.
      */
     static async processEdit(ctx) {
         const db = ctx.state.user.db;
 
         try {
 
-            await Centre.update(db, ctx.params.id, ctx.request.body);
+            await Resource.update(db, ctx.params.id, ctx.request.body);
 
-            // return to list of centres
-            ctx.redirect('/centres');
+            // return to list of resources
+            ctx.redirect('/resources');
 
         } catch (e) {
             // stay on current page to report error
@@ -117,17 +117,17 @@ class CentresHandlers {
 
 
     /**
-     * POST /centres/:id/delete - Process delete centre.
+     * POST /resources/:id/delete - Process delete resource.
      */
     static async processDelete(ctx) {
         const db = ctx.state.user.db;
 
         try {
 
-            await Centre.delete(db, ctx.params.id);
+            await Resource.delete(db, ctx.params.id);
 
-            // return to list of centres
-            ctx.redirect('/centres');
+            // return to list of resources
+            ctx.redirect('/resources');
 
         } catch (e) {
             // stay on current page to report error
@@ -142,4 +142,4 @@ class CentresHandlers {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = CentresHandlers;
+module.exports = ResourcesHandlers;

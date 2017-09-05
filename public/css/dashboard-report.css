@@ -1,0 +1,64 @@
+/* Report Page */
+
+.report-container {
+    border-left: 1px solid #ebebeb;
+}
+
+.report-header-container {
+    background: #485a61;
+    color: #ffffff;
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.report-header {
+    font-size: 1.3em;
+}
+
+.report-action {
+    padding: 0 10px;
+}
+
+#commentsContainer {
+    /*padding: 15px;*/
+}
+
+#rightFixedSidebar {
+    position: fixed;
+    overflow-y: scroll;
+    top: 107px;
+    bottom: 0;
+    right: 0;
+    background: #ffffff;
+}
+
+.link-inverse{
+    color: #ffffff;
+}
+
+.weather-header {
+    font-size: 1.2em;
+    padding: 10px;
+    border-bottom: 1px solid #ebebeb;
+    margin-bottom: -1px;
+}
+
+.weather-header > span {
+    margin-right: 15px;
+}
+
+.weather-body {
+    padding: 15px;
+}
+
+.weather-condition {
+    display: inline-block;
+}
+
+.weather-condition > div {
+    padding: 4px 0;
+}
+
+.weather-condition-hour {
+    font-size: 0.9em;
+}

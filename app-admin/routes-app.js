@@ -51,11 +51,7 @@ router.get('/reports-map',             reports.map);             // render repor
 router.get('/reports/export-csv',      reports.exportCsv);       // download CSV list of reports
 router.get('/reports/export-pdf',      reports.exportPdf);       // download PDF list of reports
 router.get('/reports/export-pdf/:id',  reports.exportPdfSingle); // download PDF of report
-router.get('/reports/:id',             reports.viewReport);      // render view report management tab
-router.get('/reports/:id/submission',  reports.viewSubmission);  // render view submitted report tab
-router.get('/reports/:id/files',       reports.viewFiles);       // render view report files tab
-router.get('/reports/:id/commentary',  reports.viewCommentary);  // render view report commentary tab
-router.get('/reports/:id/location',    reports.viewLocation);    // render view report location tab
+router.get('/reports/:id',             reports.viewReport);      // render view report tab
 router.get('/reports/:id/edit',        reports.edit);            // render edit report details page
 router.get('/reports/:id/delete',      reports.delete);          // render delete a report page
 

@@ -70,7 +70,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('submits incident report', async function() {
             const values = {
                 'generated-name':    'testy-tiger',
-                date:                dateFormat('yyyy-mm-dd'),
+                date:                dateFormat(new Date(Date.now() - 1000*60*60*24), 'yyyy-mm-dd'), // yesterday in case of early-morning run
                 time:                dateFormat('HH:MM'),
                 'brief-description': 'test',
                 'location-address':  'Mill Lane, Cambridge',
@@ -104,16 +104,16 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(document.getElementById(reportId).querySelector('a').href).to.equal(`/reports/${reportId}`);
         });
 
-        it('sees weather conditions in report/location page', async function() {
-            const response = await request.get('/reports/'+reportId+'/location').set(headers);
+        it('sees weather conditions in report page', async function() {
+            const response = await request.get('/reports/'+reportId).set(headers);
             expect(response.status).to.equal(200, response.text);
             const document = new JsDom(response.text).window.document;
-            const iconRe = new RegExp('^/img/weather/underground/icons/black/png/32x32/[a-z]+.png$')
-            expect(document.querySelector('#weather table tr td img').src).to.match(iconRe);
+            const iconRe = new RegExp('^/img/weather/underground/icons/black/png/32x32/[a-z]+.png$');
+            expect(document.querySelector('#weather div.weather-body img').src).to.match(iconRe);
         });
 
-        it('sees uploaded image in report/documents page', async function() {
-            const response = await request.get('/reports/'+reportId+'/files').set(headers);
+        it('sees uploaded image in report page', async function() {
+            const response = await request.get('/reports/'+reportId).set(headers);
             expect(response.status).to.equal(200, response.text);
             const document = new JsDom(response.text).window.document;
             const src = `/test/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
@@ -121,8 +121,8 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(document.getElementById(imgFile).querySelector('td img').src).to.equal(src);
         });
 
-        it('sees uploaded image exif metadata in report/documents page', async function() {
-            const response = await request.get('/reports/'+reportId+'/files').set(headers);
+        it('sees uploaded image exif metadata in report page', async function() {
+            const response = await request.get('/reports/'+reportId).set(headers);
             expect(response.status).to.equal(200, response.text);
             const document = new JsDom(response.text).window.document;
             const src = `/test/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;

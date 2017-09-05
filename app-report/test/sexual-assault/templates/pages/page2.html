@@ -1,0 +1,73 @@
+<form method="post" class="pure-form pure-form-aligned">
+    {{> back}}{{> step}}
+
+    <div class="pure-u">
+
+        <p class="special-intro">We understand that this can be difficult.<br>
+            So please take your time and tell us what happened.</p>
+
+        <h1>To begin with, when did it happen?</h1>
+
+        <ul class="validation-errors">{{#@koa.flash.validation}}
+            <li>{{this}}</li>{{/@koa.flash.validation}}
+        </ul>
+
+        <ul>
+            <li>
+                <label for="specific-date" class="pure-radio">
+                    <input type="radio" name="when" id="specific-date" value="specific-date">
+                    On
+                    <table class="inline">
+                        <tr class="field-label">
+                            <td>DD</td>
+                            <td>MM</td>
+                            <td>YYYY</td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" name="day" id="day" value="{{day}}" class="width-2chars" maxlength="2"></td>
+                            <td><input type="text" name="month" id="month" value="{{month}}" class="width-2chars" maxlength="2"></td>
+                            <td><input type="text" name="year" id="year" value="{{year}}" class="width-4chars" maxlength="4"></td>
+                        </tr>
+                    </table>
+                    at
+                    <table class="inline">
+                        <tr class="field-label">
+                            <td>HH</td>
+                            <td>MM</td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" name="hour" id="hour" value="{{hour}}" class="width-2chars" maxlength="2"></td>
+                            <td><input type="text" name="minutes" id="minutes" value="{{minutes}}" class="width-2chars" maxlength="2"></td>
+                        </tr>
+                    </table>
+                </label>
+            </li>
+            <li>
+                <label for="within">
+                    <input type="radio" name="when" id="within" value="within">
+                    It was within:
+                    <select name="within-options" id="within-options">
+                        <option name="last-month" value="last-month">Last month</option>
+                        <option name="last-week" value="last-6months">Last six months</option>
+                        <option name="last-year" value="last-year">Last year</option>
+                        <option name="more" value="more">More than a year ago</option>
+                    </select>
+                </label>
+            </li>
+            <li>
+                <input type="radio" name="when" id="dont-remember" value="dont-remember"> <label for="dont-remember">I don't exactly remember</label>
+            </li>
+            <li>
+                <input type="radio" name="when" id="dont-know" value="dont-know"> <label for="dont-know">I don't know when it happened</label>
+            </li>
+        </ul>
+        <h1>Is it still happening?</h1>
+        <ul>
+            <li>
+                <input type="radio" name="still-happening" id="still-y" value="y"> <label for="still-y">Yes</label>
+                <input type="radio" name="still-happening" id="still-n" value="n" class="radio-margin"> <label for="still-n">No</label>
+            </li>
+        </ul>
+        {{> continue}}
+    </div>
+</form>

@@ -1,0 +1,23 @@
+<main>
+
+<table class="progress"><tr><td>TBC</td></tr></table>
+
+<h1>Survivor-centred response form</h1>
+<h2>Administrative information</h2>
+
+<form method="post">
+    <ul>
+        <li>
+            {{#checked report-by-survivor}}
+            <label>Report by survivor?</label>
+            <input type="radio" name="report-by-survivor" id="report-by-survivor-y" value="y" autofocus> <label for="report-by-survivor-y">Yes</label>
+            <input type="radio" name="report-by-survivor" id="report-by-survivor-n" value="n"> <label for="report-by-survivor-n">No</label>
+            {{/checked}}
+        </li>
+        <li class="nav">
+            <button type="submit" name="nav-next" value="next" class="nav next">Next ⇒</button>
+        </li>
+    </ul>
+</form>
+
+</main>

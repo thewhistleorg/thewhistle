@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>The Whistle Eyewitness Report</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <style>
+        body {
+            font-family: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+            background: white;
+            color: #444444;
+            margin-top: 2em;
+            margin-bottom: 2em;
+            max-width: 48em;
+        }
+
+        h1           { color: #888888; font-size: 2.4em; font-weight: normal; line-height: 1; }
+        main h1      { margin: 0 0; max-width: 48em; }
+        h3           { font-style: italic; }
+
+        a            { color: #33a0c0; }
+
+        main         { max-width: 48em; }
+
+        a, a:visited { color: #33a0c0; }
+        a.grey       { color: #999999; }
+
+        .green       { color: #006600; }
+        .red         { color: #660000; }
+
+
+        form li.nav {
+            clear: both;
+        }
+        button.nav {
+            background: none;
+            border: none;
+            color: #009900;
+            float: right;
+            font-weight: bold;
+            margin-top: 1em;
+            cursor: pointer;
+        }
+        button.prev {
+            float: left;
+        }
+        button.next {
+            float: right;
+        }
+
+        label {
+            margin-top: 1em;
+            width: auto;
+        }
+        input, textarea {
+        }
+        input[type=date], input[type=time] {
+            width: auto;
+        }
+
+        table.progress {
+            border-collapse: collapse;
+            float: right;
+            font-size: 80%;
+        }
+        table.progress td {
+            border: 1px solid #009900;
+            min-width: 3em;
+            padding: 0.1em 0.25em;
+            text-align: center;
+        }
+        table.progress td.current {
+            background-color: #009900;
+            color: #ffffff;
+        }
+    </style>
+    <style>
+        /* page 5 */
+        main.p5 .note { color: #999999; font-size: 90%; }
+        main.p5 label { min-width: 12em; }
+        main.p5 input + label { min-width: auto; }
+        main.p5 p.note { clear: both; } /* for nav buttons */
+    </style>
+    <style>
+        /* page 6 */
+        main.p6 .note { color: #999999; font-size: 90%; }
+        main.p6 label { min-width: 12em; }
+        main.p6 input + label { min-width: auto; }
+    </style>
+    <style>
+        /* page 7 */
+        main.p7 .note { color: #999999; font-size: 90%; }
+        main.p7 label { min-width: 12em; }
+        main.p7 input + label { min-width: auto; }
+    </style>
+    <script>
+        /* page 4 */
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.querySelector('#location-other').defaultChecked) {
+                document.querySelector('#other-li').classList.remove('hide');
+            }
+            document.querySelectorAll('input[name=location]').forEach(i => i.onchange = function() {
+                if (this.value == 'other') {
+                    document.querySelector('#other-li').classList.remove('hide');
+                    document.querySelector('#location-other').focus();
+                } else {
+                    document.querySelector('#other-li').classList.add('hide');
+                }
+            });
+        });
+        /* page 5 */
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.querySelector('#type-penetration-involved').defaultChecked) {
+                document.querySelector('#penetration-ul').classList.remove('hide');
+            }
+            document.querySelectorAll('input[name=type]').forEach(i => i.onchange = function() {
+                if (this.value == 'penetration-involved') {
+                    document.querySelector('#penetration-ul').classList.remove('hide');
+                } else {
+                    document.querySelector('#penetration-ul').classList.add('hide');
+                }
+            });
+            /* page 6 */
+            document.addEventListener('DOMContentLoaded', function() {
+                if (document.querySelector('#abducted-y').defaultChecked) {
+                    document.querySelector('#abducted-ul').classList.remove('hide');
+                }
+                document.querySelectorAll('input[name=abducted]').forEach(i => i.onchange = function() {
+                    if (this.value == 'y') {
+                        document.querySelector('#abducted-ul').classList.remove('hide');
+                    } else {
+                        document.querySelector('#abducted-ul').classList.add('hide');
+                    }
+                });
+            });
+        });
+    </script>
+    <script defer src="/js/report.js"></script>
+</head>
+<body>
+
+{{{@body}}}
+
+</body>
+</html>

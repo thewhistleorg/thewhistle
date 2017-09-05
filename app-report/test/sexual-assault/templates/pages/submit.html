@@ -1,0 +1,24 @@
+<form method="post" class="pure-form pure-form-aligned">
+    {{> back}}
+
+    <div class="pure-g pure-u">
+        <h1>Check before you send the report</h1>
+
+        <h2>Report</h2>
+        {{{reportHtml}}}
+
+        <h2>Geocoding</h2>
+        {{{geocodeHtml}}}
+
+        <hr>
+
+        <p>An assessor will read the report and take any necessary action. Your identity will remain
+            anonymous and safe.</p>
+
+        <ul>
+            <li>
+                <button type="submit" name="submit" value="submit" accesskey="s" class="nav-action-button"><u>S</u>end the report</button>
+            </li>
+        </ul>
+    </div>
+</form>

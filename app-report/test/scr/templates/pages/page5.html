@@ -1,0 +1,75 @@
+<main>
+
+<table class="progress"><tr><td>TBC</td></tr></table>
+
+<h1>Survivor-centred response form</h1>
+<h2>Type of incident/violence</h2>
+
+<form method="post">
+    <ul>
+        {{#checked type}}
+        <li>
+            <input type="radio" name="type" id="type-rape" value="rape" autofocus> <label for="type-rape">Rape</label>
+            <div class="note">(includes any penetration)</div>
+        </li>
+        <li>
+            <input type="radio" name="type" id="type-sexual-assault" value="sexual-assault"> <label for="type-sexual-assault">Sexual assault</label>
+            <div class="note">(includes attempted rape and all sexual violence/abuse without penetration, and female genital mutilation)</div>
+        </li>
+        <li>
+            <input type="radio" name="type" id="type-physical-assault" value="physical-assault"> <label for="type-physical-assault">Physical assault</label>
+            <div class="note">(includes hitting, slapping , kicking, shoving, etc, that is not sexual in nature)</div>
+        </li>
+        <li>
+            <input type="radio" name="type" id="type-forced-marriage" value="forced-marriage"> <label for="type-forced-marriage">Forced marriage</label>
+            <div class="note">includes early marriage)</div>
+        </li>
+        <li>
+            <input type="radio" name="type" id="type-denial-resources" value="denial-resources"> <label for="type-denial-resources">Denial of resources, opportunities or services</label>
+            <div class="note">(includes denaial of inheritance, hearnings, access to school or contraceptives, etc)</div>
+        </li>
+        <li>
+            <input type="radio" name="type" id="type-psychological-abuse" value="psychological-abuse"> <label for="type-psychological-abuse">Psychological / emotional abuse</label>
+            <div class="note">(includes threats, violence, forced isolation, harrassment/intimidation, gestures, etc)</div>
+        </li>
+        <li>
+            <input type="radio" name="type" id="type-non-gbv" value="non-gbv"> <label for="type-non-gbv">Non-GBV</label>
+        </li>
+        <li>
+            <input type="radio" name="type" id="type-penetration-involved" value="penetration-involved"> <label for="type-penetration-involved">Penetration involved</label>
+        </li>
+        {{/checked}}
+    </ul>
+    <ul id="penetration-ul" class="hide">
+        {{#checked type-penetration}}
+        <li>
+            <label>Penis</label>
+            <input type="checkbox" name="type-penetration" id="type-penetration-penis-vagina" value="penis-vagina"> <label for="type-penetration-penis-vagina">Vagina</label>
+            <input type="checkbox" name="type-penetration" id="type-penetration-penis-anus" value="penis-anus"> <label for="type-penetration-penis-anus">Anus</label>
+            <input type="checkbox" name="type-penetration" id="type-penetration-penis-other" value="penis-other"> <label for="type-penetration-penis-other">Other orifice</label>
+        </li>
+        <li>
+            <label>Finger / other body parts</label>
+            <input type="checkbox" name="type-penetration" id="type-penetration-finger-vagina" value="finger-vagina"> <label for="type-penetration-finger-vagina">Vagina</label>
+            <input type="checkbox" name="type-penetration" id="type-penetration-finger-anus" value="finger-anus"> <label for="type-penetration-finger-anus">Anus</label>
+            <input type="checkbox" name="type-penetration" id="type-penetration-finger-other" value="finger-other"> <label for="type-penetration-finger-other">Other orifice</label>
+        </li>
+        <li>
+            <label>Other objects</label>
+            <input type="checkbox" name="type-penetration" id="type-penetration-other-vagina" value="other-vagina"> <label for="type-penetration-other-vagina">Vagina</label>
+            <input type="checkbox" name="type-penetration" id="type-penetration-other-anus" value="other-anus"> <label for="type-penetration-other-anus">Anus</label>
+            <input type="checkbox" name="type-penetration" id="type-penetration-other-other" value="other-other"> <label for="type-penetration-other-other">Other orifice</label>
+        </li>
+        {{/checked}}
+    </ul>
+    <ul>
+        <li class="nav">
+            <button type="submit" name="nav-prev" value="prev" class="nav prev">⇐ Previous</button>
+            <button type="submit" name="nav-next" value="next" class="nav next">Next ⇒</button>
+        </li>
+    </ul>
+</form>
+
+<p class="note">[note: penetration could be on same page as here, or on subsequent page controlled by conditional logic]</p>
+
+</main>

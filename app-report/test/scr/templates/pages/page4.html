@@ -1,0 +1,79 @@
+<main>
+
+<table class="progress"><tr><td>TBC</td></tr></table>
+
+<h1>Survivor-centred response form</h1>
+<h2>Details of the incident</h2>
+
+<form method="post">
+    <ul>
+        {{#checked location}}
+        <li>
+            <label>Incident location / where the incident took place</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-idp-camp" value="idp-camp" autofocus> <label for="location-idp-camp">IDP camp</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-insurgent-camp" value="insurgent-camp"> <label for="location-insurgent-camp">Insurgent camp</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-survivors-home" value="survivors-home"> <label for="location-survivors-home">Survivor’s home</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-survivors-neighbourhood" value="survivors-neighbourhood"><label for="location-survivors-neighbourhood">Survivor’s neighbourhood</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-health-centre" value="health-centre"> <label for="location-health-centre">Health centre / hospital</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-market" value="market"> <label for="location-market">Market / shopping centre</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-perpetrators-home" value="perpetrators-home"> <label for="location-perpetrators-home">Perpetrator’s home</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-police-prison" value="police-prison"> <label for="location-police-prison">Police/prison</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-religious-centre" value="religious-centre"> <label for="location-religious-centre">Religious centre (mosque, church)</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-school" value="school"> <label for="location-school">School / education institution</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-security-instn" value="security-instn"> <label for="location-security-instn">Security institution</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-shelter" value="shelter"> <label for="location-shelter">Shelter / safe house</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-street" value="street"> <label for="location-street">Street</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-bus-stop" value="bus-stop"> <label for="location-bus-stop">Bus stop</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-transportation" value="transportation"> <label for="location-transportation">Transportation</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-wash-facilities" value="wash-facilities"> <label for="location-wash-facilities">Wash facilities</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-workplace" value="workplace"> <label for="location-workplace">Workplace (factory, office)</label>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-other" value="other"> <label for="location-other">Other</label>
+        </li>
+        {{/checked}}
+        <li id="other-li" class="hide">
+            <input type="text" name="location-other" id="other" value="{{location-other}}">
+        </li>
+        <li class="nav">
+            <button type="submit" name="nav-prev" value="prev" class="nav prev">⇐ Previous</button>
+            <button type="submit" name="nav-next" value="next" class="nav next">Next ⇒</button>
+        </li>
+    </ul>
+</form>
+
+</main>

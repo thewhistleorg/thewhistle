@@ -1,0 +1,31 @@
+<form method="post" class="pure-form pure-form-aligned">
+    {{> back}}{{> step}}
+
+    <div class="pure-u">
+
+        <h1>Have you spoken to anybody about it?</h1>
+
+        <p class="hint-text">Pick all options that apply.</p>
+        <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+
+        <ul>
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-police" value="police"> <label for="action-taken-police">I have told the police</label>
+            </li>
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-organisation" value="organisation"> <label for="action-taken-organisation">I have told somebody within an organisation</label>
+            </li>
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-friends" value="friends"> <label for="action-taken-friends">I spoke to friends or other people I know</label>
+            </li>
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-teacher" value="teacher"> <label for="action-taken-teacher">I spoke to a teacher</label>
+            </li>
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-other" value="other"> <label for="action-taken-other">Other:</label>
+                <input type="text" name="action-taken-other-details" id="action-taken-other-details">
+            </li>
+        </ul>
+        {{> continue}}
+    </div>
+</form>

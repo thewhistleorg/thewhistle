@@ -1,0 +1,34 @@
+<main>
+
+<table class="progress"><tr><td>TBC</td></tr></table>
+
+<h1>Survivor-centred response form</h1>
+<h2>Administrative information</h2>
+
+<form method="post">
+    <ul>
+        {{#checked status}}
+        <li>
+            <label>Current civil/marital status</label>
+        </li>
+        <li>
+            <input type="radio" name="status" id="status-single" value="single"  autofocus> <label for="status-single">Single</label>
+        </li>
+        <li>
+            <input type="radio" name="status" id="status-married" value="married"> <label for="status-married">Married / cohabiting</label>
+        </li>
+        <li>
+            <input type="radio" name="status" id="status-divorced" value="divorced"> <label for="status-divorced">Divorced / separated</label>
+        </li>
+        <li>
+            <input type="radio" name="status" id="status-widowed" value="widowed"> <label for="status-widowed">Widowed</label>
+        </li>
+        {{/checked}}
+        <li class="nav">
+            <button type="submit" name="nav-prev" value="prev" class="nav prev">⇐ Previous</button>
+            <button type="submit" name="nav-next" value="next" class="nav next">Next ⇒</button>
+        </li>
+    </ul>
+</form>
+
+</main>

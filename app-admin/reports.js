@@ -67,6 +67,8 @@ class ReportsHandlers {
                     rpt.location = field.split('.').reduce((obj, key) => obj[key], rpt); // stackoverflow.com/questions/6393943
                     if (rpt.location) break;
                 }
+            } else {
+                rpt.location = '—';
             }
             for (let t=0; t<rpt.tags.length; t++) { // style tags in cartouches
                 rpt.tags.splice(t, 1, `<span class="tag">${rpt.tags[t]}</span>`);
@@ -1135,7 +1137,7 @@ function ago(date, short=false) {
 /**
  * Geocoded fields with lowest-level distinct values within the report set.
  *
- * There may be more than one: if all level2short values are the same, best address may be in either
+ * There may be more than one: if all level2long values are the same, best address may be in either
  * streetName or extra.establishment.
  *
  * @param {Object[]} reports - Array of reports to be examined.
@@ -1143,13 +1145,18 @@ function ago(date, short=false) {
  */
 function lowestDistinctGeographicLevel(reports) {
     const adminLevels = reports.map(r => r.geocode.administrativeLevels);
+
     // level 2 addresses identical? use streetName or establishment, whichever is available
-    const l2 = [...new Set(adminLevels.map(al => al ? al.level2short : undefined))].filter(l2 => l2 != undefined);
+    const l2 = [...new Set(adminLevels.map(al => al ? al.level2long : undefined))].filter(l2 => l2 != undefined);
     if (l2.length == 1) return [ 'geocode.streetName', 'geocode.extra.establishment' ];
 
-    // level 1 addressses identical? use level 2
-    const l1 = [...new Set(adminLevels.map(al => al ? al.level1short : undefined))].filter(l1 => l1 != undefined);
-    if (l1.length == 1) return ['geocode.administrativeLevels.level2short'];
+    // level 1 addresses identical? use level 2
+    const l1 = [...new Set(adminLevels.map(al => al ? al.level1long : undefined))].filter(l1 => l1 != undefined);
+    if (l1.length == 1) return ['geocode.administrativeLevels.level2long'];
+
+    // countries identical? use level 1
+    const countries = [...new Set(reports.map(r => r.geocode.country))].filter(c => c != undefined);
+    if (countries.length == 1) return ['geocode.administrativeLevels.level1long'];
 
     // reports from more than one country!
     return ['geocode.country'];

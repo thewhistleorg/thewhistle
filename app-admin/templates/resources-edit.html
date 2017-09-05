@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Add Centre | The Whistle</title>
+    <title>Edit Resource {{name}} | The Whistle</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
@@ -20,7 +20,7 @@
 
 <main>
 
-<h1>Add Centre</h1>
+<h1>Edit resource {{name}}</h1>
 
 {{>errpartial}}
 
@@ -36,16 +36,16 @@
         </li>
         <li class="pure-control-group">
             <label for="lat">Latitude</label>
-            <input type="number" name="lat" id="lat" min="-90" max="90" step="any" value="{{lat}}" required>
+            <input type="number" name="lat" id="lat" min="-90" max="90" step="any" value="{{location.coordinates.[1]}}" required>
         </li>
         <li class="pure-control-group">
             <label for="lon">Longitude</label>
-            <input type="number" name="lon" id="lon" min="-90" max="90" step="any" value="{{lon}}" required>
+            <input type="number" name="lon" id="lon" min="-180" max="180" step="any" value="{{location.coordinates.[0]}}" required>
         </li>
 
         <li class="pure-control-group">
             <label></label>
-            <button type="submit" class="pure-button pure-button-primary">Add centre</button>
+            <button type="submit" class="pure-button pure-button-primary">Update resource</button>
         </li>
     </ul>
 </form>

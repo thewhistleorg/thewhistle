@@ -181,6 +181,7 @@ class ReportsHandlers {
         const y = 1000*60*60*24*365; // one year
         for (const rpt of rpts) {
             if (!rpt.geocode) continue;
+            if (Object.keys(rpt.geocode).length == 0) continue;
             const fields = {
                 _id:        rpt._id,
                 summary:    rpt.summary || '', // ensure summary is string

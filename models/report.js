@@ -12,6 +12,7 @@ const dateFormat = require('dateformat');        // Steven Levithan's dateFormat
 const exiftool   = require('exiftool-vendored'); // cross-platform Node.js access to ExifTool
 const ObjectId   = require('mongodb').ObjectId;
 
+const User    = require('../models/user.js');
 const Weather = require('../lib/weather.js');
 // const Update = require('./update.js'); !! this is done at the bottom of the file to resolve Node cyclic references!
 

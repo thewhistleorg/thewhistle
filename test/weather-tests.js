@@ -8,6 +8,7 @@ const expect  = require('chai').expect;               // BDD/TDD assertion libra
 const weather = require('../lib/weather.js');
 
 describe('Weather data extraction tests', function() {
+    this.timeout(4e3); // 4 sec
 
     const abuja = { lat: 9.06, lon: 7.49 };
     const country = 'Nigeria';

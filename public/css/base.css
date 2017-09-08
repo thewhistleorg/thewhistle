@@ -67,6 +67,7 @@ th     { color: #666666; font-style: italic; font-weight: normal; text-align: le
 .rule-above    { border-top: 1px solid #999999; }
 .rule-above td { border-top: 1px solid #999999; } /* to apply to tr */
 .small         { font-size: 80%; } /* like <small> */
+.bold          { font-weight: bold;}
 
 /* form input widths */
 .w2  { width: 2em;  }

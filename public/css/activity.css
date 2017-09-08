@@ -12,7 +12,7 @@ ul.accordion label {
     line-height: 4;
     cursor: inherit;
     border: 0;
-    border-bottom: 1px solid #ebebeb;
+    border-bottom: 1px solid #F0F3F4;
 }
 
 ul.accordion table, ul.accordion p {
@@ -30,7 +30,7 @@ ul.accordion li {
     float: left;
     min-height: 196px;
     margin: 15px;
-    border: 1px solid #ebebeb;
+    border: 1px solid #F0F3F4;
     -moz-box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
     -webkit-box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
     box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
@@ -42,7 +42,7 @@ ul.accordion label::after {
 
 .activity-page h2 {
     margin: 15px 15px 4px;
-    border-bottom: 1px solid #ebebeb;
+    border-bottom: 1px solid #F0F3F4;
     padding-bottom: 8px;
     width: 96%;
 }

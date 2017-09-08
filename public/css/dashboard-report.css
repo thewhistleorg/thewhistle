@@ -1,7 +1,7 @@
 /* Report Page */
 
 .report-container {
-    border-left: 1px solid #ebebeb;
+    border-left: 1px solid #F0F3F4;
 }
 
 .report-header-container {
@@ -39,7 +39,7 @@
 .weather-header {
     font-size: 1.2em;
     padding: 10px;
-    border-bottom: 1px solid #ebebeb;
+    border-bottom: 1px solid #F0F3F4;
     margin-bottom: -1px;
 }
 

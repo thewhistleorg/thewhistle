@@ -79,7 +79,7 @@
                 // TODO: if already sorted, use window.location.replace() to avoid excessive history
                 window.location.href = window.location.pathname + (Qs.stringify(qs) ? '?'+Qs.stringify(qs) : '');
             });
-            const sortIndicator = document.querySelector('span[data-sort={{sort.column}}]');
+            const sortIndicator = document.querySelector('th[data-sort={{sort.column}}] .fa');
             sortIndicator.style.color = '#666666';
             sortIndicator.classList.remove('fa-sort');
             sortIndicator.classList.add('{{sort.asc}}'=='+' ? 'fa-sort-asc' : 'fa-sort-desc');

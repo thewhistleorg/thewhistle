@@ -4,6 +4,7 @@
 body {
     font-family: 'Open Sans', "Segoe UI", Tahoma, sans-serif;
     padding: 0;
+    background: #F0F3F4;
 }
 
 main {
@@ -23,6 +24,11 @@ h2 {
     color: #033549;
     font-size: 2em;
     font-weight: normal;
+}
+
+.page-header-title{
+  padding: 0;
+  margin: 8px 0 8px;
 }
 
 h3 {
@@ -168,17 +174,23 @@ header nav .pure-menu-children .pure-menu-link:hover {
 /*override pure striped background*/
 
 .custom-table tr:nth-child(2n-1) td {
-    background-color: #fafbfd;
+    /*background-color: #fafbfd;*/
 }
 
 table.custom-table {
     border-color: #ebebeb;
+    background: #fff;
 }
 
 table.custom-table th {
     color: #999;
     font-size: 14px;
     font-style: normal;
+    padding: 4px 10px;
+    background-color: #fafbfd;
+}
+table.custom-table th .fa {
+    margin: 4px -8px;
 }
 
 table.custom-table td, table.custom-table th {
@@ -187,8 +199,13 @@ table.custom-table td, table.custom-table th {
 }
 
 table.custom-table td {
-    padding: 8px;
+    padding: 16px 8px;
     vertical-align: middle;
+}
+
+.clickable-row tr:hover {
+    background-color:#fafbfd;
+    cursor:pointer;
 }
 
 table.custom-table td.action, table.custom-table th.action { padding: 0; }
@@ -199,6 +216,13 @@ td.action a {
     padding: 5px;
 }
 
+th[data-sort]{
+  cursor: pointer;
+}
+th[data-sort]:hover {
+  background: #f6f7f9;
+}
+
 /*tweak margin*/
 .custom-table.margin-tweak {
       margin-top: 3px;
@@ -206,12 +230,17 @@ td.action a {
 
 /*Tags*/
 
+span.tag:hover, a.tag:hover {
+    background: #ebeff1;
+}
+
 span.tag, a.tag {
-    background: #ffffff;
-    border: 1px solid #ebebeb;
-    border-radius: 8px;
-    padding: 0 4px;
-    white-space: nowrap;
+  background: #f0f3f4;
+  border: 1px solid #ebebeb;
+  border-radius: 8px;
+  padding: 0px 6px 1px;
+  white-space: nowrap;
+  font-size: 0.9em;
 }
 
 /* override pure form checkbox labels */
@@ -240,6 +269,11 @@ input[type=number] { width:  4em; }
 textarea           { width: 24em; }
 */
 
+.drop-shadow{
+  -moz-box-shadow:    0px 1px 5px 0px rgba(0, 0, 0, 0.08);
+  -webkit-box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.08);
+  box-shadow:         0px 1px 5px 0px rgba(0, 0, 0, 0.08);
+}
 .fluid {
     width: 100%;
 }

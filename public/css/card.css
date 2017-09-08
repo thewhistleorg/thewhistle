@@ -27,6 +27,7 @@ ul.card-list table, ul.card-list p {
 } */
 
 ul.card-list li {
+    background-color: #fff;
     margin-bottom: 1px;
     width: 99%;
     float: left;
@@ -59,6 +60,7 @@ ul.card-list input + span ~ *{
 ul.card-list-sidebar {
   list-style-type: none;
   padding: 0;
+  background-color: #fff;
   margin: 0px 0px 0 10px;
   border: 1px solid #ebebeb;
   height: 100%;

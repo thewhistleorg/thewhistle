@@ -183,14 +183,14 @@ table.custom-table {
 }
 
 table.custom-table th {
-    color: #999;
-    font-size: 14px;
+    color: #033549;
     font-style: normal;
-    padding: 4px 10px;
+    padding: 6px 10px;
     background-color: #fafbfd;
 }
 table.custom-table th .fa {
-    margin: 4px -8px;
+    margin: 4px -6px;
+    opacity: 0.2;
 }
 
 table.custom-table td, table.custom-table th {

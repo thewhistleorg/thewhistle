@@ -12,9 +12,12 @@ const ObjectId = require('mongodb').ObjectId;
  * Rape crisis resources are provided as support information e.g. after incident report submission.
  */
 const validator = { $and: [
-    { name:        { $type: 'string', $exists: true } },
-    { description: { $type: 'string', $exists: true } },
-    { location:    { $type: 'object', $exists: true } }, // GeoJSON (with spatial index)
+    { name:     { $type: 'string', $exists: true } },
+    { address:  { $type: 'string',               } },
+    { phone:    { $type: 'array',                } },
+    { email:    { $type: 'array',                } },
+    { services: { $type: 'array',                } },
+    { location: { $type: 'object',               } }, // GeoJSON (with spatial index)
 ] };
 
 
@@ -147,24 +150,21 @@ class Resource {
      *
      * @param   {string} db - Database to use.
      * @param   {Object} values - Resource details.
+     * @param   {Object} geocode - Geocoding result.
      * @returns {number} New resource id.
      * @throws  Error on validation or referential integrity errors.
      */
-    static async insert(db, values) {
+    static async insert(db, values, geocode) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         const resources = global.db[db].collection('resources');
 
-        // allow location to be supplied as lat,lon as convenience
-        if (values.location == undefined) {
-            values.location = { type: 'Point', coordinates: [ values.lon, values.lat ] };
-            delete values.lat;
-            delete values.lon;
+        if (geocode) { // record (geoJSON) location for (indexed) geospatial queries
+            values.location = {
+                type:        'Point',
+                coordinates: [ Number(geocode.longitude), Number(geocode.latitude) ],
+            };
         }
-
-        // ensure coordinate is numeric
-        values.location.coordinates[0] = Number(values.location.coordinates[0]);
-        values.location.coordinates[1] = Number(values.location.coordinates[1]);
 
         const { insertedId } = await resources.insertOne(values);
         return insertedId;
@@ -177,25 +177,22 @@ class Resource {
      * @param  {string}   db - Database to use.
      * @param  {number}   id - Resource id.
      * @param  {ObjectId} values - Resource details.
+     * @param  {Object}   geocode - Geocoding result.
      * @throws Error on referential integrity errors.
      */
-    static async update(db, id, values) {
+    static async update(db, id, values, geocode) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
         const resources = global.db[db].collection('resources');
 
-        // allow location to be supplied as lat,lon as convenience
-        if (values.location == undefined) {
-            values.location = { type: 'Point', coordinates: [ values.lon, values.lat ] };
-            delete values.lat;
-            delete values.lon;
+        if (geocode) { // record (geoJSON) location for (indexed) geospatial queries
+            values.location = {
+                type:        'Point',
+                coordinates: [ Number(geocode.longitude), Number(geocode.latitude) ],
+            };
         }
-
-        // ensure coordinate is numeric
-        values.location.coordinates[0] = Number(values.location.coordinates[0]);
-        values.location.coordinates[1] = Number(values.location.coordinates[1]);
 
         await resources.updateOne({ _id: id }, { $set: values });
     }
@@ -203,6 +200,8 @@ class Resource {
 
     /**
      * Delete Resource record.
+     *
+     * TODO: never actually delete, just flag deleted, so that recorded referrals don't have dead links
      *
      * @param  {string}   db - Database to use.
      * @param  {ObjectId} id - Resource id.

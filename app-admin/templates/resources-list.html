@@ -14,6 +14,11 @@
         button.fa-trash { background: none; border: none; color: #990000; padding: 1px; }
         button.fa-trash:hover { cursor: pointer; }
         #map { margin-top: 4em; height: 400px; width: 100%; }
+        td { border-top: 1px solid #cccccc; }
+        .phone-valid { }
+        .phone-invalid { color: #999999; }
+        .email-valid { }
+        .email-invalid { color: #999999; }
     </style>
     <script src="//maps.googleapis.com/maps/api/js?callback=initMap&key=AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw" defer></script>
     <script>
@@ -23,11 +28,11 @@
             // show/hide delete button on hover over resource tr
             document.querySelectorAll('tr.resource').forEach(tr => tr.onmouseenter = async function showDeleteButton() {
                 this.querySelector('button').classList.remove('hide');
-                this.querySelector('a').classList.remove('hide');
+                this.querySelector('a.fa-pencil').classList.remove('hide');
             });
             document.querySelectorAll('tr.resource').forEach(tr => tr.onmouseleave = async function hideDeleteButton() {
                 this.querySelector('button').classList.add('hide');
-                this.querySelector('a').classList.add('hide');
+                this.querySelector('a.fa-pencil').classList.add('hide');
             });
 
             // report deletion confirmation pop-up
@@ -35,14 +40,23 @@
                 return confirm('Are you sure you want to delete this resource?');
             });
 
+            // filter
+            document.querySelector('select').onchange = function submitFilter() {
+                if (this.form.service.value == '') { // remove query string entirely
+                    window.location = window.location.href.replace(location.search, '');
+                    return;
+                }
+                this.form.submit();
+            };
+
         });
     </script>
     <script>
         'use strict';
         const resources = [
-            {{#each resources}}
+            {{#resourceLocns}}
             { resourceId: '{{_id}}', lat: {{lat}}, lng: {{lon}}, name: '{{name}}' },
-            {{/each}}
+            {{/resourceLocns}}
         ];
         function initMap() {
 
@@ -82,21 +96,36 @@
 
 {{>errpartial}}
 
+<form>Filter service:
+    <select name="service">
+        {{#selected filter.service}}
+        <option value="">&nbsp;</option>
+        {{#services}}
+        <option value="{{this}}">{{this}}</option>
+        {{/services}}
+        {{/selected}}
+    </select>
+</form>
+
 <table>
     <tr>
         <th>Name</th>
-        <th>Description</th>
-        <th>Latitude</th>
-        <th>Longitude</th>
+        <th>Address</th>
+        <th>Phone(s)</th>
+        <th>Email(s)</th>
+        <th>Services</th>
+        <th></th>
         <th></th>
         <th><a href="/resources/add" title="Add new resource" class="fa fa-plus green"></a></th>
     </tr>
     {{#resources}}
     <tr id="{{_id}}" class="resource">
         <td>{{name}}</td>
-        <td>{{description}}</td>
-        <td class="align-right">{{lat}}</td>
-        <td class="align-right">{{lon}}</td>
+        <td>{{address}}</td>
+        <td>{{{phone}}}</td>
+        <td>{{{email}}}</td>
+        <td>{{services}}</td>
+        <td>{{#if location}}<a href="https://maps.google.com/maps/search/{{address}}" class="fa fa-globe"></a>{{/if}}</td>
         <td><a href="/resources/{{_id}}/edit" title="Edit resource" class="fa fa-pencil grey hide"></a></td>
         <td><form action="/resources/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" title="Delete resource" class="fa fa-trash hide"></button></form></td>
     </tr>

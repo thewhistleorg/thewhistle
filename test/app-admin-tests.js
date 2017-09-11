@@ -242,7 +242,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         let resourceId = null;
 
         it('adds new resource', async function() {
-            const values = { name: 'Test', description: 'Resource', lat: '51.1', lon: '-1.1' };
+            const values = { name: 'Test', address: 'Free School Lane, Cambridge CB2 3RQ', services: 'testing' };
             const response = await request.post('/resources/add').set(headers).send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/resources');
@@ -253,7 +253,8 @@ describe('Admin app'+' ('+app.env+')', function() {
             const response = await request.get('/resources').set(headers);
             expect(response.status).to.equal(200);
             const document = new JsDom(response.text).window.document;
-            expect(document.getElementById(resourceId).querySelector('td').textContent).to.equal('Test');
+            expect(document.getElementById(resourceId).querySelectorAll('td')[0].textContent).to.equal('Test');
+            expect(document.getElementById(resourceId).querySelectorAll('td')[4].textContent).to.equal('testing');
         });
 
         it('edits test resource', async function() {
@@ -261,6 +262,18 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(response.status).to.equal(200);
             const document = new JsDom(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Edit resource Test');
+            const values = { name: 'Test', address: 'Free School Lane, Cambridge CB2 3RQ', services: 'testing; validation' };
+            const responsePost = await request.post('/resources/'+resourceId+'/edit').set(headers).send(values);
+            expect(responsePost.status).to.equal(302);
+            expect(responsePost.headers.location).to.equal('/resources');
+        });
+
+        it('lists resources including updated test resource', async function() {
+            const response = await request.get('/resources').set(headers);
+            expect(response.status).to.equal(200);
+            const document = new JsDom(response.text).window.document;
+            expect(document.getElementById(resourceId).querySelectorAll('td')[0].textContent).to.equal('Test');
+            expect(document.getElementById(resourceId).querySelectorAll('td')[4].textContent).to.equal('testing; validation');
         });
 
         it('deletes test resource', async function() {

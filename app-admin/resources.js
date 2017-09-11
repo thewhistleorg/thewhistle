@@ -9,6 +9,13 @@
 
 'use strict';
 
+const Geocoder       = require('node-geocoder');         // library for geocoding and reverse geocoding
+const libphonenumber = require('google-libphonenumber'); // wrapper for Google's libphonenumber
+const isEmail        = require('isemail');               // email address validation library
+
+const phoneUtil         = libphonenumber.PhoneNumberUtil.getInstance();
+const PhoneNumberFormat = libphonenumber.PhoneNumberFormat;
+
 const Resource = require('../models/resource.js');
 
 const validationErrors = require('../lib/validation-errors.js');
@@ -16,11 +23,9 @@ const validationErrors = require('../lib/validation-errors.js');
 
 const validation = {
     name: 'required',
-    lat:  'type=number required',
-    lon:  'type=number required',
 };
 
-class ResourcesHandlers {
+class Handlers {
 
     /**
      * GET /resources/add - Render add resource page.
@@ -38,13 +43,32 @@ class ResourcesHandlers {
     static async list(ctx) {
         const db = ctx.state.user.db;
 
-        const resources = await Resource.getAll(db);
-        resources.forEach(c => {
-            c.lat = c.location.coordinates[1].toFixed(4);
-            c.lon = c.location.coordinates[0].toFixed(4);
-        });
+        // get resources matching querystring filter
+        const query = ctx.query.service ? { services: ctx.query.service } : {};
+        const resources = await Resource.find(db, query);
+
         resources.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1);
-        await ctx.render('resources-list', { resources });
+
+        let allServices = [];
+        resources.forEach(r => {
+            r.phone = formatPhoneNumbers(r.phone, 'NG'); // TODO: derive country code from database
+            r.email = formatEmails(r.email);
+            allServices = allServices.concat(r.services);
+            r.services = r.services.join('; ');
+        });
+        const services = [...new Set(allServices)].sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
+
+        // need separate list of resources with locations for map
+        const resourceLocns = resources.filter(r => r.location != null).map(r => ({
+            _id:  r._id,
+            lat:  r.location.coordinates[1].toFixed(4),
+            lon:  r.location.coordinates[0].toFixed(4),
+            name: r.name,
+        }));
+
+        const filter = { service: ctx.query.service }; // current filter criteria
+        const context = { resources, resourceLocns, services, filter }
+        await ctx.render('resources-list', context);
     }
 
 
@@ -54,6 +78,10 @@ class ResourcesHandlers {
     static async edit(ctx) {
         const db = ctx.state.user.db;
         const resource = await Resource.get(db, ctx.params.id);
+
+        resource.phone = resource.phone.join(', ');
+        resource.email = resource.email.join(', ');
+        resource.services = resource.services.join('; ');
 
         const context = Object.assign(resource, ctx.flash.formdata);
         await ctx.render('resources-edit', context);
@@ -76,9 +104,33 @@ class ResourcesHandlers {
             ctx.redirect(ctx.url); return;
         }
 
+        const country = 'NG';  // TODO: derive country code from database
+
+        // convert phones, e-mails, services to arrays
+        ctx.request.body.phone = ctx.request.body.phone
+            ? ctx.request.body.phone.split(',').map(num => formatPhone(num)).sort((a, b) => a < b ? -1 : 1)
+            : [];
+        ctx.request.body.email = ctx.request.body.email
+            ? ctx.request.body.email.split(',').map(str => str.trim()).sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1)
+            : [];
+        ctx.request.body.services = ctx.request.body.services
+            ? ctx.request.body.services.split(';').map(str => str.trim()).sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1)
+            : [];
+
+        // geocode address
+        const geocoder = Geocoder();
+        let location = null;
+        try {
+            if (ctx.request.body.address) {
+                [location] = await geocoder.geocode(ctx.request.body.address);
+            }
+        } catch (e) {
+            console.error('Geocoder error', e);
+        }
+
         try {
 
-            const id = await Resource.insert(db, ctx.request.body);
+            const id = await Resource.insert(db, ctx.request.body, location);
             ctx.set('X-Insert-Id', id); // for integration tests
 
             // return to list of resources
@@ -91,6 +143,9 @@ class ResourcesHandlers {
             ctx.redirect(ctx.url);
         }
 
+        function formatPhone(num) {
+            phoneUtil.format(phoneUtil.parse(num, country), PhoneNumberFormat.NATIONAL)
+        }
     }
 
 
@@ -100,9 +155,38 @@ class ResourcesHandlers {
     static async processEdit(ctx) {
         const db = ctx.state.user.db;
 
+        if (validationErrors(ctx.request.body, validation)) {
+            ctx.flash = { validation: validationErrors(ctx.request.body, validation) };
+            ctx.redirect(ctx.url); return;
+        }
+
+        const country = 'NG';  // TODO: derive country code from database
+
+        // convert phones, e-mails, services to arrays
+        ctx.request.body.phone = ctx.request.body.phone
+            ? ctx.request.body.phone.split(',').map(num => formatPhone(num)).sort((a, b) => a < b ? -1 : 1)
+            : [];
+        ctx.request.body.email = ctx.request.body.email
+            ? ctx.request.body.email.split(',').map(str => str.trim()).sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1)
+            : [];
+        ctx.request.body.services = ctx.request.body.services
+            ? ctx.request.body.services.split(';').map(str => str.trim()).sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1)
+            : [];
+
+        // geocode address
+        const geocoder = Geocoder();
+        let geocode = null;
+        try {
+            if (ctx.request.body.address) {
+                [geocode] = await geocoder.geocode(ctx.request.body.address);
+            }
+        } catch (e) {
+            console.error('Geocoder error', e);
+        }
+
         try {
 
-            await Resource.update(db, ctx.params.id, ctx.request.body);
+            await Resource.update(db, ctx.params.id, ctx.request.body, geocode);
 
             // return to list of resources
             ctx.redirect('/resources');
@@ -112,6 +196,10 @@ class ResourcesHandlers {
             console.error(e);
             ctx.flash = { _error: e.message };
             ctx.redirect(ctx.url);
+        }
+
+        function formatPhone(num) {
+            phoneUtil.format(phoneUtil.parse(num, country), PhoneNumberFormat.NATIONAL)
         }
     }
 
@@ -140,6 +228,43 @@ class ResourcesHandlers {
 }
 
 
+/**
+ * Format array of phone numbers for presentation in list of resources.
+ *
+ * Each number is wrapped in a nowrap div, with a class indicating validity.
+ *
+ * @param   {string[]} phoneNumbers - array of numbers as stored in database
+ * @param   {string}   country - ISO 3166-1 country code
+ * @returns {string}   HTML-formatted list of numbers
+ */
+function formatPhoneNumbers(phoneNumbers, country) {
+    const numbers = phoneNumbers.map(phone => {
+        const num = phoneUtil.parse(phone, country);
+        return phoneUtil.isValidNumber(num)
+            ? `<div class="phone-valid nowrap">${phone}</div>`
+            : `<div class="phone-invalid nowrap" title="invalid number?">${phone}</div>`;
+    });
+    return numbers.join('');
+}
+
+/**
+ * Format array of e-mails for presentation in list of resources.
+ *
+ * Each number is wrapped in a span, with a class indicating validity.
+ *
+ * @param   {string[]} emails - array of e-mails as stored in database
+ * @returns {string}   HTML-formatted list of e-mails
+ */
+function formatEmails(emails) {
+    const emailList = emails.map(email => {
+        return isEmail.validate(email)
+            ? `<span class="email-valid">${email}</span>`
+            : `<span class="email-invalid" title="invalid email?">${email}</span>`;
+    });
+    return emailList.join(', ');
+}
+
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = ResourcesHandlers;
+module.exports = Handlers;

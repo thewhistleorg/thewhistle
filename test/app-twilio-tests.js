@@ -50,7 +50,7 @@ describe('Twilio app'+' ('+app.env+')', function() {
                 ApiVersion:    '2010-04-01',
             };
             const response = await request.post('/messages').set(headers).send(values);
-            expect(response.status).to.equal(200, response.text);
+            expect(response.status).to.equal(200);
         });
     });
 
@@ -60,12 +60,12 @@ describe('Twilio app'+' ('+app.env+')', function() {
         it('logs in', async function() {
             const values = { username: testuser, password: testpass };
             const response = await request.post('/login').set(headers).send(values);
-            expect(response.status).to.equal(302, response.text);
+            expect(response.status).to.equal(302);
         });
 
         it('views messages list page', async function() {
             const response = await request.get('/messages').set(headers);
-            expect(response.status).to.equal(200, response.text);
+            expect(response.status).to.equal(200);
             const htmlDom = new JsDom(response.text);
             expect(htmlDom.window.document.querySelector('title').textContent.slice(0, 8)).to.equal('Messages');
             expect(htmlDom.window.document.getElementById(messageId).querySelector('a').textContent).to.equal('07973 559336');
@@ -73,7 +73,7 @@ describe('Twilio app'+' ('+app.env+')', function() {
 
         it('logs out', async function() {
             const response = await request.get('/logout').set(headers);
-            expect(response.status).to.equal(302, response.text);
+            expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/');
         });
     });

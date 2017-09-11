@@ -16,6 +16,11 @@ notes set out in detail the developer workflow used in the project, in order tha
 successfully collaborate on development. The notes also explain the use of continuous integration 
 tests, and review apps.
 
+## [Redgate down-tools week](/dev/notes/redgate-dtw)
+
+Technical notes made during the Redgate down-tools week detailing the work done by Redgate staff, 
+and its inclusion in the app.
+
 ## [Technology Trial notes](/dev/notes/technology-trial-notes)
 
 Early notes (from April 2017) intended to be a living document, but neglected since then. May now be

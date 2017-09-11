@@ -12,14 +12,6 @@
         {{#if @koa.state.user.isAdmin}}
         <li class="pure-menu-item"><a href="/users" class="pure-menu-link">users</a></li>
         <li class="pure-menu-item"><a href="/centres" class="pure-menu-link">resources</a></li>
-        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-            <a href="#" class="pure-menu-link">notes</a>
-            <ul class="pure-menu-children">
-                <li class="pure-menu-item"><a href="/dev-notes/readme" class="pure-menu-link">readme</a></li>
-                <li class="pure-menu-item"><a href="/dev-notes/development-workflow" class="pure-menu-link">development workflow</a></li>
-                <li class="pure-menu-item"><a href="/dev-notes/development-notes" class="pure-menu-link">development notes</a></li>
-            </ul>
-        </li>
         {{/if}}
         <li class="pure-menu-item"><a href="/logout" class="pure-menu-link">logout</a></li>
     </ul>

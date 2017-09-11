@@ -25,5 +25,39 @@ router.get('/dev/user-agents', async function(ctx) {
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/*  Route to handle dev-notes pages                                                               */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+const fs  = require('mz/fs');              // 'modernised' node api
+const md  = require('markdown-it')();      // markdown parser
+const mda = require('markdown-it-anchor'); // header anchors for markdown-it
+
+md.use(mda);
+
+router.get('/dev/notes', async function getIndexPage(ctx) {
+    const index = await fs.readFile('dev/index.md', 'utf8');
+    const content = md.render(index);
+    await ctx.render('dev-notes', { content });
+});
+
+router.get('/dev/notes/readme', async function getReadMePage(ctx) {
+    const readme = await fs.readFile('README.md', 'utf8');
+    const content = md.render(readme);
+    await ctx.render('dev-notes', { content });
+});
+
+router.get('/dev/notes/:notes', async function getNotesPage(ctx) {
+    const notesFile = `dev/${ctx.params.notes}.md`;
+    try {
+        const notesMarkdown = await fs.readFile(notesFile, 'utf8');
+        const content = md.render(notesMarkdown);
+        await ctx.render('dev-notes', { content });
+    } catch (e) {
+        ctx.throw(404, 'Notes not found');
+    }
+});
+
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 module.exports = router.middleware();

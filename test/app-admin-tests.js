@@ -58,8 +58,8 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(response.status).to.equal(200, response.text);
             const document = new JsDom(response.text).window.document;
             expect(document.querySelector('title').textContent).to.match(/.*Activity.+/);
-            // nav should be /, reports, analysis×2, users, resources, notes×4, logout
-            expect(document.querySelectorAll('header nav ul li').length).to.equal(11);
+            // nav should be /, reports, analysis×2, users, resources, logout
+            expect(document.querySelectorAll('header nav ul li').length).to.equal(7);
         });
     });
 

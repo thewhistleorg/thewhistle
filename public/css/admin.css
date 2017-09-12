@@ -13,7 +13,7 @@ main {
 }
 
 h1 {
-    border-bottom: 1px solid #ebebeb;
+    border-bottom: 1px solid #F0F3F4;
     color: #033549;
     font-size: 3em;
     font-weight: 300;
@@ -116,9 +116,9 @@ header nav .pure-menu-children .pure-menu-link:hover {
 }
 
 .tabs ul {
-    border: 1px solid #ebebeb;
+    border: 1px solid #F0F3F4;
     margin: 5px 0;
-    border-bottom: 4px solid #ebebeb;
+    border-bottom: 4px solid #F0F3F4;
     background: #fafbfd;
 }
 
@@ -126,7 +126,7 @@ header nav .pure-menu-children .pure-menu-link:hover {
     text-align: center;
     margin: -4px -2px -4px;
     padding: 0;
-    border-right: 1px solid #ebebeb;
+    border-right: 1px solid #F0F3F4;
 }
 
 .tabs li:first-child {
@@ -135,7 +135,7 @@ header nav .pure-menu-children .pure-menu-link:hover {
 
 .tabs .active {
       border-top: 4px solid #4A90E2;
-      border-right: 1px solid #ebebeb;
+      border-right: 1px solid #F0F3F4;
 }
 
 .tabs li a {
@@ -168,65 +168,6 @@ header nav .pure-menu-children .pure-menu-link:hover {
 }
 
 
-/*Custom table */
-
-
-/*override pure striped background*/
-
-.custom-table tr:nth-child(2n-1) td {
-    /*background-color: #fafbfd;*/
-}
-
-table.custom-table {
-    border-color: #ebebeb;
-    background: #fff;
-}
-
-table.custom-table th {
-    color: #033549;
-    font-style: normal;
-    padding: 6px 10px;
-    background-color: #fafbfd;
-}
-table.custom-table th .fa {
-    margin: 4px -6px;
-    opacity: 0.2;
-}
-
-table.custom-table td, table.custom-table th {
-    border-color: #ebebeb;
-    border-bottom: 1px solid #ebebeb;
-}
-
-table.custom-table td {
-    padding: 16px 8px;
-    vertical-align: middle;
-}
-
-.clickable-row tr:hover {
-    background-color:#fafbfd;
-    cursor:pointer;
-}
-
-table.custom-table td.action, table.custom-table th.action { padding: 0; }
-td.action { min-width: 0; }
-
-td.action a {
-    font-size: 1.4em;
-    padding: 5px;
-}
-
-th[data-sort]{
-  cursor: pointer;
-}
-th[data-sort]:hover {
-  background: #f6f7f9;
-}
-
-/*tweak margin*/
-.custom-table.margin-tweak {
-      margin-top: 3px;
-}
 
 /*Tags*/
 
@@ -236,7 +177,7 @@ span.tag:hover, a.tag:hover {
 
 span.tag, a.tag {
   background: #f0f3f4;
-  border: 1px solid #ebebeb;
+  border: 1px solid #F0F3F4;
   border-radius: 8px;
   padding: 0px 6px 1px;
   white-space: nowrap;
@@ -279,7 +220,7 @@ textarea           { width: 24em; }
 }
 
 .border-top {
-    border-top: 1px solid #ebebeb;
+    border-top: 1px solid #F0F3F4;
 }
 
 a, a:visited { color: #033549; }
@@ -292,6 +233,6 @@ a.grey       { color: #999999; }
 
 .tab-content {
     padding: 10px 15px;
-    border: 1px solid #ebebeb;
+    border: 1px solid #F0F3F4;
     margin-top: -6px;
 }

@@ -12,11 +12,10 @@ const test = it; // just an alias
 
 describe('Auto identifier', function() {
     let id=null, id2=null;
-    test('generate hyphen-separated name-pair', function() {
+    test('generate space-separated name-pair', function() {
         id = autoIdentifier();
         expect(id).to.be.a('string');
         expect(id).to.match(/[a-z]+ [a-z]+/);
-        console.log(id)
     });
     test('distinct', function() {
         id2 = autoIdentifier();

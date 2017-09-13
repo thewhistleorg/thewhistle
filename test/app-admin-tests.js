@@ -65,15 +65,15 @@ describe('Admin app'+' ('+app.env+')', function() {
 
     describe('incident report', function() {
         let reportId = null;
-        let imgFldr = 'test/img/';
-        let imgFile = 's_gps.jpg';
+        const imgFldr = 'test/img/';
+        const imgFile = 's_gps.jpg';
         it('submits incident report', async function() {
             const values = {
-                'generated-name':    'testy-tiger',
+                'generated-name':    'test test',
                 date:                dateFormat(new Date(Date.now() - 1000*60*60*24), 'yyyy-mm-dd'), // yesterday in case of early-morning run
                 time:                dateFormat('HH:MM'),
                 'brief-description': 'test',
-                'location-address':  'Mill Lane, Cambridge',
+                'location-address':  'Free School Lane, Cambridge CB2 3RQ',
             };
             // sadly, it seems that superagent doesn't allow request.attach() to be used with
             // request.send(), so instead we need to use request.field()
@@ -82,7 +82,7 @@ describe('Admin app'+' ('+app.env+')', function() {
                 .field('date', dateFormat('yyyy-mm-dd'))
                 .field('time', dateFormat('HH:MM'))
                 .field('brief-description', 'test')
-                .field('location-address', 'Mill Lane, Cambridge')
+                .field('location-address', 'Free School Lane, Cambridge CB2 3RQ')
                 .attach('documents', imgFldr+imgFile);
             expect(responseEnter.status).to.equal(302);
             const koaSession = base64.decode(responseEnter.headers['set-cookie'][0].match(/^koa:sess=([a-zA-Z0-9=.]+);.+/)[1]);
@@ -126,8 +126,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             const response = await request.get('/reports/'+reportId).set(headers);
             expect(response.status).to.equal(200);
             const document = new JsDom(response.text).window.document;
-            const src = `/test/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
-            const distRe = new RegExp('^340 km NNW from incident location')
+            const distRe = new RegExp('^340 km NNW from incident location');
             expect(document.getElementById(imgFile).querySelector('td.exif div').textContent).to.match(distRe);
         });
 
@@ -137,10 +136,20 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(response.body.latest.timestamp).to.equal(ObjectId(reportId).getTimestamp().toISOString());
         });
 
-        it('gets reports in bounding box', async function() {
+        it('gets reports in bounding box (ajax)', async function() {
             const response = await request.get('/ajax/reports/within/52.2,0.11:52.3,0.12').set(headers);
             expect(response.status).to.equal(200);
             expect(response.body.reports.filter(r => r._id == reportId).length).to.equal(1);
+        });
+
+        it('sees ‘test test’ name is used (ajax)', async function() {
+            const response = await request.get('/ajax/report/test/names/shy-jackal').set(headers);
+            expect(response.status).to.equal(200);
+        });
+
+        it('sees unused name is not used (ajax)', async function() {
+            const response = await request.get('/ajax/report/test/names/no+way+this+should+be+a+used+name').set(headers);
+            expect(response.status).to.equal(404);
         });
 
         it('sets summary', async function() {
@@ -155,7 +164,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(matches.numberValue).to.equal(1);
         });
 
-        it('sets report tag', async function() {
+        it('sets report tag (ajax)', async function() {
             const values = { tag: 'test' };
             const response = await request.post(`/ajax/reports/${reportId}/tags`).set(headers).send(values);
             expect(response.status).to.equal(201);
@@ -178,12 +187,12 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         // TODO: commentary tests
 
-        it('deletes updates (tidyup)', async function() {
+        it('tidyup: deletes updates (ajax)', async function() {
             const response = await request.delete(`/ajax/reports/${reportId}/updates/`).set(headers).send();
             expect(response.status).to.equal(200);
         });
 
-        it('deletes incident report', async function() {
+        it('tidyup: deletes incident report', async function() {
             const response = await request.post('/reports/'+reportId+'/delete').set(headers).send();
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');

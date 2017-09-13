@@ -160,7 +160,10 @@
                             {{#analysis.files}}
                             <tr id="{{name}}" class="align-top">
                                 <td><a href="/{{path}}{{name}}">{{#if isImage}}<img src="/{{path}}{{name}}" alt="{{name}}">{{else}}{{name}}{{/if}}</a></td>
-                                <td class="exif">{{distance}} {{direction}} from incident location<div title="{{time}}">{{timeDesc}}</div></td>
+                                <td class="exif">
+                                    {{#if distance}}<div>{{distance}} {{direction}} from incident location</div>{{/if}}
+                                    {{#if time}}<div title="{{time}}">{{timeDesc}}</div>{{/if}}
+                                </td>
                             </tr>
                             {{/analysis.files}}
                         </table>

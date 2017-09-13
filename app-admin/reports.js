@@ -792,11 +792,13 @@ class ReportsHandlers {
             const submissionTime = report._id.getTimestamp();
             for (const file of report.analysis.files) {
                 file.isImage = file.type.slice(0, 5) == 'image';
-                if (file.exif) {
+                if (file.exif && incidentLocn.lat && incidentLocn.lon) {
                     const d = incidentLocn.distanceTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
-                    file.distance = d > 1e3 ? Number(d.toPrecision(2))/1e3 + ' km' : Number(d.toPrecision(2)) + ' metres';
+                    file.distance = d > 1e3 ? Number(d.toPrecision(2)) / 1e3 + ' km' : Number(d.toPrecision(2)) + ' metres';
                     file.bearing = incidentLocn.bearingTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
                     file.direction = Dms.compassPoint(file.bearing);
+                }
+                if (file.exif && file.exif.CreateDate) {
                     const date = file.exif.CreateDate;
                     file.time = new Date(Date.UTC(date.year, date.month-1, date.day, date.hour, date.minute - date.tzoffsetMinutes)); // TODO: exif tz?
                     if (file.time) file.timeDesc = !isNaN(incidentTime)

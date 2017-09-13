@@ -128,7 +128,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             const document = new JsDom(response.text).window.document;
             const src = `/test/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
             const distRe = new RegExp('^340 km NNW from incident location')
-            expect(document.getElementById(imgFile).querySelector('td.exif').textContent).to.match(distRe);
+            expect(document.getElementById(imgFile).querySelector('td.exif div').textContent).to.match(distRe);
         });
 
         it('gets timestamp of new report (ajax)', async function() {

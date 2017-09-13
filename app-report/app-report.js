@@ -47,7 +47,7 @@ app.use(async function handleErrors(ctx, next) {
                 await ctx.render('404-not-found', context404);
                 break;
             default:
-            case 500: // Internal Server Error
+            case 500: // Internal Server Error TODO: 500-internal-server-error gets looked for within individual project
                 console.error(ctx.status, e.message);
                 const context500 = app.env=='production' ? {} : { e: e };
                 await ctx.render('500-internal-server-error', context500);

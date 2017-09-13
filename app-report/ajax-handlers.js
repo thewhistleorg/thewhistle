@@ -19,7 +19,10 @@ const handler = {};
 
 
 /**
- * Generate a random adjective-noun name.
+ * Generate a random anonymous name.
+ *
+ * For efficiency, this doesn't check if the name is already in use (should be very small
+ * probability), but such check should be done when submitting report.
  */
 handler.getGenerateNewName = async function(ctx) {
     let name = null;
@@ -40,7 +43,7 @@ handler.getGenerateNewName = async function(ctx) {
  */
 handler.getName = async function(ctx) {
     const db = ctx.params.db;
-    const reports = await Report.getBy(db, 'report.identifier-name', ctx.params.id);
+    const reports = await Report.getBy(db, 'name', ctx.params.id);
     ctx.body = {};
     ctx.body.root = 'name';
     ctx.status = reports.length==0 && ctx.params.id!='' ? 404 : 200; // Not Found / Ok

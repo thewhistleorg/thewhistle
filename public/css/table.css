@@ -19,8 +19,9 @@ table.custom-table td, table.custom-table th {
 }
 
 table.custom-table th {
-    color: #033549;
+    color: #50addb;
     font-style: normal;
+    font-weight: bold;
     padding: 10px 10px;
     background-color: #fafbfd;
     border-bottom: 1px solid #F0F3F4;

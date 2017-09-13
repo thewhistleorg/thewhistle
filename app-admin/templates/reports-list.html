@@ -103,11 +103,11 @@
 
 <main>
 
-<div class="float-right">
-  <span>Export: CSV </span>
-  <a href="{{exportCsv}}" title="Save as CSV" class="fa fa-file-excel-o"></a>
-  <span>/ PDF </span>
-  <a href="{{exportPdf}}" title="Save as PDF" class="fa fa-file-pdf-o"></a>
+<div class="float-right bold">
+    <span>Export to</span>
+    <a href="{{exportCsv}}" title="Save as CSV"> CSV </a>
+    <span>/</span>
+    <a href="{{exportPdf}}" title="Save as PDF">PDF</a>
 </div>
 
 <h2 class="page-header-title">Reports</h2>
@@ -147,7 +147,7 @@
 
     <tr id="{{_id}}" onClick="window.open('/reports/{{_id}}')">
 
-        <td data-ago="{{updatedOn}}" title="{{updatedOnPretty}} by @{{updatedBy}}" class="align-right">
+        <td data-ago="{{updatedOn}}" title="{{updatedOnPretty}} by @{{updatedBy}}" class="grey">
           <span>{{updatedAgo}}</span>
         </td>
 
@@ -155,7 +155,7 @@
           <span>{{{summary}}}</span>
         </td>
 
-        <td title="{{reportedOnFull}} by {{reportedBy}}" class="align-right nowrap">
+        <td title="{{reportedOnFull}} by {{reportedBy}}" class="grey nowrap">
           <span>{{reportedOnPretty}}</span>
         </td>
 
@@ -173,7 +173,7 @@
           <span>{{location}}</span>
         </td>
 
-        <td>
+        <td class="grey">
           <span>{{name}}</span>
         </td>
         <!-- <td class="small grey">{{#if comments.length}}<span class="fa-stack fa-1x"><span class="fa fa-comment-o fa-stack-2x"></span><a href="/reports/{{_id}}" class="fa-stack-1x fa-stack-text fa-inverse">{{comments.length}}</a></span>{{/if}}</td>

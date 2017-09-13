@@ -220,10 +220,10 @@ textarea           { width: 24em; }
 }
 
 .border-top {
-    border-top: 1px solid #F0F3F4;
+    border-top: 1px solid #e0e6e8;
 }
 
-a, a:visited { color: #033549; }
+a, a:visited { color: #50addb; }
 a.grey       { color: #999999; }
 .green       { color: #006600; }
 .red         { color: #660000; }

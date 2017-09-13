@@ -1,14 +1,23 @@
 <form method="post" class="pure-form pure-form-aligned">
     {{> back}}
 
+    {{#if @koa.flash.name}}
+    <p class="error">{{@koa.flash.name}}</p>
+    {{/if}}
+
     <div class="pure-g pure-u">
         <h1>Check before you send the report</h1>
 
         <h2>Report</h2>
         {{{reportHtml}}}
 
+        {{#if files}}
+        <h2>Files</h2>
+        {{files}}
+        {{/if}}
+
         <h2>Geocoding</h2>
-        {{{geocodeHtml}}}
+        Formatted address: {{formattedAddress}}
 
         <hr>
 

@@ -13,60 +13,67 @@
         </ul>
 
         <ul>
+            {{#checked when}}
             <li>
-                <label for="specific-date" class="pure-radio">
-                    <input type="radio" name="when" id="specific-date" value="specific-date">
-                    On
-                    <table class="inline">
-                        <tr class="field-label">
-                            <td>DD</td>
-                            <td>MM</td>
-                            <td>YYYY</td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" name="day" id="day" value="{{day}}" class="width-2chars" maxlength="2"></td>
-                            <td><input type="text" name="month" id="month" value="{{month}}" class="width-2chars" maxlength="2"></td>
-                            <td><input type="text" name="year" id="year" value="{{year}}" class="width-4chars" maxlength="4"></td>
-                        </tr>
-                    </table>
-                    at
-                    <table class="inline">
-                        <tr class="field-label">
-                            <td>HH</td>
-                            <td>MM</td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" name="hour" id="hour" value="{{hour}}" class="width-2chars" maxlength="2"></td>
-                            <td><input type="text" name="minutes" id="minutes" value="{{minutes}}" class="width-2chars" maxlength="2"></td>
-                        </tr>
-                    </table>
-                </label>
+                <input type="radio" name="when" id="when-date" value="date">
+                <label for="when-date" class="pure-radio">On</label>
+                <table class="inline">
+                    <tr class="field-label">
+                        <td>DD</td>
+                        <td>MMM</td>
+                        <td>YYYY</td>
+                    </tr>
+                    <tr>
+                        <td><input type="number" name="date.day" id="date.day" value="{{date.day}}" class="w4" min="1" max="31"></td>
+                        <td><input type="text" name="date.month" id="date.month" value="{{date.month}}" list="months" class="w5" maxlength="3"></td>
+                        <td><input type="number" name="date.year" id="date.year" value="{{date.year}}" class="w5" min="{{lastyear}}" max="{{thisyear}}"></td>
+                    </tr>
+                </table>
+                <datalist id="months">
+                    <option value="Jan"><option value="Feb"><option value="Mar">
+                    <option value="Apr"><option value="May"><option value="Jun">
+                    <option value="Jul"><option value="Aug"><option value="Sep">
+                    <option value="Oct"><option value="Nov"><option value="Dec">
+                </datalist>
+                at
+                <table class="inline">
+                    <tr class="field-label">
+                        <td>HH</td>
+                        <td>MM</td>
+                    </tr>
+                    <tr>
+                        <td><input type="number" name="date.hour" id="date.hour" value="{{date.hour}}" class="w4" min="0" max="23" title="24h"></td>
+                        <td><input type="number" name="date.minute" id="date.minute" value="{{date.minute}}" class="w4" min="0" max="59"></td>
+                    </tr>
+                </table>
             </li>
             <li>
-                <label for="within">
-                    <input type="radio" name="when" id="within" value="within">
-                    It was within:
-                    <select name="within-options" id="within-options">
-                        <option name="last-month" value="last-month">Last month</option>
-                        <option name="last-week" value="last-6months">Last six months</option>
-                        <option name="last-year" value="last-year">Last year</option>
-                        <option name="more" value="more">More than a year ago</option>
-                    </select>
-                </label>
+                <input type="radio" name="when" id="when-within" value="within">
+                <label for="when-within">It was within</label>
+                <select name="within-options" id="within-options">
+                    <option value="">&nbsp;</option>
+                    <option value="within last month">Last month</option>
+                    <option value="within last 6 months">Last six months</option>
+                    <option value="within last year">Last year</option>
+                    <option value="more than a year ago">More than a year ago</option>
+                </select>
             </li>
             <li>
-                <input type="radio" name="when" id="dont-remember" value="dont-remember"> <label for="dont-remember">I don't exactly remember</label>
+                <input type="radio" name="when" id="when-dont-remember" value="dont-remember"> <label for="when-dont-remember">I don't exactly remember</label>
             </li>
             <li>
-                <input type="radio" name="when" id="dont-know" value="dont-know"> <label for="dont-know">I don't know when it happened</label>
+                <input type="radio" name="when" id="when-dont-know" value="dont-know"> <label for="when-dont-know">I don't know when it happened</label>
             </li>
+            {{/checked}}
         </ul>
         <h1>Is it still happening?</h1>
         <ul>
+            {{#checked still-happening}}
             <li>
                 <input type="radio" name="still-happening" id="still-y" value="y"> <label for="still-y">Yes</label>
                 <input type="radio" name="still-happening" id="still-n" value="n" class="radio-margin"> <label for="still-n">No</label>
             </li>
+            {{/checked}}
         </ul>
         {{> continue}}
     </div>

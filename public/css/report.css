@@ -58,9 +58,6 @@ label {
 input[type=date], input[type=time] {
     width: auto;
 }
-input[type=number] {
-    width: auto;
-}
 input[type=radio] {
     float: none;
     width: auto;
@@ -251,6 +248,15 @@ tr.field-label {
 label.inline {
     display: inline;
 }
+
+/* 'existing-name' check */
+.name-available { font-weight: bold; margin-top: 1em; }
+#name-ok  { color: #009900; }
+#name-nok { color: #990000; }
+
+/* sexual-assault pages 2, 5, 7 */
+.pure-form .pure-radio { display: inline-block; margin: 0; }
+
 
 @media screen and (max-width: 480px) {
     header img {

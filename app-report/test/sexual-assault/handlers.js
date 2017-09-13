@@ -6,22 +6,15 @@
 
 'use strict';
 
-const Geocoder = require('node-geocoder'); // library for geocoding and reverse geocoding
+const Geocoder   = require('node-geocoder'); // library for geocoding and reverse geocoding
+const dateFormat = require('dateformat');    // Steven Levithan's dateFormat()
 
 const Report = require('../../../models/report.js');
 
 const jsObjectToHtml   = require('../../../lib/js-object-to-html.js');
 const useragent        = require('../../../lib/user-agent.js');
-const validationErrors = require('../../../lib/validation-errors.js');
 
 const nPages = 7;
-
-const validation = {
-    3: { date: 'type=date required', time: 'type=time required' },
-    4: { 'brief-description': 'required' },
-    5: { 'location-address': 'required' },
-    '*': { date: 'type=date required', time: 'type=time required', 'brief-description': 'required', 'location-address': 'required' },
-};
 
 class Handlers {
 
@@ -29,8 +22,14 @@ class Handlers {
      * Render incident report index page.
      */
     static async getIndex(ctx) {
-        ctx.session.report = {};
-        ctx.session.completed = 0;
+        // default the incident report date to today: this is a natural default, is quite easy to
+        // change to yesterday, or to any other day; it also maximises the chances of getting an
+        // actual date, rather than leaving the option blank or selecting a 'within' option
+        const today = { day: dateFormat('d'), month: dateFormat('mmm'), year: dateFormat('yyyy') };
+        ctx.session.report = { when: 'date', date: today };
+
+        ctx.session.completed = 0; // number of pages completed; used to prevent users jumping ahead
+
         await ctx.render('index');
     }
 
@@ -44,7 +43,8 @@ class Handlers {
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num); // note '+' is allowed on windows, '*' is not
         if (page > ctx.session.completed+1) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); return; }
 
-        const context = Object.assign({ p: page, n: nPages }, ctx.session.report);
+        const validYears = { thisyear: dateFormat('yyyy'), lastyear: dateFormat('yyyy')-1 }; // limit report to current or last year
+        const context = Object.assign({ p: page, n: nPages }, ctx.session.report, validYears);
 
         await ctx.render('page'+page, context);
     }
@@ -53,7 +53,7 @@ class Handlers {
     /**
      * Process 'next' / 'previous' page submissions.
      */
-    static async postPage(ctx) {
+    static postPage(ctx) {
         if (!ctx.session.report) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
         const page = ctx.params.num==undefined ? 0 : Number(ctx.params.num);
         ctx.session.completed = Number(page);
@@ -74,36 +74,28 @@ class Handlers {
             for (let f=0; f<body.files.length; f++) if (body.files[f].size == 0) body.files.splice(f, 1);
         }
 
-        //switch (page) {
-        //    case 1: // bespoke validation required for identifier-name
-        //        if (body['existing-name'] != null) {
-        //            // verify existing name does exist
-        //            const reports = await Report.getBy('test', 'report.identifier-name', body['existing-name']);
-        //            if (reports.length == 0) { ctx.flash = 'Name not found'; ctx.redirect(ctx.url); }
-        //            body['identifier-name'] = body['existing-name'];
-        //        } else {
-        //            // verify generated name does not exist
-        //            if (body['generated-name'] == null) { ctx.flash = 'Name not given'; ctx.redirect(ctx.url); }
-        //            const reports = await Report.getBy('test', 'report.identifier-name', body['generated-name']);
-        //            if (reports.length > 0) { ctx.flash = 'Generated name not available'; ctx.redirect(ctx.url); }
-        //            body['identifier-name'] = body['generated-name'];
-        //        }
-        //        if (page != '*') break; // eslint-disable-line no-fallthrough
-        //    case 6: // set blank radio/checkbox fields to null
-        //        body['perpetrator-gender'] = body['perpetrator-gender'] || null;
-        //        if (page != '*') break; // eslint-disable-line no-fallthrough
-        //}
-        //if (validationErrors(body, validation[page])) {
-        //    ctx.flash = { validation: validationErrors(body, validation[page]) };
-        //    ctx.redirect(ctx.url); return;
-        //}
-
+        // remember if we're going forward or back, then delete nav from body
         const go = body['nav-next'] ? page + 1 : page - 1;
-
         delete body['nav-prev'];
         delete body['nav-next'];
 
+        // record current body in session before validation
         ctx.session.report = Object.assign(ctx.session.report, body);
+
+        // if date specified, verify it is valid (to back up client-side validation)
+        if (body.when == 'date') {
+            const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
+            const date = new Date(body.date.year, months.indexOf(body.date.month.toLowerCase()), body.date.day, body.date.hour, body.date.minute);
+            if (isNaN(date.getTime())) {
+                ctx.flash = { validation: ['Invalid date'] };
+                ctx.redirect(ctx.url); return;
+            }
+            if (date.getTime() > Date.now()) {
+                ctx.flash = { validation: ['Date is in the future'] };
+                ctx.redirect(ctx.url); return;
+            }
+        }
+
         ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/`+(go<=nPages ? go : 'submit'));
     }
 
@@ -121,8 +113,8 @@ class Handlers {
         const geocoder = Geocoder();
         ctx.session.geocode = null;
         try {
-            if (ctx.session.report['location-address']) {
-                [ctx.session.geocode] = await geocoder.geocode(ctx.session.report['location-address']);
+            if (ctx.session.report['at-address']) {
+                [ctx.session.geocode] = await geocoder.geocode(ctx.session.report['at-address']);
             }
         } catch (e) {
             console.error('Geocoder error', e);
@@ -131,7 +123,10 @@ class Handlers {
         if (ctx.session.report['existing-name']) { delete ctx.session.report['generated-name']; ctx.session.report = Object.assign({ 'existing-name': null }, ctx.session.report); }
         if (ctx.session.report['generated-name']) { delete ctx.session.report['existing-name']; ctx.session.report = Object.assign({ 'generated-name': null }, ctx.session.report); }
 
-        const context = { reportHtml: jsObjectToHtml(ctx.session.report), geocodeHtml: jsObjectToHtml(ctx.session.geocode) };
+        const prettyReport = prettifyReport(ctx.session.report);
+        const formattedAddress = ctx.session.geocode ? ctx.session.geocode.formattedAddress : '[unrecognised address]';
+        const files = ctx.session.report.files.map(f => f.name).join(', ');
+        const context = { reportHtml: jsObjectToHtml(prettyReport), formattedAddress, files };
 
         await ctx.render('submit', context);
     }
@@ -147,9 +142,26 @@ class Handlers {
         // record this report
         delete ctx.request.body['submit'];
 
+        // check generated name not already used, or existing name does exist
+        switch (ctx.session.report['used-before']) {
+            case 'y':
+                // verify existing name does exist
+                const reportsY = await Report.getBy('test', 'name', ctx.session.report['existing-name']);
+                if (reportsY.length == 0) { ctx.flash = { name: 'Anonymous name not found' }; ctx.redirect(ctx.url); return; }
+                break;
+            case 'n':
+                // verify generated name does not exist
+                if (ctx.session.report['generated-name'] == null) { ctx.flash = 'Name not given'; ctx.redirect(ctx.url); }
+                const reportsN = await Report.getBy('test', 'name', ctx.session.report['generated-name']);
+                if (reportsN.length > 0) { ctx.flash = { name: 'Generated name not available: please select another' }; ctx.redirect(ctx.url); return; }
+                break;
+        }
+
         const name = ctx.session.report['existing-name'] || ctx.session.report['generated-name'];
 
-        const id = await Report.insert('test', undefined, name, ctx.session.report, 'sexual-assault', ctx.session.files, ctx.session.geocode);
+        const prettyReport = prettifyReport(ctx.session.report);
+
+        const id = await Report.insert('test', undefined, name, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.session.geocode);
         ctx.set('X-Insert-Id', id); // for integration tests
 
         // record user-agent
@@ -170,6 +182,93 @@ class Handlers {
         await ctx.render('whatnext');
     }
 
+}
+
+
+/**
+ * Convert fields as defined in form input fields to presentation-friendly fields.
+ *
+ * This includes
+ *  - renaming fields for attractive presentation
+ *  - converting dd-mmm-yyyy hh:mm fields to date value
+ *  - merging radio-button fields ('where', 'who', 'used-before') with supplementary information to
+ *    monotonic fields
+ *  - merging checkbox fields ('action') to full texts integrating 'other' field
+ *  - setting undefined fields resulting from checkboxes / radio buttons with nothing checked
+ *
+ * @param   {Object} report - Report as submitted
+ * @returns {Object} Transformed report
+ */
+function prettifyReport(report) {
+    const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
+
+    const rpt = {};
+
+    // on-behalf-of
+    const onbehalfof = {
+        myself:         'myself',
+        'someone-else': 'someone else',
+        undefined:      null,
+    };
+    rpt['On behalf of'] = onbehalfof[report['on-behalf-of']];
+
+    // date gets allocated to either Date (if it's an actual date) or Happened for other options
+    const d = report.date;
+    switch (report.when) {
+        case 'date':          rpt.Date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, d.hour, d.minute); break;
+        case 'within':        rpt.Happened = report['within-options']; break;
+        case 'dont-remember': rpt.Happened = 'Don’t remember'; break;
+        case 'dont-know':     rpt.Happened = 'Don’t know'; break;
+    }
+
+    // still-happening
+    const stillHappening = {
+        y:         'yes',
+        n:         'no',
+        undefined: null,
+    };
+    rpt['Still happening'] = stillHappening[report['still-happening']];
+
+    // description
+    rpt.Description = report.description;
+
+    //where
+    const where = {
+        at:              report['at-address'],
+        'dont-remember': 'Don’t remember',
+        'dont-know':     'Don’t know',
+        undefined:       null,
+    };
+    rpt['Where'] = where[report['where']];
+
+    // who
+    const who = {
+        y:         'Known: ' + report['who-relationship'],
+        n:         'Not known: ' + report['who-description'],
+        undefined: null,
+    };
+    rpt['Who'] = who[report['who']];
+
+    // action-taken: create array of responses matching form labels
+    const action = {
+        police:       'I have told the police',
+        organisation: 'I have told somebody within an organisation',
+        friends:      'I spoke to friends or other people I know',
+        teacher:      'I spoke to a teacher',
+        other:        report['action-taken-other-details'],
+        unset:        null, // no checkboxes ticked
+    };
+    if (report['action-taken'] == undefined) report['action-taken'] = 'unset';
+    if (typeof report['action-taken'] == 'string') report['action-taken'] = [report['action-taken']];
+    rpt['Action taken'] = report['action-taken'].map(a => action[a]);
+
+    // used-before: either Generated name or Existing name is set as appropriate
+    switch (report['used-before']) {
+        case 'n': rpt['Generated name'] = report['generated-name']; break;
+        case 'y': rpt['Existing name'] = report['existing-name']; break;
+    }
+
+    return rpt;
 }
 
 

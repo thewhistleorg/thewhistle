@@ -16,11 +16,10 @@ router.get( '/:database/:project',          handlers.getIndex);
 router.post('/:database/:project',          handlers.postPage);
 router.get( '/:database/:project/submit',   handlers.getSubmit);
 router.post('/:database/:project/submit',   handlers.postSubmit);
+router.get( '/:database/:project/reset', function(ctx) { ctx.session.report = {}; ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return;  }); // TODO; for testing only
 router.get( '/:database/:project/whatnext', handlers.getWhatnext);
 router.get( '/:database/:project/:num',     handlers.getPage);
 router.post('/:database/:project/:num',     handlers.postPage);
-
-app.use(router.routes());
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

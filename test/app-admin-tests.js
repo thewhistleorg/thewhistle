@@ -238,39 +238,52 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
     });
 
-    describe('centres', function() {
-        let centreId = null;
+    describe('resources', function() {
+        let resourceId = null;
 
-        it('adds new centre', async function() {
-            const values = { name: 'Test', description: 'Centre', lat: '51.1', lon: '-1.1' };
-            const response = await request.post('/centres/add').set(headers).send(values);
+        it('adds new resource', async function() {
+            const values = { name: 'Test', address: 'Free School Lane, Cambridge CB2 3RQ', services: 'testing' };
+            const response = await request.post('/resources/add').set(headers).send(values);
             expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/centres');
-            centreId = response.headers['x-insert-id'];
+            expect(response.headers.location).to.equal('/resources');
+            resourceId = response.headers['x-insert-id'];
         });
 
-        it('lists centres including test centre', async function() {
-            const response = await request.get('/centres').set(headers);
+        it('lists resources including test resource', async function() {
+            const response = await request.get('/resources').set(headers);
             expect(response.status).to.equal(200);
             const document = new JsDom(response.text).window.document;
-            expect(document.getElementById(centreId).querySelector('td').textContent).to.equal('Test');
+            expect(document.getElementById(resourceId).querySelectorAll('td')[0].textContent).to.equal('Test');
+            expect(document.getElementById(resourceId).querySelectorAll('td')[4].textContent).to.equal('testing');
         });
 
-        it('edits test centre', async function() {
-            const response = await request.get('/centres/'+centreId+'/edit').set(headers);
+        it('edits test resource', async function() {
+            const response = await request.get('/resources/'+resourceId+'/edit').set(headers);
             expect(response.status).to.equal(200);
             const document = new JsDom(response.text).window.document;
-            expect(document.querySelector('h1').textContent).to.equal('Edit centre Test');
+            expect(document.querySelector('h1').textContent).to.equal('Edit resource Test');
+            const values = { name: 'Test', address: 'Free School Lane, Cambridge CB2 3RQ', services: 'testing; validation' };
+            const responsePost = await request.post('/resources/'+resourceId+'/edit').set(headers).send(values);
+            expect(responsePost.status).to.equal(302);
+            expect(responsePost.headers.location).to.equal('/resources');
         });
 
-        it('deletes test centre', async function() {
-            const response = await request.post('/centres/'+centreId+'/delete').set(headers);
+        it('lists resources including updated test resource', async function() {
+            const response = await request.get('/resources').set(headers);
+            expect(response.status).to.equal(200);
+            const document = new JsDom(response.text).window.document;
+            expect(document.getElementById(resourceId).querySelectorAll('td')[0].textContent).to.equal('Test');
+            expect(document.getElementById(resourceId).querySelectorAll('td')[4].textContent).to.equal('testing; validation');
+        });
+
+        it('deletes test resource', async function() {
+            const response = await request.post('/resources/'+resourceId+'/delete').set(headers);
             expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/centres');
+            expect(response.headers.location).to.equal('/resources');
         });
 
-        it('returns 404 for non-existent centre', async function() {
-            const response = await request.get('/centres/no-one-here-by-that-name').set(headers);
+        it('returns 404 for non-existent resource', async function() {
+            const response = await request.get('/resources/no-one-here-by-that-name').set(headers);
             expect(response.status).to.equal(404);
             const document = new JsDom(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal(':(');

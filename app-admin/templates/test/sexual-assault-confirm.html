@@ -15,9 +15,9 @@
     <script>
         'use strict';
         const report = { lat: {{report.lat}}, lng: {{report.lon}} };
-        const centres = [
-            {{#each centres}}
-            { centreId: '{{_id}}', lat: {{location.coordinates.[1]}}, lng: {{location.coordinates.[0]}}, name: '{{name}}' },
+        const resources = [
+            {{#each resources}}
+            { resourceId: '{{_id}}', lat: {{location.coordinates.[1]}}, lng: {{location.coordinates.[0]}}, name: '{{name}}' },
             {{/each}}
         ];
         function initMap() {
@@ -27,11 +27,11 @@
                 center: { lat: 0, lng: 0 }
             });
 
-            const markers = centres.map(function(centre, i) {
+            const markers = resources.map(function(resource, i) {
                 const m = new google.maps.Marker({
-                    position: centre,
+                    position: resource,
                     icon:     '/map-marker/blue/100',
-                    label:    centre.name,
+                    label:    resource.name,
                     map:      map,
                 });
                 return m;
@@ -63,10 +63,10 @@
 
 {{>errpartial}}
 
-<p>This page will have information about support which may be available, including support centres
+<p>This page will have information about support which may be available, including support resources
     close to the location of the reported incident.</p>
 
-<h2>Rape crisis centres</h2>
+<h2>Rape crisis resources</h2>
 
 <table>
     <tr>
@@ -74,13 +74,13 @@
         <th>Description</th>
         <th>Distance</th>
     </tr>
-    {{#centres}}
-    <tr id="{{_id}}" class="centre">
+    {{#resources}}
+    <tr id="{{_id}}" class="resource">
         <td>{{name}}</td>
         <td>{{description}}</td>
         <td class="align-right">{{distance}} km</td>
     </tr>
-    {{/centres}}
+    {{/resources}}
 </table>
 
 <div id="map"></div>

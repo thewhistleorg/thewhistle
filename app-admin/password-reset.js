@@ -23,8 +23,8 @@ const smtpConfig = {
     secure: false,
     auth:   {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-    }
+        pass: process.env.SMTP_PASS,
+    },
 };
 const transporter = nodemailer.createTransport(smtpConfig);
 
@@ -46,7 +46,7 @@ class PasswordResetHandlers {
     static async processRequest(ctx) {
         const email = ctx.request.body.email;
 
-        const [user] = await User.getBy('email', email);
+        const [ user ] = await User.getBy('email', email);
 
         // current timestamp for token expiry in base36
         const now = Math.floor(Date.now()/1000).toString(36);
@@ -82,11 +82,11 @@ class PasswordResetHandlers {
 
         // send out e-mail
         try {
-            //const info = await transporter.verify();
+            //const info = await transporter.verify(); TODO: ??
             const info = await transporter.sendMail(message);
-            console.log('info', info)
+            console.log('info', info);
         } catch (e) {
-            console.log('ERROR', e)
+            console.log('ERROR', e);
         }
 
 
@@ -117,7 +117,7 @@ class PasswordResetHandlers {
         }
 
         // check token has been recorded
-        const [user] = await User.getBy({ passwordResetRequest: token });
+        const [ user ] = await User.getBy({ passwordResetRequest: token });
 
         if (!user) {
             await ctx.render('password-reset', { unrecognised: true });
@@ -143,7 +143,7 @@ class PasswordResetHandlers {
         }
 
         //
-        const [user] = await User.getBy('passwordResetRequest', token);
+        const [ user ] = await User.getBy('passwordResetRequest', token);
         const password = await scrypt.kdf(ctx.request.body.password, await scrypt.params(0.5));
         await User.update(user._id, { password: password.toString('base64'), passwordResetRequest: null });
 

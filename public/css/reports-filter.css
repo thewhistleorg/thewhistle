@@ -49,13 +49,57 @@
 input.summary-input {
   background-color: #ffffff;
   border-right: 1px solid #e0e6e8;
-  padding: 12px 6px 11px;
+  padding: 13px 6px 11px;
   border-left: 1px solid #e0e6e8;
   margin: -4px;
+  width: 20%;
   border-bottom: 0;
   border-top: 0;
+  -moz-box-shadow:    0 1px 3px 0 rgba(0, 0, 0, 0.11) inset;
+  -webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.11) inset;
+  box-shadow:         0 1px 3px 0 rgba(0, 0, 0, 0.11) inset;
 }
 
 input.summary-input::placeholder {
     color: #99b2c1;
+}
+
+
+/* Overrid bootstrap slider styles */
+
+.range-filter {
+    padding: 20px;
+}
+
+.slider.slider-horizontal {
+    margin-top: 28px;
+}
+.tooltip.tooltip-main.top {
+
+    font-size: 1.2em;
+    padding: 0 10px;
+    margin-left: 0px!important;
+}
+
+.slider-track-low, .slider-track-high {
+    border-top: 1px solid #c4c4c4;
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    background-color: #f0f3f4;
+}
+
+.slider-selection{
+  background: #e0edf5 !important;
+  border: 1px solid #e0edf5;
+}
+
+.slider-handle {
+    background: #50b2e2!important;
+}
+
+/* override pure-menu-link*/
+
+a.pure-menu-link {
+     color: #50addb; 
 }

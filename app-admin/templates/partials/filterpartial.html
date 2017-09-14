@@ -33,6 +33,15 @@
             <li class="pure-menu-item pure-menu-disabled"><a href="#" class="pure-menu-link">updated</a></li>
 
             <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                <a href="#" class="pure-menu-link">submitted</a>
+                <ul class="pure-menu-children range-filter">
+                    <li class="pure-menu-item">
+                        <input name="submitted" class="submitted">
+                    </li>
+                </ul>
+            </li>
+
+            <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
                 <a href="#" class="pure-menu-link">assigned to</a>
                 <ul class="pure-menu-children">
                     {{#filterLists.assignees}}
@@ -49,6 +58,7 @@
                     {{/filterLists.statuses}}
                 </ul>
             </li>
+
 
             <!-- <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
                 <a href="#" class="pure-menu-link">summary</a>
@@ -68,14 +78,6 @@
                 </ul>
             </li>
 
-            <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-                <a href="#" class="pure-menu-link">submitted</a>
-                <ul class="pure-menu-children">
-                    <li class="pure-menu-item">
-                        <input name="submitted" class="submitted">
-                    </li>
-                </ul>
-            </li>
 
             <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
                 <a href="#" class="pure-menu-link">report fields</a>

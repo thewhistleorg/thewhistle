@@ -43,7 +43,7 @@
     <script src="//unpkg.com/dateformat@2.0.0/lib/dateformat.js"></script>
     <script src="/js/report.js"></script>
     <script src="/js/reports.js"></script>
-    <script> const slider = { oldest: '{{oldest}}', latest: '{{latest}}' }; </script>
+    <script> const slider = { oldest: '{{oldest}}', latest: '{{latest}}' , sort: '{{sort}}'}; </script>
     <script src="/js/reports-filter.js"></script>
     <script> // list of reports
         'use strict';
@@ -132,7 +132,7 @@
 <table class="pure-table w100pc custom-table margin-tweak drop-shadow clickable-row">
     <tr>
         <th data-sort="updated" class="w6">updated <span  class="float-right fa fa-sort"></span></th>
-        <th data-sort="summary">summary <span  class="float-right fa fa-sort"></span></th>
+        <th data-sort="summary">description <span  class="float-right fa fa-sort"></span></th>
         <th data-sort="submitted" class="w6">submitted <span  class="float-right fa fa-sort"></span></th>
         <th data-sort="assigned" class="w6">assigned to <span  class="float-right fa fa-sort"></span></th>
         <th data-sort="status" class="w6">status <span  class="float-right fa fa-sort"></span></th>
@@ -151,7 +151,7 @@
           <span>{{updatedAgo}}</span>
         </td>
 
-        <td class="bold">
+        <td >
           <span>{{{summary}}}</span>
         </td>
 
@@ -184,7 +184,8 @@
     {{/reports}}
 </table>
 
-<p class="grey"><b>Notes</b></p>
+<!-- Disabling the dev notes for now -->
+<!-- <p class="grey"><b>Notes</b></p>
 <p class="grey"><i>Updated</i> filter: the <i>updated</i> column shows 'ago' vaues: should the
     <i>updated</i> filter also be by 'ago' values, or by dates?</p>
 <p class="grey">Formatting issues to be addressed on <i>submitted</i> range filter.</p>
@@ -195,7 +196,7 @@
 <p class="grey">If number of <i>report fields</i> is likely to be very large, perhaps that should be
     implemented using some form of autocomplete.</p>
 <p class="grey">Think about use of history.</p>
-<p class="grey">Should there be a 'delete report' function?</p>
+<p class="grey">Should there be a 'delete report' function?</p> -->
 
 </main>
 

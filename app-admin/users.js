@@ -60,11 +60,11 @@ class UsersHandlers {
 
             // ensure roles is array (koa-body will return single selection as string not array)
             if (!Array.isArray(ctx.request.body.roles)) {
-                ctx.request.body.roles = ctx.request.body.roles ? [ctx.request.body.roles] : [];
+                ctx.request.body.roles = ctx.request.body.roles ? [ ctx.request.body.roles ] : [];
             }
             // ensure databases is array (koa-body will return single selection as string not array)
             if (!Array.isArray(ctx.request.body.databases)) {
-                ctx.request.body.databases = ctx.request.body.databases ? [ctx.request.body.databases] : [];
+                ctx.request.body.databases = ctx.request.body.databases ? [ ctx.request.body.databases ] : [];
             }
 
             const id = await User.insert(ctx.request.body);
@@ -96,11 +96,11 @@ class UsersHandlers {
 
             // ensure roles is array (koa-body will return single selection as string not array)
             if (!Array.isArray(ctx.request.body.roles)) {
-                ctx.request.body.roles = ctx.request.body.roles ? [ctx.request.body.roles] : [];
+                ctx.request.body.roles = ctx.request.body.roles ? [ ctx.request.body.roles ] : [];
             }
             // ensure databases is array (koa-body will return single selection as string not array)
             if (!Array.isArray(ctx.request.body.databases)) {
-                ctx.request.body.databases = ctx.request.body.databases ? [ctx.request.body.databases] : [];
+                ctx.request.body.databases = ctx.request.body.databases ? [ ctx.request.body.databases ] : [];
             }
 
             await User.update(ctx.params.id, ctx.request.body);

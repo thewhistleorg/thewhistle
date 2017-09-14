@@ -114,7 +114,7 @@ router.get('/map-marker/:colour/:percentage', async function getMapMarker(ctx) {
         const outline = await Jimp.read('static/map/marker-'+colour+'-outline.png');
         marker.opacity(percentage/100);
         marker.composite(outline, 0, 0);
-        marker.color([{ apply: 'desaturate', params: [100-percentage] }]);
+        marker.color([ { apply: 'desaturate', params: [ 100-percentage ] } ]);
         await marker.writePromise(path);
         await send(ctx, path, { maxage: 1000*60*60 });
     }

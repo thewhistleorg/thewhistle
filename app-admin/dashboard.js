@@ -25,7 +25,7 @@ class DashboardHandlers {
         const db = ctx.state.user.db;
 
         // user details
-        const [user] = await User.getBy('username', ctx.params.username);
+        const [ user ] = await User.getBy('username', ctx.params.username);
         if (!user) ctx.throw(404, 'User not found');
 
         // all user details (for user names)
@@ -66,7 +66,7 @@ class DashboardHandlers {
                 for (const tag of report.tags) t.add(tag);
             }
         }
-        const tags = [...t].map(tag => ({ tag: tag, tagHref: encodeURIComponent(tag).replace('%20', '+') }));
+        const tags = [ ...t ].map(tag => ({ tag: tag, tagHref: encodeURIComponent(tag).replace('%20', '+') }));
 
         // recent activity
         const updates = await Update.getByUser(db, user._id, 12);
@@ -99,7 +99,7 @@ class DashboardHandlers {
         }
 
         // most recently viewed reports
-        const filterRecentlyViewed = { ['views.'+user._id] : {'$exists': true} }; // TODO: remove .toArray from .find()
+        const filterRecentlyViewed = { ['views.'+user._id]: { '$exists': true } }; // TODO: remove .toArray from .find()
         const recentlyViewed = await global.db[db].collection('reports').find(filterRecentlyViewed).sort({ ['views.'+user._id]: -1 }).limit(6).toArray();
         for (const report of recentlyViewed) {
             report.viewedOn = report.views[user._id].toISOString();
@@ -117,7 +117,7 @@ class DashboardHandlers {
         const context = Object.assign(user, {
             reportsNewlyAssigned:   reportsNewlyAssigned,
             recentlyViewed:         recentlyViewed,
-            tags:                   [...tags],
+            tags:                   [ ...tags ],
             reportsReferencingUser: reportsReferencingUser,
             reportsUser:            reportsUser,
             updates:                updates,
@@ -135,7 +135,7 @@ class DashboardHandlers {
         const db = ctx.state.user.db;
 
         // current user details (for user activity tab)
-        const [user] = await User.getBy('username', ctx.state.user.name);
+        const [ user ] = await User.getBy('username', ctx.state.user.name);
         if (!user) ctx.throw(404, 'User not found');
 
         const filterActive = { archived: false };
@@ -169,9 +169,9 @@ class DashboardHandlers {
         const latest = await Report.getLatestTimestamp(db);
 
         const context = Object.assign(user, {
-            reportsUnassigned:      reportsUnassigned.sort((a, b) => a.reportedOn < b.reportedOn ? -1 : 1),
-            updates:                updates,
-            latest:                 latest,
+            reportsUnassigned: reportsUnassigned.sort((a, b) => a.reportedOn < b.reportedOn ? -1 : 1),
+            updates:           updates,
+            latest:            latest,
         });
 
         await ctx.render('dashboard-general', context);

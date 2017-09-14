@@ -188,7 +188,7 @@ class MessagesHandlers {
      * GET /ajax/messages/latest-timestamp - Timestamp of most recently received message (for ajax
      * call to automatically update messages list), as ISO timestamp.
      */
-    static async ajaxMessageLatestTimestamp(ctx) {
+    static ajaxMessageLatestTimestamp(ctx) {
         const latest = global.messages.reduce((prevVal, currVal) => Math.max(prevVal, currVal.timestamp), 0);
         ctx.status = 200;
         ctx.body = { latest: { timestamp: new Date(latest).valueOf() } };

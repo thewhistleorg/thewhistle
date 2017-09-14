@@ -59,7 +59,7 @@ class Handlers {
         // list of services for filter <select>
         let allServices = [];
         (await Resource.getAll(db)).forEach(r => { allServices = allServices.concat(r.services); });
-        const services = [...new Set(allServices)].sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
+        const services = [ ...new Set(allServices) ].sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
 
         // need separate list of resources with locations for map
         const resourceLocns = resources.filter(r => r.location != null).map(r => ({
@@ -70,7 +70,7 @@ class Handlers {
         }));
 
         const filter = { service: ctx.query.service }; // current filter criteria
-        const context = { resources, resourceLocns, services, filter }
+        const context = { resources, resourceLocns, services, filter };
         await ctx.render('resources-list', context);
     }
 
@@ -125,7 +125,7 @@ class Handlers {
         let location = null;
         try {
             if (ctx.request.body.address) {
-                [location] = await geocoder.geocode(ctx.request.body.address);
+                [ location ] = await geocoder.geocode(ctx.request.body.address);
             }
         } catch (e) {
             console.error('Geocoder error', e);
@@ -147,7 +147,7 @@ class Handlers {
         }
 
         function formatPhone(num) {
-            return phoneUtil.format(phoneUtil.parse(num, country), PhoneNumberFormat.NATIONAL)
+            return phoneUtil.format(phoneUtil.parse(num, country), PhoneNumberFormat.NATIONAL);
         }
     }
 
@@ -181,7 +181,7 @@ class Handlers {
         let geocode = null;
         try {
             if (ctx.request.body.address) {
-                [geocode] = await geocoder.geocode(ctx.request.body.address);
+                [ geocode ] = await geocoder.geocode(ctx.request.body.address);
             }
         } catch (e) {
             console.error('Geocoder error', e);
@@ -202,7 +202,7 @@ class Handlers {
         }
 
         function formatPhone(num) {
-            return phoneUtil.format(phoneUtil.parse(num, country), PhoneNumberFormat.NATIONAL)
+            return phoneUtil.format(phoneUtil.parse(num, country), PhoneNumberFormat.NATIONAL);
         }
     }
 
@@ -248,7 +248,7 @@ function formatPhoneNumbers(phoneNumbers, country) {
                 ? `<div class="phone-valid nowrap">${phone}</div>`
                 : `<div class="phone-invalid nowrap" title="invalid number?">${phone}</div>`;
         } catch (e) {
-            return `<div class="phone-invalid" title="invalid number">${phone}</div>`
+            return `<div class="phone-invalid" title="invalid number">${phone}</div>`;
         }
     });
     return numbers.join('');

@@ -46,7 +46,7 @@ class ReportsHandlers {
         const { filter, filterDesc, oldest, latest } = await ReportsHandlers.buildFilter(db, ctx.request.query);
 
         // indicate when filters applied in page title
-        const title = 'Reports list' + (filterDesc.size>0 ? ` (filtered by ${[...filterDesc].join(', ')})` : '');
+        const title = 'Reports list' + (filterDesc.size>0 ? ` (filtered by ${[ ...filterDesc ].join(', ')})` : '');
 
 
         // ------------ find reports matching search criteria
@@ -167,7 +167,7 @@ class ReportsHandlers {
         const { filter, filterDesc } = await ReportsHandlers.buildFilter(db, ctx.request.query);
 
         // indicate when filters applied in page title
-        const title = 'Reports map' + (filterDesc.size>0 ? ` (filtered by ${[...filterDesc].join(', ')})` : '');
+        const title = 'Reports map' + (filterDesc.size>0 ? ` (filtered by ${[ ...filterDesc ].join(', ')})` : '');
 
 
         // ------------ find reports matching search criteria
@@ -272,7 +272,7 @@ class ReportsHandlers {
         reports.sort((a, b) => a.reportedOn < b.reportedOn ? 1 : -1); // sort in reverse chronological order (match main list default)
 
         const csv = json2csv({ data: reports });
-        const filenameFilter = filterDesc.size>0 ? ` (filtered by ${[...filterDesc].join(', ')}) ` : ' ';
+        const filenameFilter = filterDesc.size>0 ? ` (filtered by ${[ ...filterDesc ].join(', ')}) ` : ' ';
         const filename = 'the whistle incident reports' + filenameFilter +  dateFormat('yyyy-mm-dd HH:MM') + '.csv';
         ctx.status = 200;
         ctx.body = csv;
@@ -396,7 +396,7 @@ class ReportsHandlers {
         };
 
         // return PDF as attachment
-        const filenameFilter = filterDesc.size>0 ? ` (filtered by ${[...filterDesc].join(', ')}) ` : ' ';
+        const filenameFilter = filterDesc.size>0 ? ` (filtered by ${[ ...filterDesc ].join(', ')}) ` : ' ';
         const filename = 'the whistle incident reports' + filenameFilter +  dateFormat('yyyy-mm-dd HH:MM') + '.pdf';
         ctx.status = 200;
         ctx.body = await reportsPdf.toBufferPromise();
@@ -446,7 +446,7 @@ class ReportsHandlers {
         };
 
         const context = {
-            reports: [fields],
+            reports: [ fields ],
             nowFull: dateFormat('d mmm yyyy HH:MM'),
             single:  true,
             title:   'The Whistle submitted incident report',
@@ -509,7 +509,7 @@ class ReportsHandlers {
         for (const report of allReports) {
             projectsSet.add(report.project);
         }
-        const projects = [...projectsSet].sort();
+        const projects = [ ...projectsSet ].sort();
 
         // list of users (with reports assigned to them)
         const assigneesSet = new Set();
@@ -518,7 +518,7 @@ class ReportsHandlers {
         }
 
         // get user details for users with reports assigned
-        const assignees = (await Promise.all([...assigneesSet].map(u => User.get(u)))).map(u => u==null ? {} : u);
+        const assignees = (await Promise.all([ ...assigneesSet ].map(u => User.get(u)))).map(u => u==null ? {} : u);
         assignees.sort((a, b) => {
             if (a._id!=undefined && a._id.toString() == ctx.state.user.id) { a.fmt = 'bold'; return -1; } // current user to top of list
             if (b._id!=undefined && b._id.toString() == ctx.state.user.id) { b.fmt = 'bold'; return  1; } // current user to top of list
@@ -544,7 +544,7 @@ class ReportsHandlers {
             statusesSet.add('');
         }
 
-        const statuses = [...statusesSet].sort().map(s => s==''
+        const statuses = [ ...statusesSet ].sort().map(s => s==''
             ? { status: s, display: '<span class="grey">&lt;not set&gt;</span>' }
             : { status: s, display: s }
         );
@@ -554,7 +554,7 @@ class ReportsHandlers {
         for (const report of allReports) {
             for (const tag of report.tags) tagsSet.add(tag);
         }
-        const tags = [...tagsSet].sort();
+        const tags = [ ...tagsSet ].sort();
 
         // ---- list of report fields
 
@@ -573,7 +573,7 @@ class ReportsHandlers {
         // TODO: remove non-text fields?
         // convert set of values for each field to array, & sort
         for (const field in fieldValues) {
-            fieldValues[field] = [...fieldValues[field]].sort();
+            fieldValues[field] = [ ...fieldValues[field] ].sort();
         }
 
         // sorted list of field names
@@ -616,7 +616,7 @@ class ReportsHandlers {
         // otherwise reports assigned to given user
         if (q.assigned != undefined) {
             if (q.assigned != '') { // list reports for given user
-                const [user] = await User.getBy('username', q.assigned);
+                const [ user ] = await User.getBy('username', q.assigned);
                 if (user) {
                     filter.push({ ['assignedTo']: user._id });
                     filterDesc.add('assigned');
@@ -672,7 +672,7 @@ class ReportsHandlers {
         for (const key in q) {
             if (key.slice(0, 6) == 'field:') {
                 const field = key.slice(6);
-                const fld = 'report.' + [field];
+                const fld = 'report.' + [ field ];
                 const val = q[key] || '.+';
                 filter.push({ [fld]: { $regex: val } });
                 filterDesc.add('report content');
@@ -746,14 +746,14 @@ class ReportsHandlers {
             if (new Date(c.on).getFullYear() == new Date().getFullYear()) format = 'd mmm';   // this year
             if (new Date(c.on).toDateString() == new Date().toDateString()) format = 'HH:MM'; // today
             return {
-                id:        c.byId + '-' + new Date(c.on).valueOf().toString(36), // commentary id = user id + timestamp
-                byId:      c.byId,
-                byName:    c.byName,
-                on:        c.on,
-                onPretty:  dateFormat(c.on, format),
-                onFull:    dateFormat(c.on, 'd mmm yyyy, HH:MM Z'),
-                owner:     c.byId == ctx.state.user._id,
-                comment:   MarkdownIt().render(comment),
+                id:       c.byId + '-' + new Date(c.on).valueOf().toString(36), // commentary id = user id + timestamp
+                byId:     c.byId,
+                byName:   c.byName,
+                on:       c.on,
+                onPretty: dateFormat(c.on, format),
+                onFull:   dateFormat(c.on, 'd mmm yyyy, HH:MM Z'),
+                owner:    c.byId == ctx.state.user._id,
+                comment:  MarkdownIt().render(comment),
             };
         });
 
@@ -803,7 +803,7 @@ class ReportsHandlers {
                     file.time = new Date(Date.UTC(date.year, date.month-1, date.day, date.hour, date.minute - date.tzoffsetMinutes)); // TODO: exif tz?
                     if (file.time) file.timeDesc = !isNaN(incidentTime)
                         ? moment(file.time).from(incidentTime)+' from incident'
-                        : moment(file.time).from(submissionTime)+' from submission'
+                        : moment(file.time).from(submissionTime)+' from submission';
                 }
             }
         }
@@ -946,7 +946,7 @@ class ReportsHandlers {
 
         try {
             const bounds = { s: Number(ctx.params.s), w: Number(ctx.params.w), n: Number(ctx.params.n), e: Number(ctx.params.e) };
-            const coords = [[ [ bounds.w, bounds.s ], [ bounds.w, bounds.n ], [ bounds.e, bounds.n ], [ bounds.e, bounds.s ], [ bounds.w, bounds.s ] ]];
+            const coords = [ [ [ bounds.w, bounds.s ], [ bounds.w, bounds.n ], [ bounds.e, bounds.n ], [ bounds.e, bounds.s ], [ bounds.w, bounds.s ] ] ];
             const query = { location: { $geoWithin: { $geometry: { type: 'Polygon', coordinates: coords } } } };
             const reports = await Report.find(db, query);
             const y = 1000*60*60*24*365;
@@ -1150,19 +1150,19 @@ function lowestDistinctGeographicLevel(reports) {
     const adminLevels = reports.map(r => r.geocode.administrativeLevels);
 
     // level 2 addresses identical? use streetName or establishment, whichever is available
-    const l2 = [...new Set(adminLevels.map(al => al ? al.level2long : undefined))].filter(l2 => l2 != undefined);
+    const l2 = [ ...new Set(adminLevels.map(al => al ? al.level2long : undefined)) ].filter(l2 => l2 != undefined);
     if (l2.length == 1) return [ 'geocode.streetName', 'geocode.extra.establishment' ];
 
     // level 1 addresses identical? use level 2
-    const l1 = [...new Set(adminLevels.map(al => al ? al.level1long : undefined))].filter(l1 => l1 != undefined);
-    if (l1.length == 1) return ['geocode.administrativeLevels.level2long'];
+    const l1 = [ ...new Set(adminLevels.map(al => al ? al.level1long : undefined)) ].filter(l1 => l1 != undefined);
+    if (l1.length == 1) return [ 'geocode.administrativeLevels.level2long' ];
 
     // countries identical? use level 1
-    const countries = [...new Set(reports.map(r => r.geocode.country))].filter(c => c != undefined);
-    if (countries.length == 1) return ['geocode.administrativeLevels.level1long'];
+    const countries = [ ...new Set(reports.map(r => r.geocode.country)) ].filter(c => c != undefined);
+    if (countries.length == 1) return [ 'geocode.administrativeLevels.level1long' ];
 
     // reports from more than one country!
-    return ['geocode.country'];
+    return [ 'geocode.country' ];
 }
 
 

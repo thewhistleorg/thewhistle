@@ -60,7 +60,7 @@ const hbsCheckedHelper = function(value, options) {
 };
 
 app.use(handlebars({
-    extension:   ['html'],
+    extension:   [ 'html' ],
     viewsDir:    'app-admin/templates',
     partialsDir: 'app-admin/templates/partials',
     helpers:     { selected: hbsSelectedHelper, checked: hbsCheckedHelper },

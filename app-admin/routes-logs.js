@@ -15,11 +15,11 @@ router.get('/logs/:logfile', async function logs(ctx) {
 
     const bunyan = require.resolve('bunyan/bin/bunyan'); // full path to bunyan command
     const logfile = path.join(__dirname, '../logs/'+ctx.params.logfile);
-    const args = ctx.query.options ? [ logfile, ctx.query.options ] : [logfile];
+    const args = ctx.query.options ? [ logfile, ctx.query.options ] : [ logfile ];
 
     try {
 
-        const proc = await spawn(bunyan, [args], { capture: [ 'stdout', 'stderr' ] });
+        const proc = await spawn(bunyan, [ args ], { capture: [ 'stdout', 'stderr' ] });
 
         await ctx.render('logs', { bunyan: proc.stdout, logfile: ctx.params.logfile });
 

@@ -239,10 +239,14 @@ class Handlers {
  */
 function formatPhoneNumbers(phoneNumbers, country) {
     const numbers = phoneNumbers.map(phone => {
-        const num = phoneUtil.parse(phone, country);
-        return phoneUtil.isValidNumber(num)
-            ? `<div class="phone-valid nowrap">${phone}</div>`
-            : `<div class="phone-invalid nowrap" title="invalid number?">${phone}</div>`;
+        try {
+            const num = phoneUtil.parse(phone, country);
+            return phoneUtil.isValidNumber(num)
+                ? `<div class="phone-valid nowrap">${phone}</div>`
+                : `<div class="phone-invalid nowrap" title="invalid number?">${phone}</div>`;
+        } catch (e) {
+            return `<div class="phone-invalid" title="invalid number">${phone}</div>`
+        }
     });
     return numbers.join('');
 }

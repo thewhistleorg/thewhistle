@@ -4,7 +4,7 @@
 
 
 /**
- * Setup listeners for metadata fields (summary, assigned-to, status, archived).
+ * Set up listeners for metadata fields (summary, assigned-to, status, archived).
  */
 function setupMetadataAutosubmitListeners() {
     document.querySelector('#summary').onchange = function submitSummary() {
@@ -25,7 +25,7 @@ function setupMetadataAutosubmitListeners() {
 
 
 /**
- * Setup listeners for adding / saving / cancelling / deleting tags.
+ * Set up listeners for adding / saving / cancelling / deleting tags.
  *
  * @param {ObjectId} reportId - id of report being updated.
  */
@@ -108,7 +108,7 @@ function setupTagsListeners(reportId) {
 
 
 /**
- * Setup listeners for adding / editing / deleting notes (comments).
+ * Set up listeners for adding / editing / deleting notes (comments).
  *
  * @param {ObjectId} reportId - id of report being updated.
  * @param {string}   username - name of user making changes.

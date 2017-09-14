@@ -74,10 +74,7 @@ class IncidentReport {
      * Render incident report confirm page.
      */
     static async getReportConfirm(ctx) {
-        const project = ctx.params.project;
-        const id = ctx.params.id;
-
-        const report = await Report.get('test', id);
+        const report = await Report.get('test', ctx.params.id);
 
         report.lat = report.location.coordinates[1];
         report.lon = report.location.coordinates[0];
@@ -91,7 +88,7 @@ class IncidentReport {
             const φ1 = lat1*Math.PI/180, φ2 = lat2*Math.PI/180, Δλ = (lon2-lon1)*Math.PI/180, R = 6371e3;
             const d = Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
             resource.distance = (d/1000).toPrecision(2);
-        })
+        });
 
         await ctx.render(ctx.state.user.db+'/'+ctx.params.project+'-confirm', { report, resources });
     }
@@ -114,7 +111,7 @@ class IncidentReport {
             delete body.fields;
 
             // file input fields are named 'documents'; move File objects from body up to session
-            if (!Array.isArray(body.files['documents'])) body.files['documents'] = [body.files['documents']];
+            if (!Array.isArray(body.files['documents'])) body.files['documents'] = [ body.files['documents'] ];
             ctx.session.files = body.files['documents'].filter(f => f.size != 0);
             delete body.files;
         }
@@ -145,7 +142,7 @@ class IncidentReport {
         // geocode location
         const geocoder = Geocoder();
         try {
-            [ctx.session.geocode] = await geocoder.geocode(body['location-address']);
+            [ ctx.session.geocode ] = await geocoder.geocode(body['location-address']);
         } catch (e) {
             console.error('Geocoder error', e);
             ctx.session.geocode = null;

@@ -38,7 +38,7 @@ class LoginHandlers {
             if (ctx.flash.formdata) context.username = ctx.flash.formdata.username; // failed authentication
             if (context.username) {
                 // show list of databases
-                const [usr] = await User.getBy('email', context.username);
+                const [ usr ] = await User.getBy('email', context.username);
                 if (usr && usr.databases.length>1) context.databases = usr.databases;
             }
         }
@@ -72,13 +72,13 @@ class LoginHandlers {
     static async postLogin(ctx) {
         const body = ctx.request.body;
 
-        let [user] = await User.getBy('email', body.username); // lookup user
+        let [ user ] = await User.getBy('email', body.username); // lookup user
 
         // always invoke verifyKdf (whether email found or not) to mitigate against timing attacks on login function
         const userPassword = user ? user.password : Math.random().toString();
         let passwordMatch = null;
         try {
-            passwordMatch = await scrypt.verifyKdf(Buffer.from(user.password, 'base64'), body.password);
+            passwordMatch = await scrypt.verifyKdf(Buffer.from(userPassword, 'base64'), body.password);
         } catch (e) {
             user = null; // e.g. "data is not a valid scrypt-encrypted block"
         }
@@ -158,7 +158,7 @@ class LoginHandlers {
      * GET /ajax/login/:user/databases - Return list of databases user has access to
      */
     static async getUserDatabases(ctx) {
-        const [user] = await User.getBy('email', ctx.request.query.user); // lookup user
+        const [ user ] = await User.getBy('email', ctx.request.query.user); // lookup user
 
         ctx.body = { databases: user ? user.databases : [] };
         ctx.status = 200; // Ok

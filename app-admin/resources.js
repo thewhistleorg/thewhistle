@@ -49,13 +49,16 @@ class Handlers {
 
         resources.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1);
 
-        let allServices = [];
+        // pretty format phone, email, services
         resources.forEach(r => {
             r.phone = formatPhoneNumbers(r.phone, 'NG'); // TODO: derive country code from database
             r.email = formatEmails(r.email);
-            allServices = allServices.concat(r.services);
             r.services = r.services.join('; ');
         });
+
+        // list of services for filter <select>
+        let allServices = [];
+        (await Resource.getAll(db)).forEach(r => { allServices = allServices.concat(r.services); });
         const services = [...new Set(allServices)].sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
 
         // need separate list of resources with locations for map

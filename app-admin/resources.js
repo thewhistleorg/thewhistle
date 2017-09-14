@@ -144,7 +144,7 @@ class Handlers {
         }
 
         function formatPhone(num) {
-            phoneUtil.format(phoneUtil.parse(num, country), PhoneNumberFormat.NATIONAL)
+            return phoneUtil.format(phoneUtil.parse(num, country), PhoneNumberFormat.NATIONAL)
         }
     }
 
@@ -199,7 +199,7 @@ class Handlers {
         }
 
         function formatPhone(num) {
-            phoneUtil.format(phoneUtil.parse(num, country), PhoneNumberFormat.NATIONAL)
+            return phoneUtil.format(phoneUtil.parse(num, country), PhoneNumberFormat.NATIONAL)
         }
     }
 

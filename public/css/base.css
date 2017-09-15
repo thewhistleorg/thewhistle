@@ -72,6 +72,7 @@ th     { color: #666666; font-style: italic; font-weight: normal; text-align: le
 .w2  { width: 2em;  }
 .w3  { width: 3em;  }  /* eg time */
 .w4  { width: 4em;  }
+.w5  { width: 5em;  }
 .w6  { width: 6em;  }  /* eg date, postcode */
 .w8  { width: 8em;  }  /* eg first/last name, town, phone  */
 .w12 { width: 12em; }  /* eg addr1/2 */

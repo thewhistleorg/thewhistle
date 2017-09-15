@@ -98,11 +98,11 @@ Pushing to the topic branch will automatically deploy the new version to the rev
 Once review is complete, it can be merged to master and deployed to staging with:
 
     $ git checkout master && git pull --rebase origin && git rebase master my-new-development
-    $ git checkout master && git merge my-new-development
+    $ git checkout master && git merge --no-ff my-new-development
     $ npm test
     $ git push origin master
-    $ git branch -d my-new-development
     $ git push -d origin my-new-development
+    $ git branch -d my-new-development
 
 Always run a final test before pushing in order to avoid CI failures. Always garbage collect the 
 merged topic branch.

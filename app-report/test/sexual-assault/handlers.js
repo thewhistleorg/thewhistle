@@ -8,8 +8,10 @@
 
 const Geocoder   = require('node-geocoder'); // library for geocoding and reverse geocoding
 const dateFormat = require('dateformat');    // Steven Levithan's dateFormat()
+const LatLon     = require('geodesy').LatLonSpherical; // spherical earth geodesy functions
 
-const Report = require('../../../models/report.js');
+const Report   = require('../../../models/report.js');
+const Resource = require('../../../models/resource.js');
 
 const jsObjectToHtml   = require('../../../lib/js-object-to-html.js');
 const useragent        = require('../../../lib/user-agent.js');
@@ -69,7 +71,7 @@ class Handlers {
             // file input fields are named 'documents'; move File objects up to be immediately under 'files'
             body.files = body.files['documents'];
             // normalise files to be array of File objects (koa-body does not provide array if just 1 file uploaded)
-            if (!Array.isArray(body.files)) body.files = [body.files];
+            if (!Array.isArray(body.files)) body.files = [ body.files ];
             // strip out any 0-size files
             for (let f=0; f<body.files.length; f++) if (body.files[f].size == 0) body.files.splice(f, 1);
         }
@@ -87,11 +89,11 @@ class Handlers {
             const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
             const date = new Date(body.date.year, months.indexOf(body.date.month.toLowerCase()), body.date.day, body.date.hour, body.date.minute);
             if (isNaN(date.getTime())) {
-                ctx.flash = { validation: ['Invalid date'] };
+                ctx.flash = { validation: [ 'Invalid date' ] };
                 ctx.redirect(ctx.url); return;
             }
             if (date.getTime() > Date.now()) {
-                ctx.flash = { validation: ['Date is in the future'] };
+                ctx.flash = { validation: [ 'Date is in the future' ] };
                 ctx.redirect(ctx.url); return;
             }
         }
@@ -114,7 +116,7 @@ class Handlers {
         ctx.session.geocode = null;
         try {
             if (ctx.session.report['at-address']) {
-                [ctx.session.geocode] = await geocoder.geocode(ctx.session.report['at-address']);
+                [ ctx.session.geocode ] = await geocoder.geocode(ctx.session.report['at-address']);
             }
         } catch (e) {
             console.error('Geocoder error', e);
@@ -167,7 +169,10 @@ class Handlers {
         // record user-agent
         await useragent.log('test', ctx.ip, ctx.headers);
 
-        ctx.session = null;
+        // remove all session data (to prevent duplicate submission)
+        // except geocoding result (to present local resources)
+        ctx.session = { geocode: ctx.session.geocode };
+
         ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/whatnext`);
     }
 
@@ -177,9 +182,40 @@ class Handlers {
 
     /**
      * Render 'what's next' page.
+     *
+     * Shows local resources grouped by services they offer.
      */
     static async getWhatnext(ctx) {
-        await ctx.render('whatnext');
+        // get all resources within 10km of geocoded location
+        const resources = ctx.session.geocode
+            ? await Resource.getNear('test', ctx.session.geocode.latitude, ctx.session.geocode.longitude, 10e3)
+            : [];
+
+        // add distance from geocoded location to each resource, & convert phone/email arrays to lists
+        const locn = new LatLon(ctx.session.geocode.latitude, ctx.session.geocode.longitude);
+        for (const resource of resources) {
+            const lat = resource.location.coordinates[1];
+            const lon = resource.location.coordinates[0];
+            resource.dist = locn.distanceTo(new LatLon(lat, lon)); // used for sorting
+            resource.distKm = (resource.dist/1000).toPrecision(2); // used for display
+            resource.phone = resource.phone.map(p => `<span class="nowrap">${p}</span>`).join(', ');
+            resource.email = resource.email.join(' ');
+        }
+
+        // extract list of distinct services from local resources
+        const servicesDups = resources.map(r => r.services).reduce((a, b) => a.concat(b), []);
+        const servicesDedup = [ ...new Set(servicesDups) ];
+        const services = servicesDedup.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
+
+        // make a list of resources grouped by services they offer
+        const resourcesGrouped = {};
+        for (const service of services) {
+            resourcesGrouped[service] = resources.filter(r => r.services.includes(service));
+            resourcesGrouped[service].sort((a, b) => a.dist < b.dist ? -1 : 1);
+            resourcesGrouped[service] = resourcesGrouped[service].slice(0, 3);
+        }
+
+        await ctx.render('whatnext', { resources: resourcesGrouped });
     }
 
 }
@@ -259,7 +295,7 @@ function prettifyReport(report) {
         unset:        null, // no checkboxes ticked
     };
     if (report['action-taken'] == undefined) report['action-taken'] = 'unset';
-    if (typeof report['action-taken'] == 'string') report['action-taken'] = [report['action-taken']];
+    if (typeof report['action-taken'] == 'string') report['action-taken'] = [ report['action-taken'] ];
     rpt['Action taken'] = report['action-taken'].map(a => action[a]);
 
     // used-before: either Generated name or Existing name is set as appropriate

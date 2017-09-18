@@ -15,7 +15,7 @@ const ObjectId    = require('mongodb').ObjectId;
 const dateFormat  = require('dateformat');  // Steven Levithan's dateFormat()
 const base64      = require('base-64');     // base64 encoder/decoder
 
-const app = require('../app.js');
+const app = require('../../app.js');
 
 const testuser = process.env.TESTUSER;
 const testpass = process.env.TESTPASS;

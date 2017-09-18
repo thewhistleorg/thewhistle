@@ -1,12 +1,12 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Auto identifier tests                                                   (c) Chris Veness 2017  */
+/* Auto identifier unit tests                                                                     */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';
 
-const expect = require('chai').expect;  // BDD/TDD assertion library
+const expect = require('chai').expect; // BDD/TDD assertion library
 
-const autoIdentifier = require('../lib/auto-identifier.js');
+const autoIdentifier = require('../../lib/auto-identifier.js');
 
 const test = it; // just an alias
 

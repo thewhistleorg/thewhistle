@@ -9,9 +9,13 @@
     "start": "forever --minUptime 1000 --spinSleepTime 1000 app.js",
     "start-dev": "nodemon -e js,json,html --ignore db/reports.json --ignore static/report-docs/ app.js",
     "start-devtools": "nodemon --inspect -e js,json,html app.js",
-    "test": "mocha test/*.js",
+    "test": "mocha test/*/*.js",
+    "test-unit": "mocha test/unit/*.js",
+    "test-intgn": "mocha test/integration/*.js",
     "lint": "eslint --ignore-pattern app-api/apidoc .",
     "cover": "istanbul cover node_modules/.bin/_mocha test/",
+    "cover-unit": "istanbul cover node_modules/.bin/_mocha test/unit/",
+    "cover-intgn": "istanbul cover node_modules/.bin/_mocha test/integration",
     "apidoc": "apidoc -i app-api -o app-api/apidoc/apidoc"
   },
   "engines": {

@@ -8,7 +8,7 @@ const supertest   = require('supertest');   // SuperAgent driven library for tes
 const expect      = require('chai').expect; // BDD/TDD assertion library
 const JsDom       = require('jsdom').JSDOM; // JavaScript implementation of DOM and HTML standards
 
-const app = require('../app.js');
+const app = require('../../app.js');
 
 const testuser = process.env.TESTUSER;
 const testpass = process.env.TESTPASS;

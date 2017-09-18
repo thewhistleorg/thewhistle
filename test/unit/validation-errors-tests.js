@@ -1,12 +1,12 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* ValidationErrors tests                                                  (c) Chris Veness 2017  */
+/* ValidationErrors unit tests                                                                    */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';
 
-const expect = require('chai').expect;  // BDD/TDD assertion library
+const expect = require('chai').expect; // BDD/TDD assertion library
 
-const validationErrors = require('../lib/validation-errors.js');
+const validationErrors = require('../../lib/validation-errors.js');
 
 const test = it; // just an alias
 

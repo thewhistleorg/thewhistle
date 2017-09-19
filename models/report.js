@@ -255,7 +255,7 @@ class Report {
             project:    project,
             by:         by,
             name:       name,
-            report:     report,
+            report:     report, // TODO rename to 'submitted'
             geocode:    geocode || {},
             location:   {},
             analysis:   {},
@@ -264,11 +264,12 @@ class Report {
             status:     undefined,
             tags:       [],
             comments:   [],
+            views:      {},
             archived:   false,
         };
 
         // record uploaded files within the submitted report object
-        values.report.files = files || [];
+        values.report.files = files || []; // TODO: move up to main report
 
         // if successful geocode, record (geoJSON) location for (indexed) geospatial queries
         if (geocode) {
@@ -279,9 +280,8 @@ class Report {
         }
 
         // record weather conditions at location & date of incident
-        const incidentOn = new Date(report.date+' '+report.time);
-        if (incidentOn.getTime() && geocode) {
-            values.analysis.weather = await Weather.fetchWeatherConditions(geocode.latitude, geocode.longitude, incidentOn);
+        if (report.Date && report.Date.getTime() && geocode) {
+            values.analysis.weather = await Weather.fetchWeatherConditions(geocode.latitude, geocode.longitude, report.Date);
         }
 
         //values._id = ObjectId(Math.floor(Date.now()/1000 - Math.random()*60*60*24*365).toString(16)+(Math.random()*2**64).toString(16)); // random date in past year
@@ -478,6 +478,9 @@ class Report {
     /**
      * Add comment to report.
      *
+     * This could currently be achieved with Report.update(), but will probably involve more
+     * processing in future. It also mirrors Report.deleteComment().
+     *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report id.
      * @param {string}   comment - Comment with markdown formatting.
@@ -498,13 +501,12 @@ class Report {
 
 
     /**
-     * Delete specified comment from report.
+     * Delete comment identified by 'by', 'on' from report 'id'.
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report id.
      * @param {ObjectId} by - Id of user who added comment.
      * @param {Date}     on - Timestamp comment added.
-     * @param {string}   comment - Comment with markdown formatting.
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async deleteComment(db, id, by, on, userId) {
@@ -514,6 +516,7 @@ class Report {
         by = objectId(by);                            // allow id as string
         userId = objectId(userId);                    // allow id as string
         if (!(on instanceof Date)) on = new Date(on); // allow timestamp as string
+        if (isNaN(on.getTime())) throw new Error('invalid ‘on’ date');
 
         const reports = global.db[db].collection('reports');
         await reports.updateOne({ _id: id }, { $pull: { comments: { byId: by, on: on } } });
@@ -563,6 +566,7 @@ class Report {
         userId = objectId(userId); // allow id as string
 
         const reports = global.db[db].collection('reports');
+        
         const report = await reports.findOne(id);
 
         return report.views ? report.views[userId] : null;

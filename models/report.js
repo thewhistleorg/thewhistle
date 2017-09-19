@@ -79,7 +79,7 @@ class Report {
             const allRpts = await Report.getAll(db);
             const flds = new Set;
             for (const rpt of allRpts) {
-                for (const fld of Object.keys(rpt.report || rpt.submitted)) flds.add(fld);
+                for (const fld of Object.keys(rpt.submitted)) flds.add(fld);
             }
             flds.delete('_id');
             const fields = {};

@@ -102,13 +102,14 @@ class User {
     /**
      * Delete User record.
      *
-     * @param  {ObjectId} id - User id.
-     * @throws Error
+     * @param   {ObjectId} id - User id.
+     * @returns {boolean}  True if a record was deleted.
      */
     static async delete(id) {
         const users = global.db.users.collection('users');
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
-        await users.deleteOne({ _id: id });
+        const result = await users.deleteOne({ _id: id });
+        return result.deletedCount == 1;
     }
 
 

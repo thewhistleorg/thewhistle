@@ -29,7 +29,7 @@ const Weather = require('../lib/weather.js');
  */
 const validator = { $and: [ // TODO: validation for string or null
     { project:    { $type: 'string',   $exists: true } }, // name of project report belongs to
-    { report:     { $type: 'object',   $exists: true } }, // flexible format following incident reporting format
+    { submitted:  { $type: 'object',   $exists: true } }, // flexible format following incident reporting format
     { by:         { $type: 'objectId',               } }, // user entering incident report
     { name:       { $type: 'string',   $exists: true } }, // auto-generated name of victim/survivor
     { geocode:    { $type: 'object',                 } }, // google geocoding data
@@ -79,7 +79,7 @@ class Report {
             const allRpts = await Report.getAll(db);
             const flds = new Set;
             for (const rpt of allRpts) {
-                for (const fld of Object.keys(rpt.report)) flds.add(fld);
+                for (const fld of Object.keys(rpt.report || rpt.submitted)) flds.add(fld);
             }
             flds.delete('_id');
             const fields = {};
@@ -235,14 +235,14 @@ class Report {
      * @param   {string}   db - Database to use.
      * @param   {ObjectId} [by] - User recording incident report (undefined for public submission).
      * @param   {string}   name - Generated name used to refer to victim/survivor.
-     * @param   {Object}   report - Report details (values depend on project).
+     * @param   {Object}   submitted - Report details (values depend on project).
      * @param   {string}   project - Project report is part of.
      * @param   {Object[]} files - Uploaded files ('formidable' File objects).
      * @param   {Object}   geocode - Google geocoding results.
      * @returns {ObjectId} New report id.
      * @throws  Error on validation or referential integrity errors.
      */
-    static async insert(db, by, name, report, project, files, geocode) {
+    static async insert(db, by, name, submitted, project, files, geocode) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         by = objectId(by); // allow id as string
@@ -255,7 +255,7 @@ class Report {
             project:    project,
             by:         by,
             name:       name,
-            report:     report, // TODO rename to 'submitted'
+            submitted:  submitted,
             geocode:    geocode || {},
             location:   {},
             analysis:   {},
@@ -269,7 +269,7 @@ class Report {
         };
 
         // record uploaded files within the submitted report object
-        values.report.files = files || []; // TODO: move up to main report
+        values.submitted.files = files || [];
 
         // if successful geocode, record (geoJSON) location for (indexed) geospatial queries
         if (geocode) {
@@ -280,8 +280,8 @@ class Report {
         }
 
         // record weather conditions at location & date of incident
-        if (report.Date && report.Date.getTime() && geocode) {
-            values.analysis.weather = await Weather.fetchWeatherConditions(geocode.latitude, geocode.longitude, report.Date);
+        if (submitted.Date && submitted.Date.getTime() && geocode) {
+            values.analysis.weather = await Weather.fetchWeatherConditions(geocode.latitude, geocode.longitude, submitted.Date);
         }
 
         //values._id = ObjectId(Math.floor(Date.now()/1000 - Math.random()*60*60*24*365).toString(16)+(Math.random()*2**64).toString(16)); // random date in past year
@@ -302,8 +302,8 @@ class Report {
                     file.path = dir;
 
                     // replace name with slug & path with saved file location
-                    const filter = { _id: insertedId, 'report.files.path': src };
-                    const path = { 'report.files.$.name': dst, 'report.files.$.path': dir };
+                    const filter = { _id: insertedId, 'submitted.files.path': src };
+                    const path = { 'submitted.files.$.name': dst, 'submitted.files.$.path': dir };
                     await reports.updateOne(filter, { $set: path });
 
                     // augment files object with EXIF metadata & save in analysis
@@ -341,7 +341,7 @@ class Report {
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow id as string
 
-        if (values.report != undefined) throw new Error('Cannot update submitted report');
+        if (values.submitted != undefined) throw new Error('Cannot update submitted report');
 
         const reports = global.db[db].collection('reports');
 

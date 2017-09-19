@@ -1,11 +1,11 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Weather data tests                                                                             */
+/* Weather data unit tests                                                                        */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';
 
-const expect  = require('chai').expect;               // BDD/TDD assertion library
-const weather = require('../lib/weather.js');
+const expect  = require('chai').expect; // BDD/TDD assertion library
+const weather = require('../../lib/weather.js');
 
 describe('Weather data extraction tests', function() {
     return; // TODO investigate why wunderground is returning 400 Bad Request

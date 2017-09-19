@@ -115,11 +115,7 @@ class Report {
     static async get(db, id) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
-        try {
-            if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
-        } catch (e) {
-            return null; // invalid id TODO: best to return null or allow exception through?
-        }
+        id = objectId(id); // allow id as string
 
         const reports = global.db[db].collection('reports');
         const rpt = await reports.findOne(id);
@@ -249,7 +245,7 @@ class Report {
     static async insert(db, by, name, report, project, files, geocode) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
-        if (typeof by == 'string') by = new ObjectId(by); // allow id as string
+        by = objectId(by); // allow id as string
 
         const reports = global.db[db].collection('reports');
 
@@ -342,8 +338,8 @@ class Report {
     static async update(db, id, values, userId) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
-        if (!(id instanceof ObjectId)) id = new ObjectId(id);             // allow id as string
-        if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
+        id = objectId(id);         // allow id as string
+        userId = objectId(userId); // allow id as string
 
         const reports = global.db[db].collection('reports');
         await reports.updateOne({ _id: id }, { $set: values });
@@ -362,7 +358,7 @@ class Report {
     static async delete(db, id) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
-        if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
+        id = objectId(id); // allow id as string
 
         // retrieve report to determine project, in case there are persistent files to delete
         const report = await Report.get(db, id);
@@ -448,8 +444,8 @@ class Report {
     static async insertTag(db, id, tag, userId) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
-        if (!(id instanceof ObjectId)) id = new ObjectId(id);             // allow id as string
-        if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
+        id = objectId(id);         // allow id as string
+        userId = objectId(userId); // allow id as string
 
         const reports = global.db[db].collection('reports');
         await reports.updateOne({ _id: id }, { $addToSet: { tags: tag } });
@@ -469,8 +465,8 @@ class Report {
     static async deleteTag(db, id, tag, userId) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
-        if (!(id instanceof ObjectId)) id = new ObjectId(id);             // allow id as string
-        if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
+        id = objectId(id);         // allow id as string
+        userId = objectId(userId); // allow id as string
 
         const reports = global.db[db].collection('reports');
         await reports.updateOne({ _id: id }, { $pull: { tags: tag } });
@@ -490,8 +486,8 @@ class Report {
     static async insertComment(db, id, comment, userId) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
-        if (!(id instanceof ObjectId)) id = new ObjectId(id);             // allow id as string
-        if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
+        id = objectId(id);         // allow id as string
+        userId = objectId(userId); // allow id as string
 
         const reports = global.db[db].collection('reports');
         const user = await User.get(userId);
@@ -514,10 +510,10 @@ class Report {
     static async deleteComment(db, id, by, on, userId) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
-        if (!(id instanceof ObjectId)) id = new ObjectId(id);             // allow report id as string
-        if (!(by instanceof ObjectId)) by = new ObjectId(by);             // allow by id as string
-        if (!(on instanceof Date))     on = new Date(on);                 // allow timestamp as string
-        if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
+        id = objectId(id);                            // allow id as string
+        by = objectId(by);                            // allow id as string
+        userId = objectId(userId);                    // allow id as string
+        if (!(on instanceof Date)) on = new Date(on); // allow timestamp as string
 
         const reports = global.db[db].collection('reports');
         await reports.updateOne({ _id: id }, { $pull: { comments: { byId: by, on: on } } });
@@ -536,8 +532,8 @@ class Report {
     static async flagView(db, id, userId) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
-        if (!(id instanceof ObjectId)) id = new ObjectId(id);             // allow id as string
-        if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
+        id = objectId(id);         // allow id as string
+        userId = objectId(userId); // allow id as string
 
         const reports = global.db[db].collection('reports');
         const report = await reports.findOne(id);
@@ -563,8 +559,8 @@ class Report {
     static async lastViewed(db, id, userId) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
-        if (!(id instanceof ObjectId)) id = new ObjectId(id);             // allow id as string
-        if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
+        id = objectId(id);         // allow id as string
+        userId = objectId(userId); // allow id as string
 
         const reports = global.db[db].collection('reports');
         const report = await reports.findOne(id);
@@ -572,6 +568,16 @@ class Report {
         return report.views ? report.views[userId] : null;
     }
 
+}
+
+function objectId(id) {
+    if (id == undefined) return undefined;
+    try {
+        const objId = id instanceof ObjectId ? id : new ObjectId(id);
+        return objId;
+    } catch (e) {
+        throw new Error (`Invalid ObjectId ‘${id}’`);
+    }
 }
 
 

@@ -85,7 +85,7 @@ class ReportsHandlers {
                 updatedBy:        lastUpdate.by,
                 assignedTo:       rpt.assignedTo ? users.get(rpt.assignedTo.toString()).username : '',
                 status:           rpt.status || '', // ensure status is string
-                summary:          rpt.summary || `<span class="grey" title="submitted description">[${rpt.report['Description']}]</span>`,
+                summary:          rpt.summary || `<span class="grey" title="submitted description">[${rpt.report?rpt.report['Description']:rpt.submitted['Description']}]</span>`,
                 tags:             rpt.tags,
                 reportedOnPretty: prettyDate(rpt._id.getTimestamp()),
                 reportedOnFull:   dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
@@ -561,9 +561,9 @@ class ReportsHandlers {
         // all values in all reports fields
         const fieldValues = {};
         for (const report of allReports) {
-            for (const field in report.report) {
+            for (const field in report.submitted) {
                 if (fieldValues[field] == undefined) fieldValues[field] = new Set();
-                if (report.report[field]) fieldValues[field].add(report.report[field]);
+                if (report.submitted[field]) fieldValues[field].add(report.submitted[field]);
             }
         }
         // remove fields with nothing filled in in any reports
@@ -766,7 +766,7 @@ class ReportsHandlers {
             reportedOnFull:   dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
             reportedOnTz:     dateFormat(report.reported, 'Z'),
             reportedBy:       report.by ? '@'+(await User.get(report.by)).username : report.name,
-            reportHtml:       jsObjectToHtml(report.report), // submitted incident report
+            reportHtml:       jsObjectToHtml(report.report ? report.report : report.submitted), // submitted incident report
             geocodeHtml:      jsObjectToHtml(report.geocode),
             formattedAddress: encodeURIComponent(report.geocode.formattedAddress),
             lat:              report.geocode ? report.geocode.latitude  : null,
@@ -777,7 +777,7 @@ class ReportsHandlers {
             statuses:         statuses,            // for datalist
             otherReports:     otherReports,
             tagList:          tagList,             // for autocomplete datalist
-            files:            report.report.files, // for tabs
+            files:            report.report ? report.report.files : report.submitted.files, // for tabs
             updates:          updates,
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
         };
@@ -788,7 +788,7 @@ class ReportsHandlers {
         // uploaded files
         if (report.analysis.files) {
             const incidentLocn = new LatLon(report.geocode.latitude, report.geocode.longitude);
-            const incidentTime = new Date(report.report.date+' '+report.report.time);
+            const incidentTime = new Date(report.report ? report.report.date+' '+report.report.time : report.submitted.Date);
             const submissionTime = report._id.getTimestamp();
             for (const file of report.analysis.files) {
                 file.isImage = file.type.slice(0, 5) == 'image';

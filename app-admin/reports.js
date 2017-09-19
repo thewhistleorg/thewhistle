@@ -85,7 +85,7 @@ class ReportsHandlers {
                 updatedBy:        lastUpdate.by,
                 assignedTo:       rpt.assignedTo ? users.get(rpt.assignedTo.toString()).username : '',
                 status:           rpt.status || '', // ensure status is string
-                summary:          rpt.summary || `<span class="grey" title="submitted description">[${rpt.report?rpt.report['Description']:rpt.submitted['Description']}]</span>`,
+                summary:          rpt.summary || `<span class="grey" title="submitted description">[${rpt.submitted['Description']}]</span>`,
                 tags:             rpt.tags,
                 reportedOnPretty: prettyDate(rpt._id.getTimestamp()),
                 reportedOnFull:   dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
@@ -318,7 +318,7 @@ class ReportsHandlers {
             }
             const fields = {
                 _id:           rpt._id,
-                reportHtml:    jsObjectToHtml(rpt.report),
+                reportHtml:    jsObjectToHtml(rpt.submitted),
                 updatedDate:   lastUpdate.on ? dateFormat(lastUpdate.on, 'd mmm yyyy') : '—',
                 updatedTime:   lastUpdate.on ? dateFormat(lastUpdate.on, 'HH:MM') : '',
                 updatedBy:     lastUpdate.by ? '@'+lastUpdate.by : '',
@@ -430,7 +430,7 @@ class ReportsHandlers {
         }
         const fields = { // as per exportPdf()
             _id:           rpt._id,
-            reportHtml:    jsObjectToHtml(rpt.report),
+            reportHtml:    jsObjectToHtml(rpt.submitted),
             updatedDate:   lastUpdate.on ? dateFormat(lastUpdate.on, 'd mmm yyyy') : '—',
             updatedTime:   lastUpdate.on ? dateFormat(lastUpdate.on, 'HH:MM') : '',
             updatedBy:     lastUpdate.by ? '@'+lastUpdate.by : '',
@@ -766,18 +766,18 @@ class ReportsHandlers {
             reportedOnFull:   dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
             reportedOnTz:     dateFormat(report.reported, 'Z'),
             reportedBy:       report.by ? '@'+(await User.get(report.by)).username : report.name,
-            reportHtml:       jsObjectToHtml(report.report ? report.report : report.submitted), // submitted incident report
+            reportHtml:       jsObjectToHtml(report.submitted), // submitted incident report
             geocodeHtml:      jsObjectToHtml(report.geocode),
             formattedAddress: encodeURIComponent(report.geocode.formattedAddress),
             lat:              report.geocode ? report.geocode.latitude  : null,
             lng:              report.geocode ? report.geocode.longitude : null,
             highlight:        Math.max(Math.round(100 * (report._id.getTimestamp() - new Date() + y) / y), 0),
             comments:         comments,
-            users:            users,               // for select
-            statuses:         statuses,            // for datalist
+            users:            users,                  // for select
+            statuses:         statuses,               // for datalist
             otherReports:     otherReports,
-            tagList:          tagList,             // for autocomplete datalist
-            files:            report.report ? report.report.files : report.submitted.files, // for tabs
+            tagList:          tagList,                // for autocomplete datalist
+            files:            report.submitted.files, // for tabs
             updates:          updates,
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
         };
@@ -788,7 +788,7 @@ class ReportsHandlers {
         // uploaded files
         if (report.analysis.files) {
             const incidentLocn = new LatLon(report.geocode.latitude, report.geocode.longitude);
-            const incidentTime = new Date(report.report ? report.report.date+' '+report.report.time : report.submitted.Date);
+            const incidentTime = new Date(report.submitted.Date);
             const submissionTime = report._id.getTimestamp();
             for (const file of report.analysis.files) {
                 file.isImage = file.type.slice(0, 5) == 'image';

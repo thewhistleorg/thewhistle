@@ -52,19 +52,14 @@ class IncidentReport {
     static async getReportSubmit(ctx) {
         if (!ctx.session.report) { ctx.flash = { expire: 'Your session has expired' }; ctx.redirect(`/report/${ctx.params.project}`); return; }
 
-        // list of files
-        const files = ctx.session.files.map(f => f.name).join(', ');
-
-        // make sure only one of generated-name and existing-name are recorded, and make it 1st property of report TODO: still needed?
-        if (ctx.session.report['existing-name']) { delete ctx.session.report['generated-name']; ctx.session.report = Object.assign({ 'existing-name': null }, ctx.session.report); }
-        if (ctx.session.report['generated-name']) { delete ctx.session.report['existing-name']; ctx.session.report = Object.assign({ 'generated-name': null }, ctx.session.report); }
+        const prettyReport = prettifyReport(ctx.session.report);
 
         const context = {
-            reporter:         ctx.state.user.name,
-            reportHtml:       jsObjectToHtml(ctx.session.report),
-            geocodeHtml:      jsObjectToHtml(ctx.session.geocode),
-            formattedAddress: encodeURIComponent(ctx.session.geocode.formattedAddress),
-            files:            files,
+            reporter:            ctx.state.user.name,
+            reportHtml:          jsObjectToHtml(prettyReport),
+            formattedAddress:    ctx.session.geocode ? ctx.session.geocode.formattedAddress : '[unrecognised address]',
+            formattedAddressUrl: encodeURIComponent(ctx.session.geocode ? ctx.session.geocode.formattedAddress : ''),
+            files:               ctx.session.files.map(f => f.name).join(', '),
         };
 
         await ctx.render(ctx.state.user.db+'/'+ctx.params.project+'-submit', context);
@@ -163,8 +158,9 @@ class IncidentReport {
 
         const by = ctx.state.user.id;
         const name = ctx.session.report['existing-name'] || ctx.session.report['generated-name'];
+        const prettyReport = prettifyReport(ctx.session.report);
 
-        const id = await Report.insert('test', by, name, ctx.session.report, ctx.params.project, ctx.session.files, ctx.session.geocode);
+        const id = await Report.insert('test', by, name, prettyReport, ctx.params.project, ctx.session.files, ctx.session.geocode);
 
         // record user-agent
         await useragent.log('test', ctx.ip, ctx.headers);
@@ -206,6 +202,50 @@ class IncidentReport {
         ctx.status = reports.length==0 && ctx.params.id!='' ? 404 : 200; // Not Found / Ok
     }
 
+}
+
+
+/**
+ * Convert fields as defined in form input fields to presentation-friendly fields.
+ *
+ * This includes
+ *  - renaming fields for attractive presentation
+ *  - converting dd-mmm-yyyy hh:mm fields to date value
+ *
+ * @param   {Object} report - Report as submitted
+ * @returns {Object} Transformed report
+ */
+function prettifyReport(report) {
+
+    const rpt = {
+        Name:                            report.name,
+        Gender:                          report.gender=='m' ? 'Male' : 'Female',
+        Age:                             report.age,
+        Employment:                      report.employment,
+        Contact:                         report['client-contact'],
+        'Assistance sought':             report['assistance-sought-elsewhere'],
+        'Summary of problem':            report['problem-summary'],
+        'Desired outcome':               report['desired-outcome'],
+        'Nature of assault':             report['nature-of-assault'],
+        'Date':                          new Date(report.date+' '+report.time),
+        Description:                     report['brief-description'],
+        Address:                         report['location-address'],
+        Location:                        report['location-description'],
+        'Perpetrator identity':          report['perpetrator-identity'],
+        'Relationship with perpetrator': report['perpetrator-relationship'],
+        'Age of perpetrator':            report['perpetrator-age'],
+        'Gender of perpetrator':         report['perpetrator-gender']=='m' ? 'Male' : 'Female',
+        'Action taken':                  report['action-taken'],
+        'Assistance requested':          report['assistance-requested'],
+    };
+
+    if (report['existing-name']) {
+        rpt['Existing name'] = report['existing-name'];
+    } else {
+        rpt['Generated name'] = report['generated-name'];
+    }
+
+    return rpt;
 }
 
 

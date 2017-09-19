@@ -78,15 +78,26 @@ describe('Report model', function() {
 
     describe('insert', async function() {
         it('creates minimal incident report', async function() {
-            const submitted = { Date: new Date() };
+            const submitted = { Date: new Date(), Description: 'a test report' };
 
             // spoof file upload (copy file to /tmp & create formidable object)
             await fs.copy('./test/img/s_gps.jpg', '/tmp/upload_s_gps.jpg');
             const stat = await fs.stat('/tmp/upload_s_gps.jpg');
-            const files = [{ size: stat.size, path: '/tmp/upload_s_gps.jpg', name: 's_gps.jpg', type: 'image/jpeg', mtime: stat.mtime }];
+            const files = [{
+                size:  stat.size,
+                path:  '/tmp/upload_s_gps.jpg',
+                name:  's_gps.jpg',
+                type:  'image/jpeg',
+                mtime: stat.mtime
+            }];
 
             // spoof geocode incident location (this subset of results is all we need)
-            const geocode = { formattedAddress: 'Free School Ln, Cambridge CB2, UK', latitude: 52.2031684, longitude: 0.118871 };
+            const geocode = {
+                formattedAddress:     'Free School Ln, Cambridge CB2, UK',
+                latitude:             52.2031684,
+                longitude:            0.118871,
+                administrativeLevels: {}
+            };
 
             reportId = await Report.insert('test', undefined, 'test test', submitted, 'test-project', files, geocode);
             console.info('report id:', reportId)
@@ -150,6 +161,16 @@ describe('Report model', function() {
         it('gets most oldest report timestamp', async function() {
             const timestamp = await Report.getOldestTimestamp('test');
             expect(new Date(timestamp)).to.be.below(reportId.getTimestamp());
+        });
+    });
+
+    describe('filter', async function() {
+        it('filter by submitted test search', async function() {
+            const query = { $and: [ { archived: false }, { 'submitted.Description': { '$regex': 'report', '$options': 'i' } } ] };
+            const rpts = await Report.find('test', query);
+            expect(rpts).to.be.an('array');
+            expect(rpts.length).to.equal(1);
+            expect(rpts[0].name).to.equal('test test');
         });
     });
 

@@ -67,26 +67,42 @@ class Report {
         //const infos = await reports.infos();
         //await global.db[db].command({ collMod: 'reports' , validator: validator }); TODO: sort out validation!
 
-        // if 'reports' collection doesn't have correct indexes, add them
-        const indexes = (await reports.indexes()).map(i => i.key);
+        // ---- indexing
+
+        // indexes seem to be a bit strange in MongoDB: even determining if an index exists is not
+        // straightforward; for now, just request index without testing if it already exists - this
+        // seems to be fast, and is only done on explicit login
+
+        //const indexes = (await reports.indexes()).map(i => i.key);
+        //console.info('init/indexes', indexes)
 
         // geospatial index
-        if (indexes.location == undefined) reports.createIndex({ location: '2dsphere' });
 
-        // free-text index (on submitted report fields) TODO: what happens when new report fields added?
-        if (indexes._fts == undefined) {
-            // get all submitted fields in all reports
-            const allRpts = await Report.getAll(db);
-            const flds = new Set;
-            for (const rpt of allRpts) {
-                for (const fld of Object.keys(rpt.submitted)) flds.add(fld);
-            }
-            flds.delete('_id');
-            const fields = {};
-            for (const f of flds) fields['report.'+f] = 'text';
-            //reports.createIndex({ '$**': 'text' }); // creates free-text search index on entire collection
-            reports.createIndex(fields, { name: 'freetextfieldssearch' });
-        }
+        reports.createIndex({ location: '2dsphere' });
+
+        // free-text index for submitted information (ie fields in report.submitted)
+
+        // there can only be a single free-text index on a collection; this can be either on all
+        // fields in the collection, or on specified individual fields - the former is not what we
+        // want, and the latter blows up, so for now, free-text searching uses $regex searches on
+        // unindexed individual fields within the submitted sub-document
+
+        // option a) - free-text search index on entire collection - not what we want!
+        //reports.createIndex({ '$**': 'text' });
+
+        // option b) - single free-text index on all submitted report fields simultaneously - no go,
+        // MongoDB blows up with 'MongoError: Index key pattern too large'
+
+        // get all submitted fields in all reports
+        //const allRpts = await Report.getAll(db);
+        //const flds = new Set;
+        //for (const rpt of allRpts) {
+        //    for (const fld of Object.keys(rpt.submitted)) flds.add(fld);
+        //}
+        //flds.delete('_id');
+        //const fields = {};
+        //for (const f of flds) fields['report.'+f] = 'text';
+        //reports.createIndex(fields, { name: 'freetextfieldssearch' });
     }
 
     /**

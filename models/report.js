@@ -520,9 +520,9 @@ class Report {
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
 
         const reports = global.db[db].collection('reports');
-        await reports.updateOne({ _id: new id }, { $pull: { comments: { byId: id, on: on } } });
+        await reports.updateOne({ _id: id }, { $pull: { comments: { byId: by, on: on } } });
 
-        await Update.insert(db, id, userId, { pull: { comments: { byId: id, on: on } } }); // audit trail
+        await Update.insert(db, id, userId, { pull: { comments: { byId: by, on: on } } }); // audit trail
     }
 
 

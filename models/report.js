@@ -341,7 +341,10 @@ class Report {
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow id as string
 
+        if (values.report != undefined) throw new Error('Cannot update submitted report');
+
         const reports = global.db[db].collection('reports');
+
         await reports.updateOne({ _id: id }, { $set: values });
 
         await Update.insert(db, id, userId, { set: values }); // audit trail
@@ -566,7 +569,7 @@ class Report {
         userId = objectId(userId); // allow id as string
 
         const reports = global.db[db].collection('reports');
-        
+
         const report = await reports.findOne(id);
 
         return report.views ? report.views[userId] : null;

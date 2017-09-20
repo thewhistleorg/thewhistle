@@ -32,6 +32,10 @@
             // notes
             setupCommentaryListeners('{{_id}}', '{{@koa.state.user.name}}',  '{{@koa.state.user.id}}');
 
+            // set scroll height
+            resizeElementHeight(document.getElementById('scroll-container'));
+
+
         });
 
     </script>
@@ -39,6 +43,7 @@
 </head>
 
 <body>
+  {{>errpartial}}
 
 <header>
     {{>navpartial}}
@@ -52,7 +57,7 @@
           <div class="header-table">
             <div class="header-table-Body">
               <div class="header-table-Row">
-                <div class="header-table-Cell">
+                <div class="header-table-Cell report-header">
                   <div class="content-header">Description</div>
                   <div class="report-header-content">{{{submittedDesc}}}</div>
                 </div>
@@ -75,6 +80,14 @@
                               {{/users}}
                               {{/selected}}
                           </select>
+                          <!-- <input name="assigned-to" id="assigned-to" value="" list="assignedTo">
+                          <datalist id="assignedTo">
+                            {{#selected assignedTo}}
+                            {{#users}}
+                              <option>{{firstname}} {{lastname}}</option>
+                            {{/users}}
+                            {{/selected}}
+                          </datalist> -->
                       </div>
                   </form>
                 </div>
@@ -104,9 +117,8 @@
           </div>
         </div>
 
-        {{>errpartial}}
 
-        <div class="pure-u-3-5">
+        <div id="scroll-container" class="pure-u-3-5 apply-scroll">
 
             <ul class="card-list">
                 <li>
@@ -170,7 +182,15 @@
                     <div class="padding-15">
                         <!-- <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p> -->
                         <div id="map"></div>
-                        {{{geocodeHtml}}}
+                        <ul class="accordion_2">
+                            <li class="accordion__item">
+                                <input type="checkbox" class="accordion__toggle" id="toggle-geo" />
+                                <label class="accordion__trigger " for="toggle-geo"><span class="content-header">More info</span></label>
+                                <div class="accordion__target">
+                                  {{{geocodeHtml}}}
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </li>
 
@@ -222,53 +242,21 @@
                     </div>
                 </li>
 
-                <li>
+                <!-- <li>
                     <span class="card-header">Admin Note</span>
                     <div class="report-action">
-                        <!-- <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p> -->
-
                         <form method="post" class="pure-form pure-form-aligned">
                             <div class="pure-control-group">
                                 <label for="summary">Summary</label>
                                 <input name="summary" id="summary" value="{{summary}}" class="w24">
                             </div>
                         </form>
-
-
-                        <form method="post" class="pure-form pure-form-aligned">
-                            <div class="pure-control-group">
-                                {{#checked archived}}
-                                <label>Archive</label>
-                                <input type="radio" name="archived" id="archived-n" value="n"> <label for="archived-n">Active</label>
-                                <input type="radio" name="archived" id="archived-y" value="y"> <label for="archived-y">Archived</label>
-                                {{/checked}}
-                            </div>
-                        </form>
-
-                        {{#if otherReports}}
-                        <p>Other reports by {{by}}:</p>
-                        <table>
-                            {{#otherReports}}
-                            <tr>
-                                <td></td>
-                                <td><a href="/reports/{{_id}}">{{reported}}</a></td>
-                                <td>{{name}}</td>
-                                <td>{{summary}}</td>
-                            </tr>
-                            {{/otherReports}}
-                        </table>
-                        {{/if}}
-
-                        <!-- <p><i>The contents of the incident report will vary according to the organisation/project the report
-                            is submitted for.</i></p> -->
-
-
                     </div>
-                </li>
+                </li> -->
                 <ul class="accordion_2">
                     <li class="accordion__item">
-                        <label class="accordion__trigger" for="toggle-05"><span class="card-header">Audit trail</span></label>
-                        <input type="checkbox" class="accordion__toggle" id="toggle-05" />
+                        <input type="checkbox" class="accordion__toggle" id="toggle-updates" />
+                        <label class="accordion__trigger" for="toggle-updates"><span class="card-header">Audit trail</span></label>
                         <div class="accordion__target">
                           <table id="updates">
                               {{#updates}}
@@ -282,11 +270,36 @@
                         </div>
                     </li>
                 </ul>
+                <li>
+                  <span class="card-header">Archive</span>
+
+                  <form method="post" class="pure-form pure-form-aligned">
+                      <div class="pure-control-group">
+                          {{#checked archived}}
+                          <input type="radio" name="archived" id="archived-n" value="n"> <label for="archived-n">Active</label>
+                          <input type="radio" name="archived" id="archived-y" value="y"> <label for="archived-y">Archived</label>
+                          {{/checked}}
+                      </div>
+                  </form>
+
+                  {{#if otherReports}}
+                  <p>Other reports by {{by}}:</p>
+                  <table>
+                      {{#otherReports}}
+                      <tr>
+                          <td></td>
+                          <td><a href="/reports/{{_id}}">{{reported}}</a></td>
+                          <td>{{name}}</td>
+                          <td>{{summary}}</td>
+                      </tr>
+                      {{/otherReports}}
+                  </table>
+                  {{/if}}
+                </li>
             </ul>
         </div>
     </div>
 </main>
 
 </body>
-
 </html>

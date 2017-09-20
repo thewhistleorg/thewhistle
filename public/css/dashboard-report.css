@@ -1,7 +1,7 @@
 /* Individual Report Page */
 
 #individual-report {
-  padding: 0
+  padding: 0 1px;
 }
 
 .report-container {
@@ -12,12 +12,18 @@
 .report-header-container {
   color: #033549;
   background: #ffffff;
+  position: relative;
+  z-index: 1;
 }
 
 .report-header-content {
   font-size: 1.2em;
   font-weight: bold;
   padding: 6px 0;
+  width: 98%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #rightFixedSidebar {
@@ -68,13 +74,17 @@
   font-weight: lighter;
 }
 
+.header-table-Cell.report-header {
+    width: 40%;
+}
+
 .header-table-Cell form {
     padding: 0;
     margin: 5px 0px;
 }
 
 .header-table-Cell select,.header-table-Cell input {
-    width: 70%;
+    width: 100%;
 }
 
 .header-table {
@@ -94,7 +104,7 @@
 .header-table-Cell, .header-table-Head {
   border: 0px;
   display: table-cell;
-  padding: 6px 10px 0;
+  padding: 6px 10px 8px;
 }
 
 .header-table-Heading {
@@ -204,10 +214,20 @@ textarea {
 
 .json-to-html h3 {
     margin: 0;
+    font-weight: lighter;
+    color: #6C949E;
 }
 
 .json-to-html p {
-    margin: 2px 0 15px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #f0f3f4;
+  margin: 0px 0 15px;
+  padding-bottom: 4px;
+  font-size: 1.2em;
+  border-bottom: 1px solid #f0f3f4;
+}
+
+/* enable scroll; */
+
+.apply-scroll{
+  position: relative;
+  overflow-y: scroll;
 }

@@ -7,9 +7,10 @@
  * Set up listeners for metadata fields (summary, assigned-to, status, archived).
  */
 function setupMetadataAutosubmitListeners() {
-    document.querySelector('#summary').onchange = function submitSummary() {
-        this.form.submit();
-    };
+    // disabling summary for this release
+    // document.querySelector('#summary').onchange = function submitSummary() {
+    //     this.form.submit();
+    // };
     document.querySelector('#assigned-to').onchange = function submitAssignedTo() {
         this.form.submit();
     };
@@ -190,6 +191,7 @@ function initialiseMap(reportId, reporter, lat, lon, reportedOnDay, reportedOnFu
     const map = new google.maps.Map(document.getElementById('map'), {
         zoom:   14,
         center: { lat: lat, lng: lon },
+        scrollwheel: false,
         styles:   [{
                       "featureType": "all",
                       "elementType": "geometry",
@@ -549,4 +551,23 @@ function initialiseMap(reportId, reporter, lat, lon, reportedOnDay, reportedOnFu
             alert(e.message);
         }
     });
+}
+
+/**
+ * Set height of a container
+ *
+ * @param {ObjectId} element
+ */
+
+function resizeElementHeight(element) {
+  var height = 0;
+  var body = window.document.body;
+  if (window.innerHeight) {
+      height = window.innerHeight;
+  } else if (body.parentElement.clientHeight) {
+      height = body.parentElement.clientHeight;
+  } else if (body && body.clientHeight) {
+      height = body.clientHeight;
+  }
+  element.style.height = ((height - element.offsetTop) + "px");
 }

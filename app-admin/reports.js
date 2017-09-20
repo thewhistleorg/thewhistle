@@ -26,6 +26,7 @@ const User   = require('../models/user.js');
 const Update = require('../models/update.js');
 
 const jsObjectToHtml = require('../lib/js-object-to-html');
+const jsObjectToRichHtml = require('../lib/js-object-to-rich-html');
 
 
 class ReportsHandlers {
@@ -76,6 +77,7 @@ class ReportsHandlers {
             if (rpt.tags.length > 2) { // limit displayed tags to 2
                 rpt.tags.splice(2, rpt.tags.length, `<span class="nowrap">+${rpt.tags.length-2} more...</span>`);
             }
+
             const fields = {
                 _id:              rpt._id,
                 updatedOn:        lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
@@ -85,7 +87,8 @@ class ReportsHandlers {
                 updatedBy:        lastUpdate.by,
                 assignedTo:       rpt.assignedTo ? users.get(rpt.assignedTo.toString()).username : '',
                 status:           rpt.status || '', // ensure status is string
-                summary:          rpt.summary || `<span title="submitted description">[${rpt.submitted['Description']}]</span>`,
+                summary:          rpt.summary || `<span title="submitted description">${rpt.submitted['Description']}</span>`,
+                submittedDesc:    rpt.submitted['Description'] || `<i title="submitted description" class="grey">No Description</i>`,
                 tags:             rpt.tags,
                 reportedOnPretty: prettyDate(rpt._id.getTimestamp()),
                 reportedOnFull:   dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
@@ -766,7 +769,7 @@ class ReportsHandlers {
             reportedOnFull:   dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
             reportedOnTz:     dateFormat(report.reported, 'Z'),
             reportedBy:       report.by ? '@'+(await User.get(report.by)).username : report.name,
-            reportHtml:       jsObjectToHtml(report.submitted), // submitted incident report
+            reportHtml:       jsObjectToRichHtml(report.submitted,['Anonymous id']), // submitted incident report
             geocodeHtml:      jsObjectToHtml(report.geocode),
             formattedAddress: encodeURIComponent(report.geocode.formattedAddress),
             lat:              report.geocode ? report.geocode.latitude  : null,
@@ -780,6 +783,7 @@ class ReportsHandlers {
             files:            report.submitted.files, // for tabs
             updates:          updates,
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
+            submittedDesc:    report.submitted.Description || `<i title="submitted description" class="grey">No Description</i>`
         };
         extra.reportDescription = report.summary
             ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`

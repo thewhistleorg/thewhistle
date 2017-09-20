@@ -145,14 +145,14 @@
     </tr>
     {{#reports}}
 
-    <tr id="{{_id}}" onClick="window.open('/reports/{{_id}}')">
+    <tr id="{{_id}}" onClick="window.open('/reports/{{_id}}', '_self')">
 
         <td data-ago="{{updatedOn}}" title="{{updatedOnPretty}} by @{{updatedBy}}" class="grey">
           <span>{{updatedAgo}}</span>
         </td>
 
         <td >
-          <span>{{{summary}}}</span>
+          <span>{{{submittedDesc}}}</span>
         </td>
 
         <td title="{{reportedOnFull}} by {{reportedBy}}" class="grey nowrap">

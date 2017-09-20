@@ -17,7 +17,7 @@ ul.card-list .card-header {
   border-bottom: 2px solid #F0F3F4;
 }
 
-ul.card-list table, ul.card-list p {
+ul.card-list table{
   padding: 5px 10px;
   display: block;
 }

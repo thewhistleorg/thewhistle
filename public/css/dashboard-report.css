@@ -73,6 +73,10 @@
     margin: 5px 0px;
 }
 
+.header-table-Cell select,.header-table-Cell input {
+    width: 70%;
+}
+
 .header-table {
   display: table;
   width: 100%;
@@ -194,4 +198,16 @@ textarea {
 #files img {
   max-width: 80px;
   max-height: 80px;
+}
+
+/* for js-object-to-rich-html */
+
+.json-to-html h3 {
+    margin: 0;
+}
+
+.json-to-html p {
+    margin: 2px 0 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f3f4;
 }

@@ -2,25 +2,30 @@
 <nav class="pure-menu pure-menu-horizontal">
     <ul class="pure-menu-list">
         <li class="pure-menu-item"><a href="/" class="pure-menu-link logo-container"></a></li>
-        <li class="pure-menu-item"><a href="/reports" class="pure-menu-link">reports</a></li>
-        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+        <li class="pure-menu-item"><a href="/reports" class="pure-menu-link">Reports</a></li>
+        <!-- Analysis not needed for now -->
+        <!-- <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
             <a href="#" class="pure-menu-link">analysis</a>
             <ul class="pure-menu-children">
                 <li class="pure-menu-item"><a href="#" class="pure-menu-link">TBC</a></li>
             </ul>
-        </li>
+        </li> -->
         {{#if @koa.state.user.isAdmin}}
-        <li class="pure-menu-item"><a href="/users" class="pure-menu-link">users</a></li>
-        <li class="pure-menu-item"><a href="/resources" class="pure-menu-link">resources</a></li>
+        <li class="pure-menu-item"><a href="/users" class="pure-menu-link">Users</a></li>
+        <li class="pure-menu-item"><a href="/resources" class="pure-menu-link">Resources</a></li>
         {{/if}}
-        <li class="pure-menu-item"><a href="/logout" class="pure-menu-link">logout</a></li>
+    </ul>
+    <ul class="pure-menu-list float-right">
+      <!-- TODO: add username here -->
+      <!-- <li class="pure-menu-item"><a href="#" class="pure-menu-link"></a></li> -->
+      <li class="pure-menu-item"><a href="/logout" class="pure-menu-link">Logout</a></li>
     </ul>
 </nav>
 {{else}}
 <nav class="pure-menu pure-menu-horizontal">
     <ul class="pure-menu-list">
         <li class="pure-menu-item"><a href="/" class="pure-menu-link logo-container"></a></li>
-        <li class="pure-menu-item"><a href="/login" class="pure-menu-link">login</a></li>
+        <li class="pure-menu-item"><a href="/login" class="pure-menu-link">Login</a></li>
     </ul>
 </nav>
 {{/if}}

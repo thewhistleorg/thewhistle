@@ -30,7 +30,7 @@
             </li>
             <li class="pure-control-group">
                 <label for="address">Address</label>
-                <input type="text" name="address" id="address" value="{{address}}" required class="w48">
+                <input type="text" name="address" id="address" value="{{address}}" required class="w36">
             </li>
             <li class="pure-control-group">
                 <label for="phone">Phone(s)</label>
@@ -39,13 +39,21 @@
             </li>
             <li class="pure-control-group">
                 <label for="email">E-mail(s)</label>
-                <input type="text" name="email" id="email" value="{{email}}" class="w48">
+                <input type="text" name="email" id="email" value="{{email}}" class="w36">
                 <span class="small grey">Comma-separated list of e-mail addresses</span>
             </li>
             <li class="pure-control-group">
                 <label for="services">Services</label>
-                <input type="text" name="services" id="services" value="{{services}}" class="w48">
+                <input type="text" name="services" id="services" value="{{services}}" class="w36">
                 <span class="small grey">Semicolon-separated list of services offered</span>
+            </li>
+            <li class="pure-control-group">
+                {{#selected category}}
+                <label>Category</label>
+                <input type="radio" name="category" id="category-legal" value="Legal aid" required> <label for="category-legal">Legal aid</label>
+                <input type="radio" name="category" id="category-medical" value="Medical aid"> <label for="category-medical">Medical aid</label>
+                <input type="radio" name="category" id="category-counselling" value="Counselling"> <label for="category-counselling">Counselling</label>
+                {{/selected}}
             </li>
 
             <li class="pure-control-group">

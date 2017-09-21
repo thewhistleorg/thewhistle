@@ -78,6 +78,7 @@ class ReportsHandlers {
                 rpt.tags.splice(2, rpt.tags.length, `<span class="nowrap">+${rpt.tags.length-2} more...</span>`);
             }
 
+            const desc = rpt.submitted['Description'] || rpt.submitted['brief-description']; // TODO: transition code until all early test report are deleted
             const fields = {
                 _id:              rpt._id,
                 updatedOn:        lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
@@ -87,8 +88,8 @@ class ReportsHandlers {
                 updatedBy:        lastUpdate.by,
                 assignedTo:       rpt.assignedTo ? users.get(rpt.assignedTo.toString()).username : '',
                 status:           rpt.status || '', // ensure status is string
-                summary:          rpt.summary || `<span title="submitted description">${rpt.submitted['Description']}</span>`,
-                submittedDesc:    truncate(rpt.submitted['Description'],140)|| `<i title="submitted description" class="grey">No Description</i>`,
+                summary:          rpt.summary || `<span title="submitted description">${desc}</span>`,
+                submittedDesc:    truncate(desc,140)|| `<i title="submitted description" class="grey">No Description</i>`,
                 tags:             rpt.tags,
                 reportedOnPretty: prettyDate(rpt._id.getTimestamp()),
                 reportedOnFull:   dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
@@ -764,6 +765,7 @@ class ReportsHandlers {
         const updates = await Update.getByReport(db, ctx.params.id);
 
         const y = 1000*60*60*24*365;
+        const desc = report.submitted['Description'] || report.submitted['brief-description']; // TODO: transition code until all early test report are deleted
         const extra = {
             reportedOnDay:    dateFormat(report.reported, 'd mmm yyyy'),
             reportedOnFull:   dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
@@ -783,7 +785,7 @@ class ReportsHandlers {
             files:            report.submitted.files, // for tabs
             updates:          updates,
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
-            submittedDesc:    truncate(report.submitted['Description'],70) || `<i title="submitted description" class="grey">No Description</i>`
+            submittedDesc:    truncate(desc,70) || `<i title="submitted description" class="grey">No Description</i>`
         };
         extra.reportDescription = report.summary
             ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`

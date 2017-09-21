@@ -108,7 +108,7 @@ Always run a final test before pushing in order to avoid CI failures. Always gar
 merged topic branch.
 
 If other clones of the repository have the topic branch, they can then delete it by using `git fetch 
---all --prune`.
+origin --prune`.
 
 Note that topic branches are always merged into master, not vice versa (topic branches are rebased 
 from master).
@@ -116,7 +116,7 @@ from master).
 When any commit (either a simple commit or a merge commit of topic branch) is pushed to the GitHub 
 repository `master`, it will be automatically deployed to the staging app 
 ([admin.staging.thewhistle.org](http://admin.staging.thewhistle.org) / 
-[report.staging.thewhistle.org](report.staging.thewhistle.org)) for final testing.
+[report.staging.thewhistle.org](http://report.staging.thewhistle.org)) for final testing.
 
 When final verification is complete, the staging app can be promoted to production.
 

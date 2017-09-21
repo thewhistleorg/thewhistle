@@ -13,10 +13,12 @@
 
 {{#if @koa.session.geocode}}
 
+<hr>
+
 <h2>Local Resources</h2>
 
 <table>
-    {{#each resources}}
+    {{#each categories}}
     <tr>
         <td colspan="2"><h3>{{@key}}</h3></td>
     </tr>
@@ -32,6 +34,10 @@
     <tr>
         <td></td>
         <td>{{{phone}}} {{email}}</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td class="grey"><i>services offered: {{services}}</i></td>
     </tr>
     {{/each}}
     {{/each}}

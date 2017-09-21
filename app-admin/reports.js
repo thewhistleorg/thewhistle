@@ -1094,7 +1094,8 @@ class ReportsHandlers {
 
 
 /**
- * Format supplied date as hh:mm if it is today, or d mmm yyyy otherwise.
+ * Format supplied date showing just time if it is today, de-emphasing year if it is current year,
+ * de-emphasing day/month if older.
  *
  * @param {Date} date - Date to be formatted.
  * @returns {string} Formatted date.
@@ -1102,11 +1103,18 @@ class ReportsHandlers {
  * TODO: timezone?
  */
 function prettyDate(date) {
-    // use appropriate date format for today, this year, older
-    let format = 'd mmm yyyy';                                                        // before this year
-    if (new Date(date).getFullYear() == new Date().getFullYear()) format = 'd mmm';   // this year
-    if (new Date(date).toDateString() == new Date().toDateString()) format = 'HH:MM'; // today
-    return dateFormat(date, format);
+    // today
+    if (new Date(date).toDateString() == new Date().toDateString()) {
+        return dateFormat(date, 'HH:MM &#8199;&#8199;&#8199;&#8199;'); // figure spaces to match year spacing
+    }
+
+    // this year
+    if (new Date(date).getFullYear() == new Date().getFullYear()) {
+        return `${dateFormat(date, 'd mmm')} <span style="opacity:0.6">${dateFormat(date, 'yyyy')}</span>`
+    }
+
+    // before this year
+    return `<span style="opacity:0.6">${dateFormat(date, 'd mmm')}</span> ${dateFormat(date, 'yyyy')}`
 }
 
 

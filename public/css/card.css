@@ -2,85 +2,96 @@
 Following css styles are for quick UI changes and they must be optimised
 */
 
-ul.card-list{
+ul.card-list {
   list-style: none;
-  padding-left: 15px;
-}
-ul.card-list .card-header {
-    color: #333333;
-    display: block;
-    padding-left: 1em;
-    background: rgb(250, 251, 253);
-    line-height: 3;
-    font-size: 1.3em;
-    border: 0;
-    border-bottom: 1px solid #F0F3F4;
+  padding: 0 8px 0 12px;
 }
 
-ul.card-list table, ul.card-list p {
-    padding:5px 10px;
-    display: block;
+ul.card-list .card-header {
+  display: block;
+  padding-left: 1em;
+  background: rgb(250, 251, 253);
+  line-height: 3;
+  font-size: 1.3em;
+  border: 0;
+  border-bottom: 2px solid #F0F3F4;
 }
+
+ul.card-list table{
+  padding: 5px 10px;
+  display: block;
+}
+
 
 /* ul.card-list li:last-child:not(:nth-child(even)){
     width: 95.5%;
 } */
 
-ul.card-list li {
-    background-color: #fff;
-    margin-bottom: 1px;
-    width: 99%;
-    float: left;
-    padding: 0;
-    margin: 0 1px 16px;
-    border: 1px solid #F0F3F4;
-    -moz-box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
-    -webkit-box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
-    box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
+ul.card-list >li {
+  background-color: #fff;
+  margin-bottom: 1px;
+  width: 99%;
+  float: left;
+  padding: 0;
+  margin: 0 1px 16px;
+  border: 1px solid #F0F3F4;
+  -moz-box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
+  -webkit-box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
+  box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
 }
 
 ul.card-list span::after {
-    display:none;
+  display: none;
 }
 
 .activity-page h2 {
-    margin: 15px 15px 4px;
-    border-bottom: 1px solid #F0F3F4;
-    padding-bottom: 8px;
-    width: 96%;
+  margin: 15px 15px 4px;
+  border-bottom: 1px solid #F0F3F4;
+  padding-bottom: 8px;
+  width: 96%;
 }
-ul.card-list input + span ~ *{
+
+ul.card-list input+span~* {
   display: block;
 }
 
-.width-100{
-  width:95.5%!important;
+.width-100 {
+  width: 95.5%!important;
 }
 
 ul.card-list-sidebar {
   list-style-type: none;
   padding: 0;
   background-color: #fff;
-  margin: 0px 0px 0 10px;
+  margin: 0 -1px 0 0;
   border: 1px solid #F0F3F4;
   height: 100%;
+  position: relative;
+    z-index: 1;
   -moz-box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
   -webkit-box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
   box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
 }
 
 ul.card-list-sidebar .card-header {
-    font-size: 1.3em;
+  font-size: 1.3em;
 }
 
 ul.card-list-sidebar .comment {
-    background: #fff;
-}
-ul.card-list-sidebar li {
-    padding: 10px 15px 5px;
-    border-bottom: 1px dotted #F0F3F4;
+  background: #fff;
 }
 
- ul.card-list-sidebar .comment:last-child {
+ul.card-list-sidebar >li {
+  padding: 10px 15px 5px;
+  border-bottom: 1px solid #F0F3F4;
+}
+
+ul.card-list-sidebar .comment:last-child {
   border: 0;
+}
+
+span.card-sub-header {
+  float: right;
+  margin: 6px 10px;
+  font-size: 69%;
 }

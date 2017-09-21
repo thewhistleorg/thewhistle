@@ -11,82 +11,7 @@
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/dashboard-report.css">
     <link rel="stylesheet" href="/css/card.css">
-    <style>
-        #map {
-            height: 400px;
-            width: 400px;
-        }
-
-        p.note {
-            color: #999999;
-            font-size: 80%;
-        }
-
-        h1 {
-            border-bottom: none;
-        }
-
-        button {
-            background: none;
-            border: none;
-            padding: 4px;
-        }
-
-        h1 {
-            border-bottom: none;
-        }
-
-        div.comment {
-            border: 1px solid #F0F3F4;
-            margin: 0.5em 0;
-            max-width: 640px;
-        }
-
-        div.comment div {
-            padding: 0.5em
-        }
-
-        div.comment .by {
-            background: #f9f9f9;
-        }
-
-        div.comment p {
-            margin: 0.5em 0;
-        }
-
-        div.by a {
-            color: #333333;
-        }
-
-        div.by button {
-            background: none;
-            border: none;
-            color: #999999;
-        }
-
-        div.by button:hover {
-            color: #3992ab;
-            cursor: pointer;
-        }
-
-        #div-add-comment {
-            padding: 0.5em;
-            max-width: calc(640px - 1em);
-        }
-
-        textarea {
-            display: block;
-            height: 8em;
-            margin-bottom: 0.5em;
-            padding: 0.5em;
-            width: 96%;
-        }
-
-        .padding-15 { padding: 15px; }
-    </style>
-    <style>
-        #files img { max-width: 80px; max-height: 80px; }
-    </style>
+    <link rel="stylesheet" href="/css/accordion.css">
     <script src="/js/report-details.js" defer>/* scripts for managing user interaction on report details page */</script>
     <script>
         'use strict';
@@ -107,6 +32,10 @@
             // notes
             setupCommentaryListeners('{{_id}}', '{{@koa.state.user.name}}',  '{{@koa.state.user.id}}');
 
+            // set scroll height
+            resizeElementHeight(document.getElementById('scroll-container'));
+
+
         });
 
     </script>
@@ -114,37 +43,89 @@
 </head>
 
 <body>
+  {{>errpartial}}
 
 <header>
     {{>navpartial}}
 </header>
 
-<main>
+<main id="individual-report">
 
     <div class="pure-g report-container">
 
-        <div class="pure-u-1 report-header-container">
-            <div class="float-left report-header">{{reportDescription}}</div>
-            <div class="float-right">
-                <small>
-                    <a href="{{exportPdf}}" title="Save as PDF" class="link-inverse">
-                        <span>Export as PDF </span>
-                        <i  class="fa fa-file-pdf-o"></i>
-                    </a>
-                </small>
+        <div class="pure-u-1 report-header-container drop-shadow">
+          <div class="header-table">
+            <div class="header-table-Body">
+              <div class="header-table-Row">
+                <div class="header-table-Cell report-header">
+                  <div class="content-header">Description</div>
+                  <div class="report-header-content">{{{submittedDesc}}}</div>
+                </div>
+
+                <div class="header-table-Cell">
+                  <div class="content-header">Submitted</div>
+                  <div class="report-header-content">{{reportedOnFull}}</div>
+                </div>
+
+                <div class="header-table-Cell">
+                  <div class="content-header">Assigned to</div>
+                  <form method="post" class="pure-form pure-form-aligned">
+                      <div class="pure-control-group">
+                          <!-- <label for="assigned-to">Assigned to:</label> -->
+                          <select name="assigned-to" id="assigned-to">
+                              {{#selected assignedTo}}
+                              <option value="">&nbsp;</option>
+                              {{#users}}
+                              <option value="{{_id}}">{{firstname}} {{lastname}}</option>
+                              {{/users}}
+                              {{/selected}}
+                          </select>
+                          <!-- <input name="assigned-to" id="assigned-to" value="" list="assignedTo">
+                          <datalist id="assignedTo">
+                            {{#selected assignedTo}}
+                            {{#users}}
+                              <option>{{firstname}} {{lastname}}</option>
+                            {{/users}}
+                            {{/selected}}
+                          </datalist> -->
+                      </div>
+                  </form>
+                </div>
+
+                <div class="header-table-Cell">
+                  <div class="content-header">Status</div>
+                  <form method="post" class="pure-form pure-form-aligned">
+                      <div class="pure-control-group">
+                          <!-- <label for="status" title="any status values can be used to suit your workflow">Status:</label> -->
+                          <input name="status" id="status" value="{{status}}" list="statuses">
+                          <datalist id="statuses">
+                              {{#statuses}}
+                              <option>{{this}}</option>
+                              {{/statuses}}
+                          </datalist>
+                      </div>
+                  </form>
+                </div>
+                <div class="header-table-Cell export-link">
+                  <a href="{{exportPdf}}" title="Save as PDF" class="bold">
+                      <span>Export to PDF </span>
+                  </a>
+                </div>
+
+              </div>
             </div>
+          </div>
         </div>
 
-        {{>errpartial}}
 
-        <div class="pure-u-3-5">
+        <div id="scroll-container" class="pure-u-3-5 apply-scroll">
 
             <ul class="card-list">
                 <li>
-                    <span class="card-header">Submitted Incident Report</span>
+                    <span class="card-header">REPORT INFO <span class="card-sub-header">Anonymous Identifier: <strong>{{reportedBy}}</strong></span></span>
                     <div class="padding-15">
 
-                        <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p>
+                        <!-- <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p> -->
                         {{{reportHtml}}}
 
                         <p><i>Note the contents of the incident report will vary according to the organisation/project the
@@ -153,7 +134,7 @@
                 </li>
 
                 <li id="files">
-                    <span class="card-header">Files</span>
+                    <span class="card-header">FILES</span>
                     <div class="image-ctx">
                         {{#if analysis.files}}
                         <table>
@@ -173,7 +154,8 @@
                     </div>
                 </li>
 
-                <li id="weather">
+                <!--  Weather report is hidden for now-->
+                <li id="weather" class="hide">
                     <span class="card-header">Weather </span>
                     <div>
                         {{#if analysis.weather}}
@@ -196,11 +178,19 @@
                 </li>
 
                 <li id="geocoding">
-                    <span class="card-header">Geocoding <a href="https://maps.google.com/maps/search/{{formattedAddress}}" class="fa fa-globe"></a></span>
+                    <span class="card-header">LOCATION MAP <a href="https://maps.google.com/maps/search/{{formattedAddress}}" class="fa fa-globe"></a></span>
                     <div class="padding-15">
-                        <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p>
+                        <!-- <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p> -->
                         <div id="map"></div>
-                        {{{geocodeHtml}}}
+                        <ul class="accordion_2">
+                            <li class="accordion__item">
+                                <input type="checkbox" class="accordion__toggle" id="toggle-geo" />
+                                <label class="accordion__trigger " for="toggle-geo"><span class="content-header bold"><strong>More about location</strong></span></label>
+                                <div class="accordion__target">
+                                  {{{geocodeHtml}}}
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </li>
 
@@ -211,7 +201,22 @@
 
         <div class="pure-u-2-5">
             <ul class="card-list-sidebar">
-
+                  <li>
+                    <span class="card-header">Tags</span>
+                    <div id="tag-list">{{#tags}}
+                        <span class="tag">{{this}} <button title="remove tag" class="tag-del hide fa fa-trash red"></button></span> {{/tags}}
+                        <button id="tag-add" title="add tag" class="fa fa-plus green"></button></div>
+                    <div id="new-tag" class="hide">
+                        <span class="grey">#</span><input name="tag" id="tag" list="tags" placeholder="enter tag">
+                        <button id="tag-save" title="add tag" class="fa fa-check green"></button>
+                        <button id="tag-cancel" title="cancel" class="fa fa-times red"></button>
+                    </div>
+                    <datalist id="tags">
+                        {{#tagList}}
+                        <option value="{{this}}">
+                            {{/tagList}}
+                    </datalist>
+                </li>
                 <li>
                     <span class="card-header">Notes</span>
                     <div id="commentsContainer">
@@ -237,94 +242,59 @@
                     </div>
                 </li>
 
-                <li>
-                    <span class="card-header">Report Actions</span>
+                <!-- <li>
+                    <span class="card-header">Admin Note</span>
                     <div class="report-action">
-                        <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p>
-
                         <form method="post" class="pure-form pure-form-aligned">
                             <div class="pure-control-group">
                                 <label for="summary">Summary</label>
                                 <input name="summary" id="summary" value="{{summary}}" class="w24">
                             </div>
                         </form>
-
-                        <form method="post" class="pure-form pure-form-aligned">
-                            <div class="pure-control-group">
-                                <label for="assigned-to">Assigned to:</label>
-                                <select name="assigned-to" id="assigned-to">
-                                    {{#selected assignedTo}}
-                                    <option value="">&nbsp;</option>
-                                    {{#users}}
-                                    <option value="{{_id}}">{{firstname}} {{lastname}}</option>
-                                    {{/users}}
-                                    {{/selected}}
-                                </select>
-                            </div>
-                        </form>
-
-                        <form method="post" class="pure-form pure-form-aligned">
-                            <div class="pure-control-group">
-                                <label for="status" title="any status values can be used to suit your workflow">Status:</label>
-                                <input name="status" id="status" value="{{status}}" list="statuses">
-                                <datalist id="statuses">
-                                    {{#statuses}}
-                                    <option>{{this}}</option>
-                                    {{/statuses}}
-                                </datalist>
-                            </div>
-                        </form>
-
-                        <form method="post" class="pure-form pure-form-aligned">
-                            <div class="pure-control-group">
-                                {{#checked archived}}
-                                <label>Archive</label>
-                                <input type="radio" name="archived" id="archived-n" value="n"> <label for="archived-n">Active</label>
-                                <input type="radio" name="archived" id="archived-y" value="y"> <label for="archived-y">Archived</label>
-                                {{/checked}}
-                            </div>
-                        </form>
-
-                        <div id="tag-list">Tags: {{#tags}}
-                            <span class="tag">{{this}} <button title="remove tag" class="tag-del hide fa fa-trash red"></button></span> {{/tags}}
-                            <button id="tag-add" title="add tag" class="fa fa-plus green"></button></div>
-                        <div id="new-tag" class="hide">
-                            <span class="grey">#</span><input name="tag" id="tag" list="tags" placeholder="enter tag">
-                            <button id="tag-save" title="add tag" class="fa fa-check green"></button>
-                            <button id="tag-cancel" title="cancel" class="fa fa-times red"></button>
-                        </div>
-                        <datalist id="tags">
-                            {{#tagList}}
-                            <option value="{{this}}">
-                                {{/tagList}}
-                        </datalist> {{#if otherReports}}
-                        <p>Other reports by {{by}}:</p>
-                        <table>
-                            {{#otherReports}}
-                            <tr>
-                                <td></td>
-                                <td><a href="/reports/{{_id}}">{{reported}}</a></td>
-                                <td>{{name}}</td>
-                                <td>{{summary}}</td>
-                            </tr>
-                            {{/otherReports}}
-                        </table>
-                        {{/if}}
-
-                        <p><i>The contents of the incident report will vary according to the organisation/project the report
-                            is submitted for.</i></p>
-
-                        <span class="card-header">Audit trail</span>
-                        <table id="updates">
-                            {{#updates}}
-                            <tr id="{{_id}}">
-                                <td><span class="nowrap">{{onDate}}</span> {{onTime}}</td>
-                                <td>@{{by}}</td>
-                                <td>{{description}}</td>
-                            </tr>
-                            {{/updates}}
-                        </table>
                     </div>
+                </li> -->
+                <ul class="accordion_2">
+                    <li class="accordion__item">
+                        <input type="checkbox" class="accordion__toggle" id="toggle-updates" />
+                        <label class="accordion__trigger" for="toggle-updates"><span class="card-header">Audit trail</span></label>
+                        <div class="accordion__target">
+                          <table id="updates">
+                              {{#updates}}
+                              <tr id="{{_id}}">
+                                  <td><span class="nowrap">{{onDate}}</span> {{onTime}}</td>
+                                  <td>@{{by}}</td>
+                                  <td>{{description}}</td>
+                              </tr>
+                              {{/updates}}
+                          </table>
+                        </div>
+                    </li>
+                </ul>
+                <li>
+                  <span class="card-header">Archive</span>
+
+                  <form method="post" class="pure-form pure-form-aligned">
+                      <div class="pure-control-group">
+                          {{#checked archived}}
+                          <input type="radio" name="archived" id="archived-n" value="n"> <label for="archived-n">Active</label>
+                          <input type="radio" name="archived" id="archived-y" value="y"> <label for="archived-y">Archived</label>
+                          {{/checked}}
+                      </div>
+                  </form>
+
+                  {{#if otherReports}}
+                  <p>Other reports by {{by}}:</p>
+                  <table>
+                      {{#otherReports}}
+                      <tr>
+                          <td></td>
+                          <td><a href="/reports/{{_id}}">{{reported}}</a></td>
+                          <td>{{name}}</td>
+                          <td>{{summary}}</td>
+                      </tr>
+                      {{/otherReports}}
+                  </table>
+                  {{/if}}
                 </li>
             </ul>
         </div>
@@ -332,5 +302,4 @@
 </main>
 
 </body>
-
 </html>

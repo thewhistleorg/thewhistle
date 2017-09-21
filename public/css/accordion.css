@@ -27,11 +27,114 @@ ul.accordion input:checked ~ * {
     transition: all .35s;
 }
 ul.accordion label::after {
-    content: "\25BC"; /* ▼ */
+    content: "\25BC";
     position: absolute;
     right: 0;
     margin-right: 1em;
 }
 ul.accordion input:checked + label::after {
     transform: rotateX(180deg);
+}
+
+
+/* Accordion style 2 */
+
+/**
+  REFERENCE: https://jsfiddle.net/csswizardry/e9Lt5p4b/
+*/
+
+
+.accordion_2 {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  list-style: none;
+}
+
+
+
+.accordion__item {
+  border-bottom: 1px solid #fd665a;
+}
+.accordion__item:last-of-type {
+  border-bottom: none;
+}
+
+/**
+ * The label element which triggers the open/close.
+ */
+.accordion__trigger {
+  display: block;
+  background-color: #ffffff;
+  cursor: pointer;
+  padding: 1rem;
+  border: 1px solid #F0F3F4;
+}
+
+.accordion__trigger::after {
+  content: "+";
+  margin-right: 0em;
+  position: absolute;
+  font-weight: bold;
+  font-size: 1.5em;
+  right: 0;
+  top: 0;
+  display: block;
+  color: #999999;
+  width: 3em;
+  height: 3em;
+  line-height: 3;
+  text-align: center;
+  -webkit-transition: all .35s;
+  -o-transition: all .35s;
+  transition: all .35s;
+}
+.accordion__toggle:checked + .accordion__trigger::after {
+    /*transform: rotateX(180deg);*/
+    transform: rotate(315deg);
+}
+
+/**
+ * The radio/checkbox element needs to always be hidden.
+ */
+.accordion__toggle {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+/**
+ * Hide the accordion content.
+ */
+.accordion__target {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  background-color: #fafbfd;
+  /**
+   * When the radio/checkbox is checked, show the accordion content.
+   */
+}
+.accordion__toggle:checked ~ .accordion__target {
+  position: static;
+  overflow: visible;
+  width: auto;
+  height: auto;
+  margin: auto;
+  clip: auto;
+  padding: 1.5rem;
+}
+
+.accordion__trigger:hover {
+    background-color: #F0F3F4;
 }

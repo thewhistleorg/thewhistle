@@ -48,12 +48,12 @@
                 <span class="small grey">Semicolon-separated list of services offered</span>
             </li>
             <li class="pure-control-group">
-                {{#selected category}}
+                {{#checked category}}
                 <label>Category</label>
                 <input type="radio" name="category" id="category-legal" value="Legal aid" required> <label for="category-legal">Legal aid</label>
-                <input type="radio" name="category" id="category-medical" value="Medical aid"> <label for="category-medical">Medical aid</label>
-                <input type="radio" name="category" id="category-counselling" value="Counselling"> <label for="category-counselling">Counselling</label>
-                {{/selected}}
+                <input type="radio" name="category" id="category-medical" value="Medical help"> <label for="category-medical">Medical Help</label>
+                <input type="radio" name="category" id="category-counselling" value="Mental health counselling"> <label for="category-counselling">Mental health counselling</label>
+                {{/checked}}
             </li>
 
             <li class="pure-control-group">

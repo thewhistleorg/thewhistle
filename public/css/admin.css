@@ -1,13 +1,14 @@
 /* The Whistle stylesheet */
 
 @import url('//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i');
+
 body {
-    font-family: 'Open Sans', "Segoe UI", Tahoma, sans-serif!important;
+    font-family: 'Open Sans', "Segoe UI", Tahoma, sans-serif;
     padding: 0;
     background: #F0F3F4;
 }
 
-/* override pure css font*/
+/* override pure css font because we do not need the Pure css's font-family */
 .pure-g [class*=pure-u] {
   font-family: 'Open Sans', "Segoe UI", Tahoma, sans-serif!important;
 }

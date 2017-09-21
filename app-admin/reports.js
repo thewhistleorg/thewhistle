@@ -675,9 +675,9 @@ class ReportsHandlers {
         for (const key in q) {
             if (key.slice(0, 6) == 'field:') {
                 const field = key.slice(6);
-                const fld = 'report.' + [ field ];
+                const fld = 'submitted.' + [ field ];
                 const val = q[key] || '.+';
-                filter.push({ [fld]: { $regex: val } });
+                filter.push({ [fld]: { $regex: val, $options: 'i' } });
                 filterDesc.add('report content');
             }
         }

@@ -59,7 +59,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             const document = new JsDom(response.text).window.document;
             expect(document.querySelector('title').textContent).to.match(/.*Activity.+/);
             // nav should be /, reports, analysis×2, users, resources, logout
-            expect(document.querySelectorAll('header nav ul li').length).to.equal(7);
+            expect(document.querySelectorAll('header nav li').length).to.equal(6);
         });
     });
 
@@ -152,17 +152,18 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(response.status).to.equal(404);
         });
 
-        it('sets summary', async function() {
-            const values = { summary: 'test report' };
-            const responsePost = await request.post(`/reports/${reportId}`).set(headers).send(values);
-            expect(responsePost.status).to.equal(302);
-            const response = await request.get(responsePost.headers.location).set(headers);
-            expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
-            expect(document.querySelector('#summary').value).to.equal('test report');
-            const matches = document.evaluate('count(//td[text()="Set summary to ‘test report’"])', document, null, 0, null);
-            expect(matches.numberValue).to.equal(1);
-        });
+        // Summary function is disabled for this release
+        // it('sets summary', async function() {
+        //     const values = { summary: 'test report' };
+        //     const responsePost = await request.post(`/reports/${reportId}`).set(headers).send(values);
+        //     expect(responsePost.status).to.equal(302);
+        //     const response = await request.get(responsePost.headers.location).set(headers);
+        //     expect(response.status).to.equal(200);
+        //     const document = new JsDom(response.text).window.document;
+        //     expect(document.querySelector('#summary').value).to.equal('test report');
+        //     const matches = document.evaluate('count(//td[text()="Set summary to ‘test report’"])', document, null, 0, null);
+        //     expect(matches.numberValue).to.equal(1);
+        // });
 
         it('sets report tag (ajax)', async function() {
             const values = { tag: 'test' };

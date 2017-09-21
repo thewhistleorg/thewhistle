@@ -17,6 +17,7 @@ const validator = { $and: [
     { phone:    { $type: 'array',                } },
     { email:    { $type: 'array',                } },
     { services: { $type: 'array',                } },
+    { category: { $type: 'string',               } },
     { location: { $type: 'object',               } }, // GeoJSON (with spatial index)
 ] };
 

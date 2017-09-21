@@ -7,18 +7,44 @@
 <h2>For any further help...</h2>
 
 <p>If you'd like any more help, or would like to follow up, you can get in touch with us.</p>
-
 <p>Make sure to mention your anonymous name <output id="user-id">{{user-id}}</output> so we can access any relevant information.</p>
+<p>Call us on <b>814-917-1224</b></p>
+<p>Visit us at <b>19, YPO Shodehinde Street, Utako, Abuja</b></p>
 
-<p> Call us on XX-XXX-XX </p>
-<p> <a> Start a web chat </a> </p>
-<p> Visit us at: <br>Address 1<br>Address 2<br>Postcode</p>
+{{#if @koa.session.geocode}}
+
+<hr>
+
+<h2>Local Resources</h2>
+
+<table>
+    {{#each categories}}
+    <tr>
+        <td colspan="2"><h3>{{@key}}</h3></td>
+    </tr>
+    {{#each this}}
+    <tr>
+        <td>{{distKm}}km</td>
+        <td><b>{{name}}</b></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>{{address}}</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>{{{phone}}} {{email}}</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td class="grey"><i>services offered: {{services}}</i></td>
+    </tr>
+    {{/each}}
+    {{/each}}
+</table>
+{{/if}}
 
 
 <form method="post" class="pure-form pure-form-aligned">
-    <ul>
-        <li>
-            <button type="submit" name="end" value="end" accesskey="e" class="float-right"><u>B</u>ack to start</button>
-        </li>
-    </ul>
+    <button type="submit" name="end" value="end" accesskey="e" class="float-right"><u>B</u>ack to start</button>
 </form>

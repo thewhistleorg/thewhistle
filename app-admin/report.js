@@ -139,7 +139,7 @@ class IncidentReport {
         try {
             [ ctx.session.geocode ] = await geocoder.geocode(body['location-address']);
         } catch (e) {
-            console.error('Geocoder error', e);
+            console.error('IncidentReport.processReportEntry: Geocoder error', e.message);
             ctx.session.geocode = null;
         }
 

@@ -128,7 +128,7 @@ class Handlers {
                 [ location ] = await geocoder.geocode(ctx.request.body.address);
             }
         } catch (e) {
-            console.error('Geocoder error', e);
+            console.error('ResourcesHandlers.processAdd: Geocoder error', e.message);
         }
 
         try {
@@ -184,7 +184,7 @@ class Handlers {
                 [ geocode ] = await geocoder.geocode(ctx.request.body.address);
             }
         } catch (e) {
-            console.error('Geocoder error', e);
+            console.error('ResourcesHandlers.processEdit: Geocoder error', e.message);
         }
 
         try {

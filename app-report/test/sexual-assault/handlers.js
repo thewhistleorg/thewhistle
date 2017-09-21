@@ -119,7 +119,7 @@ class Handlers {
                 [ ctx.session.geocode ] = await geocoder.geocode(ctx.session.report['at-address']);
             }
         } catch (e) {
-            console.error('Geocoder error', e);
+            console.error('Handlers.getSubmit: Geocoder error', e.message);
         }
         // make sure only one of generated-name and existing-name are recorded, and make it 1st property of report
         if (ctx.session.report['existing-name']) { delete ctx.session.report['generated-name']; ctx.session.report = Object.assign({ 'existing-name': null }, ctx.session.report); }

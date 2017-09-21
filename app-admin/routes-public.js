@@ -13,7 +13,9 @@ const router = require('koa-router')(); // router middleware for koa
 
 router.get('/', async function getIndexPage(ctx) {
     // if user logged in, redirect to user's home page
-    if (ctx.state.user) return ctx.redirect('/dashboard/'+ctx.state.user.name);
+    //if (ctx.state.user) return ctx.redirect('/dashboard/'+ctx.state.user.name);
+    // for the moment, we will redirect to the list of reports, as user's home page dashboard is not ready
+    if (ctx.state.user) return ctx.redirect('/reports');
 
     // otherwise render index page
     await ctx.render('index');

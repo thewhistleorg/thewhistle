@@ -57,7 +57,8 @@ describe('Admin app'+' ('+app.env+')', function() {
             const response = await request.get(location).set(headers);
             expect(response.status).to.equal(200);
             const document = new JsDom(response.text).window.document;
-            expect(document.querySelector('title').textContent).to.match(/.*Activity.+/);
+            //expect(document.querySelector('title').textContent).to.match(/.*Activity.+/); home page is temporarily list of reports
+            expect(document.querySelector('title').textContent).to.equal('Reports list');
             // nav should be /, reports, analysis×2, users, resources, logout
             expect(document.querySelectorAll('header nav li').length).to.equal(6);
         });

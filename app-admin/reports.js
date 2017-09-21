@@ -85,7 +85,7 @@ class ReportsHandlers {
                 updatedBy:        lastUpdate.by,
                 assignedTo:       rpt.assignedTo ? users.get(rpt.assignedTo.toString()).username : '',
                 status:           rpt.status || '', // ensure status is string
-                summary:          rpt.summary || `<span class="grey" title="submitted description">[${rpt.submitted['Description']}]</span>`,
+                summary:          rpt.summary || `<span title="submitted description">[${rpt.submitted['Description']}]</span>`,
                 tags:             rpt.tags,
                 reportedOnPretty: prettyDate(rpt._id.getTimestamp()),
                 reportedOnFull:   dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),

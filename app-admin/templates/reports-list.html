@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.0/css/bootstrap-slider.min.css" integrity="sha256-SimsGsu3ragCO+uhwd4Um5PUzUuc3Eg+pxshtVHXYpM=" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/table.css">
     <link rel="stylesheet" href="/css/reports-filter.css">
     <style>
         /* TODO: maybe won't want to keep delete function on this page, but useful for testing */
@@ -42,19 +43,19 @@
     <script src="//unpkg.com/dateformat@2.0.0/lib/dateformat.js"></script>
     <script src="/js/report.js"></script>
     <script src="/js/reports.js"></script>
-    <script> const slider = { oldest: '{{oldest}}', latest: '{{latest}}' }; </script>
+    <script> const slider = { oldest: '{{oldest}}', latest: '{{latest}}' , sort: '{{sort}}'}; </script>
     <script src="/js/reports-filter.js"></script>
     <script> // list of reports
         'use strict';
         document.addEventListener('DOMContentLoaded', async function() { // reports list
 
             // show/hide delete button on hover over report tr
-            document.querySelectorAll('tr[id]').forEach(tr => tr.onmouseenter = function showDeleteButton() {
-                this.querySelector('button').classList.remove('hide');
-            });
-            document.querySelectorAll('tr[id]').forEach(tr => tr.onmouseleave = function hideDeleteButton() {
-                this.querySelector('button').classList.add('hide');
-            });
+            // document.querySelectorAll('tr[id]').forEach(tr => tr.onmouseenter = function showDeleteButton() {
+            //     this.querySelector('button').classList.remove('hide');
+            // });
+            // document.querySelectorAll('tr[id]').forEach(tr => tr.onmouseleave = function hideDeleteButton() {
+            //     this.querySelector('button').classList.add('hide');
+            // });
 
             // report deletion confirmation pop-up
             document.querySelectorAll('form.delete').forEach(form => form.onsubmit = function confirmDelete() {
@@ -62,7 +63,7 @@
             });
 
             // sorting: set search field or reverse current sort order
-            document.querySelectorAll('span[data-sort]').forEach(el => el.onclick = function() {
+            document.querySelectorAll('th[data-sort]').forEach(el => el.onclick = function() {
                 const qs = Qs.parse(location.search.slice(1));
                 const sort = this.dataset.sort;
                 if (!qs.sort && sort=='updated') {
@@ -79,7 +80,7 @@
                 // TODO: if already sorted, use window.location.replace() to avoid excessive history
                 window.location.href = window.location.pathname + (Qs.stringify(qs) ? '?'+Qs.stringify(qs) : '');
             });
-            const sortIndicator = document.querySelector('span[data-sort={{sort.column}}]');
+            const sortIndicator = document.querySelector('th[data-sort={{sort.column}}] .fa');
             sortIndicator.style.color = '#666666';
             sortIndicator.classList.remove('fa-sort');
             sortIndicator.classList.add('{{sort.asc}}'=='+' ? 'fa-sort-asc' : 'fa-sort-desc');
@@ -102,59 +103,89 @@
 
 <main>
 
-<div class="float-right">
-  <span>Export: CSV </span>
-  <a href="{{exportCsv}}" title="Save as CSV" class="fa fa-file-excel-o"></a>
-  <span>/ PDF </span>
-  <a href="{{exportPdf}}" title="Save as PDF" class="fa fa-file-pdf-o"></a>
+<div class="float-right bold">
+    <span>Export to</span>
+    <a href="{{exportCsv}}" title="Save as CSV"> CSV </a>
+    <span>/</span>
+    <a href="{{exportPdf}}" title="Save as PDF">PDF</a>
 </div>
 
-<h1>Reports</h1>
+<h2 class="page-header-title">Reports</h2>
 
 {{>errpartial}}
 
 {{>filterpartial}}
 
-<nav class="tabs">
+<h5>Result ({{count}})</h5>
+
+<!-- "The map wont be relevant until we start on Gen 2"  -->
+<!-- Disabling the tabs since we don't have map for now -->
+
+<!-- <nav class="tabs">
     <ul>
         <li class="active"><a href="/reports">List ({{count}})</a></li>
         <li><a href="/reports-map{{@koa.request.search}}">Map</a></li>
     </ul>
-</nav>
+</nav> -->
 
 
-<table class="pure-table w100pc custom-table margin-tweak">
+<table class="pure-table w100pc custom-table margin-tweak drop-shadow clickable-row">
     <tr>
-        <th>updated <span data-sort="updated" class="float-right fa fa-sort"></span></th>
-        <th>assigned to <span data-sort="assigned" class="float-right fa fa-sort"></span></th>
-        <th>status <span data-sort="status" class="float-right fa fa-sort"></span></th>
-        <th>summary <span data-sort="summary" class="float-right fa fa-sort"></span></th>
-        <th>tags</th>
-        <th>submitted <span data-sort="submitted" class="float-right fa fa-sort"></span></th>
-        <th>location <span data-sort="location" class="float-right fa fa-sort"></span></th>
-        <th>from <span data-sort="from" class="float-right fa fa-sort"></span></th>
-        <th></th>
+        <th data-sort="updated" class="w6">updated <span  class="float-right fa fa-sort"></span></th>
+        <th data-sort="summary">description <span  class="float-right fa fa-sort"></span></th>
+        <th data-sort="submitted" class="w6">submitted <span  class="float-right fa fa-sort"></span></th>
+        <th data-sort="assigned" class="w6">assigned to <span  class="float-right fa fa-sort"></span></th>
+        <th data-sort="status" class="w6">status <span  class="float-right fa fa-sort"></span></th>
+        <th class="w6">tags</th>
+        <th data-sort="location" class="w6">location <span  class="float-right fa fa-sort"></span></th>
+        <th data-sort="from" class="w6">from <span  class="float-right fa fa-sort"></span></th>
+        <!-- <th></th>
         <th class="action"></th>
-        <th class="action"></th>
+        <th class="action"></th> -->
     </tr>
     {{#reports}}
-    <tr id="{{_id}}">
-        <td data-ago="{{updatedOn}}" title="{{updatedOnPretty}} by @{{updatedBy}}" class="align-right">{{updatedAgo}}</td>
+
+    <tr id="{{_id}}" onClick="window.open('/reports/{{_id}}')">
+
+        <td data-ago="{{updatedOn}}" title="{{updatedOnPretty}} by @{{updatedBy}}" class="grey">
+          <span>{{updatedAgo}}</span>
+        </td>
+
+        <td >
+          <span>{{{summary}}}</span>
+        </td>
+
+        <td title="{{reportedOnFull}} by {{reportedBy}}" class="grey nowrap">
+          <span>{{reportedOnPretty}}</span>
+        </td>
+
         <td class="assigned">{{#if assignedTo}}@{{assignedTo}}{{/if}}</td>
-        <td>{{status}}</td>
-        <td>{{{summary}}}</td>
-        <td>{{#tags}}{{{this}}} {{/tags}}</td>
-        <td title="{{reportedOnFull}} by {{reportedBy}}" class="align-right nowrap">{{reportedOnPretty}}</td>
-        <td>{{location}}</td>
-        <td>{{name}}</td>
-        <td class="small grey">{{#if comments.length}}<span class="fa-stack fa-1x"><span class="fa fa-comment-o fa-stack-2x"></span><a href="/reports/{{_id}}" class="fa-stack-1x fa-stack-text fa-inverse">{{comments.length}}</a></span>{{/if}}</td>
+
+        <td>
+          <span>{{status}}</span>
+        </td>
+
+        <td>
+          {{#tags}}{{{this}}} {{/tags}}
+        </td>
+
+        <td>
+          <span>{{location}}</span>
+        </td>
+
+        <td class="grey">
+          <span>{{name}}</span>
+        </td>
+        <!-- <td class="small grey">{{#if comments.length}}<span class="fa-stack fa-1x"><span class="fa fa-comment-o fa-stack-2x"></span><a href="/reports/{{_id}}" class="fa-stack-1x fa-stack-text fa-inverse">{{comments.length}}</a></span>{{/if}}</td>
         <td class="action"><a href="/reports/{{_id}}" title="view report" class="fa fa-search"></a></td>
-        <td class="action"><form action="/reports/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" class="fa fa-trash hide"></button></form></td>
+        <td class="action"><form action="/reports/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" class="fa fa-trash hide"></button></form></td> -->
     </tr>
+
     {{/reports}}
 </table>
 
-<p class="grey"><b>Notes</b></p>
+<!-- Disabling the dev notes for now -->
+<!-- <p class="grey"><b>Notes</b></p>
 <p class="grey"><i>Updated</i> filter: the <i>updated</i> column shows 'ago' vaues: should the
     <i>updated</i> filter also be by 'ago' values, or by dates?</p>
 <p class="grey">Formatting issues to be addressed on <i>submitted</i> range filter.</p>
@@ -165,7 +196,7 @@
 <p class="grey">If number of <i>report fields</i> is likely to be very large, perhaps that should be
     implemented using some form of autocomplete.</p>
 <p class="grey">Think about use of history.</p>
-<p class="grey">Should there be a 'delete report' function?</p>
+<p class="grey">Should there be a 'delete report' function?</p> -->
 
 </main>
 

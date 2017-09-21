@@ -58,12 +58,12 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
     });
 
     // prevent click on (summary) input propagating up to li
-    document.querySelectorAll('#search .pure-menu-item li input').forEach(el => el.onclick = function filterOpenInput(event) {
+    document.querySelectorAll('#search input[name="summary"]').forEach(el => el.onclick = function filterOpenInput(event) {
         event.stopPropagation();
     });
 
     // when (summary) input entered, apply filter
-    document.querySelectorAll('#search .pure-menu-item li input').forEach(el => el.onchange = function filterAddInput() {
+    document.querySelectorAll('#search input[name="summary"]').forEach(el => el.onchange = function filterAddInput() {
         addFilter(this.name, this.value);
         applyFilter();
     });

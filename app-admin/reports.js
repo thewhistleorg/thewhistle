@@ -1180,7 +1180,9 @@ function lowestDistinctGeographicLevel(reports) {
  */
 
 function truncate(string, limit){
-   if ((typeof string != 'undefined') && (string.length > limit))
+   if ((typeof string === 'undefined') || (string === null))
+      return false
+   if (string.length > limit)
       return string.substring(0,limit)+'...';
    else
       return string;

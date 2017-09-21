@@ -134,3 +134,7 @@ ul.accordion input:checked + label::after {
   clip: auto;
   padding: 1.5rem;
 }
+
+.accordion__trigger:hover {
+    background-color: #F0F3F4;
+}

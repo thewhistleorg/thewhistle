@@ -1,0 +1,65 @@
+/*Custom table */
+
+
+/*override pure striped background*/
+
+.custom-table tr:nth-child(2n-1) td {
+    /*background-color: #fafbfd;*/
+}
+
+table.custom-table {
+    border-color: #F0F3F4;
+    background: #fff;
+}
+
+table.custom-table td, table.custom-table th {
+    border-color: #F0F3F4;
+    /*border-left: 0;*/
+    text-align: left;
+}
+
+table.custom-table th {
+    color: #50addb;
+    font-style: normal;
+    font-weight: bold;
+    padding: 10px 10px;
+    background-color: #fafbfd;
+    border-bottom: 1px solid #F0F3F4;
+}
+
+table.custom-table td {
+    padding: 16px 8px;
+    vertical-align: middle;
+    border-bottom: 1px solid #F0F3F4;
+}
+
+
+table.custom-table th .fa {
+    margin: 4px -6px;
+    opacity: 0.2;
+}
+
+.clickable-row tr:hover {
+    background-color:#fafbfd;
+    cursor:pointer;
+}
+
+table.custom-table td.action, table.custom-table th.action { padding: 0; }
+td.action { min-width: 0; }
+
+td.action a {
+    font-size: 1.4em;
+    padding: 5px;
+}
+
+th[data-sort]{
+  cursor: pointer;
+}
+th[data-sort]:hover {
+  background: #f6f7f9;
+}
+
+/*tweak margin*/
+.custom-table.margin-tweak {
+      margin-top: 3px;
+}

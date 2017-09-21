@@ -186,9 +186,9 @@ class Handlers {
      * Shows local resources grouped by services they offer.
      */
     static async getWhatnext(ctx) {
-        // get all resources within 10km of geocoded location
+        // get all resources within 20km of geocoded location
         const resources = ctx.session.geocode
-            ? await Resource.getNear('test', ctx.session.geocode.latitude, ctx.session.geocode.longitude, 10e3)
+            ? await Resource.getNear('test', ctx.session.geocode.latitude, ctx.session.geocode.longitude, 20e3)
             : [];
 
         // add distance from geocoded location to each resource, & convert phone/email arrays to lists
@@ -200,22 +200,38 @@ class Handlers {
             resource.distKm = (resource.dist/1000).toPrecision(2); // used for display
             resource.phone = resource.phone.map(p => `<span class="nowrap">${p}</span>`).join(', ');
             resource.email = resource.email.join(' ');
+            resource.services = resource.services.join('; ');
         }
 
-        // extract list of distinct services from local resources
-        const servicesDups = resources.map(r => r.services).reduce((a, b) => a.concat(b), []);
-        const servicesDedup = [ ...new Set(servicesDups) ];
-        const services = servicesDedup.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
+        // extract list of distinct services from local resources - not currently used
+        //const servicesDups = resources.map(r => r.services).reduce((a, b) => a.concat(b), []);
+        //const servicesDedup = [ ...new Set(servicesDups) ];
+        //const services = servicesDedup.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
 
-        // make a list of resources grouped by services they offer
+        // make a list of resources grouped by services they offer - not currently used
+        //const resourcesGrouped = {};
+        //for (const service of services) {
+        //    resourcesGrouped[service] = resources.filter(r => r.services.includes(service));
+        //    resourcesGrouped[service].sort((a, b) => a.dist < b.dist ? -1 : 1);
+        //    resourcesGrouped[service] = resourcesGrouped[service].slice(0, 3);
+        //}
+
+        // extract list of distinct categories from local resources (currently just legal, medical,
+        // counselling, but keep it flexible...)
+        const categoriesDups = resources.map(r => r.category);
+        const categoriesDedup = [ ...new Set(categoriesDups) ];
+        const categories = categoriesDedup.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
+
+        // make list of resources grouped by category
         const resourcesGrouped = {};
-        for (const service of services) {
-            resourcesGrouped[service] = resources.filter(r => r.services.includes(service));
-            resourcesGrouped[service].sort((a, b) => a.dist < b.dist ? -1 : 1);
-            resourcesGrouped[service] = resourcesGrouped[service].slice(0, 3);
+        for (const category of categories) {
+            resourcesGrouped[category] = resources.filter(r => r.category == category);
+            resourcesGrouped[category].sort((a, b) => a.dist < b.dist ? -1 : 1);
+            resourcesGrouped[category] = resourcesGrouped[category].slice(0, 3); // TODO: ??
         }
 
-        await ctx.render('whatnext', { resources: resourcesGrouped });
+
+        await ctx.render('whatnext', { categories: resourcesGrouped });
     }
 
 }

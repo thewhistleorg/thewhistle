@@ -49,19 +49,6 @@
         'use strict';
         document.addEventListener('DOMContentLoaded', async function() { // reports list
 
-            // show/hide delete button on hover over report tr
-            // document.querySelectorAll('tr[id]').forEach(tr => tr.onmouseenter = function showDeleteButton() {
-            //     this.querySelector('button').classList.remove('hide');
-            // });
-            // document.querySelectorAll('tr[id]').forEach(tr => tr.onmouseleave = function hideDeleteButton() {
-            //     this.querySelector('button').classList.add('hide');
-            // });
-
-            // report deletion confirmation pop-up
-            document.querySelectorAll('form.delete').forEach(form => form.onsubmit = function confirmDelete() {
-                return confirm('Are you sure you want to delete this report?');
-            });
-
             // sorting: set search field or reverse current sort order
             document.querySelectorAll('th[data-sort]').forEach(el => el.onclick = function() {
                 const qs = Qs.parse(location.search.slice(1));
@@ -143,44 +130,34 @@
         <th class="action"></th>
         <th class="action"></th> -->
     </tr>
+
     {{#reports}}
-
     <tr id="{{_id}}" onClick="window.open('/reports/{{_id}}', '_self')">
-
         <td data-ago="{{updatedOn}}" title="{{updatedOnPretty}} by @{{updatedBy}}" class="grey">
           <span>{{updatedAgo}}</span>
         </td>
-
         <td >
           <span>{{{submittedDesc}}}</span>
         </td>
-
         <td title="{{reportedOnFull}} by {{reportedBy}}" class="grey nowrap" style="text-align:right">
           <span>{{{reportedOnPretty}}}</span>
         </td>
-
-        <td class="assigned">{{#if assignedTo}}@{{assignedTo}}{{/if}}</td>
-
+        <td class="assigned">
+            {{#if assignedTo}}@{{assignedTo}}{{/if}}
+        </td>
         <td>
           <span>{{status}}</span>
         </td>
-
         <td>
           {{#tags}}{{{this}}} {{/tags}}
         </td>
-
         <td>
           <span>{{location}}</span>
         </td>
-
         <td class="grey">
           <span>{{name}}</span>
         </td>
-        <!-- <td class="small grey">{{#if comments.length}}<span class="fa-stack fa-1x"><span class="fa fa-comment-o fa-stack-2x"></span><a href="/reports/{{_id}}" class="fa-stack-1x fa-stack-text fa-inverse">{{comments.length}}</a></span>{{/if}}</td>
-        <td class="action"><a href="/reports/{{_id}}" title="view report" class="fa fa-search"></a></td>
-        <td class="action"><form action="/reports/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" class="fa fa-trash hide"></button></form></td> -->
     </tr>
-
     {{/reports}}
 </table>
 
@@ -196,7 +173,6 @@
 <p class="grey">If number of <i>report fields</i> is likely to be very large, perhaps that should be
     implemented using some form of autocomplete.</p>
 <p class="grey">Think about use of history.</p>
-<p class="grey">Should there be a 'delete report' function?</p> -->
 
 </main>
 

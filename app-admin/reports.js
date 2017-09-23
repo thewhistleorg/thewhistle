@@ -785,7 +785,8 @@ class ReportsHandlers {
             files:            report.submitted.files, // for tabs
             updates:          updates,
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
-            submittedDesc:    truncate(desc,70) || `<i title="submitted description" class="grey">No Description</i>`
+            submittedDesc:    truncate(desc,70) || `<i title="submitted description" class="grey">No Description</i>`,
+            showDeleteButton: ctx.app.env != 'production',
         };
         extra.reportDescription = report.summary
             ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`

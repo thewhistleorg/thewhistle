@@ -166,7 +166,8 @@ describe('Report model', function() {
 
     describe('filter', async function() {
         it('filter by submitted test search', async function() {
-            const query = { $and: [ { archived: false }, { 'submitted.Description': { '$regex': 'report', '$options': 'i' } } ] };
+            // emulate buildFilter() free-text filter
+            const query = { $and: [ { archived: false }, { 'submitted.Description': { '$regex': 'test report', '$options': 'i' } } ] };
             const rpts = await Report.find('test', query);
             expect(rpts).to.be.an('array');
             expect(rpts.length).to.equal(1);

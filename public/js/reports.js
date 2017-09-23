@@ -1,9 +1,14 @@
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/* JavaScript for various admin app pages                                                         */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
 'use strict';
+/* eslint-env browser */
 
 
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    // keep updated-ago current every 10 secs
+    // listener to keep updated-ago current every 10 secs
     function updateAgo() {
         document.querySelectorAll('td[data-ago]').forEach(td => {
             if (td.dataset.ago) td.textContent = ago(td.dataset.ago);

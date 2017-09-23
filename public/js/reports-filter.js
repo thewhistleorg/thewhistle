@@ -1,5 +1,11 @@
-/* eslint-env browser *//* global Qs, Slider, slider, dateFormat */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/* JavaScript for managing filtering functions in reports-list.html                               */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
 'use strict';
+/* eslint-env browser *//* global Qs, Slider, slider, dateFormat */
+
+
 document.addEventListener('DOMContentLoaded', function() { // filtering
 
     // convert query string filters to filter spans in #search-display
@@ -44,14 +50,14 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
     });
 
     // auto-submit form on click on 'assigned to' in list
-    document.querySelectorAll('td.assigned').forEach(el => el.onclick = function filterAdd(event) {
+    document.querySelectorAll('td.assigned').forEach(el => el.onclick = function filterAdd() {
         // add filter span and apply filter
         addFilter('assigned', this.textContent.slice(1)); // strip off '@'
         applyFilter();
     });
 
     // auto-submit form on click on 'tag' in list
-    document.querySelectorAll('span.tag').forEach(el => el.onclick = function filterAdd(event) {
+    document.querySelectorAll('span.tag').forEach(el => el.onclick = function filterAdd() {
         // add filter span and apply filter
         addFilter('tag', this.textContent);
         applyFilter();

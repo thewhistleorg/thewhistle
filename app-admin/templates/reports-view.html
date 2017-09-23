@@ -17,9 +17,13 @@
         'use strict';
 
         // map
+        {{#if geocode}}
         function initMap() {
             initialiseMap(google, '{{_id}}', '{{name}}', {{lat}}, {{lng}}, '{{reportedOnDay}}', '{{reportedOnFull}}', {{highlight}});
         }
+        {{else}}
+        function initMap() {}
+        {{/if}}
 
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -178,6 +182,7 @@
                 </li>
 
                 <li id="geocoding">
+                    {{#if geocode}}
                     <span class="card-header">LOCATION MAP <a href="https://maps.google.com/maps/search/{{formattedAddress}}" class="fa fa-globe"></a></span>
                     <div class="padding-15">
                         <!-- <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p> -->
@@ -192,9 +197,11 @@
                             </li>
                         </ul>
                     </div>
+                    {{else}}
+                    <span class="card-header">LOCATION</span>
+                    <div class="padding-15">No incident location identified</div>
+                    {{/if}}
                 </li>
-
-
 
             </ul>
         </div>
@@ -253,48 +260,48 @@
                         </form>
                     </div>
                 </li> -->
-                <ul class="accordion_2">
-                    <li class="accordion__item">
-                        <input type="checkbox" class="accordion__toggle" id="toggle-updates" />
-                        <label class="accordion__trigger" for="toggle-updates"><span class="card-header">Audit trail</span></label>
-                        <div class="accordion__target">
-                          <table id="updates">
-                              {{#updates}}
-                              <tr id="{{_id}}">
-                                  <td><span class="nowrap">{{onDate}}</span> {{onTime}}</td>
-                                  <td>@{{by}}</td>
-                                  <td>{{description}}</td>
-                              </tr>
-                              {{/updates}}
-                          </table>
-                        </div>
-                    </li>
-                </ul>
+                <li class="accordion__item">
+                    <input type="checkbox" class="accordion__toggle" id="toggle-updates" />
+                    <label class="accordion__trigger" for="toggle-updates"><span class="card-header">Audit trail</span></label>
+                    <div class="accordion__target">
+                        <table id="updates">
+                            {{#updates}}
+                            <tr id="{{_id}}">
+                                <td><span class="nowrap">{{onDate}}</span> {{onTime}}</td>
+                                <td>@{{by}}</td>
+                                <td>{{description}}</td>
+                            </tr>
+                            {{/updates}}
+                        </table>
+                    </div>
+                </li>
                 <li>
-                  <span class="card-header">Archive</span>
+                    <span class="card-header">Archive</span>
 
-                  <form method="post" class="pure-form pure-form-aligned">
-                      <div class="pure-control-group">
-                          {{#checked archived}}
-                          <input type="radio" name="archived" id="archived-n" value="n"> <label for="archived-n">Active</label>
-                          <input type="radio" name="archived" id="archived-y" value="y"> <label for="archived-y">Archived</label>
-                          {{/checked}}
-                      </div>
-                  </form>
+                    <form method="post" class="pure-form pure-form-aligned">
+                        <div class="pure-control-group">
+                            {{#checked archived}}
+                            <input type="radio" name="archived" id="archived-n" value="n">
+                            <label for="archived-n">Active</label>
+                            <input type="radio" name="archived" id="archived-y" value="y">
+                            <label for="archived-y">Archived</label>
+                            {{/checked}}
+                        </div>
+                    </form>
 
-                  {{#if otherReports}}
-                  <p>Other reports by {{by}}:</p>
-                  <table>
-                      {{#otherReports}}
-                      <tr>
-                          <td></td>
-                          <td><a href="/reports/{{_id}}">{{reported}}</a></td>
-                          <td>{{name}}</td>
-                          <td>{{summary}}</td>
-                      </tr>
-                      {{/otherReports}}
-                  </table>
-                  {{/if}}
+                    {{#if otherReports}}
+                    <p>Other reports by {{by}}:</p>
+                    <table>
+                        {{#otherReports}}
+                        <tr>
+                            <td></td>
+                            <td><a href="/reports/{{_id}}">{{reported}}</a></td>
+                            <td>{{name}}</td>
+                            <td>{{summary}}</td>
+                        </tr>
+                        {{/otherReports}}
+                    </table>
+                    {{/if}}
                 </li>
             </ul>
         </div>

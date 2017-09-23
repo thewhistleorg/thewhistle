@@ -774,8 +774,8 @@ class ReportsHandlers {
             reportHtml:       jsObjectToRichHtml(report.submitted,['Anonymous id','files']), // submitted incident report
             geocodeHtml:      jsObjectToHtml(report.geocode),
             formattedAddress: encodeURIComponent(report.geocode.formattedAddress),
-            lat:              report.geocode ? report.geocode.latitude  : null,
-            lng:              report.geocode ? report.geocode.longitude : null,
+            lat:              report.geocode.latitude  ? report.geocode.latitude  : 0,
+            lng:              report.geocode.longitude ? report.geocode.longitude : 0,
             highlight:        Math.max(Math.round(100 * (report._id.getTimestamp() - new Date() + y) / y), 0),
             comments:         comments,
             users:            users,                  // for select
@@ -813,6 +813,8 @@ class ReportsHandlers {
                 }
             }
         }
+
+        if (Object.keys(report.geocode).length == 0) report.geocode = false;
 
         await ctx.render('reports-view', Object.assign(report, extra));
         Report.flagView(db, ctx.params.id, ctx.state.user.id);

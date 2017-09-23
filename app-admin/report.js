@@ -135,7 +135,7 @@ class IncidentReport {
         ctx.session.report = body;
 
         // geocode location
-        const geocoder = Geocoder();
+        const geocoder = Geocoder({ provider: 'google', apiKey: 'AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw' });
         try {
             [ ctx.session.geocode ] = await geocoder.geocode(body['location-address']);
         } catch (e) {

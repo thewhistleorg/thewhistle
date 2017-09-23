@@ -121,7 +121,7 @@ class Handlers {
             : [];
 
         // geocode address
-        const geocoder = Geocoder();
+        const geocoder = Geocoder({ provider: 'google', apiKey: 'AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw' });
         let location = null;
         try {
             if (ctx.request.body.address) {
@@ -177,7 +177,7 @@ class Handlers {
             : [];
 
         // geocode address
-        const geocoder = Geocoder();
+        const geocoder = Geocoder({ provider: 'google', apiKey: 'AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw' });
         let geocode = null;
         try {
             if (ctx.request.body.address) {

@@ -128,7 +128,11 @@ class Handlers {
         const prettyReport = prettifyReport(ctx.session.report);
         const formattedAddress = ctx.session.geocode ? ctx.session.geocode.formattedAddress : '[unrecognised address]';
         const files = ctx.session.report.files.map(f => f.name).join(', ');
-        const context = { reportHtml: jsObjectToHtml(prettyReport), formattedAddress, files };
+        const context = {
+            reportHtml:       jsObjectToHtml.usingTable(prettyReport),
+            formattedAddress: formattedAddress,
+            files:            files ,
+        };
 
         await ctx.render('submit', context);
     }

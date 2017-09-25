@@ -26,7 +26,6 @@ const User   = require('../models/user.js');
 const Update = require('../models/update.js');
 
 const jsObjectToHtml = require('../lib/js-object-to-html');
-const jsObjectToRichHtml = require('../lib/js-object-to-rich-html');
 
 
 class ReportsHandlers {
@@ -322,7 +321,7 @@ class ReportsHandlers {
             }
             const fields = {
                 _id:           rpt._id,
-                reportHtml:    jsObjectToHtml(rpt.submitted),
+                reportHtml:    jsObjectToHtml.usingTable(rpt.submitted),
                 updatedDate:   lastUpdate.on ? dateFormat(lastUpdate.on, 'd mmm yyyy') : '—',
                 updatedTime:   lastUpdate.on ? dateFormat(lastUpdate.on, 'HH:MM') : '',
                 updatedBy:     lastUpdate.by ? '@'+lastUpdate.by : '',
@@ -434,7 +433,7 @@ class ReportsHandlers {
         }
         const fields = { // as per exportPdf()
             _id:           rpt._id,
-            reportHtml:    jsObjectToHtml(rpt.submitted),
+            reportHtml:    jsObjectToHtml.usingTable(rpt.submitted),
             updatedDate:   lastUpdate.on ? dateFormat(lastUpdate.on, 'd mmm yyyy') : '—',
             updatedTime:   lastUpdate.on ? dateFormat(lastUpdate.on, 'HH:MM') : '',
             updatedBy:     lastUpdate.by ? '@'+lastUpdate.by : '',
@@ -771,8 +770,8 @@ class ReportsHandlers {
             reportedOnFull:   dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
             reportedOnTz:     dateFormat(report.reported, 'Z'),
             reportedBy:       report.by ? '@'+(await User.get(report.by)).username : report.name,
-            reportHtml:       jsObjectToRichHtml(report.submitted,['Anonymous id','files']), // submitted incident report
-            geocodeHtml:      jsObjectToHtml(report.geocode),
+            reportHtml:       jsObjectToHtml.usingHeading(report.submitted, [ 'Anonymous id','files' ], 'h3'),
+            geocodeHtml:      jsObjectToHtml.usingTable(report.geocode),
             formattedAddress: encodeURIComponent(report.geocode.formattedAddress),
             lat:              report.geocode.latitude  ? report.geocode.latitude  : 0,
             lng:              report.geocode.longitude ? report.geocode.longitude : 0,

@@ -56,7 +56,7 @@ class IncidentReport {
 
         const context = {
             reporter:            ctx.state.user.name,
-            reportHtml:          jsObjectToHtml(prettyReport),
+            reportHtml:          jsObjectToHtml.usingTable(prettyReport),
             formattedAddress:    ctx.session.geocode ? ctx.session.geocode.formattedAddress : '[unrecognised address]',
             formattedAddressUrl: encodeURIComponent(ctx.session.geocode ? ctx.session.geocode.formattedAddress : ''),
             files:               ctx.session.files.map(f => f.name).join(', '),

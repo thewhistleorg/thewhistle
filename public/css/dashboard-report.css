@@ -209,15 +209,15 @@ textarea {
     max-height: 80px;
 }
 
-/* for js-object-to-rich-html */
+/* for js-object-to-html */
 
-.json-to-html h3 {
+.js-obj-to-html h3 {
     margin: 0;
     font-weight: lighter;
     color: #6c949e;
 }
 
-.json-to-html p {
+.js-obj-to-html p {
     margin: 0 0 15px;
     padding-bottom: 4px;
     font-size: 1.2em;

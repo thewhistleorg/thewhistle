@@ -63,19 +63,19 @@
 
         <div class="pure-u-1 report-header-container drop-shadow">
           <div class="header-table">
-            <div class="header-table-Body">
-              <div class="header-table-Row">
-                <div class="header-table-Cell report-header">
+            <div class="header-table-body">
+              <div class="header-table-row">
+                <div class="header-table-cell report-header">
                   <div class="content-header">Description</div>
                   <div class="report-header-content">{{{submittedDesc}}}</div>
                 </div>
 
-                <div class="header-table-Cell">
+                <div class="header-table-cell">
                   <div class="content-header">Submitted</div>
                   <div class="report-header-content">{{reportedOnFull}}</div>
                 </div>
 
-                <div class="header-table-Cell">
+                <div class="header-table-cell">
                   <div class="content-header">Assigned to</div>
                   <form method="post" class="pure-form pure-form-aligned">
                       <div class="pure-control-group">
@@ -100,7 +100,7 @@
                   </form>
                 </div>
 
-                <div class="header-table-Cell">
+                <div class="header-table-cell">
                   <div class="content-header">Status</div>
                   <form method="post" class="pure-form pure-form-aligned">
                       <div class="pure-control-group">
@@ -114,7 +114,7 @@
                       </div>
                   </form>
                 </div>
-                <div class="header-table-Cell export-link">
+                <div class="header-table-cell export-link">
                   <a href="{{exportPdf}}" title="Save as PDF" class="bold">
                       <span>Export to PDF </span>
                   </a>
@@ -191,11 +191,11 @@
                     <div class="padding-15">
                         <!-- <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p> -->
                         <div id="map"></div>
-                        <ul class="accordion_2">
-                            <li class="accordion__item">
-                                <input type="checkbox" class="accordion__toggle" id="toggle-geo" />
-                                <label class="accordion__trigger " for="toggle-geo"><span class="content-header bold"><strong>More about location</strong></span></label>
-                                <div class="accordion__target">
+                        <ul class="accordion-2">
+                            <li class="accordion-item">
+                                <input type="checkbox" class="accordion-toggle" id="toggle-geo" />
+                                <label class="accordion-trigger " for="toggle-geo"><span class="content-header bold"><strong>More about location</strong></span></label>
+                                <div class="accordion-target">
                                   {{{geocodeHtml}}}
                                 </div>
                             </li>
@@ -264,10 +264,10 @@
                         </form>
                     </div>
                 </li> -->
-                <li class="accordion__item">
-                    <input type="checkbox" class="accordion__toggle" id="toggle-updates" />
-                    <label class="accordion__trigger" for="toggle-updates"><span class="card-header">Audit trail</span></label>
-                    <div class="accordion__target">
+                <li class="accordion-item">
+                    <input type="checkbox" class="accordion-toggle" id="toggle-updates" />
+                    <label class="accordion-trigger" for="toggle-updates"><span class="card-header">Audit trail</span></label>
+                    <div class="accordion-target">
                         <table id="updates">
                             {{#updates}}
                             <tr id="{{_id}}">

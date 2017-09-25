@@ -1,20 +1,19 @@
-/*Custom table */
+/* Custom table */
 
-
-/*override pure striped background*/
+/* override pure striped background */
 
 .custom-table tr:nth-child(2n-1) td {
-    /*background-color: #fafbfd;*/
+    /* background-color: #fafbfd; */
 }
 
 table.custom-table {
-    border-color: #F0F3F4;
-    background: #fff;
+    border-color: #f0f3f4;
+    background: #ffffff;
 }
 
 table.custom-table td, table.custom-table th {
-    border-color: #F0F3F4;
-    /*border-left: 0;*/
+    border-color: #f0f3f4;
+    /* border-left: 0; */
     text-align: left;
 }
 
@@ -22,17 +21,16 @@ table.custom-table th {
     color: #50addb;
     font-style: normal;
     font-weight: bold;
-    padding: 10px 10px;
+    padding: 10px;
     background-color: #fafbfd;
-    border-bottom: 1px solid #F0F3F4;
+    border-bottom: 1px solid #f0f3f4;
 }
 
 table.custom-table td {
     padding: 16px 8px;
     vertical-align: middle;
-    border-bottom: 1px solid #F0F3F4;
+    border-bottom: 1px solid #f0f3f4;
 }
-
 
 table.custom-table th .fa {
     margin: 4px -6px;
@@ -40,8 +38,8 @@ table.custom-table th .fa {
 }
 
 .clickable-row tr:hover {
-    background-color:#fafbfd;
-    cursor:pointer;
+    background-color: #fafbfd;
+    cursor: pointer;
 }
 
 table.custom-table td.action, table.custom-table th.action { padding: 0; }
@@ -52,14 +50,15 @@ td.action a {
     padding: 5px;
 }
 
-th[data-sort]{
-  cursor: pointer;
-}
-th[data-sort]:hover {
-  background: #f6f7f9;
+th[data-sort] {
+    cursor: pointer;
 }
 
-/*tweak margin*/
+th[data-sort]:hover {
+    background: #f6f7f9;
+}
+
+/* tweak margin */
 .custom-table.margin-tweak {
-      margin-top: 3px;
+    margin-top: 3px;
 }

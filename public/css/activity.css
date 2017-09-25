@@ -1,7 +1,6 @@
 /*
-Following css styles are for quick UI changes and they must be optimised
-*/
-
+ * Following css styles are for quick UI changes and they must be optimised
+ */
 
 ul.accordion label {
     color: #6d6d6d;
@@ -12,15 +11,15 @@ ul.accordion label {
     line-height: 4;
     cursor: inherit;
     border: 0;
-    border-bottom: 1px solid #F0F3F4;
+    border-bottom: 1px solid #f0f3f4;
 }
 
 ul.accordion table, ul.accordion p {
-    padding:5px 10px;
+    padding: 5px 10px;
     display: block;
 }
 
-ul.accordion li:last-child:not(:nth-child(even)){
+ul.accordion li:last-child:not(:nth-child(even)) {
     width: 95.5%;
 }
 
@@ -30,26 +29,25 @@ ul.accordion li {
     float: left;
     min-height: 196px;
     margin: 15px;
-    border: 1px solid #F0F3F4;
-    -moz-box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
-    -webkit-box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
-    box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f3f4;
+    box-shadow: 0 2px 7px 0 rgba(0, 0, 0, 0.08);
 }
 
 ul.accordion label::after {
-    display:none;
+    display: none;
 }
 
 .activity-page h2 {
     margin: 15px 15px 4px;
-    border-bottom: 1px solid #F0F3F4;
+    border-bottom: 1px solid #f0f3f4;
     padding-bottom: 8px;
     width: 96%;
 }
-ul.accordion input + label ~ *{
-  display: block;
+
+ul.accordion input + label ~ * {
+    display: block;
 }
 
-.width-100{
-  width:95.5%!important;
+.width-100 {
+    width: 95.5% !important;
 }

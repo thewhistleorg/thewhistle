@@ -1,21 +1,23 @@
 /* The Whistle stylesheet */
 
+/* stylelint block-opening-brace-space-before: [ "always", { "severity": "warning" } ] */
+
 @import url('//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i');
 
 body {
-    font-family: 'Open Sans', "Segoe UI", Tahoma, sans-serif;
+    font-family: 'Open Sans', 'Segoe UI', Tahoma, sans-serif;
     padding: 0;
-    background: #F0F3F4;
+    background: #f0f3f4;
 }
 
 /* override pure css font because we do not need the Pure css's font-family */
 .pure-g [class*=pure-u] {
-  font-family: 'Open Sans', "Segoe UI", Tahoma, sans-serif!important;
+    font-family: 'Open Sans', 'Segoe UI', Tahoma, sans-serif !important;
 }
 
-/* fix inconsistent pure form input field height*/
-.pure-form input:not([type]){
-  height: 2.25em;
+/* fix inconsistent pure form input field height */
+.pure-form input:not([type]) {
+    height: 2.25em;
 }
 
 main {
@@ -25,7 +27,7 @@ main {
 }
 
 h1 {
-    border-bottom: 1px solid #F0F3F4;
+    border-bottom: 1px solid #f0f3f4;
     color: #033549;
     font-size: 3em;
     font-weight: 300;
@@ -38,16 +40,16 @@ h2 {
     font-weight: normal;
 }
 
-.page-header-title{
-  padding: 0;
-  margin: 8px 0 8px;
+.page-header-title {
+    padding: 0;
+    margin: 8px 0;
 }
 
 h3 {
     color: #033549;
     font-size: 1.2em;
     font-weight: bold;
-    /*font-style: italic;*/
+    /* font-style: italic; */
 }
 
 h4 {
@@ -59,15 +61,15 @@ h4 {
 
 .logo-container {
     content: url(../img/logo-128x22.png);
-    /*margin-left: 40px;*/
-    /*padding: 0 1em;*/
+    /* margin-left: 40px; */
+    /* padding: 0 1em; */
 }
 
 header nav {
     background: #033549;
     font: 300 1.2em 'Open Sans';
     margin: 0;
-    /*padding-top: 0.4em*/
+    /* padding-top: 0.4em */
 }
 
 header nav ul {
@@ -75,27 +77,26 @@ header nav ul {
 }
 
 header nav li {
-    margin: 0 0;
+    margin: 0;
 }
 
 header nav a, header nav a:visited {
-    color: #fff;
+    color: #ffffff;
 }
 
 header nav a:hover {
-    color: #fff;
+    color: #ffffff;
     text-decoration: none;
 }
 
-
 /* override pure menu background colour */
 
-header nav .pure-menu-active>.pure-menu-link, header nav .pure-menu-link:hover, header nav .pure-menu-link:focus {
+header nav .pure-menu-active > .pure-menu-link, header nav .pure-menu-link:hover, header nav .pure-menu-link:focus {
     background-color: #7691b0;
 }
 
 header nav .pure-menu-link {
-    color: #fff;
+    color: #ffffff;
     padding: 0.8em 1em;
 }
 
@@ -104,15 +105,13 @@ header nav .pure-menu-children .pure-menu-link {
 }
 
 header nav .pure-menu-children .pure-menu-link:hover {
-    color: #fff;
+    color: #ffffff;
 }
 
 .pure-menu-children { /* light border around drop-down menu */
-      background-color: #fdfdfd;
-      border: 1px solid #eeeeee;
+    background-color: #fdfdfd;
+    border: 1px solid #eeeeee;
 }
-
-
 
 /*
  * tabs within pages (report details, user dashboard)
@@ -128,9 +127,9 @@ header nav .pure-menu-children .pure-menu-link:hover {
 }
 
 .tabs ul {
-    border: 1px solid #F0F3F4;
+    border: 1px solid #f0f3f4;
     margin: 5px 0;
-    border-bottom: 4px solid #F0F3F4;
+    border-bottom: 4px solid #f0f3f4;
     background: #fafbfd;
 }
 
@@ -138,16 +137,16 @@ header nav .pure-menu-children .pure-menu-link:hover {
     text-align: center;
     margin: -4px -2px -4px;
     padding: 0;
-    border-right: 1px solid #F0F3F4;
+    border-right: 1px solid #f0f3f4;
 }
 
 .tabs li:first-child {
-      margin-left: 0;
+    margin-left: 0;
 }
 
 .tabs .active {
-      border-top: 4px solid #4A90E2;
-      border-right: 1px solid #F0F3F4;
+    border-top: 4px solid #4a90e2;
+    border-right: 1px solid #f0f3f4;
 }
 
 .tabs li a {
@@ -155,7 +154,7 @@ header nav .pure-menu-children .pure-menu-link:hover {
     padding: 20px 15px;
     margin: 0;
     min-width: 100px;
-    color: #999;
+    color: #999999;
 }
 
 .tabs li a, .tabs li a:hover {
@@ -168,7 +167,7 @@ header nav .pure-menu-children .pure-menu-link:hover {
 }
 
 .tabs li a:hover, .tabs li a:focus {
-    /*pure menu hover background color*/
+    /* pure menu hover background color */
     background-color: rgb(238, 238, 238);
 }
 
@@ -179,21 +178,19 @@ header nav .pure-menu-children .pure-menu-link:hover {
     font-weight: bold;
 }
 
-
-
-/*Tags*/
+/* Tags */
 
 span.tag:hover, a.tag:hover {
     background: #ebeff1;
 }
 
 span.tag, a.tag {
-  background: #f0f3f4;
-  border: 1px solid #F0F3F4;
-  border-radius: 8px;
-  padding: 0px 6px 1px;
-  white-space: nowrap;
-  font-size: 0.9em;
+    background: #f0f3f4;
+    border: 1px solid #f0f3f4;
+    border-radius: 8px;
+    padding: 0 6px 1px;
+    white-space: nowrap;
+    font-size: 0.9em;
 }
 
 div#tag-list {
@@ -207,10 +204,9 @@ div#tag-list .tag {
 
 /* override pure form checkbox labels */
 
-.pure-form-aligned .pure-control-group input+label {
+.pure-form-aligned .pure-control-group input + label {
     width: auto;
 }
-
 
 /* override base a:hover for search menus */
 
@@ -218,11 +214,9 @@ div#tag-list .tag {
     text-decoration: none;
 }
 
-
 /*
-Helper classes
-*/
-
+ * Helper classes
+ */
 
 /*
 label              { width: 16em; }
@@ -231,13 +225,8 @@ input[type=number] { width:  4em; }
 textarea           { width: 24em; }
 */
 
-.drop-shadow{
-  -moz-box-shadow:    0px 1px 5px 0px rgba(0, 0, 0, 0.08);
-  -webkit-box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.08);
-  box-shadow:         0px 1px 5px 0px rgba(0, 0, 0, 0.08);
-}
-.fluid {
-    width: 100%;
+.drop-shadow {
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.08);
 }
 
 .border-top {
@@ -246,14 +235,12 @@ textarea           { width: 24em; }
 
 a, a:visited { color: #50addb; }
 a.grey       { color: #999999; }
-.green       { color: #006600; }
-.red         { color: #660000; }
 
 .grey-background      { background-color: #fafafa; }
 .blue-grey-background { background-color: #fafbfd; }
 
 .tab-content {
     padding: 10px 15px;
-    border: 1px solid #F0F3F4;
+    border: 1px solid #f0f3f4;
     margin-top: -6px;
 }

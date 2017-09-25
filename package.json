@@ -13,6 +13,7 @@
     "test-unit": "mocha test/unit/*.js",
     "test-intgn": "mocha test/integration/*.js",
     "lint": "eslint --ignore-pattern app-api/apidoc .",
+    "stylelint": "stylelint public/css/*.css",
     "cover": "istanbul cover node_modules/.bin/_mocha test/",
     "cover-unit": "istanbul cover node_modules/.bin/_mocha test/unit/",
     "cover-intgn": "istanbul cover node_modules/.bin/_mocha test/integration",
@@ -81,6 +82,7 @@
     "nodemon": "^1.11.0",
     "npm-check": "^5.4.0",
     "npm-check-updates": "^2.11.3",
+    "stylelint": "^8.1.1",
     "supertest": "^3.0.0"
   },
   "eslintConfig": {
@@ -111,6 +113,18 @@
       "require-await": "error",
       "semi": [ "error", "always" ],
       "strict": [ "error", "global" ]
+    }
+  },
+  "stylelint": {
+    "extends": "stylelint-config-standard",
+    "rules": {
+      "block-opening-brace-space-before": [ "always", { "severity": "warning" } ],
+      "color-hex-length": "long",
+      "comment-empty-line-before": null,
+      "indentation": 4,
+      "selector-class-pattern": "^([a-z][a-z0-9]*)(-[a-z0-9]+)*$",
+      "selector-list-comma-newline-after": "never-multi-line",
+      "string-quotes": "single"
     }
   }
 }

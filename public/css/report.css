@@ -17,15 +17,12 @@ h1 {
     font-size: 1.5em;
     font-weight: 300;
     line-height: 1;
-    margin: 0 0 0.75em 0;
+    margin: 0 0 0.75em;
 }
 
 a            { color: #033549; }
 a, a:visited { color: #033549; }
 a.grey       { color: #999999; }
-.green       { color: #006600; }
-.red         { color: #660000; }
-
 
 form li {
     clear: both;
@@ -55,9 +52,11 @@ label {
     margin-top: 1em;
     width: auto;
 }
+
 input[type=date], input[type=time] {
     width: auto;
 }
+
 input[type=radio] {
     float: none;
     width: auto;
@@ -68,12 +67,14 @@ table.progress {
     float: right;
     font-size: 80%;
 }
+
 table.progress td {
     border: 1px solid #033549;
     min-width: 3em;
     padding: 0.1em 0.25em;
     text-align: center;
 }
+
 table.progress td.current {
     background-color: #009900;
     color: #ffffff;
@@ -84,15 +85,14 @@ ul.validation-errors {
     color: #990000;
 }
 
-
 header {
     background: #033549;
     font-family: Verdana, Arial, Helvetica, sans-serif;
     font-size: 1.2em;
     font-weight: 300;
     padding: 0.2em 0 0.1em 0.4em;
-    margin: 0 0 2em 0;
-    /*padding-top: 0.4em*/
+    margin: 0 0 2em;
+    /* padding-top: 0.4em */
 }
 
 button.inline-link {
@@ -113,10 +113,6 @@ button.inline-link {
 
 header {
     color: #ffffff;
-}
-
-.logo-container {
-    content: url(../img/logo-128.png);
 }
 
 .progress-bar {
@@ -145,16 +141,16 @@ header nav img {
     height: auto;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
     margin-right: 0.5em;
 }
 
 .nav-action-button {
-    color:white;
+    color: white;
     background-color: #416dbc;
     margin-top: 1em;
     font-weight: bold;
-    padding: 4px 20px 4px 20px;
+    padding: 4px 20px;
     border-radius: 5px;
     border-width: 0;
 }
@@ -171,6 +167,7 @@ ul.with-margin li {
 .width-2chars {
     width: 2.5em;
 }
+
 .width-4chars {
     width: 5em;
 }
@@ -250,13 +247,18 @@ label.inline {
 }
 
 /* 'existing-name' check */
-.name-available { font-weight: bold; margin-top: 1em; }
+.name-available {
+    font-weight: bold;
+    margin-top: 1em;
+}
 #name-ok  { color: #009900; }
 #name-nok { color: #990000; }
 
 /* sexual-assault pages 2, 5, 7 */
-.pure-form .pure-radio { display: inline-block; margin: 0; }
-
+.pure-form .pure-radio {
+    display: inline-block;
+    margin: 0;
+}
 
 @media screen and (max-width: 480px) {
     header img {
@@ -266,10 +268,8 @@ label.inline {
 }
 
 header .pure-menu-horizontal ul.pure-menu-list {
-    /*
-     Max width is 40em so that the header appears the same width as the body, which is defined as max width 48em.
-     The difference is something to do with the ratio between the two font sizes.
-    */
+    /* max-width is 40em so that the header appears the same width as the body, which is defined as
+     * max-width 48em; the difference is something to do with the ratio between the two font sizes. */
     max-width: 40em;
     margin: 0 auto;
     display: block;

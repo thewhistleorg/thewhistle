@@ -1,9 +1,11 @@
 /* Base stylesheet with useful cross-project defaults */
 
+/* stylelint-disable block-opening-brace-space-before, declaration-block-single-line-max-declarations */
+
 body {
     background: white;
     color: #333333;
-    /*font-family: Verdana, Arial, Helvetica, sans-serif;*/
+    /* font-family: Verdana, Arial, Helvetica, sans-serif; */
     font-size: 80%;  /* adjust from default 16px (!) to 9pt (@ 96ppi) */
     line-height: 1.6;
     margin: 0 auto; /* equal l/r margins */
@@ -32,7 +34,6 @@ tr     { vertical-align: baseline; }
 td, th { padding: 0.2em; }
 th     { color: #666666; font-style: italic; font-weight: normal; text-align: left; }
 
-
 /* standard short-hand styles */
 .align-center   { text-align: center; }
 .align-left     { text-align: left; }
@@ -42,7 +43,7 @@ th     { color: #666666; font-style: italic; font-weight: normal; text-align: le
 .align-middle   { vertical-align: middle; }
 .align-bottom   { vertical-align: bottom; }
 .border-none    { border: none; }
-.clear-floats   { clear:both; }
+.clear-floats   { clear: both; }
 .display-inline { display: inline; }
 .display-none   { display: none; }
 .float-left     { float: left; }
@@ -63,19 +64,21 @@ th     { color: #666666; font-style: italic; font-weight: normal; text-align: le
 .error-msg     { color: #990000; }
 .grey          { color: #999999; }
 .pale-grey     { color: #cccccc; }
+.green         { color: #006600; }
+.red           { color: #660000; }
 .required      { color: #990000; } /* for required form field indicator */
 .rule-above    { border-top: 1px solid #999999; }
 .rule-above td { border-top: 1px solid #999999; } /* to apply to tr */
 .small         { font-size: 80%; } /* like <small> */
-.bold          { font-weight: bold;}
+.bold          { font-weight: bold; }
 
 /* form input widths */
-.w2  { width: 2em;  }
-.w3  { width: 3em;  }  /* eg time */
-.w4  { width: 4em;  }
-.w5  { width: 5em;  }
-.w6  { width: 6em;  }  /* eg date, postcode */
-.w8  { width: 8em;  }  /* eg first/last name, town, phone  */
+.w2  { width: 2em; }
+.w3  { width: 3em; }  /* eg time */
+.w4  { width: 4em; }
+.w5  { width: 5em; }
+.w6  { width: 6em; }  /* eg date, postcode */
+.w8  { width: 8em; }  /* eg first/last name, town, phone  */
 .w12 { width: 12em; }  /* eg addr1/2 */
 .w16 { width: 16em; }  /* eg email */
 .w24 { width: 24em; }

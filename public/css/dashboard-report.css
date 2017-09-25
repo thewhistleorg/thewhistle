@@ -1,213 +1,212 @@
 /* Individual Report Page */
 
 #individual-report {
-  padding: 0 1px;
+    padding: 0 1px;
 }
 
 .report-container {
-  border-left: 1px solid #F0F3F4;
-  background: #DEE9ED;
+    border-left: 1px solid #f0f3f4;
+    background: #dee9ed;
 }
 
 .report-header-container {
-  color: #033549;
-  background: #ffffff;
-  position: relative;
-  z-index: 1;
+    color: #033549;
+    background: #ffffff;
+    position: relative;
+    z-index: 1;
 }
 
 .report-header-content {
-  font-size: 1.2em;
-  font-weight: bold;
-  padding: 6px 0;
-  width: 98%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 6px 0;
+    width: 98%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #rightFixedSidebar {
-  position: fixed;
-  overflow-y: scroll;
-  top: 107px;
-  bottom: 0;
-  right: 0;
-  background: #ffffff;
+    position: fixed;
+    overflow-y: scroll;
+    top: 107px;
+    bottom: 0;
+    right: 0;
+    background: #ffffff;
 }
 
 .link-inverse {
-  color: #ffffff;
+    color: #ffffff;
 }
 
 .weather-header {
-  font-size: 1.2em;
-  padding: 10px;
-  border-bottom: 1px solid #F0F3F4;
-  margin-bottom: -1px;
+    font-size: 1.2em;
+    padding: 10px;
+    border-bottom: 1px solid #f0f3f4;
+    margin-bottom: -1px;
 }
 
-.weather-header>span {
-  margin-right: 15px;
+.weather-header > span {
+    margin-right: 15px;
 }
 
 .weather-body {
-  padding: 15px;
+    padding: 15px;
 }
 
 .weather-condition {
-  display: inline-block;
+    display: inline-block;
 }
 
-.weather-condition>div {
-  padding: 4px 0;
+.weather-condition > div {
+    padding: 4px 0;
 }
 
 .weather-condition-hour {
-  font-size: 0.9em;
+    font-size: 0.9em;
 }
-
 
 /* Report header div table */
 
 .card-header, .content-header {
-  color: #6C949E;
-  font-weight: lighter;
+    color: #6c949e;
+    font-weight: lighter;
 }
 
-.header-table-Cell.report-header {
+.header-table-cell.report-header {
     width: 40%;
 }
 
-.header-table-Cell form {
+.header-table-cell form {
     padding: 0;
-    margin: 5px 0px;
+    margin: 5px 0;
 }
 
-.header-table-Cell select,.header-table-Cell input {
+.header-table-cell select, .header-table-cell input {
     width: 100%;
 }
 
 .header-table {
-  display: table;
-  width: 100%;
+    display: table;
+    width: 100%;
 }
 
-.header-table-Row {
-  display: table-row;
+.header-table-row {
+    display: table-row;
 }
 
-.header-table-Heading {
-  background-color: #EEE;
-  display: table-header-group;
+.header-table-heading {
+    background-color: #eeeeee;
+    display: table-header-group;
 }
 
-.header-table-Cell, .header-table-Head {
-  border: 0px;
-  display: table-cell;
-  padding: 6px 10px 8px;
+.header-table-cell, .header-table-head {
+    border: 0;
+    display: table-cell;
+    padding: 6px 10px 8px;
 }
 
-.header-table-Heading {
-  background-color: #EEE;
-  display: table-header-group;
-  font-weight: bold;
+.header-table-heading {
+    background-color: #eeeeee;
+    display: table-header-group;
+    font-weight: bold;
 }
 
-.header-table-Foot {
-  background-color: #EEE;
-  display: table-footer-group;
-  font-weight: bold;
+.header-table-foot {
+    background-color: #eeeeee;
+    display: table-footer-group;
+    font-weight: bold;
 }
 
-.header-table-Body {
-  display: table-row-group;
+.header-table-body {
+    display: table-row-group;
 }
 
 .export-link {
-  vertical-align: middle;
-  border-left: 1px solid #F0F3F4;
-  text-align: center;
+    vertical-align: middle;
+    border-left: 1px solid #f0f3f4;
+    text-align: center;
 }
 
-/* Moved from dashboard-report*/
+/* Moved from dashboard-report */
 
 #map {
-  height: 400px;
-  width: 100%;
+    height: 400px;
+    width: 100%;
 }
 
 p.note {
-  color: #999999;
-  font-size: 80%;
+    color: #999999;
+    font-size: 80%;
 }
 
 h1 {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 button {
-  background: none;
-  border: none;
-  padding: 4px;
+    background: none;
+    border: none;
+    padding: 4px;
 }
 
 h1 {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 div.comment {
-  border: 1px solid #F0F3F4;
-  margin: 0.5em 0;
-  max-width: 640px;
+    border: 1px solid #f0f3f4;
+    margin: 0.5em 0;
+    max-width: 640px;
 }
 
 div.comment div {
-  padding: 0.5em
+    padding: 0.5em;
 }
 
 div.comment .by {
-  background: #f9f9f9;
+    background: #f9f9f9;
 }
 
 div.comment p {
-  margin: 0.5em 0;
+    margin: 0.5em 0;
 }
 
 div.by a {
-  color: #333333;
+    color: #333333;
 }
 
 div.by button {
-  background: none;
-  border: none;
-  color: #999999;
+    background: none;
+    border: none;
+    color: #999999;
 }
 
 div.by button:hover {
-  color: #3992ab;
-  cursor: pointer;
+    color: #3992ab;
+    cursor: pointer;
 }
 
 #div-add-comment {
-  padding: 0.5em;
-  max-width: calc(640px - 1em);
+    padding: 0.5em;
+    max-width: calc(640px - 1em);
 }
 
 textarea {
-  display: block;
-  height: 8em;
-  margin-bottom: 0.5em;
-  padding: 0.5em;
-  width: 96%;
+    display: block;
+    height: 8em;
+    margin-bottom: 0.5em;
+    padding: 0.5em;
+    width: 96%;
 }
 
 .padding-15 {
-  padding: 15px;
+    padding: 15px;
 }
 
 #files img {
-  max-width: 80px;
-  max-height: 80px;
+    max-width: 80px;
+    max-height: 80px;
 }
 
 /* for js-object-to-rich-html */
@@ -215,19 +214,19 @@ textarea {
 .json-to-html h3 {
     margin: 0;
     font-weight: lighter;
-    color: #6C949E;
+    color: #6c949e;
 }
 
 .json-to-html p {
-  margin: 0px 0 15px;
-  padding-bottom: 4px;
-  font-size: 1.2em;
-  border-bottom: 1px solid #f0f3f4;
+    margin: 0 0 15px;
+    padding-bottom: 4px;
+    font-size: 1.2em;
+    border-bottom: 1px solid #f0f3f4;
 }
 
 /* enable scroll; */
 
-.apply-scroll{
-  position: relative;
-  overflow-y: scroll;
+.apply-scroll {
+    position: relative;
+    overflow-y: scroll;
 }

@@ -57,16 +57,13 @@ class ReportsHandlers {
         const users = await User.details(); // note users is a Map
 
         // geocoded location field or fields to use
-        const locationFields = lowestDistinctGeographicLevel(rpts);
+        const lowestCommonLevel = lowestCommonGeographicLevel(rpts);
 
         const reports = [];
         for (const rpt of rpts) {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
             if (Object.keys(rpt.geocode).length > 0) {
-                for (const field of locationFields) { // if multiple location field candidates, use first available
-                    rpt.location = field.split('.').reduce((obj, key) => obj[key], rpt); // stackoverflow.com/questions/6393943
-                    if (rpt.location) break;
-                }
+                rpt.location = findBestLocnBelow(lowestCommonLevel, rpt);
             } else {
                 rpt.location = '—';
             }
@@ -302,14 +299,15 @@ class ReportsHandlers {
         const users = await User.details(); // note users is a Map
 
         // geocoded location field or fields to use
-        const locationFields = lowestDistinctGeographicLevel(rpts);
+        const lowestCommonLevel = lowestCommonGeographicLevel(rpts);
 
         const reports = [];
         for (const rpt of rpts) {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
-            for (const field of locationFields) { // if multiple location field candidates, use first available
-                rpt.location = field.split('.').reduce((obj, key) => obj[key], rpt); // stackoverflow.com/questions/6393943
-                if (rpt.location) break;
+            if (Object.keys(rpt.geocode).length > 0) {
+                rpt.location = findBestLocnBelow(lowestCommonLevel, rpt);
+            } else {
+                rpt.location = '—';
             }
             for (let t=0; t<rpt.tags.length; t++) { // style tags in cartouches
                 rpt.tags.splice(t, 1, `<span class="tag">${rpt.tags[t]}</span>`);
@@ -1114,19 +1112,19 @@ function prettyDate(date) {
 
     // this year
     if (new Date(date).getFullYear() == new Date().getFullYear()) {
-        return `${dateFormat(date, 'd mmm')} <span style="opacity:0.6">${dateFormat(date, 'yyyy')}</span>`
+        return `${dateFormat(date, 'd mmm')} <span style="opacity:0.6">${dateFormat(date, 'yyyy')}</span>`;
     }
 
     // before this year
-    return `<span style="opacity:0.6">${dateFormat(date, 'd mmm')}</span> ${dateFormat(date, 'yyyy')}`
+    return `<span style="opacity:0.6">${dateFormat(date, 'd mmm')}</span> ${dateFormat(date, 'yyyy')}`;
 }
 
 
 /**
  * Converts date to period-ago relative to now (approximates months and years).
  *
- * @param {Date|string} date - Date interval is to be given for.
- * @param {boolean}     short - Short format (just 1st letter of period).
+ * @param   {Date|string} date - Date interval is to be given for.
+ * @param   {boolean}     [short=false] - Short format (just 1st letter of period).
  * @returns {string} Description of interval between date and now.
  */
 function ago(date, short=false) {
@@ -1156,48 +1154,103 @@ function ago(date, short=false) {
 /**
  * Geocoded fields with lowest-level distinct values within the report set.
  *
- * There may be more than one: if all level2long values are the same, best address may be in either
- * streetName or extra.establishment.
+ * The list of reports needs to show the location to the best granularity for the listed set of reports.
+ * For a geographically broad list, this might be cities; for a limited list, it might be street names.
  *
- * @param {Object[]} reports - Array of reports to be examined.
- * @returns {string[]} Candidate geocoded fields to give distinct values.
+ * Google geocoding returns quite variable information; the relevant hierarchy seems to be
+ *  - country
+ *  - administrativeLevels.level1long
+ *  - city
+ *  - administrativeLevels.level2long / extra.neighborhood
+ *  - streetName
+ *  - extra.establishment
+ *
+ * Various combinations of these seem to be returned.
+ *
+ * @param   {Object[]} reports - Array of reports to be examined.
+ * @returns {string} Lowest geographic level which is common to all reports.
  */
-function lowestDistinctGeographicLevel(reports) {
-    const adminLevels = reports.map(r => r.geocode.administrativeLevels);
+function lowestCommonGeographicLevel(reports) {
+    // common street name?
+    const street = [ ...new Set(reports.map(rpt => rpt.geocode.streetName ? rpt.geocode.streetName : undefined)) ].filter(str => str != undefined);
+    if (street.length == 1) return 'streetName';
 
-    // level 2 addresses identical? use streetName or establishment, whichever is available
-    const l2 = [ ...new Set(adminLevels.map(al => al ? al.level2long : undefined)) ].filter(l2 => l2 != undefined);
-    if (l2.length == 1) return [ 'geocode.streetName', 'geocode.extra.establishment' ];
+    // common level2 address?
+    const level2 = [ ...new Set(reports.map(rpt => rpt.geocode.administrativeLevels.level2long ? rpt.geocode.administrativeLevels.level2long : undefined)) ].filter(l2 => l2 != undefined);
+    if (level2.length == 1) return 'level2long';
 
-    // level 1 addresses identical? use level 2
-    const l1 = [ ...new Set(adminLevels.map(al => al ? al.level1long : undefined)) ].filter(l1 => l1 != undefined);
-    if (l1.length == 1) return [ 'geocode.administrativeLevels.level2long' ];
+    // common city?
+    const city = [ ...new Set(reports.map(rpt => rpt.geocode.city ? rpt.geocode.city : undefined)) ].filter(city => city != undefined);
+    if (city.length == 1) return 'city';
 
-    // countries identical? use level 1
-    const countries = [ ...new Set(reports.map(r => r.geocode.country)) ].filter(c => c != undefined);
-    if (countries.length == 1) return [ 'geocode.administrativeLevels.level1long' ];
+    // common level1 address?
+    const level1 = [ ...new Set(reports.map(rpt => rpt.geocode.administrativeLevels.level1long ? rpt.geocode.administrativeLevels.level1long : undefined)) ].filter(l1 => l1 != undefined);
+    if (level1.length == 1) return 'level1long';
 
-    // reports from more than one country!
-    return [ 'geocode.country' ];
+    // common country?
+    const country = [ ...new Set(reports.map(rpt => rpt.geocode.country ? rpt.geocode.country : undefined)) ].filter(country => country != undefined);
+    if (country.length == 1) return 'country';
+
+    return ''; // multiple countries!
 }
 
 
 /**
- * Truncate string
+ * Best location below given level for specific report.
  *
- * @param {string} string - String to be truncated
- * @param {number} limit - limit
- * @returns {string} Formatted string.
+ * If available, city is *probably* preferred (TBD) over level1long despite being lower in hierarchy
+ * (eg Cambridge vs Cambridgeshire).
  *
+ * @param   {string} level - Lowest level with common value, as returned by lowestCommonGeographicLevel().
+ * @param   {Object} report - Report location is to be returned for.
+ * @returns {string} Value of best location below given level.
  */
+function findBestLocnBelow(level, report) {
+    switch (level) {
+        case '':
+            return report.geocode.country;
+        case 'country':
+            if (report.geocode.city) return report.geocode.city;
+            if (report.geocode.administrativeLevels.level1long) return report.geocode.administrativeLevels.level1long;
+            break;
+        case 'level1long':
+            if (report.geocode.city) return report.geocode.city;
+            if (report.geocode.administrativeLevels.level2long) return report.geocode.administrativeLevels.level2long;
+            if (report.geocode.streetName) return report.geocode.streetName;
+            break;
+        case 'city':
+            if (report.geocode.administrativeLevels.level2long) return report.geocode.administrativeLevels.level2long;
+            if (report.geocode.extra.establishment) return report.geocode.extra.establishment;
+            if (report.geocode.streetName) return report.geocode.streetName;
+            break;
+        case 'level2long':
+        case 'extra.neighborhood':
+            if (report.geocode.streetName) return report.geocode.streetName;
+            if (report.geocode.extra.establishment) return report.geocode.extra.establishment;
+            break;
+        case 'streetName':
+            if (report.geocode.extra.establishment) return report.geocode.extra.establishment;
+            return report.geocode.streetNumber + ' ' + report.geocode.streetName;
+    }
+    return '!!'; // shouldn't happen!
+}
 
-function truncate(string, limit){
-   if ((typeof string === 'undefined') || (string === null))
-      return false
-   if (string.length > limit)
-      return string.substring(0,limit)+'...';
-   else
-      return string;
-};
+
+/**
+ * If string is longer than given length, truncate it and append ellipsis.
+ *
+ * @param   {string} string - String to be truncated
+ * @param   {number} length - Length to truncate to
+ * @returns {string} Formatted string.
+ */
+function truncate(string, length) {
+    if (!string && string!==0) return '';
+
+    const str = String(string);
+
+    if (str.length <= length) return string;
+
+    return str.slice(0, length) + '…';
+}
 
 module.exports = ReportsHandlers;

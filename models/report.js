@@ -30,15 +30,15 @@ const Weather = require('../lib/weather.js');
 const validator = { $and: [ // TODO: validation for string or null
     { project:    { $type: 'string',   $exists: true } }, // name of project report belongs to
     { submitted:  { $type: 'object',   $exists: true } }, // flexible format following incident reporting format
-    { by:         { $type: 'objectId',               } }, // user entering incident report
+    { by:         { $type: 'objectId'                } }, // user entering incident report
     { name:       { $type: 'string',   $exists: true } }, // auto-generated name of victim/survivor
-    { geocode:    { $type: 'object',                 } }, // google geocoding data
+    { geocode:    { $type: 'object'                  } }, // google geocoding data
     { location:   { $type: 'object',   $exists: true } }, // GeoJSON (with spatial index)
-    { summary:    { $type: 'string',                 } }, // single-line summary for identification
-    { assignedTo: { $type: 'objectId',               } }, // user report is assigned to
-    { status:     { $type: 'string',                 } },
-    { tags:       { $type: 'array',                  } }, // array of strings
-    { comments:   { $type: 'array',                  } }, // array of { byId, byName, on, comment }
+    { summary:    { $type: 'string'                  } }, // single-line summary for identification
+    { assignedTo: { $type: 'objectId'                } }, // user report is assigned to
+    { status:     { $type: 'string'                  } },
+    { tags:       { $type: 'array'                   } }, // array of strings
+    { comments:   { $type: 'array'                   } }, // array of { byId, byName, on, comment }
     { archived:   { $type: 'bool',     $exists: true } }, // archived flag
     { views:      { $type: 'object'                  } }, // associative array of timestamps indexed by user id
 ] };
@@ -211,7 +211,7 @@ class Report {
         const query = active=='active'
             ? { archived: false }
             : active=='archived' ? { archived: true } : {};
-        const [lastReport] = await reports.find(query).sort({ _id: -1 }).limit(1).toArray();
+        const [ lastReport ] = await reports.find(query).sort({ _id: -1 }).limit(1).toArray();
         if (!lastReport) return ''; // TODO: test
         const latestTimestamp = lastReport._id.getTimestamp().toISOString();
 
@@ -233,7 +233,7 @@ class Report {
         const query = active=='active'
             ? { archived: false }
             : active=='archived' ? { archived: true } : {};
-        const [oldestReport] = await reports.find(query).sort({ _id: 1 }).limit(1).toArray();
+        const [ oldestReport ] = await reports.find(query).sort({ _id: 1 }).limit(1).toArray();
         if (!oldestReport) return ''; // TODO: test
         const oldestTimestamp = oldestReport._id.getTimestamp().toISOString();
 
@@ -424,7 +424,7 @@ class Report {
             statuses.add('');
         }
 
-        return [...statuses].sort();
+        return [ ...statuses ].sort();
     }
 
 
@@ -448,7 +448,7 @@ class Report {
             for (const tag of report.tags) tags.add(tag);
         }
 
-        return [...tags].sort();
+        return [ ...tags ].sort();
     }
 
 

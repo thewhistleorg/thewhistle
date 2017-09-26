@@ -6,8 +6,6 @@
 
 'use strict';
 
-const fs         = require('fs-extra');   // fs with extra functions & promise interface
-const slug       = require('slug');       // make strings url-safe
 const dateFormat = require('dateformat'); // Steven Levithan's dateFormat()
 const ObjectId   = require('mongodb').ObjectId;
 
@@ -74,7 +72,7 @@ class Update {
     static async getAll(db, limit=12) {
         const updates = global.db[db].collection('updates');
 
-        const upd = await updates.find({}).sort([['_id', -1]]).limit(limit).toArray();
+        const upd = await updates.find({}).sort([ [ '_id', -1 ] ]).limit(limit).toArray();
 
         const names = await User.names(); // note names is a Map
 
@@ -84,7 +82,7 @@ class Update {
             u.onFull = dateFormat(u.on, 'd mmm yyyy HH:MM');
             u.onDate = dateFormat(u.on, 'd mmm yyyy');
             u.onTime = dateFormat(u.on, 'HH:MM');
-            u.by = names.get(u.userId.toString())
+            u.by = names.get(u.userId.toString());
             u.report = await Report.get(db, u.reportId); // note if report gets deleted this will be null!
             u.description = Update.updateDescription(u.update, names);
         }
@@ -179,7 +177,7 @@ class Update {
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
 
         const updates = global.db[db].collection('updates');
-        const upd = await updates.find({ userId: userId }).sort([['_id', -1]]).limit(limit).toArray();
+        const upd = await updates.find({ userId: userId }).sort([ [ '_id', -1 ] ]).limit(limit).toArray();
 
         const names = await User.names(); // note names is a Map
 
@@ -208,7 +206,7 @@ class Update {
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow id as string
 
         const updates = global.db[db].collection('updates');
-        const [update] = await updates.find({ reportId: reportId }).sort({_id:-1}).limit(1).toArray();
+        const [ update ] = await updates.find({ reportId: reportId }).sort({ _id: -1 }).limit(1).toArray();
         if (update == undefined) return {};
 
         const names = await User.names(); // note names is a Map
@@ -232,7 +230,7 @@ class Update {
     static updateDescription(update, names) {
         let description = null;
 
-        const op = Object.keys(update)[0]
+        const op = Object.keys(update)[0];
         const fld = Object.keys(update[op])[0];
         const val = update[op][fld];
         switch (op) {

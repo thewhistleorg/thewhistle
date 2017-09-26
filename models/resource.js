@@ -13,12 +13,12 @@ const ObjectId = require('mongodb').ObjectId;
  */
 const validator = { $and: [
     { name:     { $type: 'string', $exists: true } },
-    { address:  { $type: 'string',               } },
-    { phone:    { $type: 'array',                } },
-    { email:    { $type: 'array',                } },
-    { services: { $type: 'array',                } },
-    { category: { $type: 'string',               } },
-    { location: { $type: 'object',               } }, // GeoJSON (with spatial index)
+    { address:  { $type: 'string'                } },
+    { phone:    { $type: 'array'                 } },
+    { email:    { $type: 'array'                 } },
+    { services: { $type: 'array'                 } },
+    { category: { $type: 'string'                } },
+    { location: { $type: 'object'                } }, // GeoJSON (with spatial index)
 ] };
 
 
@@ -50,7 +50,7 @@ class Resource {
         const indexes = (await resources.indexes()).map(i => i.key);
 
         // geospatial index
-        if (indexes.name_location == undefined) resources.createIndex({ location: '2dsphere',  name: 1}, { name: 'name_location' });
+        if (indexes.name_location == undefined) resources.createIndex({ location: '2dsphere',  name: 1 }, { name: 'name_location' });
     }
 
     /**
@@ -138,7 +138,7 @@ class Resource {
 
         const resources = global.db[db].collection('resources');
 
-        const point = { type: 'Point', coordinates: [ lon, lat] }
+        const point = { type: 'Point', coordinates: [ lon, lat ] };
         const query = { location: { $near: { $geometry: point, $maxDistance: distance } } };
         const cntrs = await resources.find(query).toArray();
 

@@ -93,8 +93,8 @@ router.get('/ajax/messages/latest-timestamp', messages.ajaxMessageLatestTimestam
 /*  Route for map marker (TODO: where should this go?)                                            */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const Jimp = require('jimp');  // image processing library
-const fs   = require('mz/fs'); // 'modernised' node api
+const Jimp = require('jimp');     // image processing library
+const fs   = require('fs-extra'); // fs with extra functions & promise interface
 
 /**
  * Render graduated map marker: 0 for transparent/monochrome -> 100 for opaque/red.

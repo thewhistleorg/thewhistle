@@ -10,7 +10,7 @@ const nodemailer = require('nodemailer');   // sends e-mails from Node.js
 const handlebars = require('handlebars');   // logicless templating language
 const JsDom      = require('jsdom').JSDOM;  // DOM Document interface in Node!
 const htmlToText = require('html-to-text'); // converts html to beautiful text
-const fs         = require('mz/fs');        // 'modernised' node api
+const fs         = require('fx-extra');     // fs with extra functions & promise interface
 const crypto     = require('crypto');       // nodejs.org/api/crypto.html
 const dateFormat = require('dateformat');   // Steven Levithan's dateFormat()
 

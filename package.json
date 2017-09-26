@@ -60,7 +60,6 @@
     "markdown-it-anchor": "^4.0.0",
     "moment": "^2.18.1",
     "mongodb": "^2.2.28",
-    "mz": "^2.6.0",
     "node-fetch": "^1.7.2",
     "node-geocoder": "^3.16.0",
     "nodejs-info": "^1.0.1",
@@ -96,29 +95,75 @@
     },
     "extends": "eslint:recommended",
     "rules": {
-      "array-bracket-spacing": [ "error", "always" ],
-      "comma-dangle": [ "error", "always-multiline" ],
-      "curly": [ "error", "multi-line" ],
-      "indent": [ "error", 4, { "SwitchCase": 1 } ],
-      "key-spacing": [ "error", { "align": "value" } ],
+      "array-bracket-spacing": [
+        "error",
+        "always"
+      ],
+      "comma-dangle": [
+        "error",
+        "always-multiline"
+      ],
+      "curly": [
+        "error",
+        "multi-line"
+      ],
+      "indent": [
+        "error",
+        4,
+        {
+          "SwitchCase": 1
+        }
+      ],
+      "key-spacing": [
+        "error",
+        {
+          "align": "value"
+        }
+      ],
       "no-case-declarations": "off",
-      "no-console": [ "warn", { "allow": [ "error", "info" ] } ],
+      "no-console": [
+        "warn",
+        {
+          "allow": [
+            "error",
+            "info"
+          ]
+        }
+      ],
       "no-redeclare": "warn",
       "no-shadow": "warn",
       "no-unused-vars": "warn",
       "no-var": "error",
-      "object-curly-spacing": [ "error", "always" ],
+      "object-curly-spacing": [
+        "error",
+        "always"
+      ],
       "prefer-const": "error",
-      "quotes": [ "error", "single", "avoid-escape" ],
+      "quotes": [
+        "error",
+        "single",
+        "avoid-escape"
+      ],
       "require-await": "error",
-      "semi": [ "error", "always" ],
-      "strict": [ "error", "global" ]
+      "semi": [
+        "error",
+        "always"
+      ],
+      "strict": [
+        "error",
+        "global"
+      ]
     }
   },
   "stylelint": {
     "extends": "stylelint-config-standard",
     "rules": {
-      "block-opening-brace-space-before": [ "always", { "severity": "warning" } ],
+      "block-opening-brace-space-before": [
+        "always",
+        {
+          "severity": "warning"
+        }
+      ],
       "color-hex-length": "long",
       "comment-empty-line-before": null,
       "indentation": 4,

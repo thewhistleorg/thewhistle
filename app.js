@@ -17,7 +17,7 @@ const compress    = require('koa-compress');   // HTTP compression
 const session     = require('koa-session');    // session for flash messages
 const dateFormat  = require('dateformat');     // Steven Levithan's dateFormat()
 const MongoClient = require('mongodb').MongoClient;
-const fs          = require('mz/fs');          // 'modernised' node api
+const fs          = require('fs-extra');       // fs with extra functions & promise interface
 const debug       = require('debug')('app');   // small debugging utility
 
 require('dotenv').config(); // loads environment variables from .env file (if available - eg dev env)

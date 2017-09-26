@@ -28,7 +28,7 @@ router.get('/dev/user-agents', async function(ctx) {
 /*  Route to handle dev-notes pages                                                               */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const fs  = require('mz/fs');              // 'modernised' node api
+const fs  = require('fs-extra');           // fs with extra functions & promise interface
 const md  = require('markdown-it')();      // markdown parser
 const mda = require('markdown-it-anchor'); // header anchors for markdown-it
 

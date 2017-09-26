@@ -50,17 +50,19 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
     });
 
     // auto-submit form on click on 'assigned to' in list
-    document.querySelectorAll('td.assigned').forEach(el => el.onclick = function filterAdd() {
+    document.querySelectorAll('td.assigned span').forEach(el => el.onclick = function filterAdd(event) {
         // add filter span and apply filter
         addFilter('assigned', this.textContent.slice(1)); // strip off '@'
         applyFilter();
+        event.stopPropagation(); // don't allow this event to be caught by the 'tr' open report details event
     });
 
     // auto-submit form on click on 'tag' in list
-    document.querySelectorAll('span.tag').forEach(el => el.onclick = function filterAdd() {
+    document.querySelectorAll('span.tag').forEach(el => el.onclick = function filterAdd(event) {
         // add filter span and apply filter
         addFilter('tag', this.textContent);
         applyFilter();
+        event.stopPropagation(); // don't allow this event to be caught by the 'tr' open report details event
     });
 
     // prevent click on (summary) input propagating up to li

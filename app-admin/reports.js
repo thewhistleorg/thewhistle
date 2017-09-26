@@ -68,7 +68,7 @@ class ReportsHandlers {
                 rpt.location = '—';
             }
             for (let t=0; t<rpt.tags.length; t++) { // style tags in cartouches
-                rpt.tags.splice(t, 1, `<span class="tag">${rpt.tags[t]}</span>`);
+                rpt.tags.splice(t, 1, `<span class="tag" title="filter by tag=‘${rpt.tags[t]}’">${rpt.tags[t]}</span>`);
             }
             if (rpt.tags.length > 2) { // limit displayed tags to 2
                 rpt.tags.splice(2, rpt.tags.length, `<span class="nowrap">+${rpt.tags.length-2} more...</span>`);

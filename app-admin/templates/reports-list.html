@@ -49,6 +49,11 @@
         'use strict';
         document.addEventListener('DOMContentLoaded', async function() { // reports list
 
+            // listener for click on tr to open report details page
+            document.querySelectorAll('tr[id]').forEach(el => el.onclick = function() {
+                window.location.href = '/reports/'+this.id;
+            });
+
             // sorting: set search field or reverse current sort order
             document.querySelectorAll('th[data-sort]').forEach(el => el.onclick = function() {
                 const qs = Qs.parse(location.search.slice(1));
@@ -132,18 +137,18 @@
     </tr>
 
     {{#reports}}
-    <tr id="{{_id}}" onClick="window.open('/reports/{{_id}}', '_self')">
+    <tr id="{{_id}}">
         <td data-ago="{{updatedOn}}" title="{{updatedOnPretty}} by @{{updatedBy}}" class="grey">
           <span>{{updatedAgo}}</span>
         </td>
-        <td >
+        <td>
           <span>{{{submittedDesc}}}</span>
         </td>
         <td title="{{reportedOnFull}} by {{reportedBy}}" class="grey nowrap" style="text-align:right">
           <span>{{{reportedOnPretty}}}</span>
         </td>
         <td class="assigned">
-            {{#if assignedTo}}@{{assignedTo}}{{/if}}
+            {{#if assignedTo}}<span title="filter by assigned-to={{assignedTo}}">@{{assignedTo}}</span>{{/if}}
         </td>
         <td>
           <span>{{status}}</span>

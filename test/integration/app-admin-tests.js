@@ -102,7 +102,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             const response = await request.get('/reports').set(headers);
             expect(response.status).to.equal(200);
             const document = new JsDom(response.text).window.document;
-            expect(document.getElementById(reportId).getAttribute('onClick')).to.contain(`/reports/${reportId}`);
+            expect(document.getElementById(reportId)).to.not.be.null;
         });
 
         it('sees weather conditions in report page', async function() {

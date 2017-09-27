@@ -13,11 +13,11 @@ const serve       = require('koa-static');     // static file serving middleware
 const jwt         = require('jsonwebtoken');   // JSON Web Token implementation
 const bunyan      = require('bunyan');         // logging
 const koaLogger   = require('koa-bunyan');     // logging
-const document    = new (require('jsdom')).JSDOM().window.document; // DOM Document interface in Node!
 const convert     = require('koa-convert');    // tmp for koa-flash, koa-lusca
 const router      = require('koa-router')();   // router middleware for koa
 const MongoClient = require('mongodb').MongoClient;
-const ObjectId    = require('mongodb').ObjectId;
+
+const HandlebarsHelpers = require('../lib/handlebars-helpers.js');
 
 const app = new Koa(); // admin app
 
@@ -30,40 +30,11 @@ app.use(serve('public', { maxage: maxage }));
 
 
 // handlebars templating
-
-const hbsSelectedHelper = function(value, options) {   // stackoverflow.com/questions/13046401#answer-15373215
-    const select = document.createElement('select');   // create a select element
-    select.innerHTML = options.fn(this);               // populate it with the option HTML
-    select.value = value;                              // set the value
-    if (select.children[select.selectedIndex]) {       // if selected node exists add 'selected' attribute
-        select.children[select.selectedIndex].setAttribute('selected', '');
-    }
-    return select.innerHTML;
-};
-
-const hbsCheckedHelper = function(value, options) {
-    const div = document.createElement('div'); // create a container div
-    div.innerHTML = options.fn(this);          // parse content into dom
-    if (typeof value == 'string') {
-        div.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(function(input) {
-            // if input value matches supplied value, check it
-            if (input.value == value) input.defaultChecked = true;
-        });
-    }
-    if (typeof value == 'object') {
-        div.querySelectorAll('input[type=checkbox]').forEach(function(input) {
-            // if input value is included in supplied value, check it
-            if (value.includes(input.value)) input.defaultChecked = true;
-        });
-    }
-    return div.innerHTML;
-};
-
 app.use(handlebars({
     extension:   [ 'html' ],
     viewsDir:    'app-admin/templates',
     partialsDir: 'app-admin/templates/partials',
-    helpers:     { selected: hbsSelectedHelper, checked: hbsCheckedHelper },
+    helpers:     { selected: HandlebarsHelpers.selected, checked: HandlebarsHelpers.checked },
 }));
 
 

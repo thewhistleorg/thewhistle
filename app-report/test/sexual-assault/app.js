@@ -13,8 +13,8 @@
 const Koa         = require('koa');                 // koa framework
 const handlebars  = require('koa-handlebars');      // handlebars templating
 const MongoClient = require('mongodb').MongoClient; // official MongoDB driver for Node.js
-const document    = new (require('jsdom')).JSDOM().window.document; // DOM Document interface in Node!
 
+const HandlebarsHelpers = require('../../../lib/handlebars-helpers.js');
 
 const app = new Koa(); // report app
 
@@ -33,32 +33,15 @@ app.use(async function getDbConnection(ctx, next) {
 });
 
 
-const hbsCheckedHelper = function(value, options) {
-    const div = document.createElement('div'); // create a container div
-    div.innerHTML = options.fn(this);          // parse content into dom
-    if (typeof value == 'string') {
-        div.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(function(input) {
-            // if input value matches supplied value, check it
-            if (input.value == value) input.defaultChecked = true;
-        });
-    }
-    if (typeof value == 'object') {
-        div.querySelectorAll('input[type=checkbox]').forEach(function(input) {
-            // if input value is included in supplied value, check it
-            if (value.includes(input.value)) input.defaultChecked = true;
-        });
-    }
-    return div.innerHTML;
-};
-
+// handlebars templating
 app.use(handlebars({
-    extension:     ['html'],
+    extension:     [ 'html' ],
     root:          __dirname,
     viewsDir:      './templates/pages',
     layoutsDir:    './templates',
     defaultLayout: 'layout',
     partialsDir:   './templates/partials',
-    helpers:       { checked: hbsCheckedHelper },
+    helpers:       { checked: HandlebarsHelpers.checked },
 }));
 
 

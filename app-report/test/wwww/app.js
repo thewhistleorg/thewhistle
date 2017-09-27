@@ -10,30 +10,17 @@
 
 'use strict';
 
-const Koa         = require('koa');                 // koa framework
-const handlebars  = require('koa-handlebars');      // handlebars templating
-const MongoClient = require('mongodb').MongoClient; // official MongoDB driver for Node.js
+const Koa         = require('koa');            // koa framework
+const handlebars  = require('koa-handlebars'); // handlebars templating
 
 const HandlebarsHelpers = require('../../../lib/handlebars-helpers.js');
+const ReportMiddleware  = require('../../middleware.js');
 
 const app = new Koa(); // report app
 
+app.use(ReportMiddleware.mongoConnect()); // get db connection to ctx.params.database if not already available
 
-// get database connection if not already available
-app.use(async function getDbConnection(ctx, next) {
-    if (!global.db[ctx.params.database]) {
-        try {
-            const connectionString = process.env['DB_'+ctx.params.database.toUpperCase()];
-            global.db[ctx.params.database] = await MongoClient.connect(connectionString);
-        } catch (e) {
-            app.throw(e);
-        }
-    }
-    await next();
-});
-
-
-// handlebars templating
+// handlebars templating (templates specific to this database/project)
 app.use(handlebars({
     extension:     [ 'html' ],
     root:          __dirname,
@@ -41,12 +28,10 @@ app.use(handlebars({
     layoutsDir:    './templates',
     defaultLayout: 'layout',
     partialsDir:   './templates/partials',
-    helpers:       { checked: HandlebarsHelpers.checked },
+    helpers:       { selected: HandlebarsHelpers.selected, checked: HandlebarsHelpers.checked },
 }));
 
-
-app.use(require('./routes.js'));
-
+app.use(require('./routes.js')); // routes/handlers are specific to this database/project)
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 

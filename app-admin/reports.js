@@ -1171,24 +1171,26 @@ function ago(date, short=false) {
  * @returns {string} Lowest geographic level which is common to all reports.
  */
 function lowestCommonGeographicLevel(reports) {
+    const rpts = reports.filter(rpt => Object.keys(rpt.geocode).length > 0); // ignore reports with no geocoding available
+
     // common street name?
-    const street = [ ...new Set(reports.map(rpt => rpt.geocode.streetName ? rpt.geocode.streetName : undefined)) ].filter(str => str != undefined);
+    const street = [ ...new Set(rpts.map(rpt => rpt.geocode.streetName ? rpt.geocode.streetName : undefined)) ].filter(str => str != undefined);
     if (street.length == 1) return 'streetName';
 
     // common level2 address?
-    const level2 = [ ...new Set(reports.map(rpt => rpt.geocode.administrativeLevels.level2long ? rpt.geocode.administrativeLevels.level2long : undefined)) ].filter(l2 => l2 != undefined);
+    const level2 = [ ...new Set(rpts.map(rpt => rpt.geocode.administrativeLevels.level2long ? rpt.geocode.administrativeLevels.level2long : undefined)) ].filter(l2 => l2 != undefined);
     if (level2.length == 1) return 'level2long';
 
     // common city?
-    const city = [ ...new Set(reports.map(rpt => rpt.geocode.city ? rpt.geocode.city : undefined)) ].filter(city => city != undefined);
+    const city = [ ...new Set(rpts.map(rpt => rpt.geocode.city ? rpt.geocode.city : undefined)) ].filter(city => city != undefined);
     if (city.length == 1) return 'city';
 
     // common level1 address?
-    const level1 = [ ...new Set(reports.map(rpt => rpt.geocode.administrativeLevels.level1long ? rpt.geocode.administrativeLevels.level1long : undefined)) ].filter(l1 => l1 != undefined);
+    const level1 = [ ...new Set(rpts.map(rpt => rpt.geocode.administrativeLevels.level1long ? rpt.geocode.administrativeLevels.level1long : undefined)) ].filter(l1 => l1 != undefined);
     if (level1.length == 1) return 'level1long';
 
     // common country?
-    const country = [ ...new Set(reports.map(rpt => rpt.geocode.country ? rpt.geocode.country : undefined)) ].filter(country => country != undefined);
+    const country = [ ...new Set(rpts.map(rpt => rpt.geocode.country ? rpt.geocode.country : undefined)) ].filter(country => country != undefined);
     if (country.length == 1) return 'country';
 
     return ''; // multiple countries!

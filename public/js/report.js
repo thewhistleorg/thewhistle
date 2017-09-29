@@ -5,17 +5,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // add 'required' indicators for form labels
     document.querySelectorAll('[required]').forEach(function(input) {
-        const req = '<sup class="required" title="required">*</sup>';
-        let prev = input.previousSibling;
+        var req = '<sup class="required" title="required">*</sup>';
+        var prev = input.previousSibling;
         while (prev && prev.localName != 'label' && prev.previousSibling != null) prev = prev.previousSibling;
         if (prev && prev.localName=='label' && prev.textContent!='&nbsp;') prev.insertAdjacentHTML('beforeend', req);
     });
 
     // remove 'required' attributes if going back to prev page
-    const prevButton = document.querySelector('button.prev');
+    var prevButton = document.querySelector('button.prev');
     if (prevButton) {
         prevButton.onclick = function () {
-            document.querySelectorAll('input,textarea').forEach(i => i.required = false);
+            document.querySelectorAll('input,textarea').forEach(function(i) { i.required = false; });
         };
     }
 
@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (this.setCustomValidity) this.setCustomValidity('');
                         break;
                     case 404: // name not found
-                        const err = 'Name not found';
+                        var err = 'Name not found';
                         if (this.setCustomValidity) document.querySelector('input[name="existing-name"]').setCustomValidity(err);
                         document.querySelector('#name-ok').classList.add('hide');
                         document.querySelector('#name-nok').classList.remove('hide');

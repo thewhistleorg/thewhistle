@@ -1,15 +1,11 @@
 <div id="search" class="drop-shadow">
     <div id="search-display">
-      <div class="magnifying-glass">
-        <div class="fa fa-search"></div>
-      </div>
-      <input class="summary-input" name="summary" placeholder="Enter a keyword">
+        <div class="magnifying-glass">
+            <div class="fa fa-search"></div>
+        </div>
+        <input class="description-filter" name="description" placeholder="Search description">
     </div>
     <div class="pure-menu pure-menu-horizontal border-top blue-grey-background">
-      <!-- <div class="magnifying-glass">
-        <div class="fa fa-filter"></div>
-        Filter
-      </div> -->
         <ul class="pure-menu-list">
 
             <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
@@ -22,7 +18,7 @@
             </li>
 
             <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-                <a href="#" class="pure-menu-link">projects</a>
+                <a href="#" class="pure-menu-link">project</a>
                 <ul class="pure-menu-children">
                     {{#filterLists.projects}}
                     <li class="pure-menu-item" data-key="project" data-value="{{this}}"><a href="#" class="pure-menu-link">{{this}}</a></li>
@@ -59,16 +55,6 @@
                 </ul>
             </li>
 
-
-            <!-- <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-                <a href="#" class="pure-menu-link">summary</a>
-                <ul class="pure-menu-children">
-                    <li class="pure-menu-item">
-                      <input name="summary">
-                    </li>
-                </ul>
-            </li> -->
-
             <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
                 <a href="#" class="pure-menu-link">tags</a>
                 <ul class="pure-menu-children">
@@ -77,7 +63,6 @@
                     {{/filterLists.tags}}
                 </ul>
             </li>
-
 
             <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
                 <a href="#" class="pure-menu-link">report fields</a>
@@ -89,6 +74,5 @@
             </li>
 
         </ul>
-
     </div>
 </div>

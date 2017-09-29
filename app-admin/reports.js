@@ -489,8 +489,11 @@ class ReportsHandlers {
 
     /**
      * Build arrays representing filter selection options.
-     * @param {string} db - Reports database to use.
-     * @param {Object} ctx - Koa context.
+     *
+     * These arrays are used to create the drop-down lists on the reports-list filter options.
+     *
+     * @param   {string} db - Reports database to use.
+     * @param   {Object} ctx - Koa context.
      * @returns { projects[], assignees[], statuses[], tags[], fields[] }
      */
     static async buildFilterLists(db, ctx) {
@@ -585,10 +588,23 @@ class ReportsHandlers {
 
 
     /**
-     * Constructs MongoDb filter query object from query-string filter spec.
+     * Constructs MongoDB filter query object from query-string filter spec.
      *
-     * @param {string} db - Reports database to use.
-     * @param {string} q - Request query string.
+     * This takes query-string arguments and builds MongoDB filter object to use in database querying.
+     *
+     * Possible filters are:
+     *  - description: report.submitted.Description contains argument
+     *  - active:      report.archived false/true/either for argument active/archived/all
+     *  - project:     report.project equals argument
+     *  - updated:     ??
+     *  - submitted:   report._id between given dates
+     *  - assigned:    report.assignedTo = id of username given as argument
+     *  - status:      report.status equals argument
+     *  - tags:        report.tags array includes argument
+     *  - field:       identified field within report.submitted object includes argument
+     *
+     * @param   {string} db - Reports database to use.
+     * @param   {string} q - Request query string.
      * @returns { filter: Object[], filterDesc: Set, oldest: string, latest: string }
      */
     static async buildFilter(db, q) {
@@ -610,6 +626,14 @@ class ReportsHandlers {
         if (q.project) {
             filter.push({ 'project': q.project });
             filterDesc.add('project');
+        }
+
+        // description filtering (a bit like field filter but just for Description)
+        if (q.description) {
+            const fld = 'submitted.Description';
+            const val = q.description || '.+';
+            filter.push({ [fld]: { $regex: val, $options: 'i' } });
+            filterDesc.add('description');
         }
 
         // assigned filtering: filter by assignee user name - if there is no assigned query argument,
@@ -645,7 +669,7 @@ class ReportsHandlers {
                 break;
         }
 
-        // summary filtering: filter by reports which include query argument within summary field
+        // summary filtering: filter by reports which include query argument within summary field [not currently used]
         if (q.summary) {
             if (Array.isArray(q.summary)) {
                 for (const s of q.summary) filter.push({ ['summary']: new RegExp(`.*${s}.*`, 'i') });

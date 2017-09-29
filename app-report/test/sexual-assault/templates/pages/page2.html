@@ -1,5 +1,6 @@
 <form method="post" class="pure-form pure-form-aligned">
     {{> back}}{{> step}}
+    <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
     <div class="pure-u">
 
@@ -7,10 +8,6 @@
             So please take your time and tell us what happened.</p>
 
         <h1>To begin with, when did it happen?</h1>
-
-        <ul class="validation-errors">{{#@koa.flash.validation}}
-            <li>{{this}}</li>{{/@koa.flash.validation}}
-        </ul>
 
         <ul>
             {{#checked when}}
@@ -24,9 +21,12 @@
                         <td>YYYY</td>
                     </tr>
                     <tr>
-                        <td><input type="number" name="date.day" id="date.day" value="{{date.day}}" class="w4" min="1" max="31"></td>
-                        <td><input type="text" name="date.month" id="date.month" value="{{date.month}}" list="months" class="w5" maxlength="3"></td>
-                        <td><input type="number" name="date.year" id="date.year" value="{{date.year}}" class="w5" min="{{lastyear}}" max="{{thisyear}}"></td>
+                        <td><input type="number" name="date.day" id="date.day" value="{{date.day}}"
+                                   class="w4" min="1" max="31"></td>
+                        <td><input type="text" name="date.month" id="date.month" value="{{date.month}}" list="months"
+                                   class="w5" maxlength="3"></td>
+                        <td><input type="number" name="date.year" id="date.year" value="{{date.year}}"
+                                   class="w5" min="{{lastyear}}" max="{{thisyear}}"></td>
                     </tr>
                 </table>
                 <datalist id="months">
@@ -42,8 +42,10 @@
                         <td>MM</td>
                     </tr>
                     <tr>
-                        <td><input type="number" name="date.hour" id="date.hour" value="{{date.hour}}" class="w4" min="0" max="23" title="24h"></td>
-                        <td><input type="number" name="date.minute" id="date.minute" value="{{date.minute}}" class="w4" min="0" max="59"></td>
+                        <td><input type="number" name="date.hour" id="date.hour" value="{{date.hour}}"
+                                   class="w4" min="0" max="23" title="24h"></td>
+                        <td><input type="number" name="date.minute" id="date.minute" value="{{date.minute}}"
+                                   class="w4" min="0" max="59"></td>
                     </tr>
                 </table>
             </li>
@@ -59,10 +61,12 @@
                 </select>
             </li>
             <li>
-                <input type="radio" name="when" id="when-dont-remember" value="dont-remember"> <label for="when-dont-remember">I don't exactly remember</label>
+                <input type="radio" name="when" id="when-dont-remember" value="dont-remember">
+                <label for="when-dont-remember">I don't exactly remember</label>
             </li>
             <li>
-                <input type="radio" name="when" id="when-dont-know" value="dont-know"> <label for="when-dont-know">I don't know when it happened</label>
+                <input type="radio" name="when" id="when-dont-know" value="dont-know">
+                <label for="when-dont-know">I don't know when it happened</label>
             </li>
             {{/checked}}
         </ul>
@@ -70,8 +74,10 @@
         <ul>
             {{#checked still-happening}}
             <li>
-                <input type="radio" name="still-happening" id="still-y" value="y"> <label for="still-y">Yes</label>
-                <input type="radio" name="still-happening" id="still-n" value="n" class="radio-margin"> <label for="still-n">No</label>
+                <input type="radio" name="still-happening" id="still-y" value="y">
+                <label for="still-y">Yes</label>
+                <input type="radio" name="still-happening" id="still-n" value="n" class="radio-margin">
+                <label for="still-n">No</label>
             </li>
             {{/checked}}
         </ul>

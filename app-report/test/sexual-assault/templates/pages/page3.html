@@ -1,10 +1,11 @@
 <form method="post" enctype="multipart/form-data" class="pure-form pure-form-aligned">
     {{> back}}{{> step}}
+    <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
     <div class="pure-u">
         <script>
             'use strict';
-            document.addEventListener('DOMContentLoaded', async function () {
+            document.addEventListener('DOMContentLoaded', function () {
                 document.querySelector('input[type=file]').onchange = cloneFileInput; // change handler for initial file input
                 function cloneFileInput(event) {
                     const fileInputs = document.querySelectorAll('input[type=file]');
@@ -24,24 +25,27 @@
         </script>
 
         <h1>Describe what happened</h1>
-        <p class="hint-text">You may wish to include what led up to the event, if there were any witnesses, and if anyone was told about it afterwards.
-        </p>
-
-        <ul class="validation-errors">{{#@koa.flash.validation}}
-            <li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+        <p class="hint-text">You may wish to include what led up to the event, if there were any
+            witnesses, and if anyone was told about it afterwards.</p>
 
         <ul>
             <li>
                 <label for="description">
                     Description:
                 </label>
-                <textarea class="pure-input-1" name="description" id="description" rows="4" autofocus>{{description}}</textarea>
+                <textarea class="pure-input-1" name="description" id="description" rows="4" autofocus required>
+                    {{description}}
+                </textarea>
             </li>
             <li>
                 <label for="document0">
                     <strong>Please upload any evidence that could help.</strong>
                     This can be photos, videos or any other documents.
-                    {{#if files}}<span class="note">note: please reselect {{#each files}}{{this.name}}{{#unless @last}}, {{/unless}}{{/each}} if you wish to submit them</span>{{/if}}
+                    {{#if files}}
+                    <span class="note">note: please reselect
+                        {{#each files}}{{this.name}}{{#unless @last}}, {{/unless}}{{/each}}
+                        if you wish to submit them</span>
+                    {{/if}}
                 </label>
             </li>
             <li>

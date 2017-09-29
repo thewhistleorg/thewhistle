@@ -1,9 +1,9 @@
 <form method="post" class="pure-form pure-form-aligned">
     {{> back}}{{> step}}
+    <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
     <div class="pure-u">
         <h1>Have you used this anonymous reporting service before?</h1>
-        <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
         <ul>
             {{#checked used-before}}
             <li>

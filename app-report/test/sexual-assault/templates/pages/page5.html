@@ -1,10 +1,10 @@
 <form method="post" class="pure-form pure-form-aligned">
     {{> back}}{{> step}}
+    <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
     <div class="pure-u">
         <h1>Do you know who did it?</h1>
         <p class="hint-text">This could be one person or multiple people or a company or organisation.</p>
-        <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
         <ul>
             {{#checked who}}
             <li>
@@ -19,7 +19,9 @@
                 <input type="radio" name="who" id="who-n" value="n">
                 <label for="who-n" class="pure-radio greyed-out-unless-checked">No</label>
                 <p>Please give us a description of the person/people:</p>
-                <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
+                <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">
+                    {{who-description}}
+                </textarea>
             </li>
             {{/checked}}
         </ul>

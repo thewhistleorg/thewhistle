@@ -1,12 +1,12 @@
 <form method="post" class="pure-form pure-form-aligned">
     {{> back}}{{> step}}
+    <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
     <div class="pure-u">
 
         <h1>Have you spoken to anybody about it?</h1>
 
         <p class="hint-text">Pick all options that apply.</p>
-        <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
         <ul>
             {{#checked action-taken}}

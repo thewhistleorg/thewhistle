@@ -20,9 +20,9 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
                 document.querySelector('input[name=description]').value = qs.description;
             } else {
                 // any other filter goes in the general filters field
-                addFilter(q, qs[q]);
-            }
+            addFilter(q, qs[q]);
         }
+    }
     }
 
     // use range slider for filtering submitted/updated dates

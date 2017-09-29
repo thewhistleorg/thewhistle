@@ -124,8 +124,12 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
         if (document.querySelector('#search').dataset.active) filters.push({ key: 'active', value: document.querySelector('#search').dataset.active });
         // and convert to a query string
         const query = filters.map(f => f.key.replace('%20', '+')+'='+ encodeURIComponent(f.value).replace('%20', '+').replace('%2C', ',')).join('&');
-        // replace location so each search doesn't create separate history
-        // TODO: only when current list is already filtered, so that 'back' button returns to unfiltered list? otherwise use 'window.locaion ='?
-        window.location.replace(window.location.pathname + (query ? '?' + query : ''));
+        if (Object.keys(qs).length == 0) {
+            // no current query string: move to filtered page, leaving unfiltered list in history as normal
+            window.location = '?'+query;
+        } else {
+            // existing query string: replace current filter with new filter, without creating new history
+            window.location.replace(window.location.pathname + (query ? '?' + query : ''));
+        }
     }
 });

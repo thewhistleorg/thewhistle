@@ -8,6 +8,7 @@
 
 const MongoClient = require('mongodb').MongoClient;
 const fs          = require('fs-extra');    // fs with extra functions & promise interface
+const dateFormat  = require('dateformat');  // Steven Levithan's dateFormat()
 const expect      = require('chai').expect; // BDD/TDD assertion library
 
 require('dotenv').config(); // loads environment variables from .env file (if available - eg dev env)
@@ -28,18 +29,20 @@ before(async function() {
 });
 
 describe('Report model', function() {
+    this.timeout(5e3); // 5 sec
+
     let reportId = null;
     let userId = null;
 
-    describe('setup', async function() {
+    describe('setup', function() {
         it ('sets up test user', async function() {
             const usr = { firstname: 'Test', lastname: 'User', email: 'test@user.com', username: 'test', roles: 'admin', databases: 'test' };
             userId = await User.insert(usr);
-            console.info('user id:', userId)
-        })
-    })
+            console.info('user id:', userId);
+        });
+    });
 
-    describe('supplied db failures', async function() {
+    describe('supplied db failures', function() {
         // note chai doesn't currently cope well with exceptions thrown from async functions:
         // see github.com/chaijs/chai/issues/882#issuecomment-322131680
         it('throws on unknown db', () => Report.init('no db by this name').catch(error => expect(error).to.be.an('error')));
@@ -70,47 +73,55 @@ describe('Report model', function() {
     });
     // note we won't bother checking the "if (!global.db[db]) throw" statement on all other functions!
 
-    describe('init', async function() {
+    describe('init', function() {
         it('initialises existing db (ie noop', async function() {
             expect(await Report.init('test')).to.be.undefined;
-        })
+        });
     });
 
-    describe('insert', async function() {
+    describe('insert', function() {
         it('creates minimal incident report', async function() {
             const submitted = { Date: new Date(), Description: 'a test report' };
 
             // spoof file upload (copy file to /tmp & create formidable object)
             await fs.copy('./test/img/s_gps.jpg', '/tmp/upload_s_gps.jpg');
             const stat = await fs.stat('/tmp/upload_s_gps.jpg');
-            const files = [{
+            const files = [ {
                 size:  stat.size,
                 path:  '/tmp/upload_s_gps.jpg',
                 name:  's_gps.jpg',
                 type:  'image/jpeg',
-                mtime: stat.mtime
-            }];
+                mtime: stat.mtime,
+            } ];
 
             // spoof geocode incident location (this subset of results is all we need)
             const geocode = {
                 formattedAddress:     'Free School Ln, Cambridge CB2, UK',
                 latitude:             52.2031684,
                 longitude:            0.118871,
-                administrativeLevels: {}
+                administrativeLevels: {},
             };
 
             reportId = await Report.insert('test', undefined, 'test test', submitted, 'test-project', files, geocode);
-            console.info('report id:', reportId)
+            console.info('report id:', reportId);
             expect(reportId.constructor.name).to.equal('ObjectID');
             const report = await Report.get('test', reportId);
             expect(report).to.be.an('object');
             expect(report).to.have.property('name');
         });
-        it('has extracted uploaded file data', async function() {
+        it('has uploaded file data in submitted report', async function() {
+            const report = await Report.get('test', reportId);
+            expect(report.submitted).to.be.an('object');
+            expect(report.submitted.files).to.be.an('array');
+            expect(report.submitted.files[0].name).to.equal('s_gps.jpg');
+            expect(report.submitted.files[0].path).to.equal(`test-project/${dateFormat('yyyy-mm')}/${reportId}/`);
+        });
+        it('has extracted uploaded file data in analysis', async function() {
             const report = await Report.get('test', reportId);
             expect(report.analysis).to.be.an('object');
             expect(report.analysis.files).to.be.an('array');
             expect(report.analysis.files[0].name).to.equal('s_gps.jpg');
+            expect(report.analysis.files[0].path).to.equal(`test-project/${dateFormat('yyyy-mm')}/${reportId}/`);
         });
         it('has extracted exif data', async function() {
             const report = await Report.get('test', reportId);
@@ -122,7 +133,7 @@ describe('Report model', function() {
         });
     });
 
-    describe('find', async function() {
+    describe('find', function() {
         it('finds reports by "test test"', async function() {
             const query = { name: 'test test' };
             const rpts = await Report.find('test', query);
@@ -132,7 +143,7 @@ describe('Report model', function() {
         });
     });
 
-    describe('get', async function() {
+    describe('get', function() {
         it('gets newly created report', async function() {
             const rpt = await Report.get('test', reportId);
             expect(rpt).to.be.an('object');
@@ -164,7 +175,7 @@ describe('Report model', function() {
         });
     });
 
-    describe('filter', async function() {
+    describe('filter', function() {
         it('filter by submitted test search', async function() {
             // emulate buildFilter() free-text filter
             const query = { $and: [ { archived: false }, { 'submitted.Description': { '$regex': 'test report', '$options': 'i' } } ] };
@@ -175,7 +186,7 @@ describe('Report model', function() {
         });
     });
 
-    describe('updates', async function() {
+    describe('updates', function() {
         it('updates summary', async function() {
             await Report.update('test', reportId, { summary: 'A test report' });
             const rpt = await Report.get('test', reportId);
@@ -193,7 +204,7 @@ describe('Report model', function() {
         });
     });
 
-    describe('tags', async function() {
+    describe('tags', function() {
         it('sets test-tag', async function() {
             await Report.insertTag('test', reportId, 'test-tag', userId);
         });
@@ -216,7 +227,7 @@ describe('Report model', function() {
         });
     });
 
-    describe('status', async function() {
+    describe('status', function() {
         it('sets status', async function() {
             await Report.update('test', reportId, { status: 'In progress' });
         });
@@ -227,7 +238,7 @@ describe('Report model', function() {
         });
     });
 
-    describe('comments', async function() {
+    describe('comments', function() {
         it('sets comment', async function() {
             await Report.insertComment('test', reportId, 'This is a good test report', userId);
             const rpt = await Report.get('test', reportId);
@@ -242,13 +253,13 @@ describe('Report model', function() {
             expect(rpt2.comments).to.be.an('array');
             expect(rpt2.comments.length).to.equal(0);
         });
-        it('throws on unknown db', async function() {
+        it('throws on unknown db', function() {
             Report.deleteComment('test', reportId, userId, 'bad date', userId).catch(error => expect(error).to.be.an('error'));
         } );
 
     });
 
-    describe('flag viewed', async function() {
+    describe('flag viewed', function() {
         it('sets flag', async function() {
             await Report.flagView('test', reportId, userId);
         });
@@ -258,7 +269,7 @@ describe('Report model', function() {
         });
     });
 
-    describe('teardown', async function() {
+    describe('teardown', function() {
         it('deletes incident report', async function() {
             await Report.delete('test', reportId);
             expect(await Report.get('test', reportId)).to.be.null;

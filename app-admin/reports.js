@@ -795,6 +795,9 @@ class ReportsHandlers {
             const incidentTime = new Date(report.submitted.Date);
             const submissionTime = report._id.getTimestamp();
             for (const file of report.analysis.files) {
+                // proxy url
+                file.url = `/uploaded/${report.project}/${dateFormat(report._id.getTimestamp(), 'yyyy-mm')}/${report._id}/${file.name}`;
+                // exif location
                 file.isImage = file.type.slice(0, 5) == 'image';
                 if (file.exif && incidentLocn.lat && incidentLocn.lon) {
                     const d = incidentLocn.distanceTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
@@ -802,6 +805,7 @@ class ReportsHandlers {
                     file.bearing = incidentLocn.bearingTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
                     file.direction = Dms.compassPoint(file.bearing);
                 }
+                // exif date
                 if (file.exif && file.exif.CreateDate) {
                     const date = file.exif.CreateDate;
                     file.time = new Date(Date.UTC(date.year, date.month-1, date.day, date.hour, date.minute - date.tzoffsetMinutes)); // TODO: exif tz?

@@ -14,6 +14,7 @@ const ObjectId   = require('mongodb').ObjectId;
 
 const User    = require('../models/user.js');
 const Weather = require('../lib/weather.js');
+const AwsS3   = require('../lib/aws-s3.js');
 // const Update = require('./update.js'); !! this is done at the bottom of the file to resolve Node cyclic references!
 
 /*
@@ -291,7 +292,7 @@ class Report {
         if (geocode) {
             values.location = {
                 type:        'Point',
-                coordinates: [ Number(geocode.longitude), Number(geocode.latitude) ],
+                coordinates: [Number(geocode.longitude), Number(geocode.latitude)],
             };
         }
 
@@ -304,28 +305,29 @@ class Report {
         const { insertedId } = await reports.insertOne(values);
 
         if (files) {
-            // move uploaded files from /tmp into ./static [note: NOT ./public!]
-            const dir = `${db}/${project}/${dateFormat('yyyy-mm')}/${insertedId}/`;
+            // store uploaded files in AWS S3
+            const date = dateFormat(insertedId.getTimestamp(), 'yyyy-mm');
+            const fldr = `${project}/${date}/${insertedId}/`;
             for (const file of files) {
                 if (file.size > 0) {
                     const src = file.path;
                     const dst = slug(file.name, { lower: true, remove: null });
 
-                    // move from tmp to static
-                    await fs.copy(src, './static/'+dir+dst); // TODO: use AWS for persistent file storage
-                    await fs.remove(src);
-                    file.name = dst;
-                    file.path = dir;
+                    // upload /tmp file to S3
+                    await AwsS3.put(db, project, date, insertedId, dst, src)
 
-                    // replace name with slug & path with saved file location
+                    // replace submitted.files.name with slug & .path with S3 folder
                     const filter = { _id: insertedId, 'submitted.files.path': src };
-                    const path = { 'submitted.files.$.name': dst, 'submitted.files.$.path': dir };
+                    const path = { 'submitted.files.$.name': dst, 'submitted.files.$.path': fldr };
                     await reports.updateOne(filter, { $set: path });
 
                     // augment files object with EXIF metadata & save in analysis
 
+                    file.path = fldr; // S3 folder
+                    file.name = dst;  // slugified name
+
                     // extract EXIF metadata from files
-                    const exif = await exiftool.exiftool.read('./static/'+dir+dst);
+                    const exif = await exiftool.exiftool.read(src);
                     file.exif = {
                         GPSLatitude:  exif.GPSLatitude,
                         GPSLongitude: exif.GPSLongitude,
@@ -334,6 +336,8 @@ class Report {
 
                     await reports.updateOne({ _id: insertedId }, { $push: { 'analysis.files': file } });
 
+                    // delete uploaded file from /tmp
+                    await fs.remove(src);
                 }
             }
         }
@@ -383,15 +387,14 @@ class Report {
         const report = await Report.get(db, id);
 
         // delete audit trail
-        Update.deleteForReport(db, id);
+        await Update.deleteForReport(db, id);
 
         // delete report
         const reports = global.db[db].collection('reports');
         await reports.deleteOne({ _id: id });
 
         // delete any uploaded files
-        const dir = `static/${db}/${report.project}/${dateFormat(id.getTimestamp(), 'yyyy-mm')}/${id}/`;
-        await fs.remove(dir);
+        await AwsS3.deleteReportObjects(db, report.project, dateFormat(id.getTimestamp(), 'yyyy-mm'), id);
     }
 
 

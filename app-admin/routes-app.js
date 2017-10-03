@@ -167,5 +167,31 @@ router.post('/resources/:id/delete', resources.processDelete); // process delete
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/*  Uploaded files routes                                                                         */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+// uploaded file requests are proxied through to AWS S3
+
+const AwsS3 = require('../lib/aws-s3.js');
+
+router.get('/uploaded/:project/:date/:id/:file', async function getUploadedFile(ctx) {
+    try {
+        const db = ctx.state.user.db;
+        const { project, date, id, file } = ctx.params;
+
+        ctx.body = await AwsS3.getBuffer(db, project, date, id, file);
+
+        ctx.type = file.lastIndexOf('.') > 0
+            ? file.slice(file.lastIndexOf('.')) // kosher extension
+            : 'application/octet-stream';       // no extension or initial dot
+        ctx.set('Cache-Control', 'public, max-age=' + (ctx.app.env=='production' ? 60*60*24 : 1));
+        // TODO: Last-Modified?
+    } catch (e) {
+        ctx.throw(e.statusCode, e.message);
+    }
+});
+
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 module.exports = router.middleware();

@@ -118,7 +118,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             const response = await request.get('/reports/'+reportId).set(headers);
             expect(response.status).to.equal(200);
             const document = new JsDom(response.text).window.document;
-            const src = `/test/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
+            const src = `/uploaded/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
             expect(document.getElementById(imgFile).querySelector('td a').href).to.equal(src);
             expect(document.getElementById(imgFile).querySelector('td img').src).to.equal(src);
         });

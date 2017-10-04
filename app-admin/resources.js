@@ -9,7 +9,6 @@
 
 'use strict';
 
-const Geocoder       = require('node-geocoder');         // library for geocoding and reverse geocoding
 const libphonenumber = require('google-libphonenumber'); // wrapper for Google's libphonenumber
 const isEmail        = require('isemail');               // email address validation library
 
@@ -19,6 +18,7 @@ const PhoneNumberFormat = libphonenumber.PhoneNumberFormat;
 const Resource = require('../models/resource.js');
 
 const validationErrors = require('../lib/validation-errors.js');
+const geocode          = require('../lib/geocode.js');
 
 
 const validation = {
@@ -121,15 +121,9 @@ class Handlers {
             : [];
 
         // geocode address
-        const geocoder = Geocoder({ provider: 'google', apiKey: 'AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw' });
-        let location = null;
-        try {
-            if (ctx.request.body.address) {
-                [ location ] = await geocoder.geocode(ctx.request.body.address);
-            }
-        } catch (e) {
-            console.error('ResourcesHandlers.processAdd: Geocoder error', e.message);
-        }
+        const location = ctx.request.body.address
+            ? await geocode(ctx.request.body.address)
+            : null;
 
         try {
 
@@ -177,19 +171,13 @@ class Handlers {
             : [];
 
         // geocode address
-        const geocoder = Geocoder({ provider: 'google', apiKey: 'AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw' });
-        let geocode = null;
-        try {
-            if (ctx.request.body.address) {
-                [ geocode ] = await geocoder.geocode(ctx.request.body.address);
-            }
-        } catch (e) {
-            console.error('ResourcesHandlers.processEdit: Geocoder error', e.message);
-        }
+        const location = ctx.request.body.address
+            ? await geocode(ctx.request.body.address)
+            : null;
 
         try {
 
-            await Resource.update(db, ctx.params.id, ctx.request.body, geocode);
+            await Resource.update(db, ctx.params.id, ctx.request.body, location);
 
             // return to list of resources
             ctx.redirect('/resources');

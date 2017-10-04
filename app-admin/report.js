@@ -9,8 +9,6 @@
 
 'use strict';
 
-const Geocoder = require('node-geocoder'); // library for geocoding and reverse geocoding
-
 const Report   = require('../models/report.js');
 const Resource = require('../models/resource.js');
 
@@ -18,6 +16,7 @@ const autoIdentifier   = require('../lib/auto-identifier.js');
 const jsObjectToHtml   = require('../lib/js-object-to-html.js');
 const validationErrors = require('../lib/validation-errors.js');
 const useragent        = require('../lib/user-agent.js');
+const geocode          = require('../lib/geocode.js');
 
 
 const validation = {
@@ -135,13 +134,9 @@ class IncidentReport {
         ctx.session.report = body;
 
         // geocode location
-        const geocoder = Geocoder({ provider: 'google', apiKey: 'AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw' });
-        try {
-            [ ctx.session.geocode ] = await geocoder.geocode(body['location-address']);
-        } catch (e) {
-            console.error('IncidentReport.processReportEntry: Geocoder error', e.message);
-            ctx.session.geocode = null;
-        }
+        ctx.session.geocode = body['location-address']
+            ? await geocode(body['location-address'])
+            : null;
 
         ctx.redirect(`/report/${ctx.params.project}/submit`);
     }

@@ -1169,7 +1169,7 @@ function ago(date, short=false) {
  *  - streetName
  *  - extra.establishment
  *
- * Various combinations of these seem to be returned.
+ * Various combinations of these seem to be returned. See geocode-tests.js for some examples.
  *
  * @param   {Object[]} reports - Array of reports to be examined.
  * @returns {string} Lowest geographic level which is common to all reports.

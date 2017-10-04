@@ -6,15 +6,15 @@
 
 'use strict';
 
-const Geocoder   = require('node-geocoder'); // library for geocoding and reverse geocoding
 const dateFormat = require('dateformat');    // Steven Levithan's dateFormat()
 const LatLon     = require('geodesy').LatLonSpherical; // spherical earth geodesy functions
 
 const Report   = require('../../../models/report.js');
 const Resource = require('../../../models/resource.js');
 
-const jsObjectToHtml   = require('../../../lib/js-object-to-html.js');
-const useragent        = require('../../../lib/user-agent.js');
+const jsObjectToHtml = require('../../../lib/js-object-to-html.js');
+const useragent      = require('../../../lib/user-agent.js');
+const geocode        = require('../../../lib/geocode.js');
 
 const nPages = 7;
 
@@ -112,15 +112,10 @@ class Handlers {
         if (!ctx.session.report) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
 
         // geocode location
-        const geocoder = Geocoder();
-        ctx.session.geocode = null;
-        try {
-            if (ctx.session.report['at-address']) {
-                [ ctx.session.geocode ] = await geocoder.geocode(ctx.session.report['at-address']);
-            }
-        } catch (e) {
-            console.error('Handlers.getSubmit: Geocoder error', e.message);
-        }
+        ctx.session.geocode = ctx.session.report['at-address']
+            ? await geocode(ctx.session.report['at-address'])
+            : null;
+
         // make sure only one of generated-name and existing-name are recorded, and make it 1st property of report
         if (ctx.session.report['existing-name']) { delete ctx.session.report['generated-name']; ctx.session.report = Object.assign({ 'existing-name': null }, ctx.session.report); }
         if (ctx.session.report['generated-name']) { delete ctx.session.report['existing-name']; ctx.session.report = Object.assign({ 'generated-name': null }, ctx.session.report); }

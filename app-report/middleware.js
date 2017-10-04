@@ -16,6 +16,8 @@ class ReportMiddleware {
      * The database connection string is expected to be found in an environment variable matching
      * the :database URL component (upper-cased, with hyphen replace by underscore, prefixed by DB_;
      * e.g. for report.thewhistle.org/test-cam/my-project, the env var will be DB_TEST_CAM.
+     *
+     * If no matching environment variable is found, this will throw a 404.
      */
     static mongoConnect() {
         return async function(ctx, next) {
@@ -23,9 +25,10 @@ class ReportMiddleware {
                 try {
                     const dbEnvironmentVariable = 'DB_'+ctx.params.database.toUpperCase().replace('-', '_');
                     const connectionString = process.env[dbEnvironmentVariable];
+                    if (connectionString == undefined) ctx.throw(404, `No configuration available for organisation ‘${ctx.params.database}’`);
                     global.db[ctx.params.database] = await MongoClient.connect(connectionString);
                 } catch (e) {
-                    app.throw(e);
+                    ctx.throw(e);
                 }
             }
             await next();

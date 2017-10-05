@@ -49,11 +49,12 @@
             <input type="checkbox" name="roles" id="roles-admin" value="admin"> <label for="roles-admin">Admin</label>
             <input type="checkbox" name="roles" id="roles-user" value="user"> <label for="roles-user">User</label>
             <input type="checkbox" name="roles" id="roles-reporter" value="reporter"> <label for="roles-reporter">Reporter</label>
+            <input type="checkbox" name="roles" id="roles-su" value="su" class="{{isSuUser}}"> <label for="roles-su" class="{{isSuUser}}">SU</label>
             {{/checked}}
         </li>
-        <li class="pure-control-group">
+        <li class="pure-control-group {{isSuUser}}">
             {{#checked databases}}
-            <label>Databases</label>
+            <label>Organisations<br><span class="small grey">only avail. to s/u</span></label>
             {{#availableDatabases}}
             <input type="checkbox" name="databases" id="databases-{{this}}" value="{{this}}"> <label for="databases-{{this}}">{{this}}</label>
             {{/availableDatabases}}

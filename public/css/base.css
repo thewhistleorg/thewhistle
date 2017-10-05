@@ -86,17 +86,19 @@ th     { color: #666666; font-style: italic; font-weight: normal; text-align: le
 .w48 { width: 48em; }
 .w100pc { width: 100%; }
 
-/* show/hide */
-.show            { display: block; }
-.hide            { display: none; }
+/* show/hide (note !important to override pureCSS rules) */
+.show            { display: block !important; }
+.hide            { display: none !important; }
 /* show: over-ride for specific display types */
-a.show           { display: inline; }
-button.show      { display: inline-block; }
-li.show          { display: list-item; }
-table.show       { display: table; }
-tr.show          { display: table-row; }
-td.show, th.show { display: table-cell; }
-span.show        { display: inline; }
+a.show           { display: inline !important; }
+button.show      { display: inline-block !important; }
+input.show       { display: inline-block !important; }
+label.show       { display: inline !important; }
+li.show          { display: list-item !important; }
+table.show       { display: table !important; }
+tr.show          { display: table-row !important; }
+td.show, th.show { display: table-cell !important; }
+span.show        { display: inline !important; }
 
 /* no need for nav on printouts */
 @media print {

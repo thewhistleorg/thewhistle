@@ -53,8 +53,10 @@
 <table>
     <tr>
         <th colspan="2">Name</th>
-        <th>E-mail</th><th>Username</th>
-        <th>Roles</th><th>Databases</th>
+        <th>E-mail</th>
+        <th>Username</th>
+        <th>Roles</th>
+        <th class="{{isSuUser}}">Organisations</th>
         <th></th>
         <th><a href="/users/add" title="Add new user" class="fa fa-plus green"></a></th>
     </tr>
@@ -65,7 +67,7 @@
         <td>{{email}}</td>
         <td>{{username}}</td>
         <td>{{roles}}</td>
-        <td>{{databases}}</td>
+        <td class="{{../isSuUser}}">{{databases}}</td>
         <td><a href="/users/{{_id}}/edit" title="Edit user" class="fa fa-pencil grey hide"></a></td>
         <td><form action="/users/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" title="Delete user" class="fa fa-trash hide"></button></form></td>
     </tr>

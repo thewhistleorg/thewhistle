@@ -240,7 +240,7 @@ async function setupUser(ctx, jwtPayload) {
     const db = ctx.state.user.db;
     if (!global.db[db]) {
         try {
-            const connectionString = process.env[`DB_${db.toUpperCase()}`];
+            const connectionString = process.env[`DB_${db.toUpperCase().replace('-', '_')}`];
             global.db[db] = await MongoClient.connect(connectionString);
         } catch (e) {
             const loginfailmsg = `Invalid database credentials for ‘${db}’`;

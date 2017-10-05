@@ -113,7 +113,7 @@ class LoginHandlers {
         // (these will remain in global for entire app, this doesn't happen per request)
         if (!global.db[db]) {
             try {
-                const connectionString = process.env[`DB_${db.toUpperCase()}`];
+                const connectionString = process.env[`DB_${db.toUpperCase().replace('-', '_')}`];
                 global.db[db] = await MongoClient.connect(connectionString);
             } catch (e) {
                 const loginfailmsg = `Invalid database credentials for ‘${db}’`;

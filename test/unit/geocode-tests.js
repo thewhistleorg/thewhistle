@@ -52,8 +52,8 @@ describe('Geocode', function() {
     it('geocodes University of Abuja', async function() {
         const result = await geocode('University of Abuja', 'ng');
         expect(result).to.be.an('object');
-        expect(result.latitude).to.equal(9.0009689);
-        expect(result.longitude).to.equal(7.422069999999999);
+        expect(result.latitude).to.equal(9.0009689); // occasionally turns up other values e.g. 9.0049455
+        expect(result.longitude).to.equal(7.422069999999999); // should be more like 8.9812,7.1808!
         expect(result.country).to.equal('Nigeria');
         expect(result.administrativeLevels.level1long).to.equal('FCT');
         expect(result.administrativeLevels.level2long).to.equal('Municipal Area Coun');

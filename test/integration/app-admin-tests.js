@@ -17,8 +17,8 @@ const base64      = require('base-64');     // base64 encoder/decoder
 
 const app = require('../../app.js');
 
-const testuser = process.env.TESTUSER;
-const testpass = process.env.TESTPASS;
+const testuser = process.env.TESTUSER; // note testuser must have access to test-grn only
+const testpass = process.env.TESTPASS; // (for successful login & sexual-assault report submission)
 
 
 const request = supertest.agent(app.listen());
@@ -70,7 +70,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         const imgFile = 's_gps.jpg';
         it('submits incident report', async function() {
             const values = {
-                'generated-name':    'test test',
+                'generated-name':    'testy terrain',
                 date:                dateFormat(new Date(Date.now() - 1000*60*60*24), 'yyyy-mm-dd'), // yesterday in case of early-morning run
                 time:                dateFormat('HH:MM'),
                 'brief-description': 'test',
@@ -79,8 +79,8 @@ describe('Admin app'+' ('+app.env+')', function() {
             // sadly, it seems that superagent doesn't allow request.attach() to be used with
             // request.send(), so instead we need to use request.field()
             const responseEnter = await request.post('/report/sexual-assault').set(headers)
-                .field('generated-name', 'testy-tiger')
-                .field('date', dateFormat('yyyy-mm-dd'))
+                .field('generated-name', 'testy terrain')
+                .field('date', dateFormat(new Date(Date.now() - 1000*60*60*24), 'yyyy-mm-dd')) // yesterday in case of early-morning run
                 .field('time', dateFormat('HH:MM'))
                 .field('brief-description', 'test')
                 .field('location-address', 'Free School Lane, Cambridge CB2 3RQ')
@@ -143,13 +143,14 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(response.body.reports.filter(r => r._id == reportId).length).to.equal(1);
         });
 
-        it('sees ‘test test’ name is used (ajax)', async function() {
-            const response = await request.get('/ajax/report/test/names/shy-jackal').set(headers);
+        it('sees ‘testy terrain’ name is used (ajax)', async function() {
+            const response = await request.get('/ajax/report/test-grn/names/testy+terrain').set(headers);
             expect(response.status).to.equal(200);
         });
 
+        // TODO: can 'test-grn' element of url be inferred from header credentials?
         it('sees unused name is not used (ajax)', async function() {
-            const response = await request.get('/ajax/report/test/names/no+way+this+should+be+a+used+name').set(headers);
+            const response = await request.get('/ajax/report/test-grn/names/no+way+this+should+be+a+used+name').set(headers);
             expect(response.status).to.equal(404);
         });
 
@@ -205,7 +206,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         let userId = null;
 
         it('adds new user', async function() {
-            const values = { firstname: 'Test', lastname: 'User', email: 'test@user.com', username: 'test', roles: 'admin', databases: 'test' };
+            const values = { firstname: 'Test', lastname: 'User', email: 'test@user.com', username: 'test', roles: 'admin', databases: 'test-grn' };
             const response = await request.post('/users/add').set(headers).send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/users');

@@ -37,7 +37,7 @@ class IncidentReport {
             await ctx.render(ctx.state.user.db+'/'+ctx.params.project+'-entry', ctx.session.report);
         } catch (e) {
             if (e.message.slice(0, 21) == 'unable to render view') {
-                throw new Error(`Project ‘${ctx.params.project}’ not found`); // TODO: report on home page when one available
+                ctx.throw(404, `Project ‘${ctx.params.project}’ not found`); // TODO: report on home page when one available
             } else {
                 throw e;
             }
@@ -68,12 +68,12 @@ class IncidentReport {
      * Render incident report confirm page.
      */
     static async getReportConfirm(ctx) {
-        const report = await Report.get('test', ctx.params.id);
+        const report = await Report.get(ctx.state.user.db, ctx.params.id);
 
         report.lat = report.location.coordinates[1];
         report.lon = report.location.coordinates[0];
 
-        const resources = await Resource.getNear('test', report.lat, report.lon, 10e3);
+        const resources = await Resource.getNear(ctx.state.user.db, report.lat, report.lon, 10e3);
         resources.forEach(resource => {
             const lat1 = report.lat;
             const lon1 = report.lon;
@@ -112,13 +112,13 @@ class IncidentReport {
 
         if (body['existing-name'] != null) {
             // verify existing name does exist
-            const reports = await Report.getBy('test', 'report.name', body['existing-name']);
+            const reports = await Report.getBy(ctx.state.user.db, 'report.name', body['existing-name']);
             if (reports.length == 0) { ctx.flash = 'Name not found'; ctx.redirect(ctx.url); }
             delete body['generated-name'];
         } else {
             // verify generated name does not exist
             if (body['generated-name'] == null) { ctx.flash = 'Name not given'; ctx.redirect(ctx.url); }
-            const reports = await Report.getBy('test', 'report.name', body['generated-name']);
+            const reports = await Report.getBy(ctx.state.user.db, 'report.name', body['generated-name']);
             if (reports.length > 0) { ctx.flash = 'Generated name not available'; ctx.redirect(ctx.url); }
             delete body['existing-name'];
         }
@@ -155,10 +155,10 @@ class IncidentReport {
         const name = ctx.session.report['existing-name'] || ctx.session.report['generated-name'];
         const prettyReport = prettifyReport(ctx.session.report);
 
-        const id = await Report.insert('test', by, name, prettyReport, ctx.params.project, ctx.session.files, ctx.session.geocode);
+        const id = await Report.insert(ctx.state.user.db, by, name, prettyReport, ctx.params.project, ctx.session.files, ctx.session.geocode);
 
         // record user-agent
-        await useragent.log('test', ctx.ip, ctx.headers);
+        await useragent.log(ctx.state.user.db, ctx.ip, ctx.headers);
 
         ctx.set('X-Insert-Id', id); // for integration tests
 
@@ -190,7 +190,7 @@ class IncidentReport {
      * not used.
      */
     static async getName(ctx) {
-        const reports = await Report.getBy(ctx.state.user.db, 'name', ctx.params.name);
+        const reports = await Report.getBy(ctx.state.user.db, 'name', ctx.params.name.replace('+', ' '));
 
         ctx.body = reports.map(r => r._id.toString());
         ctx.body.root = 'name';

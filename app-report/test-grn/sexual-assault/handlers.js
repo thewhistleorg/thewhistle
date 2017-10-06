@@ -147,13 +147,13 @@ class Handlers {
         switch (ctx.session.report['used-before']) {
             case 'y':
                 // verify existing name does exist
-                const reportsY = await Report.getBy('test', 'name', ctx.session.report['existing-name']);
+                const reportsY = await Report.getBy(ctx.params.database, 'name', ctx.session.report['existing-name']);
                 if (reportsY.length == 0) { ctx.flash = { name: 'Anonymous name not found' }; ctx.redirect(ctx.url); return; }
                 break;
             case 'n':
                 // verify generated name does not exist
                 if (ctx.session.report['generated-name'] == null) { ctx.flash = 'Name not given'; ctx.redirect(ctx.url); }
-                const reportsN = await Report.getBy('test', 'name', ctx.session.report['generated-name']);
+                const reportsN = await Report.getBy(ctx.params.database, 'name', ctx.session.report['generated-name']);
                 if (reportsN.length > 0) { ctx.flash = { name: 'Generated name not available: please select another' }; ctx.redirect(ctx.url); return; }
                 break;
         }
@@ -162,11 +162,11 @@ class Handlers {
 
         const prettyReport = prettifyReport(ctx.session.report);
 
-        const id = await Report.insert('test', undefined, name, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.session.geocode);
+        const id = await Report.insert(ctx.params.database, undefined, name, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.session.geocode);
         ctx.set('X-Insert-Id', id); // for integration tests
 
         // record user-agent
-        await useragent.log('test', ctx.ip, ctx.headers);
+        await useragent.log(ctx.params.database, ctx.ip, ctx.headers);
 
         // remove all session data (to prevent duplicate submission)
         // except geocoding result (to present local resources)
@@ -192,7 +192,7 @@ class Handlers {
             const geocode = ctx.session.geocode;
 
             // get all resources within 20km of geocoded location
-            const resources = await Resource.getNear('test', geocode.latitude, geocode.longitude, 20e3);
+            const resources = await Resource.getNear(ctx.params.database, geocode.latitude, geocode.longitude, 20e3);
 
             // add distance from geocoded location to each resource, & convert phone/email arrays to lists
             const locn = new LatLon(geocode.latitude, geocode.longitude);
@@ -252,6 +252,8 @@ class Handlers {
  *    monotonic fields
  *  - merging checkbox fields ('action') to full texts integrating 'other' field
  *  - setting undefined fields resulting from checkboxes / radio buttons with nothing checked
+ *
+ * Note that the admin app expects a field named 'Description'.
  *
  * @param   {Object} report - Report as submitted
  * @returns {Object} Transformed report

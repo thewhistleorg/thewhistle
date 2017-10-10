@@ -266,8 +266,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function generateName() {
+        var db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path
         var request = new XMLHttpRequest();
-        request.open('GET', '/ajax/test/names/new');
+        request.open('GET', `/ajax/${db}/names/new`);
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
                 if (request.status == 200) {
@@ -288,8 +289,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('#generated-name').classList.remove('hide');
             return;
         }
+        var db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path
         var request = new XMLHttpRequest();
-        request.open('GET', '/ajax/test/names/'+name);
+        request.open('GET', `/ajax/${db}/names/${name.replace(' ', '+')}`);
         request.setRequestHeader('Accept', 'application/json');
         request.onreadystatechange = function () {
             if (request.readyState == 4) {

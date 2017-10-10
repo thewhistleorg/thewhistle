@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Handlers: test/wwww (what-where-when-who)                                                      */
+/* Handlers: test-cam/wwww (what-where-when-who)                                                  */
 /*                                                                                                */
 /* All functions here either render or redirect, or throw.                                        */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -111,7 +111,7 @@ class Handlers {
 
             // record this report (including uploaded docs)
             delete ctx.request.body['submit'];
-            await Report.insert('test', undefined, '—', ctx.session.report, 'wwww', ctx.session.files);
+            await Report.insert(ctx.params.database, undefined, '—', ctx.session.report, 'wwww', ctx.session.files);
             ctx.session = null;
             ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/thank-you`);
         }

@@ -32,18 +32,17 @@ handler.getGenerateNewName = async function(ctx) {
     ctx.body = { name: name };
     ctx.body.root = 'generateName';
     ctx.status = 200; // Ok
-    ctx.set('Cache-Control', 'no-cache'); // stop IE cacheing generated names.
+    ctx.set('Cache-Control', 'no-cache'); // stop IE caching generated names.
 };
 
 
 /**
  * Get details of name - currently just used to check if name is available.
- *
- * TODO: generalise from GRN reports [by making top-level 'name' mandatory?]
  */
 handler.getName = async function(ctx) {
     const db = ctx.params.db;
-    const reports = await Report.getBy(db, 'name', ctx.params.id);
+    const id = ctx.params.id.replace('+', ' ');
+    const reports = await Report.getBy(db, 'name', id);
     ctx.body = {};
     ctx.body.root = 'name';
     ctx.status = reports.length==0 && ctx.params.id!='' ? 404 : 200; // Not Found / Ok

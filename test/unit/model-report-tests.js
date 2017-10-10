@@ -6,7 +6,6 @@
 
 'use strict';
 
-const MongoClient = require('mongodb').MongoClient;
 const fs          = require('fs-extra');    // fs with extra functions & promise interface
 const dateFormat  = require('dateformat');  // Steven Levithan's dateFormat()
 const expect      = require('chai').expect; // BDD/TDD assertion library
@@ -16,17 +15,7 @@ require('dotenv').config(); // loads environment variables from .env file (if av
 const Report = require('../../models/report.js');
 const User   = require('../../models/user.js');
 
-before(async function() {
-    this.timeout(10e3); // 10 sec
-    try {
-        const userDb = await MongoClient.connect(process.env['DB_USERS']);
-        const testDb = await MongoClient.connect(process.env['DB_TEST_CAM']);
-        global.db = { users: userDb, 'test-cam': testDb };
-    } catch (e) {
-        console.error(e.message);
-        process.exit(1);
-    }
-});
+require('./before.js'); // set up database connections
 
 describe('Report model', function() {
     this.timeout(5e3); // 5 sec

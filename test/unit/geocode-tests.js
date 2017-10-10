@@ -5,22 +5,12 @@
 'use strict';
 
 const expect      = require('chai').expect; // BDD/TDD assertion library
-const MongoClient = require('mongodb').MongoClient;
 
 require('dotenv').config(); // loads environment variables from .env file (if available - eg dev env)
 
 const geocode = require('../../lib/geocode.js');
 
-before(async function() {
-    this.timeout(10e3); // 10 sec
-    try {
-        const userDb = await MongoClient.connect(process.env['DB_USERS']);
-        global.db = { users: userDb };
-    } catch (e) {
-        console.error(e.message);
-        process.exit(1);
-    }
-});
+require('./before.js'); // set up database connections
 
 describe('Geocode', function() {
     it('geocodes Free School Lane', async function() {

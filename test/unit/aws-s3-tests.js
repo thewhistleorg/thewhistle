@@ -17,7 +17,7 @@ const test = it; // just an alias
 const ObjectId = (rnd = r16 => Math.floor(r16).toString(16)) =>
     rnd(Date.now()/1000) + ' '.repeat(16).replace(/./g, () => rnd(Math.random()*16));
 
-global.db = { 'test-cam': {} }; // fool library into thinking we have db env vars set up
+require('./before.js'); // set up database connections
 
 describe('AWS S3', function() {
     this.timeout(5e3); // 5 sec
@@ -43,7 +43,7 @@ describe('AWS S3', function() {
     });
 
     test('file is removed', async function() {
-        const file = await AwsS3.getBuffer('test-cam', 'sexual-assault', date, id, 's_gps.jpg').catch(error => expect(error).to.be.an('error'));
+        await AwsS3.getBuffer('test-cam', 'sexual-assault', date, id, 's_gps.jpg').catch(error => expect(error).to.be.an('error')); // (404)
     });
 
     // these are just to boost coverage stats

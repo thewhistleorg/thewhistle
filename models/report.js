@@ -35,13 +35,14 @@ const validator = { $and: [ // TODO: validation for string or null
     { name:       { $type: 'string',   $exists: true } }, // auto-generated name of victim/survivor
     { geocode:    { $type: 'object'                  } }, // google geocoding data
     { location:   { $type: 'object',   $exists: true } }, // GeoJSON (with spatial index)
-    { summary:    { $type: 'string'                  } }, // single-line summary for identification
+    { analysis:   { $type: 'object'                  } }, // exif data, weather, etc
+//  { summary:    { $type: 'string'                  } }, // single-line summary for identification (not currently used)
     { assignedTo: { $type: 'objectId'                } }, // user report is assigned to
     { status:     { $type: 'string'                  } },
     { tags:       { $type: 'array'                   } }, // array of strings
     { comments:   { $type: 'array'                   } }, // array of { byId, byName, on, comment }
-    { archived:   { $type: 'bool',     $exists: true } }, // archived flag
     { views:      { $type: 'object'                  } }, // associative array of timestamps indexed by user id
+    { archived:   { $type: 'bool',     $exists: true } }, // archived flag
 ] };
 
 class Report {
@@ -270,13 +271,13 @@ class Report {
 
         const values = {
             project:    project,
+            submitted:  submitted,
             by:         by,
             name:       name,
-            submitted:  submitted,
             geocode:    geocode || {},
             location:   {},
             analysis:   {},
-            summary:    undefined,
+//          summary:    undefined,
             assignedTo: undefined,
             status:     undefined,
             tags:       [],

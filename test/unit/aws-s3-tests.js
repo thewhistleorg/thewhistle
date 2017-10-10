@@ -46,12 +46,11 @@ describe('AWS S3', function() {
         const file = await AwsS3.getBuffer('test-cam', 'sexual-assault', date, id, 's_gps.jpg').catch(error => expect(error).to.be.an('error'));
     });
 
-    test('supplied db failures', function() { // these are just to boost coverage stats
-        // note chai doesn't currently cope well with exceptions thrown from async functions:
-        // see github.com/chaijs/chai/issues/882#issuecomment-322131680
-        it('throws on bad db', () => AwsS3.put('').catch(error => expect(error).to.be.an('error')));
-        it('throws on bad db', () => AwsS3.getBuffer('').catch(error => expect(error).to.be.an('error')));
-        it('throws on bad db', () => AwsS3.getStream('').catch(error => expect(error).to.be.an('error')));
-        it('throws on bad db', () => AwsS3.deleteReportObjects('').catch(error => expect(error).to.be.an('error')));
-    });
+    // these are just to boost coverage stats
+    // note chai doesn't currently cope well with exceptions thrown from async functions:
+    // see github.com/chaijs/chai/issues/882#issuecomment-322131680
+    test('throw on bad db (put)', () => AwsS3.put('xxxx').catch(error => expect(error).to.be.an('error')));
+    test('throw on bad db (getBuffer)', () => AwsS3.getBuffer('').catch(error => expect(error).to.be.an('error')));
+    //test('throw on bad db (getStream)', () => expect(() => AwsS3.getStream('').to.throw()));
+    test('throw on bad db (deleteReportObjects)', () => AwsS3.deleteReportObjects('').catch(error => expect(error).to.be.an('error')));
 });

@@ -9,9 +9,9 @@ const router = require('koa-router')(); // router middleware for koa
 const email = require('./email-handlers.js');
 
 
-router.get( '/email',               ctx => ctx.render('email/index'));
-router.post('/email',               email.requestVerification);
-router.get( '/email/verify/:token', email.verify);
+router.get( '/:database/email',               ctx => ctx.render('email/index'));
+router.post('/:database/email',               email.requestVerification);
+router.get( '/:database/email/verify/:token', email.verify);
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

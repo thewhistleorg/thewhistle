@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Report model unit tests                                                                        */
 /*                                                                                                */
-/* Note these tests to not mock out the database components, but operate on the live 'test' db.   */
+/* Note these tests do not mock out database components, but operate on the live 'test-cam' db    */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';
@@ -20,8 +20,8 @@ before(async function() {
     this.timeout(10e3); // 10 sec
     try {
         const userDb = await MongoClient.connect(process.env['DB_USERS']);
-        const testDb = await MongoClient.connect(process.env['DB_TEST']);
-        global.db = { users: userDb, test: testDb };
+        const testDb = await MongoClient.connect(process.env['DB_TEST_CAM']);
+        global.db = { users: userDb, 'test-cam': testDb };
     } catch (e) {
         console.error(e.message);
         process.exit(1);
@@ -75,7 +75,7 @@ describe('Report model', function() {
 
     describe('init', function() {
         it('initialises existing db (ie noop', async function() {
-            expect(await Report.init('test')).to.be.undefined;
+            expect(await Report.init('test-cam')).to.be.undefined;
         });
     });
 
@@ -102,29 +102,29 @@ describe('Report model', function() {
                 administrativeLevels: {},
             };
 
-            reportId = await Report.insert('test', undefined, 'test test', submitted, 'test-project', files, geocode);
+            reportId = await Report.insert('test-cam', undefined, 'test test', submitted, 'test-project', files, geocode);
             console.info('report id:', reportId);
             expect(reportId.constructor.name).to.equal('ObjectID');
-            const report = await Report.get('test', reportId);
+            const report = await Report.get('test-cam', reportId);
             expect(report).to.be.an('object');
             expect(report).to.have.property('name');
         });
         it('has uploaded file data in submitted report', async function() {
-            const report = await Report.get('test', reportId);
+            const report = await Report.get('test-cam', reportId);
             expect(report.submitted).to.be.an('object');
             expect(report.submitted.files).to.be.an('array');
             expect(report.submitted.files[0].name).to.equal('s_gps.jpg');
             expect(report.submitted.files[0].path).to.equal(`test-project/${dateFormat('yyyy-mm')}/${reportId}/`);
         });
         it('has extracted uploaded file data in analysis', async function() {
-            const report = await Report.get('test', reportId);
+            const report = await Report.get('test-cam', reportId);
             expect(report.analysis).to.be.an('object');
             expect(report.analysis.files).to.be.an('array');
             expect(report.analysis.files[0].name).to.equal('s_gps.jpg');
             expect(report.analysis.files[0].path).to.equal(`test-project/${dateFormat('yyyy-mm')}/${reportId}/`);
         });
         it('has extracted exif data', async function() {
-            const report = await Report.get('test', reportId);
+            const report = await Report.get('test-cam', reportId);
             expect(report.analysis).to.be.an('object');
             expect(report.analysis.files).to.be.an('array');
             expect(report.analysis.files[0].exif).to.be.an('object');
@@ -136,7 +136,7 @@ describe('Report model', function() {
     describe('find', function() {
         it('finds reports by "test test"', async function() {
             const query = { name: 'test test' };
-            const rpts = await Report.find('test', query);
+            const rpts = await Report.find('test-cam', query);
             expect(rpts).to.be.an('array');
             expect(rpts.length).to.equal(1);
             expect(rpts[0].name).to.equal('test test');
@@ -145,33 +145,33 @@ describe('Report model', function() {
 
     describe('get', function() {
         it('gets newly created report', async function() {
-            const rpt = await Report.get('test', reportId);
+            const rpt = await Report.get('test-cam', reportId);
             expect(rpt).to.be.an('object');
             expect(rpt.name).to.equal('test test');
         });
         it('gets newly created report with string id', async function() {
-            const rpt = await Report.get('test', reportId.toString());
+            const rpt = await Report.get('test-cam', reportId.toString());
             expect(rpt).to.be.an('object');
             expect(rpt.name).to.equal('test test');
         });
         it('gets all active reports', async function() {
-            const rpts = await Report.getAll('test');
+            const rpts = await Report.getAll('test-cam');
             expect(rpts).to.be.an('array');
             expect(rpts.length).to.be.at.least(1);
             // TODO: any way to test rpts includes reportId?
         });
         it('gets reports with field matching value', async function() {
-            const rpts = await Report.getBy('test', 'name', 'test test');
+            const rpts = await Report.getBy('test-cam', 'name', 'test test');
             expect(rpts).to.be.an('array');
             expect(rpts.length).to.be.equal(1);
         });
         it('gets most recent report timestamp', async function() {
-            const timestamp = await Report.getLatestTimestamp('test');
+            const timestamp = await Report.getLatestTimestamp('test-cam');
             expect(new Date(timestamp)).to.be.at.least(reportId.getTimestamp());
         });
-        it('gets most oldest report timestamp', async function() {
-            const timestamp = await Report.getOldestTimestamp('test');
-            expect(new Date(timestamp)).to.be.below(reportId.getTimestamp());
+        it('gets oldest report timestamp', async function() {
+            const timestamp = await Report.getOldestTimestamp('test-cam');
+            expect(new Date(timestamp)).to.be.at.most(reportId.getTimestamp());
         });
     });
 
@@ -179,7 +179,7 @@ describe('Report model', function() {
         it('filter by submitted test search', async function() {
             // emulate buildFilter() free-text filter
             const query = { $and: [ { archived: false }, { 'submitted.Description': { '$regex': 'test report', '$options': 'i' } } ] };
-            const rpts = await Report.find('test', query);
+            const rpts = await Report.find('test-cam', query);
             expect(rpts).to.be.an('array');
             expect(rpts.length).to.equal(1);
             expect(rpts[0].name).to.equal('test test');
@@ -188,40 +188,40 @@ describe('Report model', function() {
 
     describe('updates', function() {
         it('updates summary', async function() {
-            await Report.update('test', reportId, { summary: 'A test report' });
-            const rpt = await Report.get('test', reportId);
+            await Report.update('test-cam', reportId, { summary: 'A test report' });
+            const rpt = await Report.get('test-cam', reportId);
             expect(rpt.summary).to.equal('A test report');
         });
         it('updates assignedTo', async function() {
-            await Report.update('test', reportId, { assignedTo: userId });
-            const rpt = await Report.get('test', reportId);
+            await Report.update('test-cam', reportId, { assignedTo: userId });
+            const rpt = await Report.get('test-cam', reportId);
             expect(rpt.assignedTo).to.deep.equal(userId);
         });
         it('updates status', async function() {
-            await Report.update('test', reportId, { status: 'In progress' });
-            const rpt = await Report.get('test', reportId);
+            await Report.update('test-cam', reportId, { status: 'In progress' });
+            const rpt = await Report.get('test-cam', reportId);
             expect(rpt.status).to.equal('In progress');
         });
     });
 
     describe('tags', function() {
         it('sets test-tag', async function() {
-            await Report.insertTag('test', reportId, 'test-tag', userId);
+            await Report.insertTag('test-cam', reportId, 'test-tag', userId);
         });
         it('gets tags', async function() {
-            const tags = await Report.tags('test');
+            const tags = await Report.tags('test-cam');
             expect(tags).to.be.an('array');
             expect(tags).to.include('test-tag');
         });
         it('gets reports by tag', async function() {
-            const rpts = await Report.getByTag('test', 'test-tag');
+            const rpts = await Report.getByTag('test-cam', 'test-tag');
             expect(rpts).to.be.an('array');
             expect(rpts.length).to.be.at.least(1);
             // TODO: any way to test rpts includes 'test-tag?
         });
         it('deletes test-tag', async function() {
-            await Report.deleteTag('test', reportId, 'test-tag', userId);
-            const tags = await Report.tags('test');
+            await Report.deleteTag('test-cam', reportId, 'test-tag', userId);
+            const tags = await Report.tags('test-cam');
             expect(tags).to.be.an('array');
             expect(tags).to.not.include('test-tag');
         });
@@ -229,10 +229,10 @@ describe('Report model', function() {
 
     describe('status', function() {
         it('sets status', async function() {
-            await Report.update('test', reportId, { status: 'In progress' });
+            await Report.update('test-cam', reportId, { status: 'In progress' });
         });
         it('gets statuses', async function() {
-            const statuses = await Report.statuses('test');
+            const statuses = await Report.statuses('test-cam');
             expect(statuses).to.be.an('array');
             expect(statuses).to.include('In progress');
         });
@@ -240,39 +240,39 @@ describe('Report model', function() {
 
     describe('comments', function() {
         it('sets comment', async function() {
-            await Report.insertComment('test', reportId, 'This is a good test report', userId);
-            const rpt = await Report.get('test', reportId);
+            await Report.insertComment('test-cam', reportId, 'This is a good test report', userId);
+            const rpt = await Report.get('test-cam', reportId);
             expect(rpt.comments).to.be.an('array');
             expect(rpt.comments.length).to.equal(1);
             expect(rpt.comments[0].comment).to.equal('This is a good test report');
         });
         it('deletes comment', async function() {
-            const rpt = await Report.get('test', reportId);
-            await Report.deleteComment('test', reportId, userId, rpt.comments[0].on, userId);
-            const rpt2 = await Report.get('test', reportId);
+            const rpt = await Report.get('test-cam', reportId);
+            await Report.deleteComment('test-cam', reportId, userId, rpt.comments[0].on, userId);
+            const rpt2 = await Report.get('test-cam', reportId);
             expect(rpt2.comments).to.be.an('array');
             expect(rpt2.comments.length).to.equal(0);
         });
         it('throws on unknown db', function() {
-            Report.deleteComment('test', reportId, userId, 'bad date', userId).catch(error => expect(error).to.be.an('error'));
+            Report.deleteComment('test-cam', reportId, userId, 'bad date', userId).catch(error => expect(error).to.be.an('error'));
         } );
 
     });
 
     describe('flag viewed', function() {
         it('sets flag', async function() {
-            await Report.flagView('test', reportId, userId);
+            await Report.flagView('test-cam', reportId, userId);
         });
         it('verifies flag', async function() {
-            const lastView = await Report.lastViewed('test', reportId, userId);
+            const lastView = await Report.lastViewed('test-cam', reportId, userId);
             expect(lastView.getTime()).to.be.closeTo(Date.now(), 1e3);
         });
     });
 
     describe('teardown', function() {
         it('deletes incident report', async function() {
-            await Report.delete('test', reportId);
-            expect(await Report.get('test', reportId)).to.be.null;
+            await Report.delete('test-cam', reportId);
+            expect(await Report.get('test-cam', reportId)).to.be.null;
         });
         it('deletes test user', async function() {
             const ok = await User.delete(userId);

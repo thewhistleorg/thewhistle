@@ -49,19 +49,20 @@ describe('Geocode', function() {
         expect(result.streetName).to.be.undefined;
     });
 
-    it('geocodes University of Abuja', async function() {
-        const result = await geocode('University of Abuja', 'ng');
-        expect(result).to.be.an('object');
-        expect(result.latitude).to.equal(9.0009689); // occasionally turns up other values e.g. 9.0049455
-        expect(result.longitude).to.equal(7.422069999999999); // should be more like 8.9812,7.1808!
-        expect(result.country).to.equal('Nigeria');
-        expect(result.administrativeLevels.level1long).to.equal('FCT');
-        expect(result.administrativeLevels.level2long).to.equal('Municipal Area Coun');
-        expect(result.extra.neighborhood).to.equal('Galadimawa');
-        expect(result.city).to.equal('Abuja F.C.T');
-        expect(result.streetName).to.equal('Km 10 Airport Road');
-        expect(result.formattedAddress).to.equal('Km 10 Airport Road, Galadimawa, Abuja F.C.T, Nigeria');
-    });
+    /* remove University of Abuja test as google keeps coming back with different results! */
+    //it('geocodes University of Abuja', async function() {
+    //    const result = await geocode('University of Abuja', 'ng');
+    //    expect(result).to.be.an('object');
+    //    expect(result.latitude).to.be.closeTo(9.0009689, 0.1); // occasionally turns up other values e.g. 9.0049455, 9.0291295!
+    //    expect(result.longitude).to.be.closeTo(7.42207, 0.1);  // should actually be more like 8.9812,7.1808!
+    //    expect(result.country).to.equal('Nigeria');
+    //    expect(result.administrativeLevels.level1long).to.equal('FCT');
+    //    expect(result.administrativeLevels.level2long).to.equal('Municipal Area Coun');
+    //    expect(result.extra.neighborhood).to.equal('Galadimawa'); // sometimes comes out 'Area 3, Garki'!
+    //    expect(result.city).to.equal('Abuja F.C.T');
+    //    expect(result.streetName).to.equal('Km 10 Airport Road');
+    //    expect(result.formattedAddress).to.equal('Km 10 Airport Road, Galadimawa, Abuja F.C.T, Nigeria');
+    //});
 
     it('fails to geocode unrecognised address', async function() {
         const result = await geocode('this is a place which I’ve certainly never come across', 'uk');

@@ -39,10 +39,12 @@
             // set scroll height
             resizeElementHeight(document.getElementById('scroll-container'));
 
+            {{#if showDeleteButton}}
             // report deletion confirmation pop-up
             document.querySelector('form.delete').onsubmit = function confirmDelete() {
                 return confirm('Are you sure you want to delete this report?');
             };
+            {{/if}}
 
         });
 

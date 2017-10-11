@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
         } else {
             if (q == 'description') {
                 // the description filter goes directly in the description filter field
-                document.querySelector('input[name=description').value = qs.description;
+                document.querySelector('input[name=description]').value = qs.description;
             } else {
                 // any other filter goes in the general filters field
                 addFilter(q, qs[q]);

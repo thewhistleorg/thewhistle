@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
     // convert filter spans to query string and refresh page to that location
     function applyFilter() {
         // description filter stands on on its own, create a separate filter for that if it's filled in
-        const description = document.querySelector('input[name=description').value;
+        const description = document.querySelector('input[name=description]').value;
         const filterDescription = description ? [ { key: 'description', value: description } ] : [];
         // other filters come from the spans within the search-display input
         const filterSpans = Array.from(document.querySelectorAll('#search-display span[data-key]')); // note don't include contenteditable spans

@@ -104,6 +104,8 @@ const luscaCspTrustedCdns = [
     'developers.google.com',
     'cdn.rawgit.com',
     'raw.githubusercontent.com',
+    'www.googletagmanager.com',
+    'www.google-analytics.com',
 ].join(' ');
 const luscaCspDefaultSrc = `'self' 'unsafe-inline' 'unsafe-eval' ${luscaCspTrustedCdns}`; // 'unsafe-inline' req'd for <style> blocks !!! unsave-eval req'd for google charts !!!
 app.use(convert(lusca({ // note koa-lusca@2.2.0 is v1 middleware which generates deprecation notice

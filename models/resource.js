@@ -130,7 +130,7 @@ class Resource {
      * @param   {string}   db - Database to use.
      * @param   {number}   lat - Latitude to return results close to.
      * @param   {number}   lon - Longitude to return results close to.
-     * @param   {number}   distance - Maximum distance to return results for.
+     * @param   {number}   distance - Maximum distance (in metres) to return results for.
      * @returns {Object[]} Resources details.
      */
     static async getNear(db, lat, lon, distance) {
@@ -214,7 +214,6 @@ class Resource {
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
         const resources = global.db[db].collection('resources');
-        if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
         await resources.deleteOne({ _id: id });
     }
 

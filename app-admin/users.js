@@ -114,7 +114,7 @@ class UsersHandlers {
 
             // ensure su is also admin
             if (ctx.request.body.roles.includes('su') && !ctx.request.body.roles.includes('admin')) {
-                ctx.request.body.roles.concat(['admin'], ctx.request.body.roles); // put 'admin' at the front!
+                ctx.request.body.roles.concat([ 'admin' ], ctx.request.body.roles); // put 'admin' at the front!
             }
 
             const id = await User.insert(ctx.request.body);
@@ -158,7 +158,7 @@ class UsersHandlers {
 
             // ensure su is also admin
             if (ctx.request.body.roles.includes('su') && !ctx.request.body.roles.includes('admin')) {
-                ctx.request.body.roles.concat(['admin'], ctx.request.body.roles); // put 'admin' at the front!
+                ctx.request.body.roles.concat([ 'admin' ], ctx.request.body.roles); // put 'admin' at the front!
             }
 
             await User.update(ctx.params.id, ctx.request.body);
@@ -200,6 +200,35 @@ class UsersHandlers {
         }
     }
 
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+    /* Ajax functions                                                                             */
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+
+    /**
+     * Make user details available; for now, this is just for testing.
+     *
+     * eg /ajax/users?email=test@thewhistle.org
+     */
+    static async ajaxUserDetails(ctx) {
+        if (Object.keys(ctx.request.query).length == 0) { ctx.status = 403; ctx.body = {}; return; }
+
+        const fld = Object.keys(ctx.request.query)[0];
+        const val = ctx.request.query[fld];
+
+        try {
+            const users = await User.getBy(fld, val);
+            if (users.length == 0) { ctx.status = 404; ctx.body = {}; return; }
+            const usrsNoPw = users.map(u => { delete u.password; return u; }); // no need to show p/w, even encrypted!
+            ctx.status = 200;
+            ctx.body = { users: usrsNoPw };
+        } catch (e) {
+            ctx.status = 500;
+            ctx.body = e;
+        }
+        ctx.body.root = 'reports';
+    }
 }
 
 

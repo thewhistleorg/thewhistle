@@ -31,6 +31,8 @@ const headers = { Host: 'admin.localhost:3000' }; // set host header
 describe('Admin app'+' ('+app.env+')', function() {
     this.timeout(10e3); // 10 sec
 
+    let commentId = null;
+
     describe('login', function() {
         let location = null;
 
@@ -69,7 +71,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         const imgFldr = 'test/img/';
         const imgFile = 's_gps.jpg';
         it('submits incident report', async function() {
-            const values = {
+            const values = { // eslint-disable-line no-unused-vars
                 'generated-name':    'testy terrain',
                 date:                dateFormat(new Date(Date.now() - 1000*60*60*24), 'yyyy-mm-dd'), // yesterday in case of early-morning run
                 time:                dateFormat('HH:MM'),
@@ -107,7 +109,7 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('sees weather conditions in report page', async function() {
             return; // TODO investigate why wunderground is returning 400 Bad Request
-            const response = await request.get('/reports/'+reportId).set(headers);
+            const response = await request.get('/reports/'+reportId).set(headers); // eslint-disable-line no-unreachable
             expect(response.status).to.equal(200);
             const document = new JsDom(response.text).window.document;
             const iconRe = new RegExp('^/img/weather/underground/icons/black/png/32x32/[a-z]+.png$');
@@ -188,7 +190,37 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(matches.numberValue).to.equal(1);
         });
 
-        // TODO: commentary tests
+        it('adds a comment', async function() {
+            const respUser = await request.get(`/ajax/users?email=${testuser}`).set(headers);
+            const testUser = respUser.body.users[0];
+            const values = { comment: 'Testing testing 1-2-3', username: testUser.username, userid: testUser._id };
+            const response = await request.post(`/ajax/reports/${reportId}/comments`).set(headers).send(values);
+            expect(response.status).to.equal(201);
+            commentId = response.body.id;
+        });
+
+        it('sees comment in report page', async function() {
+            const response = await request.get('/reports/'+reportId).set(headers);
+            expect(response.status).to.equal(200);
+            const document = new JsDom(response.text).window.document;
+            expect(document.getElementById(commentId).querySelectorAll('div')[1].textContent).to.equal('Testing testing 1-2-3\n');
+        });
+
+        it('edits comment', async function() {
+            // TBC
+        });
+
+        it('deletes comment', async function() {
+            const response = await request.delete(`/ajax/reports/${reportId}/comments/${commentId}`).set(headers);
+            expect(response.status).to.equal(200);
+        });
+
+        it('no longer sees comment in report page', async function() {
+            const response = await request.get('/reports/'+reportId).set(headers);
+            expect(response.status).to.equal(200);
+            const document = new JsDom(response.text).window.document;
+            expect(document.getElementById(commentId)).to.be.null;
+        });
 
         it('tidyup: deletes updates (ajax)', async function() {
             const response = await request.delete(`/ajax/reports/${reportId}/updates/`).set(headers).send();

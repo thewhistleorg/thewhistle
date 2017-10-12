@@ -142,13 +142,15 @@ Jimp.prototype.writePromise = function(path) {
 
 const users = require('./users.js');
 
-router.get('/users',             users.list);          // render list users page
-router.get('/users/add',         users.add);           // render add user page
-router.get('/users/:id/edit',    users.edit);          // render edit user page
+router.get('/users',             users.list);            // render list users page
+router.get('/users/add',         users.add);             // render add user page
+router.get('/users/:id/edit',    users.edit);            // render edit user page
 
-router.post('/users/add',        users.processAdd);    // process add user
-router.post('/users/:id/edit',   users.processEdit);   // process edit user
-router.post('/users/:id/delete', users.processDelete); // process delete user
+router.post('/users/add',        users.processAdd);      // process add user
+router.post('/users/:id/edit',   users.processEdit);     // process edit user
+router.post('/users/:id/delete', users.processDelete);   // process delete user
+
+router.get('/ajax/users',        users.ajaxUserDetails); // get user details
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

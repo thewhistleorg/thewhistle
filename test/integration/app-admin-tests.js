@@ -134,7 +134,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('gets timestamp of new report (ajax)', async function() {
-            const response = await request.get('/ajax/dashboard/reports/latest-timestamp').set(headers);
+            const response = await request.get('/ajax/reports/latest-timestamp').set(headers);
             expect(response.status).to.equal(200);
             expect(response.body.latest.timestamp).to.equal(ObjectId(reportId).getTimestamp().toISOString());
         });

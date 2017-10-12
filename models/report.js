@@ -508,6 +508,7 @@ class Report {
      * @param {ObjectId} id - Report id.
      * @param {string}   comment - Comment with markdown formatting.
      * @param {ObjectId} userId - User id (for update audit trail).
+     * @returns {Object} Inserted comment, including byId, byName, on, comment.
      */
     static async insertComment(db, id, comment, userId) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
@@ -517,9 +518,12 @@ class Report {
 
         const reports = global.db[db].collection('reports');
         const user = await User.get(userId);
-        await reports.updateOne({ _id: id }, { $push: { comments: { byId: userId, byName: user.username, on: new Date(), comment } } });
+        const values = { byId: userId, byName: user.username, on: new Date(), comment }
+        await reports.updateOne({ _id: id }, { $push: { comments: values } });
 
         await Update.insert(db, id, userId, { push: { comments: comment } }); // audit trail
+
+        return values;
     }
 
 

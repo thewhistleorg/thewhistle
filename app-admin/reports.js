@@ -1022,24 +1022,22 @@ class ReportsHandlers {
         if (!ctx.request.body.comment) { ctx.status = 403; return; } // Forbidden
 
         try {
-            const timestamp = new Date();
-            await Report.insertComment(db, ctx.params.report, ctx.request.body.comment, ctx.state.user.id);
+            const comment = await Report.insertComment(db, ctx.params.report, ctx.request.body.comment, ctx.state.user.id);
 
-            // make links for #tags and @mentions
+            // for returned comment, make links for #tags and @mentions
             const users = await User.getAll();
             const tagList = await Report.tags(db);
-            let comment = ctx.request.body.comment;
-            for (const user of users) comment = comment.replace('@'+user.username, `[@${user.username}](/users/${user.username})`);
-            for (const tag of tagList) comment = comment.replace('#'+tag, `[#${tag}](/reports?tag=${tag})`);
+            for (const user of users) comment.comment = comment.comment.replace('@'+user.username, `[@${user.username}](/users/${user.username})`);
+            for (const tag of tagList) comment.comment = comment.comment.replace('#'+tag, `[#${tag}](/reports?tag=${tag})`);
 
             const body = {
-                id:       ctx.request.body.userid + '-' + timestamp.valueOf().toString(36), // commentary id = user id + timestamp
+                id:       ctx.request.body.userid + '-' + comment.on.valueOf().toString(36), // commentary id = user id + timestamp
                 byId:     ctx.request.body.userid,
                 byName:   ctx.request.body.username,
-                on:       timestamp.toISOString(),
-                onPretty: dateFormat(timestamp, 'HH:MM'),
-                onFull:   dateFormat(timestamp, 'd mmm yyyy, HH:MM Z'),
-                comment:  MarkdownIt().render(comment),
+                on:       comment.on.toISOString(),
+                onPretty: dateFormat(comment.on, 'HH:MM'),
+                onFull:   dateFormat(comment.on, 'd mmm yyyy, HH:MM Z'),
+                comment:  MarkdownIt().render(comment.comment), // render any markdown formatting
             };
             ctx.status = 201;
             ctx.body = body;

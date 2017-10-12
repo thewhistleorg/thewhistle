@@ -177,30 +177,6 @@ class DashboardHandlers {
         await ctx.render('dashboard-general', context);
     }
 
-
-    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-    /* Ajax functions                                                                             */
-    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-
-
-    /**
-     * GET /ajax/reports/latest-timestamp - Timestamp of most recently submitted report (for ajax
-     * call to automatically update reports list), as ISO timestamp.
-     */
-    static async ajaxReportLatestTimestamp(ctx) {
-        const db = ctx.state.user.db;
-
-        try {
-            const latest = await Report.getLatestTimestamp(db);
-            ctx.status = 200;
-            ctx.body = { latest: { timestamp: latest } };
-        } catch (e) {
-            ctx.status = 500;
-            ctx.body = e;
-        }
-        ctx.body.root = 'reports';
-    }
-
 }
 
 

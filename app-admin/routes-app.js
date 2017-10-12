@@ -10,17 +10,14 @@ const send   = require('koa-send');     // static file serving
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/*  Dashboard routes                                                                              */
+/*  Dashboard routes - TBC                                                                        */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const dashboard = require('./dashboard.js');
+//const dashboard = require('./dashboard.js');
+//
+//router.get('/dashboard/\\*',       dashboard.general); // render general dashboard page
+//router.get('/dashboard/:username', dashboard.user);    // render users’ dashboard page
 
-router.get('/dashboard/\\*',       dashboard.general); // render general dashboard page
-router.get('/dashboard/:username', dashboard.user);    // render users’ dashboard page
-
-// ---- ajax routes
-
-router.get('/ajax/dashboard/reports/latest-timestamp', dashboard.ajaxReportLatestTimestamp);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /*  Incident report submission routes                                                             */
@@ -36,8 +33,8 @@ router.get( '/report/:project/:id/confirm', report.getReportConfirm);    // rend
 
 // ---- ajax routes
 
-router.get('/ajax/report/:db/names/new',   report.getGenerateNewName); // get newly generated name
-router.get('/ajax/report/:db/names/:name', report.getName);            // check previously used name does exist
+router.get('/ajax/report/:db/names/new',     report.getGenerateNewName); // get newly generated name
+router.get('/ajax/report/:db/names/:name',   report.getName);            // check previously used name does exist
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -61,6 +58,7 @@ router.post('/reports/:id/delete',     reports.processDelete);   // process dele
 
 // ---- ajax routes
 
+router.get(   '/ajax/reports/latest-timestamp',          reports.ajaxReportLatestTimestamp);
 router.get(   '/ajax/reports/within/:s,:w::n,:e',        reports.ajaxReportsWithin);
 router.post(  '/ajax/reports/:id/tags',                  reports.ajaxReportPostTag);
 router.delete('/ajax/reports/:id/tags/:tag',             reports.ajaxReportDeleteTag);

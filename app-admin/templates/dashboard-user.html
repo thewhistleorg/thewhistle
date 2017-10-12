@@ -19,7 +19,7 @@
                 const headers = { Accept: 'application/json' };
                 const credentials = 'same-origin';
                 try {
-                    const response = await fetch('/ajax/dashboard/reports/latest-timestamp', { method: 'GET', headers, credentials });
+                    const response = await fetch('/ajax/reports/latest-timestamp', { method: 'GET', headers, credentials });
                     const body = await response.json();
                     if (response.ok) {
                         if (body.latest.timestamp > '{{latest}}') window.location.reload();

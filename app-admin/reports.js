@@ -949,6 +949,25 @@ class ReportsHandlers {
 
 
     /**
+     * GET /ajax/reports/latest-timestamp - Timestamp of most recently submitted report (for ajax
+     * call to automatically update reports list), as ISO timestamp.
+     */
+    static async ajaxReportLatestTimestamp(ctx) {
+        const db = ctx.state.user.db;
+
+        try {
+            const latest = await Report.getLatestTimestamp(db);
+            ctx.status = 200;
+            ctx.body = { latest: { timestamp: latest } };
+        } catch (e) {
+            ctx.status = 500;
+            ctx.body = e;
+        }
+        ctx.body.root = 'reports';
+    }
+
+
+    /**
      * GET /ajax/reports/within/:s,:w\::n,:e - List of reports within given SW/NE bounds.
      */
     static async ajaxReportsWithin(ctx) {

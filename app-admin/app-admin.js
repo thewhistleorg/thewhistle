@@ -47,7 +47,7 @@ app.use(async function handleErrors(ctx, next) {
     } catch (e) {
         ctx.status = e.status || 500;
         switch (ctx.status) {
-            case 401: // Unauthorised
+            case 401: // Unauthorised (eg invalid JWT auth token)
                 ctx.redirect('/login'+ctx.url);
                 break;
             case 404: // Not Found
@@ -169,11 +169,12 @@ app.use(require('./routes-dev.js'));
 
 
 // 404 status for any unrecognised ajax requests (don't throw as don't want to return html page)
-router.all(/\/ajax\/(.*)/, function(ctx) {
+router.all(/^\/ajax\/(.*)/, function(ctx) {
     ctx.body = { message: 'Not Found' };
     ctx.body.root = 'error';
     ctx.status = 404; // Not Found
 });
+app.use(router.routes());
 
 
 // end of the line: 404 status for any resource not found

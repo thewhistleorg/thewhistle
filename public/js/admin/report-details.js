@@ -127,7 +127,7 @@ function setupCommentaryListeners(reportId, username, userid) {
 
     async function postComment() {
         const comment = document.querySelector('#comment').value;
-        const values = JSON.stringify({ comment, username,userid });
+        const values = JSON.stringify({ comment, username, userid });
 
         const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
         const response = await fetch(`/ajax/reports/${reportId}/comments`, { method: 'POST', body: values, headers, credentials });

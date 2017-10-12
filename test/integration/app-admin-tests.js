@@ -332,6 +332,12 @@ describe('Admin app'+' ('+app.env+')', function() {
             const document = new JsDom(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal(':(');
         });
+
+        it('returns 404 for non-existent ajax page', async function() {
+            const response = await request.get('/ajax/zzzzzz').set(headers);
+            expect(response.status).to.equal(404);
+            expect(response.body.message).to.equal('Not Found');
+        });
     });
 
     describe('logout', function() {

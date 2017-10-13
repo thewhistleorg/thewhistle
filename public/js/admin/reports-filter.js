@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
             if (q == 'description') {
                 // the description filter goes directly in the description filter field
                 document.querySelector('input[name=description]').value = qs.description;
+                document.querySelector('a.remove-desc-srch').classList.toggle('hide');
             } else {
                 // any other filter goes in the general filters field
             addFilter(q, qs[q]);
@@ -74,6 +75,13 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
     // when description input entered, apply filter
     document.querySelector('#search input[name="description"]').onchange = function filterAddInput() {
         // note no need to 'addFilter'
+        applyFilter();
+    };
+
+    // remove description search
+    document.querySelector('#search-display a.remove-desc-srch').onclick = function descSrchRemove(event) {
+        event.preventDefault(); // don't follow link
+        document.querySelector('input.description-filter').value = '';
         applyFilter();
     };
 

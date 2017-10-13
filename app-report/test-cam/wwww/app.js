@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* App: civilian (public) incident reporting (boilerplate).                                       */
+/* App: civilian (public) incident reporting (boilerplate).                        C.Veness 2017  */
 /*                                                                                                */
 /* This is a composed sup-app, in order that the database and project for the MongoDB connection  */
 /* and the handlebars templates can be taken from the URL.                                        */

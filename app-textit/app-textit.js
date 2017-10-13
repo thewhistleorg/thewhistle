@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* API app - RESTful API for API interface and/or ajax functions.                                 */
+/* API app - RESTful API for API interface and/or ajax functions.                  C.Veness 2017  */
 /*                                                                                                */
 /* The API provides GET / POST / PATCH / DELETE methods on a variety of resources.                */
 /*                                                                                                */

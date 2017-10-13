@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Routing for ajax calls                                                                         */
+/* Routing for ajax calls.                                                         C.Veness 2017  */
 /*                                                                                                */
 /* This holds app-specific ajax calls (none specified in this sample app), and passes through     */
 /* other generic requests to the API.                                                             */

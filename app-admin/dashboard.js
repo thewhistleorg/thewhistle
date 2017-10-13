@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Dashboard handlers - user & general dashboards                                    .            */
+/* Dashboard handlers - user & general dashboards.                                 C.Veness 2017  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */

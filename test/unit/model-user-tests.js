@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* User model unit tests                                                                          */
+/* User model unit tests.                                                          C.Veness 2017  */
 /*                                                                                                */
-/* Note these tests do not mock out database components, but operate on the live 'test-cam' db    */
+/* Note these tests do not mock out database components, but operate on the live 'test-cam' db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';

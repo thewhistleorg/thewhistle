@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Password Reset handlers (invoked by router to render templates)                                */
+/* Password Reset handlers (invoked by router to render templates).                C.Veness 2017  */
 /*                                                                                                */
-/* All functions here either render or redirect, or throw.                                        */
+/* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';

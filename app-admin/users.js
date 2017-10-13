@@ -1,5 +1,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Users handlers - manage adding, editing, deleting users who have access to the app.            */
+/*                                                                                 C.Veness 2017  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */

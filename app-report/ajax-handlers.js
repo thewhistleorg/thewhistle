@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Ajax handlers (invoked by router to return JSON data)                                          */
+/* Ajax handlers (invoked by router to return JSON data).                          C.Veness 2017  */
 /*                                                                                                */
 /* All functions here should set body, and status if not 200, and should not throw (as that would */
 /* invoke the generic admin exception handler which would return an html page).                   */

@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Handlers: test-cam/wwww (what-where-when-who)                                                  */
+/* Handlers: test-cam/wwww (what-where-when-who).                                  C.Veness 2017  */
 /*                                                                                                */
-/* All functions here either render or redirect, or throw.                                        */
+/* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';

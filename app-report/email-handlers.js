@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Handlers for email verification test                                                           */
+/* Handlers for email verification test.                                           C.Veness 2017  */
 /*                                                                                                */
-/* All functions here either render or redirect, or throw.                                        */
+/* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';

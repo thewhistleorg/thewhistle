@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Admin app integration/acceptance tests                                                         */
+/* Admin app integration/acceptance tests.                                         C.Veness 2017  */
 /*                                                                                                */
-/* Note that running this test will contribute to Weather Underground API invocation limits       */
+/* Note that running this test will contribute to Weather Underground API invocation limits.      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 // TODO: modularise this? How to handle login/logout if so?

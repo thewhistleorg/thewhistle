@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* The Whistle technology trial app                                                               */
+/* The Whistle technology trial app.                                               C.Veness 2017  */
 /*                                                                                                */
 /* App comprises three (composed) sub-apps:                                                       */
 /*  - report. (public incident reporting pages)                                                   */

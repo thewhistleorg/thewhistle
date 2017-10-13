@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Set up database connections for unit tests.                                                    */
+/* Set up database connections for unit tests.                                     C.Veness 2017  */
 /*                                                                                                */
 /* Because of the way 'before' works, this is best defined once & require'd within each separate  */
 /* test, rather than being defined within each one. It only gets invoked once on calling          */

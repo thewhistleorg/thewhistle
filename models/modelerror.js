@@ -1,5 +1,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* ModelError - error thrown by model includes http status to return when error is thrown in API  */
+/* ModelError - error thrown by model includes http status to return when error is thrown in API. */
+/*                                                                                 C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';

@@ -1,6 +1,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Reports handlers - manage reports workflow including dashboard, searching/filtering, editing   */
-/* metadata, etc.                                                                                 */
+/* metadata, etc.                                                                  C.Veness 2017  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */

@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Messages handlers - manage direct SMS messaging functions.                                     */
+/* Messages handlers - manage direct SMS messaging functions.                      C.Veness 2017  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */

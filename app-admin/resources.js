@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Resources handlers - manage adding, editing, deleting rape/crisis resources.                   */
+/* Resources handlers - manage adding, editing, deleting rape/crisis resources.    C.Veness 2017  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */

@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Handlers: test-cam/scr (survivor-centred response                                              */
+/* Handlers: test-cam/scr (survivor-centred response.                              C.Veness 2017  */
 /*                                                                                                */
-/* All functions here either render or redirect, or throw.                                        */
+/* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';

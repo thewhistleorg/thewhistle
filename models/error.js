@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Error model - log system errors (those worth logging)                                          */
+/* Error model - log system errors (those worth logging).                          C.Veness 2017  */
 /*                                                                                                */
 /* For now this just records errors. They will have to be inspected directly in the database, and */
 /* also cleared out manually. In time we will have to devise some notification system.            */

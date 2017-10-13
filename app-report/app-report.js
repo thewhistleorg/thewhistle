@@ -11,6 +11,7 @@ const handlebars = require('koa-handlebars'); // handlebars templating
 const flash      = require('koa-flash');      // flash messages
 const lusca      = require('koa-lusca');      // security header middleware
 const serve      = require('koa-static');     // static file serving middleware
+const fetch      = require('node-fetch');     // window.fetch in node.js
 const convert    = require('koa-convert');    // tmp for koa-flash, koa-lusca
 const bunyan     = require('bunyan');         // logging
 const koaLogger  = require('koa-bunyan');     // logging
@@ -115,7 +116,39 @@ app.use(koaLogger(logger, {}));
 
 // TODO: any way to invoke project routes directly, rather than composing app?
 
+
 app.use(require('./ajax-routes.js'));
+
+
+// home page - list available reporting apps
+router.get('/', async function indexPage(ctx) {
+    const reportApps = {
+        GB: [
+            { name: 'survivor-centred response', url: 'report.thewhistle.org/test-cam/scr' },
+            { name: 'what-where-when-who',       url: 'report.thewhistle.org/test-cam/wwww' },
+        ],
+        NG: [
+            { name: 'GRN sexual assault',        url: 'report.thewhistle.org/test-grn/sexual-assault' },
+        ],
+    };
+    ctx.app.proxy = true;
+    const ip = ctx.request.ip.replace('::ffff:', '');
+    const response = ip=='127.0.0.1' ? {} : await fetch(`https://ipinfo.io/${ip}/json`, { method: 'GET' });
+
+    let country = '';
+    let appsLocal = {};
+
+    if (response.ok) {
+        const ipinfo = await response.json();
+        country = ipinfo.country;
+        appsLocal = reportApps[country];
+        delete reportApps[country];
+    }
+
+    const context = { country: country, appsLocal: appsLocal, appsOther: reportApps };
+    await ctx.render('index', context);
+});
+
 
 // TODO: why doesn't router.all('/:database/:project', '/:database/:project/:page', ...) work?
 router.all('/:database/:project', async function composeDatabaseProject(ctx) {

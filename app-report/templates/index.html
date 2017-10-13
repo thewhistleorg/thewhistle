@@ -4,27 +4,48 @@
     <title>The Whistle Eyewitness Report</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css">
     <link rel="stylesheet" href="/css/base.css">
-    <style>
-        body { margin-top: 2em; }
-        button {
-            color: #234c7f;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/report.css">
 </head>
 <body>
 
+<header>
+    <nav class="pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item">The Whistle Incident Reporting</li>
+            <li class="pure-menu-item"><img alt="powered by the Whistle" src="/img/powered-by-the-whistle-horiz-white-180x20.png" height="20" width="180"></li>
+        </ul>
+    </nav>
+</header>
+
 <main>
 
-<p><a href="/wwww"><button type="button">What-where-when-who trial from Chain React deliverable 3.2</button></a></p>
+<h1>The Whistle project</h1>
 
-<p><a href="/scr"><button type="button">Survivor-Centred Response trial from SGBV Response Tool-pack</button></a></p>
+<p>The Whistle project is currently under development.</p>
+<p>See <a href="http://thewhistle.org/">The Whistle</a> website for further details.</p>
 
-<p><a href="/grn"><button type="button">Global Rights Nigeria trial</button></a></p>
+{{#if country}}
+<h2>Reporting apps in {{country}}</h2>
+<ul>
+    {{#appsLocal}}
+    <li><a href="http://{{url}}">{{name}}</a></li></li>
+    {{/appsLocal}}
+</ul>
+{{/if}}
 
-<p><a href="/email"><button type="button">E-mail verification test</button></a></p>
+{{#if appsOther}}
+<h2>Reporting apps {{#if country}}outside {{country}}{{/if}}</h2>
+{{#each appsOther}}
+<h3>{{@key}}</h3>
+<ul>
+    {{#this}}
+    <li><a href="http://{{this.url}}">{{this.name}}</a></li></li>
+    {{/this}}
+</ul>
+{{/each}}
+{{/if}}
 
 </main>
 

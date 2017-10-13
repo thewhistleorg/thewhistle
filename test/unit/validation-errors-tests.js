@@ -101,7 +101,7 @@ describe('Validation errors', function() {
         });
 
         test('datetime-local ok', function() {
-            const bad = Object.assign({}, body, { fixed: dateFormat("yyyy-mm-dd'T'HH:MM") });
+            const bad = Object.assign({}, body, { fixed: dateFormat(Date.now()-1000*60*60, "yyyy-mm-dd'T'HH:MM") });
             const errors = validationErrors(bad, rules);
             expect(errors).to.be.false;
         });

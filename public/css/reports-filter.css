@@ -46,7 +46,7 @@
     text-shadow: 0 0 5px #000000;
 }
 
-input.summary-input {
+input.description-filter {
     background-color: #ffffff;
     border-right: 1px solid #e0e6e8;
     padding: 13px 6px 11px;
@@ -58,7 +58,7 @@ input.summary-input {
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.11) inset;
 }
 
-input.summary-input::placeholder {
+input.description-filter::placeholder {
     color: #99b2c1;
 }
 

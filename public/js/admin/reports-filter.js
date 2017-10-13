@@ -15,8 +15,15 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
             // if filter given multiple times eg tag=a&tag=b;
             for (const filter of qs[q]) addFilter(q, filter);
         } else {
+            if (q == 'description') {
+                // the description filter goes directly in the description filter field
+                document.querySelector('input[name=description]').value = qs.description;
+                document.querySelector('a.remove-desc-srch').classList.toggle('hide');
+            } else {
+                // any other filter goes in the general filters field
             addFilter(q, qs[q]);
         }
+    }
     }
 
     // use range slider for filtering submitted/updated dates
@@ -65,16 +72,18 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
         event.stopPropagation(); // don't allow this event to be caught by the 'tr' open report details event
     });
 
-    // prevent click on (summary) input propagating up to li
-    document.querySelectorAll('#search input[name="summary"]').forEach(el => el.onclick = function filterOpenInput(event) {
-        event.stopPropagation();
-    });
-
-    // when (summary) input entered, apply filter
-    document.querySelectorAll('#search input[name="summary"]').forEach(el => el.onchange = function filterAddInput() {
-        addFilter(this.name, this.value);
+    // when description input entered, apply filter
+    document.querySelector('#search input[name="description"]').onchange = function filterAddInput() {
+        // note no need to 'addFilter'
         applyFilter();
-    });
+    };
+
+    // remove description search
+    document.querySelector('#search-display a.remove-desc-srch').onclick = function descSrchRemove(event) {
+        event.preventDefault(); // don't follow link
+        document.querySelector('input.description-filter').value = '';
+        applyFilter();
+    };
 
     // remove filter span
     document.querySelectorAll('#search-display a.remove-filter').forEach(el => el.onclick = function filterRemove(event) {
@@ -117,8 +126,12 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
 
     // convert filter spans to query string and refresh page to that location
     function applyFilter() {
+        // description filter stands on on its own, create a separate filter for that if it's filled in
+        const description = document.querySelector('input[name=description]').value;
+        const filterDescription = description ? [ { key: 'description', value: description } ] : [];
+        // other filters come from the spans within the search-display input
         const filterSpans = Array.from(document.querySelectorAll('#search-display span[data-key]')); // note don't include contenteditable spans
-        const filters = filterSpans.map(span => span.dataset);
+        const filters = filterDescription.concat(filterSpans.map(span => span.dataset));
         // add sort & archive into filters
         if (document.querySelector('#search').dataset.sort) filters.push({ key: 'sort', value: document.querySelector('#search').dataset.sort });
         if (document.querySelector('#search').dataset.active) filters.push({ key: 'active', value: document.querySelector('#search').dataset.active });

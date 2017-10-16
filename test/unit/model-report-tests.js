@@ -4,18 +4,18 @@
 /* Note these tests do not mock out database components, but operate on the live 'test-cam' db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import chai       from 'chai';       // BDD/TDD assertion library
+import fs         from 'fs-extra';   // fs with extra functions & promise interface
+import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+import dotenv     from 'dotenv';     // load environment variables from a .env file into process.env
+const expect = chai.expect;
 
-const fs          = require('fs-extra');    // fs with extra functions & promise interface
-const dateFormat  = require('dateformat');  // Steven Levithan's dateFormat()
-const expect      = require('chai').expect; // BDD/TDD assertion library
+dotenv.config();
 
-require('dotenv').config(); // loads environment variables from .env file (if available - eg dev env)
+import Report from '../../models/report.js';
+import User   from '../../models/user.js';
 
-const Report = require('../../models/report.js');
-const User   = require('../../models/user.js');
-
-require('./before.js'); // set up database connections
+import './before.js'; // set up database connections
 
 describe('Report model', function() {
     this.timeout(5e3); // 5 sec

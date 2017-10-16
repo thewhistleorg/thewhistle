@@ -2,9 +2,7 @@
 /* API handlers - TextIt webhooks.                                                 C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const chrono = require('chrono-node');
+import chrono from 'chrono-node';
 
 
 class Webhooks {
@@ -36,4 +34,4 @@ class Webhooks {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = Webhooks;
+export default Webhooks;

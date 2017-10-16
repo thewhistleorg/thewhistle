@@ -2,12 +2,11 @@
 /* Routes for bunyan logs.                                                         C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const router = require('koa-router')();                // router middleware for koa
-const spawn  = require('child-process-promise').spawn; // promises wrapper around child_process
-const path   = require('path');                        // nodejs.org/api/path.html
-
+import Router       from 'koa-router';            // router middleware for koa
+import childProcess from 'child-process-promise'; // promises wrapper around child_process
+import path         from 'path';                  // nodejs.org/api/path.html
+const router = new Router();
+const spawn  = childProcess.spawn;
 
 // logs - quick'n'dirty visibility of bunyan logs
 router.get('/logs/:logfile', async function logs(ctx) {
@@ -33,4 +32,4 @@ router.get('/logs/:logfile', async function logs(ctx) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = router.middleware();
+export default router.middleware();

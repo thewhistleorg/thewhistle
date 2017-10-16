@@ -2,15 +2,14 @@
 /* Routes for dev tools.                                                           C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import Router     from 'koa-router';  // router middleware for koa
+import nodeinfo   from 'nodejs-info'; // node info
+import dateFormat from 'dateformat';  // Steven Levithan's dateFormat()
+import jsdom      from 'jsdom';       // DOM Document interface in Node!
 
-const router     = require('koa-router')(); // router middleware for koa
-const nodeinfo   = require('nodejs-info');  // node info
-const dateFormat = require('dateformat');   // Steven Levithan's dateFormat()
-const JsDom      = require('jsdom').JSDOM;  // JavaScript implementation of DOM and HTML standards
+import useragent  from '../lib/user-agent.js';
 
-const useragent  = require('../lib/user-agent.js');
-
+const router = new Router();
 
 router.get('/dev/nodeinfo', function(ctx) {
     ctx.body = nodeinfo(ctx.req);
@@ -29,9 +28,11 @@ router.get('/dev/user-agents', async function(ctx) {
 /* Route to handle dev-notes pages                                                                */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const fs  = require('fs-extra');           // fs with extra functions & promise interface
-const md  = require('markdown-it')();      // markdown parser
-const mda = require('markdown-it-anchor'); // header anchors for markdown-it
+import fs       from 'fs-extra';           // fs with extra functions & promise interface
+import markdown from 'markdown-it';        // markdown parser
+import mda      from 'markdown-it-anchor'; // header anchors for markdown-it
+
+const md = markdown();
 
 md.use(mda);
 
@@ -52,7 +53,7 @@ router.get('/dev/notes/:notes', async function getNotesPage(ctx) {
     try {
         const notesMarkdown = await fs.readFile(notesFile, 'utf8');
         const content = md.render(notesMarkdown);
-        const document = new JsDom(content).window.document;
+        const document = new jsdom.JSDOM(content).window.document;
         await ctx.render('dev-notes', { content, title: document.querySelector('h1').textContent });
     } catch (e) {
         if (e.code != 'ENOENT') console.error(e);
@@ -63,4 +64,4 @@ router.get('/dev/notes/:notes', async function getNotesPage(ctx) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = router.middleware();
+export default router.middleware();

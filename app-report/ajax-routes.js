@@ -7,11 +7,10 @@
 /* Being placed after auth test in the middleware stack, ajax calls are password-protected.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import Router from 'koa-router'; // router middleware for koa
+const router = new Router();
 
-const router = require('koa-router')(); // router middleware for koa
-
-const ajax = require('./ajax-handlers.js');
+import ajax from './ajax-handlers.js';
 
 
 /*
@@ -29,4 +28,4 @@ router.all(/\/ajax\/(.*)/, ajax.ajax404);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = router.middleware();
+export default router.middleware();

@@ -4,15 +4,15 @@
 /* Note these tests do not mock out database components, but operate on the live 'test-cam' db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import chai from 'chai'; // BDD/TDD assertion library
+import dotenv from 'dotenv'; // load environment variables from a .env file into process.env
+const expect = chai.expect;
 
-const expect      = require('chai').expect; // BDD/TDD assertion library
+dotenv.config();
 
-require('dotenv').config(); // loads environment variables from .env file (if available - eg dev env)
+import User from '../../models/user.js';
 
-const User   = require('../../models/user.js');
-
-require('./before.js'); // set up database connections
+import './before.js'; // set up database connections
 
 describe('User model', function() {
     this.timeout(5e3); // 5 sec

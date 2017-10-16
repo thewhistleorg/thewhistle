@@ -6,9 +6,8 @@
 /* 'mocha test/unit/*.js'!                                                                        */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const MongoClient = require('mongodb').MongoClient;
+import MongoDB         from 'mongodb'; // MongoDB driver for Node.js
+const MongoClient = MongoDB.MongoClient;
 
 before(async function() {
     this.timeout(10e3); // 10 sec
@@ -22,4 +21,4 @@ before(async function() {
     }
 });
 
-module.export = before;
+export default before;

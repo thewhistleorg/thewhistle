@@ -2,12 +2,11 @@
 /* Routes: scr (survivor-centred response).                                        C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import Koa    from 'koa';          // koa framework
+import Router from 'koa-router'; // router middleware for koa
+const router = new Router();
 
-const Koa    = require('koa');          // koa framework
-const router = require('koa-router')(); // router middleware for koa
-
-const handlers = require('./handlers.js');
+import handlers from './handlers.js';
 
 
 const app = new Koa(); // report app
@@ -23,4 +22,4 @@ router.post('/:database/:project/:num',      handlers.postPage);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = router.middleware();
+export default router.middleware();

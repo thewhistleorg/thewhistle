@@ -2,11 +2,10 @@
 /* Auto identifier unit tests.                                                     C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import chai from 'chai'; // BDD/TDD assertion library
+const expect = chai.expect;
 
-const expect = require('chai').expect; // BDD/TDD assertion library
-
-const autoIdentifier = require('../../lib/auto-identifier.js');
+import autoIdentifier from '../../lib/auto-identifier.js';
 
 const test = it; // just an alias
 

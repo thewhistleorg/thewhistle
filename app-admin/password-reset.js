@@ -4,17 +4,16 @@
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import nodemailer from 'nodemailer';   // sends e-mails from Node.js
+import handlebars from 'handlebars';   // logicless templating language
+import jsdom      from 'jsdom';        // DOM Document interface in Node!
+import htmlToText from 'html-to-text'; // converts html to beautiful text
+import fs         from 'fs-extra';     // fs with extra functions & promise interface
+import crypto     from 'crypto';       // nodejs.org/api/crypto.html
+import scrypt     from 'scrypt';       // scrypt library
+const { JsDom } = jsdom;
 
-const nodemailer = require('nodemailer');   // sends e-mails from Node.js
-const handlebars = require('handlebars');   // logicless templating language
-const JsDom      = require('jsdom').JSDOM;  // DOM Document interface in Node!
-const htmlToText = require('html-to-text'); // converts html to beautiful text
-const fs         = require('fs-extra');     // fs with extra functions & promise interface
-const crypto     = require('crypto');       // nodejs.org/api/crypto.html
-const scrypt     = require('scrypt');       // scrypt library
-
-const User = require('../models/user.js');
+import User from '../models/user.js';
 
 // nodemailer transporter
 const smtpConfig = {
@@ -162,4 +161,4 @@ class PasswordResetHandlers {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = PasswordResetHandlers;
+export default PasswordResetHandlers;

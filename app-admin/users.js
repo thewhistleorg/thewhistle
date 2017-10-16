@@ -8,9 +8,7 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const User   = require('../models/user.js');
+import User   from '../models/user.js';
 
 /*
  * Note on roles:
@@ -268,4 +266,4 @@ function possessive(name) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = UsersHandlers;
+export default UsersHandlers;

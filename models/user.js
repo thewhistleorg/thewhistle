@@ -4,9 +4,8 @@
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const ObjectId   = require('mongodb').ObjectId;
+import MongoDB from 'mongodb'; // MongoDB driver for Node.js
+const ObjectId = MongoDB.ObjectId;
 
 const validator = { $and: [ // TODO: validation for string or null
     { firstname: { $type: 'string', $exists: true } },
@@ -145,4 +144,4 @@ class User {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = User;
+export default User;

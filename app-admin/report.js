@@ -8,16 +8,14 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import Report   from '../models/report.js';
+import Resource from '../models/resource.js';
 
-const Report   = require('../models/report.js');
-const Resource = require('../models/resource.js');
-
-const autoIdentifier   = require('../lib/auto-identifier.js');
-const jsObjectToHtml   = require('../lib/js-object-to-html.js');
-const validationErrors = require('../lib/validation-errors.js');
-const useragent        = require('../lib/user-agent.js');
-const geocode          = require('../lib/geocode.js');
+import autoIdentifier   from '../lib/auto-identifier.js';
+import jsObjectToHtml   from '../lib/js-object-to-html.js';
+import validationErrors from '../lib/validation-errors.js';
+import useragent        from '../lib/user-agent.js';
+import geocode          from '../lib/geocode.js';
 
 
 const validation = {
@@ -247,4 +245,4 @@ function prettifyReport(report) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = IncidentReport;
+export default IncidentReport;

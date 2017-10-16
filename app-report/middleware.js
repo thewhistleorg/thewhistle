@@ -2,9 +2,8 @@
 /* Middleware relevant to the incident report submission sub-app.                  C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const MongoClient = require('mongodb').MongoClient; // official MongoDB driver for Node.js
+import MongoDB from 'mongodb'; // MongoDB driver for Node.js
+const MongoClient = MongoDB.MongoClient;
 
 class ReportMiddleware {
 
@@ -37,4 +36,4 @@ class ReportMiddleware {
 
 }
 
-module.exports = ReportMiddleware;
+export default ReportMiddleware;

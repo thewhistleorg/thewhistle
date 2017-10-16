@@ -2,19 +2,18 @@
 /* 'Report' app - (publicly available) witness reporting parts of the site.        C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const Koa        = require('koa');            // koa framework
-const compose    = require('koa-compose');    // middleware composer
-const router     = require('koa-router')();   // router middleware for koa
-const handlebars = require('koa-handlebars'); // handlebars templating
-const flash      = require('koa-flash');      // flash messages
-const lusca      = require('koa-lusca');      // security header middleware
-const serve      = require('koa-static');     // static file serving middleware
-const fetch      = require('node-fetch');     // window.fetch in node.js
-const convert    = require('koa-convert');    // tmp for koa-flash, koa-lusca
-const bunyan     = require('bunyan');         // logging
-const koaLogger  = require('koa-bunyan');     // logging
+import Koa        from 'koa';            // koa framework
+import compose    from 'koa-compose';    // middleware composer
+import Router     from 'koa-router';     // router middleware for koa
+import handlebars from 'koa-handlebars'; // handlebars templating
+import flash      from 'koa-flash';      // flash messages
+import lusca      from 'koa-lusca';      // security header middleware
+import serve      from 'koa-static';     // static file serving middleware
+import fetch      from 'node-fetch';     // window.fetch in node.js
+import convert    from 'koa-convert';    // tmp for koa-flash, koa-lusca
+import bunyan     from 'bunyan';         // logging
+import koaLogger  from 'koa-bunyan';     // logging
+const router = new Router();
 
 
 const app = new Koa(); // report app
@@ -116,8 +115,8 @@ app.use(koaLogger(logger, {}));
 
 // TODO: any way to invoke project routes directly, rather than composing app?
 
-
-app.use(require('./ajax-routes.js'));
+import ajaxRoutes from './ajax-routes.js'
+app.use(ajaxRoutes);
 
 
 // home page - list available reporting apps
@@ -153,7 +152,8 @@ router.get('/', async function indexPage(ctx) {
 // TODO: why doesn't router.all('/:database/:project', '/:database/:project/:page', ...) work?
 router.all('/:database/:project', async function composeDatabaseProject(ctx) {
     try {
-        await compose(require(`./${ctx.params.database}/${ctx.params.project}/app.js`).middleware)(ctx);
+        const appReport = await import(`./${ctx.params.database}/${ctx.params.project}/app.js`);
+        await compose(appReport.default.middleware)(ctx);
     } catch (e) {
         if (e.code == 'MODULE_NOT_FOUND') ctx.throw(404);
         throw e;
@@ -161,7 +161,8 @@ router.all('/:database/:project', async function composeDatabaseProject(ctx) {
 });
 router.all('/:database/:project/:page', async function composeDatabaseProject(ctx) {
     try {
-        await compose(require(`./${ctx.params.database}/${ctx.params.project}/app.js`).middleware)(ctx);
+        const appReport = await import(`./${ctx.params.database}/${ctx.params.project}/app.js`);
+        await compose(appReport.default.middleware)(ctx);
     } catch (e) {
         if (e.code == 'MODULE_NOT_FOUND') ctx.throw(404);
         throw e;
@@ -178,4 +179,4 @@ app.use(function notFound(ctx) { // note no 'next'
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = app;
+export default app;

@@ -8,24 +8,24 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import dateFormat   from 'dateformat';  // Steven Levithan's dateFormat()
+import MarkdownIt   from 'markdown-it'; // markdown parser
+import json2csv     from 'json2csv';    // converts json into csv
+import pdf          from 'html-pdf';    // HTML to PDF converter
+import fs           from 'fs-extra';    // fs with extra functions & promise interface
+import handlebars   from 'handlebars';  // logicless templating language
+import moment       from 'moment';      // date library for manipulating dates
+import MongoDB      from 'mongodb';     // MongoDB driver for Node.js
+import geodesy      from 'geodesy';     // library of geodesy functions
+const ObjectId = MongoDB.ObjectId;
+const LatLon   = geodesy.LatLonSpherical;
+const Dms      = geodesy.Dms;
 
-const dateFormat = require('dateformat');  // Steven Levithan's dateFormat()
-const MarkdownIt = require('markdown-it'); // markdown parser
-const json2csv   = require('json2csv');    // converts json into csv
-const pdf        = require('html-pdf');    // HTML to PDF converter
-const fs         = require('fs-extra');    // fs with extra functions & promise interface
-const handlebars = require('handlebars');  // logicless templating language
-const LatLon     = require('geodesy').LatLonSpherical; // spherical earth geodesy functions
-const Dms        = require('geodesy').Dms; // degrees/minutes/seconds conversion routines
-const moment     = require('moment');      // date library for manipulating dates
-const ObjectId   = require('mongodb').ObjectId;
+import Report from '../models/report.js';
+import User   from '../models/user.js';
+import Update from '../models/update.js';
 
-const Report = require('../models/report.js');
-const User   = require('../models/user.js');
-const Update = require('../models/update.js');
-
-const jsObjectToHtml = require('../lib/js-object-to-html');
+import jsObjectToHtml from '../lib/js-object-to-html';
 
 
 class ReportsHandlers {
@@ -1300,4 +1300,4 @@ function truncate(string, length) {
     return str.slice(0, length) + '…';
 }
 
-module.exports = ReportsHandlers;
+export default ReportsHandlers;

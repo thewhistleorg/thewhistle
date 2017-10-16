@@ -9,14 +9,12 @@
 /* A GET on a collection which returns no results returns a 204 / No Content response.            */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const Koa       = require('koa');          // Koa framework
-const jwt       = require('jsonwebtoken'); // JSON Web Token implementation
-const xmlify    = require('xmlify');       // JS object to XML
-const yaml      = require('js-yaml');      // JS object to YAML
-const bunyan    = require('bunyan');       // logging
-const koaLogger = require('koa-bunyan');   // logging
+import Koa       from 'koa';          // Koa framework
+import jwt       from 'jsonwebtoken'; // JSON Web Token implementation
+import xmlify    from 'xmlify';       // JS object to XML
+import yaml      from 'js-yaml';      // JS object to YAML
+import bunyan    from 'bunyan';       // logging
+import koaLogger from 'koa-bunyan';   // logging
 
 
 const app = new Koa(); // API app
@@ -98,8 +96,8 @@ app.use(koaLogger(logger, {}));
 
 // public (unsecured) modules first
 
-app.use(require('./routes.js'));
-//app.use(require('./routes-auth.js'));
+import routes from './routes.js';
+app.use(routes);
 
 // remaining routes require JWT auth (obtained from /auth and supplied in bearer authorization header)
 
@@ -126,9 +124,7 @@ app.use(async function verifyJwt(ctx, next) {
     await next();
 });
 
-app.use(require('./routes.js'));
-
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = app;
+export default app;

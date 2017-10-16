@@ -7,18 +7,15 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import libphonenumber from 'google-libphonenumber'; // wrapper for Google's libphonenumber
+import isEmail        from 'isemail';               // email address validation library
 
-const libphonenumber = require('google-libphonenumber'); // wrapper for Google's libphonenumber
-const isEmail        = require('isemail');               // email address validation library
+import Resource         from '../models/resource.js';
+import validationErrors from '../lib/validation-errors.js';
+import geocode          from '../lib/geocode.js';
 
 const phoneUtil         = libphonenumber.PhoneNumberUtil.getInstance();
 const PhoneNumberFormat = libphonenumber.PhoneNumberFormat;
-
-const Resource = require('../models/resource.js');
-
-const validationErrors = require('../lib/validation-errors.js');
-const geocode          = require('../lib/geocode.js');
 
 
 const validation = {
@@ -262,4 +259,4 @@ function formatEmails(emails) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = Handlers;
+export default Handlers;

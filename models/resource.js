@@ -4,9 +4,8 @@
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const ObjectId = require('mongodb').ObjectId;
+import MongoDB from 'mongodb'; // MongoDB driver for Node.js
+const ObjectId = MongoDB.ObjectId;
 
 /*
  * Rape crisis resources are provided as support information e.g. after incident report submission.
@@ -222,4 +221,4 @@ class Resource {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = Resource;
+export default Resource;

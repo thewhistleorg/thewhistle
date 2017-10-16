@@ -10,10 +10,8 @@
 /* Being placed after auth test in the middleware stack, ajax calls are password-protected.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const Report         = require('../models/report.js');
-const autoIdentifier = require('../lib/auto-identifier.js');
+import Report         from '../models/report.js';
+import autoIdentifier from '../lib/auto-identifier.js';
 
 const handler = {};
 
@@ -61,4 +59,4 @@ handler.ajax404 = function(ctx) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = handler;
+export default handler;

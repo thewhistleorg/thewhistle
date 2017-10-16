@@ -5,8 +5,6 @@
 /* also cleared out manually. In time we will have to devise some notification system.            */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
 
 class Error {
 
@@ -38,4 +36,4 @@ class Error {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = Error;
+export default Error;

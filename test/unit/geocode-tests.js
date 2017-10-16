@@ -2,15 +2,14 @@
 /* Geocoder unit tests.                                                            C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import chai   from 'chai';   // BDD/TDD assertion library
+import dotenv from 'dotenv'; // load environment variables from a .env file into process.env
+const expect = chai.expect;
+dotenv.config();
 
-const expect      = require('chai').expect; // BDD/TDD assertion library
+import geocode from'../../lib/geocode.js';
 
-require('dotenv').config(); // loads environment variables from .env file (if available - eg dev env)
-
-const geocode = require('../../lib/geocode.js');
-
-require('./before.js'); // set up database connections
+import './before.js'; // set up database connections
 
 describe('Geocode', function() {
     it('geocodes Free School Lane', async function() {

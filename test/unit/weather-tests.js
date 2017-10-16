@@ -2,10 +2,10 @@
 /* Weather data unit tests.                                                        C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import chai from 'chai';            // BDD/TDD assertion library
+const expect = chai.expect;
 
-const expect  = require('chai').expect; // BDD/TDD assertion library
-const weather = require('../../lib/weather.js');
+import weather from '../../lib/weather.js';
 
 describe('Weather data extraction tests', function() {
     return; // TODO investigate why wunderground is returning 400 Bad Request

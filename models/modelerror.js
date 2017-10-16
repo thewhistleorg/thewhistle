@@ -3,8 +3,6 @@
 /*                                                                                 C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
 
 /**
  * Extend Error with ModelError which includes (http) status.
@@ -25,4 +23,4 @@ class ModelError extends Error {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = ModelError;
+export default ModelError;

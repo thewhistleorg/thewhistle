@@ -4,17 +4,16 @@
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+import geodesy    from 'geodesy';    // library of geodesy functions
+const LatLon = geodesy.LatLonSpherical;
 
-const dateFormat = require('dateformat');    // Steven Levithan's dateFormat()
-const LatLon     = require('geodesy').LatLonSpherical; // spherical earth geodesy functions
+import Report   from '../../../models/report.js';
+import Resource from '../../../models/resource.js';
 
-const Report   = require('../../../models/report.js');
-const Resource = require('../../../models/resource.js');
-
-const jsObjectToHtml = require('../../../lib/js-object-to-html.js');
-const useragent      = require('../../../lib/user-agent.js');
-const geocode        = require('../../../lib/geocode.js');
+import jsObjectToHtml from '../../../lib/js-object-to-html.js';
+import useragent      from '../../../lib/user-agent.js';
+import geocode        from '../../../lib/geocode.js';
 
 const nPages = 7;
 
@@ -333,4 +332,4 @@ function prettifyReport(report) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = Handlers;
+export default Handlers;

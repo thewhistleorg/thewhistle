@@ -6,16 +6,16 @@
 
 // TODO: modularise this? How to handle login/logout if so?
 
-'use strict';
+import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
+import chai       from 'chai';       // BDD/TDD assertion library
+import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
+import MongoDB    from 'mongodb';    // MongoDB driver for Node.js
+import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+import base64     from 'base-64';    // base64 encoder/decoder
+const expect   = chai.expect;
+const ObjectId = MongoDB.ObjectId;
 
-const supertest   = require('supertest');   // SuperAgent driven library for testing HTTP servers
-const expect      = require('chai').expect; // BDD/TDD assertion library
-const JsDom       = require('jsdom').JSDOM; // JavaScript implementation of DOM and HTML standards
-const ObjectId    = require('mongodb').ObjectId;
-const dateFormat  = require('dateformat');  // Steven Levithan's dateFormat()
-const base64      = require('base-64');     // base64 encoder/decoder
-
-const app = require('../../app.js');
+import app from '../../app.js';
 
 const testuser = process.env.TESTUSER; // note testuser must have access to test-grn only
 const testpass = process.env.TESTPASS; // (for successful login & sexual-assault report submission)
@@ -39,7 +39,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('has home page with login link in nav when not logged-in', async function() {
             const response = await request.get('/').set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('title').textContent.slice(0, 11)).to.equal('The Whistle');
             expect(document.querySelectorAll('nav ul li').length).to.equal(2); // nav should be just '/', 'login'
         });
@@ -58,7 +58,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             location = res1.headers.location;
             const response = await request.get(location).set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             //expect(document.querySelector('title').textContent).to.match(/.*Activity.+/); home page is temporarily list of reports
             expect(document.querySelector('title').textContent).to.equal('Reports list');
             // nav should be /, reports, analysis×2, users, resources, logout
@@ -103,7 +103,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('has new report in list of reports', async function() {
             const response = await request.get('/reports').set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(reportId)).to.not.be.null;
         });
 
@@ -111,7 +111,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             return; // TODO investigate why wunderground is returning 400 Bad Request
             const response = await request.get('/reports/'+reportId).set(headers); // eslint-disable-line no-unreachable
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             const iconRe = new RegExp('^/img/weather/underground/icons/black/png/32x32/[a-z]+.png$');
             expect(document.querySelector('#weather div.weather-body img').src).to.match(iconRe);
         });
@@ -119,7 +119,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('sees uploaded image in report page', async function() {
             const response = await request.get('/reports/'+reportId).set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             const src = `/uploaded/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
             expect(document.getElementById(imgFile).querySelector('td a').href).to.equal(src);
             expect(document.getElementById(imgFile).querySelector('td img').src).to.equal(src);
@@ -128,7 +128,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('sees uploaded image exif metadata in report page', async function() {
             const response = await request.get('/reports/'+reportId).set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             const distRe = new RegExp('^340 km NNW from incident location');
             expect(document.getElementById(imgFile).querySelector('td.exif div').textContent).to.match(distRe);
         });
@@ -163,7 +163,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         //     expect(responsePost.status).to.equal(302);
         //     const response = await request.get(responsePost.headers.location).set(headers);
         //     expect(response.status).to.equal(200);
-        //     const document = new JsDom(response.text).window.document;
+        //     const document = new jsdom.JSDOM(response.text).window.document;
         //     expect(document.querySelector('#summary').value).to.equal('test report');
         //     const matches = document.evaluate('count(//td[text()="Set summary to ‘test report’"])', document, null, 0, null);
         //     expect(matches.numberValue).to.equal(1);
@@ -178,14 +178,14 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('sees report in reports list filtered by tag', async function() {
             const response = await request.get('/reports?tag=test').set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(reportId).nodeName).to.equal('TR');
         });
 
         it('sees update in report page', async function() {
             const response = await request.get('/reports/'+reportId).set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             const matches = document.evaluate('count(//td[text()="Add tag ‘test’"])', document, null, 0, null);
             expect(matches.numberValue).to.equal(1);
         });
@@ -202,7 +202,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('sees comment in report page', async function() {
             const response = await request.get('/reports/'+reportId).set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(commentId).querySelectorAll('div')[1].textContent).to.equal('Testing testing 1-2-3\n');
         });
 
@@ -218,7 +218,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('no longer sees comment in report page', async function() {
             const response = await request.get('/reports/'+reportId).set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(commentId)).to.be.null;
         });
 
@@ -248,14 +248,14 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('lists users including test user', async function() {
             const response = await request.get('/users').set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(userId).querySelector('td').textContent).to.equal('Test');
         });
 
         it('edits test user', async function() {
             const response = await request.get('/users/'+userId+'/edit').set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Edit User Test User');
         });
 
@@ -268,7 +268,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('returns 404 for non-existent user', async function() {
             const response = await request.get('/users/no-one-here-by-that-name').set(headers);
             expect(response.status).to.equal(404);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal(':(');
         });
     });
@@ -287,7 +287,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('lists resources including test resource', async function() {
             const response = await request.get('/resources').set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(resourceId).querySelectorAll('td')[0].textContent).to.equal('Test');
             expect(document.getElementById(resourceId).querySelectorAll('td')[4].textContent).to.equal('testing');
         });
@@ -295,7 +295,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('edits test resource', async function() {
             const response = await request.get('/resources/'+resourceId+'/edit').set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Edit resource Test');
             const values = { name: 'Test', address: 'Free School Lane, Cambridge CB2 3RQ', services: 'testing; validation' };
             const responsePost = await request.post('/resources/'+resourceId+'/edit').set(headers).send(values);
@@ -306,7 +306,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('lists resources including updated test resource', async function() {
             const response = await request.get('/resources').set(headers);
             expect(response.status).to.equal(200);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(resourceId).querySelectorAll('td')[0].textContent).to.equal('Test');
             expect(document.getElementById(resourceId).querySelectorAll('td')[4].textContent).to.equal('testing; validation');
         });
@@ -320,7 +320,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('returns 404 for non-existent resource', async function() {
             const response = await request.get('/resources/no-one-here-by-that-name').set(headers);
             expect(response.status).to.equal(404);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal(':(');
         });
     });
@@ -329,7 +329,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('returns 404 for non-existent page', async function() {
             const response = await request.get('/zzzzzz').set(headers);
             expect(response.status).to.equal(404);
-            const document = new JsDom(response.text).window.document;
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal(':(');
         });
 

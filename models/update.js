@@ -4,13 +4,12 @@
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import MongoDB    from 'mongodb';    // MongoDB driver for Node.js
+import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+const ObjectId = MongoDB.ObjectId;
 
-const dateFormat = require('dateformat'); // Steven Levithan's dateFormat()
-const ObjectId   = require('mongodb').ObjectId;
-
-const User   = require('./user.js');
-const Report = require('./report.js');
+import User   from './user.js';
+import Report from './report.js';
 
 
 /*
@@ -253,4 +252,4 @@ class Update {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = Update;
+export default Update;

@@ -2,22 +2,21 @@
 /* 'Admin' app - basic pages for reviewing reports & messages.                     C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import Koa             from 'koa';            // koa framework
+import handlebars      from 'koa-handlebars'; // handlebars templating
+import flash           from 'koa-flash';      // flash messages
+import lusca           from 'koa-lusca';      // security header middleware
+import serve           from 'koa-static';     // static file serving middleware
+import jwt             from 'jsonwebtoken';   // JSON Web Token implementation
+import bunyan          from 'bunyan';         // logging
+import koaLogger       from 'koa-bunyan';     // logging
+import convert         from 'koa-convert';    // tmp for koa-flash, koa-lusca
+import koaRouter       from 'koa-router';     // router middleware for koa
+import MongoDB         from 'mongodb';        // MongoDB driver for Node.js
+const router      = koaRouter();
+const MongoClient = MongoDB.MongoClient;
 
-
-const Koa         = require('koa');            // koa framework
-const handlebars  = require('koa-handlebars'); // handlebars templating
-const flash       = require('koa-flash');      // flash messages
-const lusca       = require('koa-lusca');      // security header middleware
-const serve       = require('koa-static');     // static file serving middleware
-const jwt         = require('jsonwebtoken');   // JSON Web Token implementation
-const bunyan      = require('bunyan');         // logging
-const koaLogger   = require('koa-bunyan');     // logging
-const convert     = require('koa-convert');    // tmp for koa-flash, koa-lusca
-const router      = require('koa-router')();   // router middleware for koa
-const MongoClient = require('mongodb').MongoClient;
-
-const HandlebarsHelpers = require('../lib/handlebars-helpers.js');
+import HandlebarsHelpers from '../lib/handlebars-helpers.js';
 
 const app = new Koa(); // admin app
 
@@ -141,7 +140,8 @@ app.use(verifyJwt);
 
 // public (unsecured) modules first (index, login)
 
-app.use(require('./routes-public.js'));
+import routesPublic from './routes-public.js';
+app.use(routesPublic);
 
 
 // verify user is signed in...
@@ -162,10 +162,13 @@ app.use(async function isSignedIn(ctx, next) {
 // serve report documents (uploaded from 'what' page of witness reporting app)
 app.use(serve('static', { maxage: maxage }));
 
-app.use(require('./routes-app.js'));
+import routesApp  from './routes-app.js';
+import routesLogs from './routes-logs.js';
+import routesDev  from './routes-dev.js'
 
-app.use(require('./routes-logs.js'));
-app.use(require('./routes-dev.js'));
+app.use(routesApp);
+app.use(routesLogs);
+app.use(routesDev);
 
 
 // 404 status for any unrecognised ajax requests (don't throw as don't want to return html page)
@@ -256,4 +259,4 @@ async function setupUser(ctx, jwtPayload) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = app;
+export default app;

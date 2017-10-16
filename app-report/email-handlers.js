@@ -4,17 +4,15 @@
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import nodemailer from 'nodemailer';   // sends e-mails from Node.js
+import handlebars from 'handlebars';   // logicless templating language
+import jsdom      from 'jsdom';        // DOM Document interface in Node!
+import htmlToText from 'html-to-text'; // converts html to beautiful text
+import fs         from 'fx-extra';     // fs with extra functions & promise interface
+import crypto     from 'crypto';       // nodejs.org/api/crypto.html
+import dateFormat from 'dateformat';   // Steven Levithan's dateFormat()
 
-const nodemailer = require('nodemailer');   // sends e-mails from Node.js
-const handlebars = require('handlebars');   // logicless templating language
-const JsDom      = require('jsdom').JSDOM;  // DOM Document interface in Node!
-const htmlToText = require('html-to-text'); // converts html to beautiful text
-const fs         = require('fx-extra');     // fs with extra functions & promise interface
-const crypto     = require('crypto');       // nodejs.org/api/crypto.html
-const dateFormat = require('dateformat');   // Steven Levithan's dateFormat()
-
-const Report = require('../models/report.js');
+import Report from '../models/report.js';
 
 // nodemailer transporter config
 const transporter = nodemailer.createTransport({
@@ -53,8 +51,8 @@ class Email {
         const html = templateHbs({ host: ctx.host, token: token });
 
         // get e-mail subject from <title> element
-        const htmlDom = new JsDom(html);
-        const subject = htmlDom.window.document.querySelector('title').textContent;
+        const document = new jsdom.JSDOM(html).window.document;
+        const subject = document.querySelector('title').textContent;
 
         // prepare e-mail message
         const message = {
@@ -113,4 +111,4 @@ class Email {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = Email;
+export default Email;

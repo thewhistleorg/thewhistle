@@ -2,11 +2,10 @@
 /* Routes for e-mail verification test                                             C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import Router from 'koa-router'; // router middleware for koa
+const router = new Router();
 
-const router = require('koa-router')(); // router middleware for koa
-
-const email = require('./email-handlers.js');
+import email from './email-handlers.js';
 
 
 router.get( '/:database/email',               ctx => ctx.render('email/index'));
@@ -16,4 +15,4 @@ router.get( '/:database/email/verify/:token', email.verify);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = router.middleware();
+export default router.middleware();

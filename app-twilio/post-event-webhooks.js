@@ -5,8 +5,6 @@
 /*  message.                                                                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
 
 class MessagesHandlers {
 
@@ -41,4 +39,4 @@ class MessagesHandlers {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = MessagesHandlers;
+export default MessagesHandlers;

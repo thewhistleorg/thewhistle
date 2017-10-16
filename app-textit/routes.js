@@ -2,11 +2,10 @@
 /* TextIt webhooks routes.                                                         C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import Router from 'koa-router'; // router middleware for koa
+const router = new Router();
 
-const router = require('koa-router')(); // router middleware for koa
-
-const webhooks = require('./webhooks.js');
+import webhooks from './webhooks.js';
 
 
 router.get( '/',           webhooks.getIndex);
@@ -16,4 +15,4 @@ router.get( '/parse/when', webhooks.postParseWhen); // for easier testing
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = router.middleware();
+export default router.middleware();

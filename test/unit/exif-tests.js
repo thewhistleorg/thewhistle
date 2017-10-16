@@ -2,10 +2,9 @@
 /* EXIF header extraction unit tests.                                              C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const expect   = require('chai').expect;       // BDD/TDD assertion library
-const exiftool = require('exiftool-vendored'); // cross-platform Node.js access to ExifTool
+import chai     from 'chai';              // BDD/TDD assertion library
+import exiftool from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
+const expect = chai.expect;
 
 describe('EXIF', function() {
     describe('extract EXIF metadata', function() {

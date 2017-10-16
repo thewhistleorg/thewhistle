@@ -4,18 +4,17 @@
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import fs         from 'fs-extra';          // fs with extra functions & promise interface
+import slug       from 'slug';              // make strings url-safe
+import dateFormat from 'dateformat';        // Steven Levithan's dateFormat()
+import exiftool   from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
+import MongoDB    from 'mongodb';           // MongoDB driver for Node.js
+const ObjectId = MongoDB.ObjectId;
 
-const fs         = require('fs-extra');          // fs with extra functions & promise interface
-const slug       = require('slug');              // make strings url-safe
-const dateFormat = require('dateformat');        // Steven Levithan's dateFormat()
-const exiftool   = require('exiftool-vendored'); // cross-platform Node.js access to ExifTool
-const ObjectId   = require('mongodb').ObjectId;
-
-const User    = require('../models/user.js');
-const Weather = require('../lib/weather.js');
-const AwsS3   = require('../lib/aws-s3.js');
-// const Update = require('./update.js'); !! this is done at the bottom of the file to resolve Node cyclic references!
+import User    from '../models/user.js';
+import Weather from '../lib/weather.js';
+import AwsS3   from '../lib/aws-s3.js';
+import Update  from './update.js';
 
 /*
  * A report holds the original submitted incident report, and various metadata.
@@ -614,8 +613,4 @@ function objectId(id) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = Report;
-
-// Update is 'require'd at the bottom of the file to resolve Node's cyclic references deficiency:
-// see stackoverflow.com/questions/10869276#answer-14098262
-const Update = require('./update.js');
+export default Report;

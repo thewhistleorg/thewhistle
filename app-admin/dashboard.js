@@ -7,14 +7,14 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import MongoDB    from 'mongodb';    // MongoDB driver for Node.js
+import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+const ObjectId = MongoDB.ObjectId;
 
-const dateFormat = require('dateformat'); // Steven Levithan's dateFormat()
-const ObjectId   = require('mongodb').ObjectId;
+import User   from '../models/user.js';
+import Report from '../models/report.js';
+import Update from '../models/update.js';
 
-const User   = require('../models/user.js');
-const Report = require('../models/report.js');
-const Update = require('../models/update.js');
 
 class DashboardHandlers {
 
@@ -250,4 +250,4 @@ function possessive(name) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = DashboardHandlers;
+export default DashboardHandlers;

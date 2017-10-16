@@ -2,18 +2,16 @@
 /* Routes for main app (reports, messages, user-agents, notes).                    C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const router = require('koa-router')(); // router middleware for koa
-const send   = require('koa-send');     // static file serving
-
+import Router from 'koa-router'; // router middleware for koa
+import send   from 'koa-send';   // static file serving
+const router = new Router();
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /*  Dashboard routes - TBC                                                                        */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-//const dashboard = require('./dashboard.js');
+//import dashboard from './dashboard.js';
 //
 //router.get('/dashboard/\\*',       dashboard.general); // render general dashboard page
 //router.get('/dashboard/:username', dashboard.user);    // render users’ dashboard page
@@ -23,7 +21,7 @@ const send   = require('koa-send');     // static file serving
 /*  Incident report submission routes                                                             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const report = require('./report.js');
+import report from './report.js';
 
 router.get( '/report/:project',             report.getReportEntry);      // render incident report entry page
 router.post('/report/:project',             report.processReportEntry);  // process incident report entry
@@ -41,7 +39,7 @@ router.get('/ajax/report/:db/names/:name',   report.getName);            // chec
 /*  Reports routes                                                                                */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const reports = require('./reports.js');
+import reports from './reports.js';
 
 router.get('/reports',                 reports.list);            // render reports search/list page
 router.get('/reports-map',             reports.map);             // render reports search/map page
@@ -71,7 +69,7 @@ router.delete('/ajax/reports/:id/updates',               reports.ajaxReportDelet
 /*  Messages routes                                                                               */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const messages = require('./messages.js');
+import messages from './messages.js';
 
 router.get('/messages',             messages.list);          // render list messages page
 router.get('/messages/:id',         messages.view);          // render view message details page
@@ -91,8 +89,8 @@ router.get('/ajax/messages/latest-timestamp', messages.ajaxMessageLatestTimestam
 /*  Route for map marker (TODO: where should this go?)                                            */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const Jimp = require('jimp');     // image processing library
-const fs   = require('fs-extra'); // fs with extra functions & promise interface
+import Jimp from 'jimp';     // image processing library
+import fs   from 'fs-extra'; // fs with extra functions & promise interface
 
 /**
  * Render graduated map marker: 0 for transparent/monochrome -> 100 for opaque/red.
@@ -138,7 +136,7 @@ Jimp.prototype.writePromise = function(path) {
 /*  Users routes                                                                                  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const users = require('./users.js');
+import users from './users.js';
 
 router.get('/users',             users.list);            // render list users page
 router.get('/users/add',         users.add);             // render add user page
@@ -155,7 +153,7 @@ router.get('/ajax/users',        users.ajaxUserDetails); // get user details
 /*  Resources routes                                                                              */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const resources = require('./resources.js');
+import resources from './resources.js';
 
 router.get('/resources',             resources.list);          // render list resources page
 router.get('/resources/add',         resources.add);           // render add resource page
@@ -172,7 +170,7 @@ router.post('/resources/:id/delete', resources.processDelete); // process delete
 
 // uploaded file requests are proxied through to AWS S3
 
-const AwsS3 = require('../lib/aws-s3.js');
+import AwsS3 from '../lib/aws-s3.js';
 
 router.get('/uploaded/:project/:date/:id/:file', async function getUploadedFile(ctx) {
     try {
@@ -194,4 +192,4 @@ router.get('/uploaded/:project/:date/:id/:file', async function getUploadedFile(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = router.middleware();
+export default router.middleware();

@@ -2,9 +2,9 @@
 /* Public routes (available with no login.                                         C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import Router from 'koa-router'; // router middleware for koa
 
-const router = require('koa-router')(); // router middleware for koa
+const router = new Router();
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -26,7 +26,7 @@ router.get('/', async function getIndexPage(ctx) {
 /*  Login routes                                                                                  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const login = require('./login.js');
+import login from './login.js';
 
 // note url allowed after '/login' to redirect to after successful login
 router.get(/^\/login(.*)/,  login.getLogin);    // render login page
@@ -43,7 +43,7 @@ router.get('/ajax/login/databases', login.getUserDatabases); // get databases us
 /*  Password reset routes                                                                         */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-const passwordReset = require('./password-reset.js');
+import passwordReset from './password-reset.js';
 
 router.get( '/password/reset-request',         passwordReset.request);        // render request password page
 router.post('/password/reset-request',         passwordReset.processRequest); // send password reset e-mail
@@ -55,4 +55,4 @@ router.post('/password/reset/:token',          passwordReset.processReset);   //
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = router.middleware();
+export default router.middleware();

@@ -7,11 +7,10 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const fetch          = require('node-fetch');            // window.fetch in node.js
-const DOMParser      = require('xmldom').DOMParser;      // DOMParser in node.js
-const libphonenumber = require('google-libphonenumber'); // wrapper for Google's libphonenumber
+import fetch          from 'node-fetch';            // window.fetch in node.js
+import xmldom         from 'xmldom';                // DOMParser in node.js
+import libphonenumber from 'google-libphonenumber'; // wrapper for Google's libphonenumber
+const DOMParser = xmldom.DOMParser;
 
 const phoneUtil         = libphonenumber.PhoneNumberUtil.getInstance();
 const PhoneNumberFormat = libphonenumber.PhoneNumberFormat;
@@ -200,4 +199,4 @@ class MessagesHandlers {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = MessagesHandlers;
+export default MessagesHandlers;

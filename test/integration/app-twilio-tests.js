@@ -2,13 +2,12 @@
 /* Twilio app integration/acceptance tests.                                        C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import supertest from 'supertest'; // SuperAgent driven library for testing HTTP servers
+import chai      from 'chai';      // BDD/TDD assertion library
+import jsdom     from 'jsdom';     // JavaScript implementation of DOM and HTML standards
+const expect = chai.expect;
 
-const supertest   = require('supertest');   // SuperAgent driven library for testing HTTP servers
-const expect      = require('chai').expect; // BDD/TDD assertion library
-const JsDom       = require('jsdom').JSDOM; // JavaScript implementation of DOM and HTML standards
-
-const app = require('../../app.js');
+import app from '../../app.js';
 
 const testuser = process.env.TESTUSER;
 const testpass = process.env.TESTPASS;
@@ -66,9 +65,9 @@ describe('Twilio app'+' ('+app.env+')', function() {
         it('views messages list page', async function() {
             const response = await request.get('/messages').set(headers);
             expect(response.status).to.equal(200);
-            const htmlDom = new JsDom(response.text);
-            expect(htmlDom.window.document.querySelector('title').textContent.slice(0, 8)).to.equal('Messages');
-            expect(htmlDom.window.document.getElementById(messageId).querySelector('a').textContent).to.equal('07973 559336');
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('title').textContent.slice(0, 8)).to.equal('Messages');
+            expect(document.getElementById(messageId).querySelector('a').textContent).to.equal('07973 559336');
         });
 
         it('logs out', async function() {

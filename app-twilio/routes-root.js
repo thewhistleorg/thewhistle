@@ -3,9 +3,8 @@
 /*                                                                                 C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const router = require('koa-router')(); // router middleware for koa
+import Router from 'koa-router'; // router middleware for koa
+const router = new Router();
 
 
 router.get('/', function getRoot(ctx) {
@@ -19,4 +18,4 @@ router.get('/', function getRoot(ctx) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = router.middleware();
+export default router.middleware();

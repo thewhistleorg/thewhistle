@@ -4,16 +4,14 @@
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import scrypt  from 'scrypt';       // scrypt library
+import jwt     from 'jsonwebtoken'; // JSON Web Token implementation
+import MongoDB from 'mongodb';      // MongoDB driver for Node.js
+const MongoClient = MongoDB.MongoClient;
 
-const scrypt = require('scrypt');       // scrypt library
-const jwt    = require('jsonwebtoken'); // JSON Web Token implementation
-
-const User     = require('../models/user.js');
-const Report   = require('../models/report.js');
-const Resource = require('../models/resource.js');
-
-const MongoClient = require('mongodb').MongoClient;
+import User     from '../models/user.js';
+import Report   from '../models/report.js';
+import Resource from '../models/resource.js';
 
 
 class LoginHandlers {
@@ -169,4 +167,4 @@ class LoginHandlers {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = LoginHandlers;
+export default LoginHandlers;

@@ -2,14 +2,14 @@
 /* AWS S3 unit tests.                                                              C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
+import chai       from 'chai';       // BDD/TDD assertion library
+import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+import dotenv from 'dotenv';         // load environment variables from a .env file into process.env
+const expect   = chai.expect;
 
-const expect     = require('chai').expect; // BDD/TDD assertion library
-const dateFormat = require('dateformat');  // Steven Levithan's dateFormat()
+dotenv.config();
 
-require('dotenv').config(); // loads environment variables from .env file (if available - eg dev env)
-
-const AwsS3 = require('../../lib/aws-s3.js');
+import AwsS3 from'../../lib/aws-s3.js';
 
 const test = it; // just an alias
 
@@ -17,7 +17,7 @@ const test = it; // just an alias
 const ObjectId = (rnd = r16 => Math.floor(r16).toString(16)) =>
     rnd(Date.now()/1000) + ' '.repeat(16).replace(/./g, () => rnd(Math.random()*16));
 
-require('./before.js'); // set up database connections
+import './before.js'; // set up database connections
 
 describe('AWS S3', function() {
     this.timeout(5e3); // 5 sec

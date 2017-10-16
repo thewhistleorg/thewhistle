@@ -4,9 +4,7 @@
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
-
-const Report = require('../../../models/report.js');
+import Report from '../../../models/report.js';
 
 class Handlers {
 
@@ -122,4 +120,4 @@ class Handlers {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = Handlers;
+export default Handlers;

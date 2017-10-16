@@ -7,20 +7,22 @@
 /*  - twilio. (RESTful API for Twilio webhooks)                                                   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-'use strict';
 /* eslint no-shadow:off *//* app is already declared in the upper scope */
 
-const Koa         = require('koa');            // Koa framework
-const body        = require('koa-body');       // body parser
-const compose     = require('koa-compose');    // middleware composer
-const compress    = require('koa-compress');   // HTTP compression
-const session     = require('koa-session');    // session for flash messages
-const dateFormat  = require('dateformat');     // Steven Levithan's dateFormat()
-const MongoClient = require('mongodb').MongoClient;
-const fs          = require('fs-extra');       // fs with extra functions & promise interface
-const debug       = require('debug')('app');   // small debugging utility
+import Koa             from 'koa';            // Koa framework
+import body            from 'koa-body';       // body parser
+import compose         from 'koa-compose';    // middleware composer
+import compress        from 'koa-compress';   // HTTP compression
+import session         from 'koa-session';    // session for flash messages
+import dateFormat      from 'dateformat';     // Steven Levithan's dateFormat()
+import MongoDB         from 'mongodb';
+import fs              from 'mz/fs';          // 'modernised' node api
+import Debug           from 'debug';          // small debugging utility
+const debug = Debug('app');
+const MongoClient = MongoDB.MongoClient;
 
-require('dotenv').config(); // loads environment variables from .env file (if available - eg dev env)
+import dotenv from 'dotenv';
+dotenv.config(); // loads environment variables from .env file (if available - eg dev env)
 
 const app = new Koa();
 
@@ -107,17 +109,23 @@ app.use(async function subApp(ctx, next) {
     await next();
 });
 
+import appAdmin  from './app-admin/app-admin.js';
+import appReport from './app-report/app-report.js';
+import appTwilio from './app-twilio/app-twilio.js';
+import appTexit  from './app-textit/app-textit.js';
+
+
 app.use(async function composeSubapp(ctx) { // note no 'next' after composed subapp
     switch (ctx.state.subapp) {
-        case 'admin':  await compose(require('./app-admin/app-admin.js').middleware)(ctx);   break;
-        case 'report': await compose(require('./app-report/app-report.js').middleware)(ctx); break;
-        case 'twilio': await compose(require('./app-twilio/app-twilio.js').middleware)(ctx); break;
-        case 'textit': await compose(require('./app-textit/app-textit.js').middleware)(ctx); break;
+        case 'admin':  await compose(appAdmin.middleware)(ctx);   break;
+        case 'report': await compose(appReport.middleware)(ctx); break;
+        case 'twilio': await compose(appTwilio.middleware)(ctx); break;
+        case 'textit': await compose(appTexit.middleware)(ctx); break;
         default: // no recognised subdomain
             if (process.env.SUBAPP) {
                 // eg for Heroku review apps where subdomain cannot be supplied, take subapp from env
-                const subapp = process.env.SUBAPP;
-                await compose(require(`./app-${subapp}/app-${subapp}.js`).middleware)(ctx); break;
+                const subapp = await import(`./app-${process.env.SUBAPP}/app-${process.env.SUBAPP}.js`);
+                await compose(subapp.middleware)(ctx); break;
             }
             if (ctx.state.subapp == 'localhost') { ctx.status = 403; break; } // avoid redirect loop
             // otherwise redirect to www static site (which should not be this app)
@@ -135,4 +143,4 @@ console.info(`${process.version} listening on port ${process.env.PORT || 3000} (
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-module.exports = app;
+export default app;

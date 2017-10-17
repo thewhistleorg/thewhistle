@@ -133,6 +133,7 @@ class Report {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id); // allow id as string
+        if (!id) return null;
 
         const reports = global.db[db].collection('reports');
         const rpt = await reports.findOne(id);
@@ -600,13 +601,19 @@ class Report {
 
 }
 
+/**
+ * Make id an ObjectId if is not already (ie if it is a string).
+ *
+ * @param {ObjectId|string} id - Id as ObjectId or string
+ * @returns {ObjectId|null}
+ */
 function objectId(id) {
     if (id == undefined) return undefined;
     try {
         const objId = id instanceof ObjectId ? id : new ObjectId(id);
         return objId;
     } catch (e) {
-        throw new Error (`Invalid ObjectId ‘${id}’`);
+        return null;
     }
 }
 

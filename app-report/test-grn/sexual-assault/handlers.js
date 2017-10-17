@@ -55,6 +55,7 @@ class Handlers {
      * Process 'next' / 'previous' page submissions.
      */
     static postPage(ctx) {
+        // getIndex initialises ctx.session.report with date, so for this project ctx.session.report is never empty
         if (!ctx.session.report) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
         const page = ctx.params.num==undefined ? 0 : Number(ctx.params.num);
         ctx.session.completed = Number(page);

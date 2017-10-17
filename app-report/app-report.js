@@ -48,10 +48,10 @@ app.use(async function handleErrors(ctx, next) {
                 break;
             default:
             case 500: // Internal Server Error TODO: 500-internal-server-error gets looked for within individual project
-                console.error(ctx.status, e.message);
+                console.error('handleErrors', ctx.status, e.message, e.stack);
                 const context500 = app.env=='production' ? {} : { e: e };
                 await ctx.render('500-internal-server-error', context500);
-                ctx.app.emit('error', e, ctx); // github.com/koajs/koa/wiki/Error-Handling
+                ctx.app.emit('error', e.message); // github.com/koajs/koa/wiki/Error-Handling
                 break;
         }
     }

@@ -258,7 +258,7 @@ class Handlers {
  * @returns {Object} Transformed report
  */
 function prettifyReport(report) {
-    const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
+    const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ];
 
     const rpt = {};
 

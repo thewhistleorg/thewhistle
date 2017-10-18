@@ -382,7 +382,6 @@ class ReportsHandlers {
         // create PDF
         const options = {
             format: 'A4',
-            base:   'file:/'+__dirname+'/public/',
         };
         const reportsPdf = pdf.create(html, options);
 
@@ -465,7 +464,6 @@ class ReportsHandlers {
         // create PDF
         const options = {
             format: 'A4',
-            base:   'file:/'+__dirname+'/public/',
         };
         const reportsPdf = pdf.create(html, options);
 

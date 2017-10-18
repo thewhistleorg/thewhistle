@@ -25,20 +25,15 @@ class LoginHandlers {
      * Allow user=email querystring to show databases without ajax call.
      */
     static async getLogin(ctx) {
-        const context = {};
+        const context = ctx.flash.formdata || {};
 
-        const user = ctx.query.user ? await User.get(ctx.query.user.id) : null;
-        if (user) {
-            // logged-in user: show current roles as part of confirmation
-            context.user.roles = user.roles.join(', '); // for confirmation display
-        } else {
-            if (ctx.request.query.user) context.username = ctx.request.query.user;  // no db selected
-            if (ctx.flash.formdata) context.username = ctx.flash.formdata.username; // failed authentication
-            if (context.username) {
-                // show list of databases
-                const [ usr ] = await User.getBy('email', context.username);
-                if (usr && usr.databases.length>1) context.databases = usr.databases;
-            }
+        // user=email querystring?
+        if (ctx.request.query.user) context.username = ctx.request.query.user;
+
+        if (context.username) {
+            // if username set & user has access to more than one org'n, show list of them
+            const [ usr ] = await User.getBy('email', context.username);
+            if (usr && usr.databases.length>1) context.databases = usr.databases;
         }
 
         await ctx.render('login', context);
@@ -98,7 +93,7 @@ class LoginHandlers {
         }
 
         if (user.databases.length > 1 && !body.database) {
-            // login submitted without having selected database - represent with databases listed (not relying on ajax)
+            // login submitted without having selected database - re-present with databases listed (not relying on ajax)
             ctx.redirect(ctx.url + `?user=${body.username}`);
             return;
         }
@@ -153,7 +148,7 @@ class LoginHandlers {
 
 
     /**
-     * GET /ajax/login/:user/databases - Return list of databases user has access to
+     * GET /ajax/login/databases?user=email - Return list of databases user has access to
      */
     static async getUserDatabases(ctx) {
         const [ user ] = await User.getBy('email', ctx.request.query.user); // lookup user

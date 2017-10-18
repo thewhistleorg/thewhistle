@@ -47,11 +47,7 @@ router.get('/reports/export-csv',      reports.exportCsv);       // download CSV
 router.get('/reports/export-pdf',      reports.exportPdf);       // download PDF list of reports
 router.get('/reports/export-pdf/:id',  reports.exportPdfSingle); // download PDF of report
 router.get('/reports/:id',             reports.viewReport);      // render view report tab
-router.get('/reports/:id/edit',        reports.edit);            // render edit report details page
-router.get('/reports/:id/delete',      reports.delete);          // render delete a report page
 
-router.post('/reports/:id',            reports.processView);     // process report view submit
-router.post('/reports/:id/edit',       reports.processEdit);     // process edit report
 router.post('/reports/:id/delete',     reports.processDelete);   // process delete report
 
 // ---- ajax routes

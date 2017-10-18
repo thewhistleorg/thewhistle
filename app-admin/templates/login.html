@@ -16,7 +16,7 @@
             vertical-align: baseline;
         }
     </style>
-    {{#unless user}}
+    {{#unless @koa.state.user}}
     <script>
         'use strict';
         document.addEventListener('DOMContentLoaded', async function() {
@@ -65,10 +65,11 @@
 
 <h1>Login</h1>
 
-{{#if user}}
+{{#if @koa.state.user}}
 
-<p>You are currently logged in as {{user.firstname}} {{user.lastname}}
-    (with {{user.roles}} privileges).</p>
+<p>You are currently logged in as <span id="name">{{@koa.state.user.name}}</span>
+    accessing <span id="db">{{@koa.state.user.db}}</span> organisation
+    (with <span id="roles">{{@koa.state.user.roles}}</span> privileges).</p>
 
 <p><a href="/password/reset-request">Password reset</a></p>
 
@@ -85,7 +86,7 @@
             <input name="password" id="password" type="password" required>
         </li>
         <li id="database" class="pure-control-group {{#unless databases.length}}hide{{/unless}}">
-            <label>Database</label>
+            <label>Organisation</label>
             {{#databases}}
             <input type="radio" name="database" id="database-{{this}}" value="{{this}}" required> <label for="database-{{this}}">{{this}}</label>
             {{/databases}}

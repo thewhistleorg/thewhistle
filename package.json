@@ -14,9 +14,9 @@
     "test-intgn": "mocha -r @std/esm test/integration/*.js",
     "lint": "eslint --ignore-pattern app-api/apidoc .",
     "stylelint": "stylelint public/css/*.css",
-    "cover": "istanbul cover node_modules/.bin/_mocha test/",
-    "cover-unit": "istanbul cover node_modules/.bin/_mocha test/unit/",
-    "cover-intgn": "istanbul cover node_modules/.bin/_mocha test/integration",
+    "cover": "istanbul cover node_modules/.bin/_mocha test/* -- -r @std/esm",
+    "cover-unit": "istanbul cover node_modules/.bin/_mocha test/unit/ -- -r @std/esm",
+    "cover-intgn": "istanbul cover node_modules/.bin/_mocha test/integration -- -r @std/esm",
     "apidoc": "apidoc -i app-api -o app-api/apidoc/apidoc"
   },
   "engines": {
@@ -101,75 +101,29 @@
     },
     "extends": "eslint:recommended",
     "rules": {
-      "array-bracket-spacing": [
-        "error",
-        "always"
-      ],
-      "comma-dangle": [
-        "error",
-        "always-multiline"
-      ],
-      "curly": [
-        "error",
-        "multi-line"
-      ],
-      "indent": [
-        "error",
-        4,
-        {
-          "SwitchCase": 1
-        }
-      ],
-      "key-spacing": [
-        "error",
-        {
-          "align": "value"
-        }
-      ],
+      "array-bracket-spacing": [ "error", "always" ],
+      "comma-dangle": [ "error", "always-multiline" ],
+      "curly": [ "error", "multi-line" ],
+      "indent": [ "error", 4, { "SwitchCase": 1 } ],
+      "key-spacing": [ "error", { "align": "value" } ],
       "no-case-declarations": "off",
-      "no-console": [
-        "warn",
-        {
-          "allow": [
-            "error",
-            "info"
-          ]
-        }
-      ],
+      "no-console": [ "warn", { "allow": [ "error", "info" ] } ],
       "no-redeclare": "warn",
       "no-shadow": "warn",
       "no-unused-vars": "warn",
       "no-var": "error",
-      "object-curly-spacing": [
-        "error",
-        "always"
-      ],
+      "object-curly-spacing": [ "error", "always" ],
       "prefer-const": "error",
-      "quotes": [
-        "error",
-        "single",
-        "avoid-escape"
-      ],
+      "quotes": [ "error", "single", "avoid-escape" ],
       "require-await": "error",
-      "semi": [
-        "error",
-        "always"
-      ],
-      "strict": [
-        "error",
-        "global"
-      ]
+      "semi": [ "error", "always" ],
+      "strict": [ "error", "global" ]
     }
   },
   "stylelint": {
     "extends": "stylelint-config-standard",
     "rules": {
-      "block-opening-brace-space-before": [
-        "always",
-        {
-          "severity": "warning"
-        }
-      ],
+      "block-opening-brace-space-before": [ "always", { "severity": "warning" } ],
       "color-hex-length": "long",
       "comment-empty-line-before": null,
       "indentation": 4,

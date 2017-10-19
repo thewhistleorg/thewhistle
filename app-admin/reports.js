@@ -950,7 +950,7 @@ class ReportsHandlers {
 
         try {
             await Report.deleteTag(db, ctx.params.id, ctx.params.tag, ctx.state.user.id);
-            ctx.status = 201;
+            ctx.status = 200;
             ctx.body = {};
         } catch (e) {
             ctx.status = 500;

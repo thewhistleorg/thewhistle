@@ -56,6 +56,7 @@ class User {
      * @returns {Object[]}      Users details.
      */
     static async getBy(field, value) {
+        if (typeof field != 'string') throw new Error('User.getBy: field must be a string');
         const users = global.db.users.collection('users');
         const usrs = await users.find({ [field]: value }).toArray();
         return usrs;

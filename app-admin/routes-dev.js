@@ -17,7 +17,7 @@ router.get('/dev/nodeinfo', function(ctx) {
 
 
 router.get('/dev/user-agents', async function(ctx) {
-    const context = await useragent.counts('test', ctx.query.since);
+    const context = await useragent.counts(ctx.state.user.db, ctx.query.since);
     context.sinceDate = context.since ? dateFormat(context.since, 'd mmm yyyy') : '–';
 
     await ctx.render('user-agents', context);

@@ -172,11 +172,13 @@ class IncidentReport {
 
 
     /**
-     * GET /ajax/report/names/new - Generate a random adjective-noun name..
+     * GET /ajax/report/:db/names/new - Generate a random adjective-noun name..
+     *
+     * For efficiency, this doesn't check if the name is already in use (should be very small
+     * probability), but such check should be done when submitting report.
      */
     static async getGenerateNewName(ctx) {
         const name = await autoIdentifier(12);
-        // TODO: verify not already used
 
         ctx.body = { name: name };
         ctx.body.root = 'generateName';

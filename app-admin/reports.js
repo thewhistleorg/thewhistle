@@ -851,6 +851,43 @@ class ReportsHandlers {
 
 
     /**
+     * POST /reports/:id - Process report update summary / assigned-to / status / etc
+     */
+    static async processView(ctx) {
+        if (!ctx.state.user.roles.includes('admin')) return ctx.redirect('/login'+ctx.url);
+        const db = ctx.state.user.db;
+
+        try {
+            if (ctx.request.body.summary !== undefined) {
+                await Report.update(db, ctx.params.id, { summary: ctx.request.body.summary }, ctx.state.user.id);
+            }
+
+            if (ctx.request.body['assigned-to'] !== undefined) {
+                const assignedTo = ctx.request.body['assigned-to']==null ? null : ObjectId(ctx.request.body['assigned-to']);
+                await Report.update(db, ctx.params.id, { assignedTo }, ctx.state.user.id);
+            }
+
+            if (ctx.request.body.status !== undefined) {
+                if (ctx.request.body.status == '*') throw new Error('Cannot use ‘*’ for status');
+                await Report.update(db, ctx.params.id, { status: ctx.request.body.status }, ctx.state.user.id);
+            }
+
+            if (ctx.request.body.archived !== undefined) {
+                await Report.update(db, ctx.params.id, { archived: ctx.request.body.archived=='y' }, ctx.state.user.id);
+            }
+
+            // remain on same page
+            ctx.redirect(ctx.url);
+
+        } catch (e) {
+            // stay on same page to report error (with current filled fields)
+            ctx.flash = { formdata: ctx.request.body, _error: e.message };
+            ctx.redirect(ctx.url);
+        }
+    }
+
+
+    /**
      * POST /reports/:id/delete - Process delete report
      */
     static async processDelete(ctx) {

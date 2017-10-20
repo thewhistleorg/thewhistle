@@ -48,6 +48,7 @@ router.get('/reports/export-pdf',      reports.exportPdf);       // download PDF
 router.get('/reports/export-pdf/:id',  reports.exportPdfSingle); // download PDF of report
 router.get('/reports/:id',             reports.viewReport);      // render view report tab
 
+router.post('/reports/:id',            reports.processView);     // process report view submit
 router.post('/reports/:id/delete',     reports.processDelete);   // process delete report
 
 // ---- ajax routes

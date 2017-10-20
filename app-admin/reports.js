@@ -668,14 +668,14 @@ class ReportsHandlers {
         }
 
         // summary filtering: filter by reports which include query argument within summary field [not currently used]
-        if (q.summary) {
-            if (Array.isArray(q.summary)) {
-                for (const s of q.summary) filter.push({ ['summary']: new RegExp(`.*${s}.*`, 'i') });
-            } else {
-                filter.push({ ['summary']: new RegExp(`.*${q.summary}.*`, 'i') });
-            }
-            filterDesc.add('summary');
-        }
+        //if (q.summary) {
+        //    if (Array.isArray(q.summary)) {
+        //        for (const s of q.summary) filter.push({ ['summary']: new RegExp(`.*${s}.*`, 'i') });
+        //    } else {
+        //        filter.push({ ['summary']: new RegExp(`.*${q.summary}.*`, 'i') });
+        //    }
+        //    filterDesc.add('summary');
+        //}
 
         // tag filtering: if a tag is given, list reports which include that tag
         if (q.tag) {

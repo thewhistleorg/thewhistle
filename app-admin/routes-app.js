@@ -68,12 +68,8 @@ router.delete('/ajax/reports/:id/updates',               reports.ajaxReportDelet
 import messages from './messages.js';
 
 router.get('/messages',             messages.list);          // render list messages page
-router.get('/messages/:id',         messages.view);          // render view message details page
-router.get('/messages/:id/edit',    messages.edit);          // render edit message details page
-router.get('/messages/:id/delete',  messages.delete);        // render delete a message page
 
 router.post('/messages',            messages.processSend);   // process send message
-router.post('/messages/:id/edit',   messages.processEdit);   // process edit message
 router.post('/messages/:id/delete', messages.processDelete); // process delete message
 
 // ---- ajax routes

@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* API app - RESTful API for API interface and/or ajax functions.                  C.Veness 2017  */
+/* Twilio app - RESTful API for handling Twilio SMS messages.                      C.Veness 2017  */
 /*                                                                                                */
 /* The API provides GET / POST / PATCH / DELETE methods on a variety of resources.                */
 /*                                                                                                */
@@ -15,9 +15,11 @@ import xmlify    from 'xmlify';       // JS object to XML
 import yaml      from 'js-yaml';      // JS object to YAML
 import bunyan    from 'bunyan';       // logging
 import koaLogger from 'koa-bunyan';   // logging
+import MongoDB   from 'mongodb';      // MongoDB driver for Node.js
+const MongoClient = MongoDB.MongoClient;
 
 
-const app = new Koa(); // API app
+const app = new Koa(); // twilio app
 
 
 // content negotiation: api will respond with json, xml, or yaml
@@ -92,6 +94,22 @@ const logger = bunyan.createLogger({ name: 'api', streams: [ access, error ] });
 app.use(koaLogger(logger, {}));
 
 
+// set up database connection: relationship between Twilio and organisation/project would have to be
+// considered if we were to use this app; perhaps it will be consumed into the textit app or
+// something... for now we'll just hardwire the test-grn organisation
+app.use(async function(ctx, next) {
+    if (!global.db['test-grn']) {
+        try {
+            global.db['test-grn'] = await MongoClient.connect(process.env.DB_TEST_GRN);
+        } catch (e) {
+            console.error('Mongo connection error', e.toString());
+            process.exit(1);
+        }
+    }
+    await next();
+});
+
+
 // ------------ routing
 
 // public (unsecured) modules first
@@ -99,30 +117,7 @@ app.use(koaLogger(logger, {}));
 import routesRoot from './routes-root.js';
 app.use(routesRoot);
 
-// remaining routes require JWT auth (obtained from /auth and supplied in bearer authorization header)
-
-app.use(async function verifyJwt(ctx, next) {
-    await next(); return;
-
-    if (!ctx.header.authorization) ctx.throw(401, 'Authorisation required');
-    const [ scheme, token ] = ctx.header.authorization.split(' ');
-    if (scheme != 'Bearer') ctx.throw(401, 'Invalid authorisation');
-
-    const roles = { g: 'guest', u: 'user', a: 'admin', r: 'reporter', s: 'su' };
-
-    try {
-        const payload = jwt.verify(token, 'koa-sample-app-signature-key'); // throws on invalid token
-
-        // valid token: accept it...
-        ctx.state.user = payload;                                          // for user id  to look up user details
-        ctx.state.user.roles = payload.roles.split('').map(r => roles[r]); // for authorisation checks
-    } catch (e) {
-        if (e.message == 'invalid token') ctx.throw(401, 'Invalid JWT'); // Unauthorized
-        ctx.throw(e.status||500, e.message); // Internal Server Error
-    }
-
-    await next();
-});
+// should remaining routes require authentication?
 
 import routesPostEventWebhooks from './routes-post-event-webhooks.js';
 app.use(routesPostEventWebhooks);

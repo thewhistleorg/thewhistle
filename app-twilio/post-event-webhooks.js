@@ -1,9 +1,11 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* API handlers - Twilio post webhooks.                                            C.Veness 2017  */
 /*                                                                                                */
-/*  Twilio is configured to POST to e.g. twilio.thewhistle.org/message after it receives an SMS   */
-/*  message.                                                                                      */
+/* Twilio is configured to POST to e.g. twilio.thewhistle.org/message after it receives an SMS    */
+/* message.                                                                                       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+import Message from '../models/message.js';
 
 
 class MessagesHandlers {
@@ -21,13 +23,16 @@ class MessagesHandlers {
      * @apiError   401/Unauthorized          Invalid JWT auth credentials supplied.
      * @apiError   403/Forbidden             Admin auth required.
      */
-    static postMessages(ctx) {
-        global.messages.push(Object.assign({ direction: 'incoming', timestamp: new Date() }, ctx.request.body));
-        // note: no point as Heroku resets filesystem on restart await fs.writeFile('./db/messages.json', JSON.stringify(global.messages, null, 2));
+    static async postMessages(ctx) {
+        const db = 'test-grn'; // TODO: for now!
+
+        const msgId = await Message.insert(db, Object.assign({ direction: 'incoming', timestamp: new Date() }, ctx.request.body));
+
         // TOOD: response should only be on 1st message of dialogue
         ctx.body = { Message: 'Thank you for your message; we will get back to you shortly' };
         ctx.body.root = 'Response';
         ctx.status = 200; // Ok
+        ctx.set('X-Insert-Id', msgId);
     }
 
     static postFail(ctx) {

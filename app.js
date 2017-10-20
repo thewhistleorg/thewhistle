@@ -27,10 +27,6 @@ dotenv.config(); // loads environment variables from .env file (if available - e
 const app = new Koa();
 
 
-// TODO: TMP load messages into global.messages from db/messages.json
-fs.readFile('./db/messages.json').then(data => global.messages = data ? JSON.parse(data) : []).catch(() => global.messages = []);
-
-
 // for user-agents reporting
 app.proxy = true;
 global.start = new Date(); // to report counts since given timestamp

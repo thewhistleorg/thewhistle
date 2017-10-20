@@ -12,6 +12,8 @@ import xmldom         from 'xmldom';                // DOMParser in node.js
 import libphonenumber from 'google-libphonenumber'; // wrapper for Google's libphonenumber
 const DOMParser = xmldom.DOMParser;
 
+import Message from '../models/message.js';
+
 const phoneUtil         = libphonenumber.PhoneNumberUtil.getInstance();
 const PhoneNumberFormat = libphonenumber.PhoneNumberFormat;
 
@@ -23,53 +25,22 @@ class MessagesHandlers {
      * Results can be filtered with URL query strings eg /messages?from=7973559336. TODO!
      */
     static async list(ctx) {
-        for (const msg of global.messages) {
+        const db = ctx.state.user.db;
+
+        const messages = await Message.getAll(db);
+
+        for (const msg of messages) {
             msg.timestampIso = msg.timestamp.toISOString().replace('T', ' ').replace(/\..+/, '');
             msg.dirn = msg.direction == 'incoming' ? '⇐' : '⇒';
             msg.fromEscaped = encodeURIComponent(msg.From.replace('+', '~'));
             msg.fromFormatted = phoneUtil.format(phoneUtil.parse(msg.From), PhoneNumberFormat.NATIONAL);
         }
-        const latest = global.messages.reduce((prevVal, currVal) => Math.max(prevVal, currVal.timestamp), 0);
+        const latest = messages.reduce((prevVal, currVal) => Math.max(prevVal, currVal.timestamp), 0);
         const filtered = ctx.query.number ? true : false;
-        const h1 = ctx.query.number ? ' with '+libphonenumber.national(ctx.query.number.replace('~', '+')) : '';
-        await ctx.render('messages-list', { messages: global.messages, latest, filtered, h1 });
-    }
-
-
-    /**
-     * GET /messages/:id - render view-message page
-     */
-    static async view(ctx) {
-        // message details
-        const message = await Message.get(ctx.params.id); // TODO: message model
-        if (!message) ctx.throw(404, 'Message not found');
-
-        await ctx.render('messages-view', message);
-    }
-
-
-    /**
-     * GET /messages/:id/edit - render edit-message page
-     */
-    static async edit(ctx) {
-        // message details
-        const message = await Message.get(ctx.params.id); // TODO: message model
-        if (!message) ctx.throw(404, 'Message not found');
-        if (ctx.flash.formdata) Object.assign(message, ctx.flash.formdata); // failed validation? fill in previous values
-
-        await ctx.render('messages-edit', message);
-    }
-
-
-    /**
-     * GET /messages/:id/delete - render delete-message page
-     */
-    static async delete(ctx) {
-        const message = await Message.get(ctx.params.id); // TODO: message model
-        if (!message) ctx.throw(404, 'Message not found');
-
-        const context = message;
-        await ctx.render('messages-delete', context);
+        const number = ctx.query.number ? ctx.query.number.replace('~', '+') : '';
+        const forNumber = number ? phoneUtil.format(phoneUtil.parse(number, 'GB'), PhoneNumberFormat.NATIONAL) : '';
+        const h1 = number ? ' with '+forNumber : '';
+        await ctx.render('messages-list', { messages: messages, latest, filtered, h1 });
     }
 
 
@@ -117,7 +88,9 @@ class MessagesHandlers {
                 From:      toNumber,
                 Body:      ctx.request.body.message,
             };
-            global.messages.push(msg);
+            const insertId = await Message.insert('test-grn', msg);
+
+            ctx.set('X-Insert-Id', insertId); // for testing
 
             // stay on same page, but with new message displayed
             ctx.redirect(ctx.url);
@@ -132,32 +105,6 @@ class MessagesHandlers {
 
 
     /**
-     * POST /messages/:id/edit - process edit-message
-     */
-    static async processEdit(ctx) {
-        if (!ctx.state.user.roles.includes('admin')) return ctx.redirect('/login'+ctx.url);
-
-        // update message details
-        if ('firstname' in ctx.request.body) {
-            try {
-
-                ctx.request.body.Active = ctx.request.body.Active ? true : false;
-
-                await Message.update(ctx.params.id, ctx.request.body); // TODO: message model
-
-                // return to list of messages
-                ctx.redirect('/messages');
-
-            } catch (e) {
-                // stay on same page to report error (with current filled fields)
-                ctx.flash = { formdata: ctx.request.body, _error: e.message };
-                ctx.redirect(ctx.url);
-            }
-        }
-    }
-
-
-    /**
      * POST /messages/:id/delete - process delete message
      */
     static async processDelete(ctx) {
@@ -165,13 +112,14 @@ class MessagesHandlers {
 
         try {
 
-            await Message.delete(ctx.params.id); // TODO: message model
+            await Message.delete('test-grn', ctx.params.id);
 
             // return to list of messages
             ctx.redirect('/messages');
 
         } catch (e) {
             // stay on same page to report error
+            console.error(e);
             ctx.flash = { _error: e.message };
             ctx.redirect(ctx.url);
         }
@@ -187,8 +135,12 @@ class MessagesHandlers {
      * GET /ajax/messages/latest-timestamp - Timestamp of most recently received message (for ajax
      * call to automatically update messages list), as ISO timestamp.
      */
-    static ajaxMessageLatestTimestamp(ctx) {
-        const latest = global.messages.reduce((prevVal, currVal) => Math.max(prevVal, currVal.timestamp), 0);
+    static async ajaxMessageLatestTimestamp(ctx) {
+        const db = ctx.state.user.db;
+
+        const messages = await Message.getAll(db); // TODO: just get latest! (this is hangover code!)
+        const latest = messages.reduce((prevVal, currVal) => Math.max(prevVal, currVal.timestamp), 0);
+
         ctx.status = 200;
         ctx.body = { latest: { timestamp: new Date(latest).valueOf() } };
         ctx.body.root = 'messages';

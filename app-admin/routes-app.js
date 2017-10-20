@@ -95,8 +95,10 @@ router.get('/map-marker/:colour/:percentage', async function getMapMarker(ctx) {
     const percentage = Math.round(ctx.params.percentage); // 0 = transparent/monochrome, 100 = full color
     const path = 'static/map/marker-'+colour+'-'+percentage+'.png';
 
+    const maxage = ctx.app.env=='production' ? 1000*60*60*24 : 1000;
+
     if (await fs.exists(path)) {
-        await send(ctx, path, { maxage: 1 }); // 1000*60*60
+        await send(ctx, path, { maxage: maxage });
     } else {
         const marker = await Jimp.read('static/map/marker-'+colour+'.png');
         const outline = await Jimp.read('static/map/marker-'+colour+'-outline.png');
@@ -104,7 +106,7 @@ router.get('/map-marker/:colour/:percentage', async function getMapMarker(ctx) {
         marker.composite(outline, 0, 0);
         marker.color([ { apply: 'desaturate', params: [ 100-percentage ] } ]);
         await marker.writePromise(path);
-        await send(ctx, path, { maxage: 1000*60*60 });
+        await send(ctx, path, { maxage: maxage });
     }
 });
 

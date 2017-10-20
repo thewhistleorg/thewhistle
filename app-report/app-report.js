@@ -20,7 +20,7 @@ const app = new Koa(); // report app
 
 
 // serve static files (html, css, js); allow browser to cache for 1 hour (note css/js req'd before login)
-const maxage = app.env=='development' ? 1000 : 1000*60*60;
+const maxage = app.env=='production' ? 1000*60*60 : 1000;
 app.use(serve('public', { maxage: maxage }));
 
 

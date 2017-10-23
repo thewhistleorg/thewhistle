@@ -12,8 +12,8 @@ const spawn  = childProcess.spawn;
 router.get('/logs/:logfile', async function logs(ctx) {
     if (!ctx.state.user.roles.includes('su')) return ctx.redirect('/login'+ctx.url);
 
-    const bunyan = require.resolve('bunyan/bin/bunyan'); // full path to bunyan command
-    const logfile = path.join(__dirname, '../logs/'+ctx.params.logfile);
+    const bunyan = 'node_modules/bunyan/bin/bunyan'; // full path to bunyan command
+    const logfile = path.resolve('./logs/'+ctx.params.logfile);
     const args = ctx.query.options ? [ logfile, ctx.query.options ] : [ logfile ];
 
     try {

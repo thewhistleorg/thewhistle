@@ -134,7 +134,6 @@ report metadata:
 - files: any images or documents uploaded as part of the incident report submission.
 
 Other metadata is added through the workflow of managing submitted incident reports, including:
-- summary [or ‘title’?]
 - assignedTo
 - status
 - tags
@@ -146,8 +145,7 @@ Other metadata is added through the workflow of managing submitted incident repo
 Images or documents associated with an incident report may be uploaded as part of the submission.
 
 Since Heroku has no persistent storage outside the Git repository the app is built from, these files
-are stored on Amazon AWS S3. Requests for these files are then proxied through to S3 [*note: to be 
-implemented*].
+are stored on Amazon AWS S3. Requests for these files are then proxied through to S3.
 
 ### Audit trail
 
@@ -159,10 +157,13 @@ reports collection records the last time a report has been viewed by a user.
 Test Suite
 ----------
 
-An integration/acceptance test suite is set up using the [mocha](https://mochajs.org/) test 
-framework and [chai](http://chaijs.com/) assertion library. This currently doesn’t have a large 
-number of tests, but the framework is in place for further tests to be added as development 
-continues and as functionality settles.
+A test suite (compring unit tests run on the code directly, and integration/acceptance tests run 
+on the web service using the [superagent](https://www.npmjs.com/package/superagent)-based 
+[suptertest](https://www.npmjs.com/package/supertest)) is set up using the [mocha](https://mochajs.org/) 
+test framework and [chai](http://chaijs.com/) assertion library. 
+[Istanbul](https://www.npmjs.com/package/istanbul) is used for code coverage; code coverage is used
+as a guide to complete test suites, not as a 100% target.
 
-When the project moves from prototype development to production use, and is held in a GitHub
-repository, continuous integration testing can be set up using [Travis CI](https://travis-ci.org/).
+Continuous integration tests have been set up using CircleCI; CI tests are run on every push to the
+GitHub master, hence no code will be released to staging without passing the test suite (promotion 
+from staging to production is a manual task; see the [development workflow](/dev/notes/development-workflow)).

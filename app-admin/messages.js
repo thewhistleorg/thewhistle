@@ -96,7 +96,6 @@ class MessagesHandlers {
             ctx.redirect(ctx.url);
 
         } catch (e) {
-            console.error(e);
             // stay on same page to report error (with current filled fields)
             ctx.flash = { formdata: ctx.request.body, _error: e.message };
             ctx.redirect(ctx.url);
@@ -119,7 +118,6 @@ class MessagesHandlers {
 
         } catch (e) {
             // stay on same page to report error
-            console.error(e);
             ctx.flash = { _error: e.message };
             ctx.redirect(ctx.url);
         }

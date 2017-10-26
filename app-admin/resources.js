@@ -132,7 +132,6 @@ class Handlers {
 
         } catch (e) {
             // stay on same page to report error (with current filled fields)
-            console.error(e);
             ctx.flash = { formdata: ctx.request.body, _error: e.message };
             ctx.redirect(ctx.url);
         }
@@ -181,7 +180,6 @@ class Handlers {
 
         } catch (e) {
             // stay on current page to report error
-            console.error(e);
             ctx.flash = { _error: e.message };
             ctx.redirect(ctx.url);
         }
@@ -207,7 +205,6 @@ class Handlers {
 
         } catch (e) {
             // stay on current page to report error
-            console.error(e);
             ctx.flash = { _error: e.message };
             ctx.redirect(ctx.url);
         }

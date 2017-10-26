@@ -1027,7 +1027,6 @@ class ReportsHandlers {
             ctx.status = 201;
             ctx.body = body;
         } catch (e) {
-            console.error(e);
             ctx.status = 500;
             ctx.body = { message: e.message };
         }

@@ -9,15 +9,25 @@
 /* A GET on a collection which returns no results returns a 204 / No Content response.            */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import Koa       from 'koa';          // Koa framework
-import jwt       from 'jsonwebtoken'; // JSON Web Token implementation
-import xmlify    from 'xmlify';       // JS object to XML
-import yaml      from 'js-yaml';      // JS object to YAML
-import bunyan    from 'bunyan';       // logging
-import koaLogger from 'koa-bunyan';   // logging
+import Koa    from 'koa';          // Koa framework
+import jwt    from 'jsonwebtoken'; // JSON Web Token implementation
+import xmlify from 'xmlify';       // JS object to XML
+import yaml   from 'js-yaml';      // JS object to YAML
+
+import log from '../lib/log.js';
 
 
 const app = new Koa(); // API app
+
+
+// log requests (into capped collection)
+app.use(async function logAccess(ctx, next) {
+    const t1 = Date.now();
+    await next();
+    const t2 = Date.now();
+
+    await log(ctx, 'access', t1, t2);
+});
 
 
 // content negotiation: api will respond with json, xml, or yaml
@@ -81,15 +91,9 @@ app.use(async function handleErrors(ctx, next) {
                 ctx.app.emit('error', e, ctx); // github.com/koajs/koa/wiki/Error-Handling
                 break;
         }
+        await log(ctx, 'error', null, null, e);
     }
 });
-
-
-// logging
-const access = { type: 'rotating-file', path: './logs/api-access.log', level: 'trace', period: '1d', count: 4 };
-const error  = { type: 'rotating-file', path: './logs/api-error.log',  level: 'error', period: '1d', count: 4 };
-const logger = bunyan.createLogger({ name: 'api', streams: [ access, error ] });
-app.use(koaLogger(logger, {}));
 
 
 // ------------ routing

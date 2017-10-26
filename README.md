@@ -154,6 +154,23 @@ An audit trail of all updates to incident reports is maintained. This is held in
 reports collection records the last time a report has been viewed by a user.
 
 
+Logging
+-------
+
+Access logs and error logs are recorded in the `users` database, in a 
+[capped collection](https://docs.mongodb.com/manual/core/capped-collections/) (limited to 1,000 
+entries).
+
+Requests for static files are not logged, as they are generally of no interest. For logged-in access,
+the organisation and user are logged, and the user-agent is also logged. For status 500 errors, the 
+full stack trace is recorded (and Chris is notified by e-mail).
+
+Only access to the production environment is normally logged.
+
+The [access log](/dev/log-access) and [error log](/dev/log-error) pages provide facilities to filter
+the log to items of interest.
+
+
 Test Suite
 ----------
 

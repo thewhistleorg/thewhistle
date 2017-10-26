@@ -24,7 +24,7 @@ const testpass = process.env.TESTPASS; // (for successful login & sexual-assault
 
 const request = supertest.agent(app.listen());
 
-const headers = { Host: 'admin.localhost:3000' }; // set host header
+const headers = { Host: 'admin.localhost:3000', Referer: 'mocha' }; // set host header
 
 // note that document.querySelector() works with CSS ids which are more restrictive than HTML5 ids,
 // so getElementById() has to be used to find ObjectId ids instead of querySelector()
@@ -52,7 +52,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('sees password reset request confirmation page', async function() {
-            const response = await request.get(`/password/reset-request-confirm`).set(headers);
+            const response = await request.get('/password/reset-request-confirm').set(headers);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('title').textContent).to.equal('Reset password request');
@@ -66,7 +66,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('throws out invalid token', async function() {
-            const response = await request.get(`/password/reset/not-a-good-token`).set(headers);
+            const response = await request.get('/password/reset/not-a-good-token').set(headers);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('p').textContent).to.equal('This password reset link is either invalid, expired, or previously used.');
@@ -82,7 +82,8 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('throws out token with valid timestamp but invalid hash', async function() {
-            const [ timestamp, hash ] = resetToken.split('-');
+            // the token is a timestamp in base36 and a hash separated by a hyphen
+            const [ timestamp ] = resetToken.split('-'); // (we don't need the hash here)
             const response = await request.get(`/password/reset/${timestamp}-abcdefgh`).set(headers);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
@@ -222,7 +223,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('reports submit without entering details', async function() {
             const response = await request.post('/report/sexual-assault/submit').set(headers);
             expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal(`/report/sexual-assault`);
+            expect(response.headers.location).to.equal('/report/sexual-assault');
         });
 
         it('enters incident report', async function() {

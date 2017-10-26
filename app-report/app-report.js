@@ -11,9 +11,9 @@ import lusca      from 'koa-lusca';      // security header middleware
 import serve      from 'koa-static';     // static file serving middleware
 import fetch      from 'node-fetch';     // window.fetch in node.js
 import convert    from 'koa-convert';    // tmp for koa-flash, koa-lusca
-import bunyan     from 'bunyan';         // logging
-import koaLogger  from 'koa-bunyan';     // logging
 const router = new Router();
+
+import log from '../lib/log.js';
 
 
 const app = new Koa(); // report app
@@ -22,6 +22,16 @@ const app = new Koa(); // report app
 // serve static files (html, css, js); allow browser to cache for 1 hour (note css/js req'd before login)
 const maxage = app.env=='production' ? 1000*60*60 : 1000;
 app.use(serve('public', { maxage: maxage }));
+
+
+// log requests (excluding static files, into capped collection)
+app.use(async function logAccess(ctx, next) {
+    const t1 = Date.now();
+    await next();
+    const t2 = Date.now();
+
+    await log(ctx, 'access', t1, t2);
+});
 
 
 // handlebars templating (supra database/project)
@@ -54,6 +64,7 @@ app.use(async function handleErrors(ctx, next) {
                 ctx.app.emit('error', e.message); // github.com/koajs/koa/wiki/Error-Handling
                 break;
         }
+        await log(ctx, 'error', null, null, e);
     }
 });
 
@@ -100,13 +111,6 @@ app.use(async function ctxAddDomain(ctx, next) {
     ctx.state.domain = ctx.host.replace('report.', '');
     await next();
 });
-
-
-// logging
-const access = { type: 'rotating-file', path: './logs/report-access.log', level: 'trace', period: '1d', count: 4 };
-const error  = { type: 'rotating-file', path: './logs/report-error.log',  level: 'error', period: '1d', count: 4 };
-const logger = bunyan.createLogger({ name: 'report', streams: [ access, error ] });
-app.use(koaLogger(logger, {}));
 
 
 // ------------ routing

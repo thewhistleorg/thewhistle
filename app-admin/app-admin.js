@@ -2,21 +2,21 @@
 /* 'Admin' app - basic pages for reviewing reports & messages.                     C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import Koa             from 'koa';            // koa framework
-import handlebars      from 'koa-handlebars'; // handlebars templating
-import flash           from 'koa-flash';      // flash messages
-import lusca           from 'koa-lusca';      // security header middleware
-import serve           from 'koa-static';     // static file serving middleware
-import jwt             from 'jsonwebtoken';   // JSON Web Token implementation
-import bunyan          from 'bunyan';         // logging
-import koaLogger       from 'koa-bunyan';     // logging
-import convert         from 'koa-convert';    // tmp for koa-flash, koa-lusca
-import koaRouter       from 'koa-router';     // router middleware for koa
-import MongoDB         from 'mongodb';        // MongoDB driver for Node.js
+import Koa        from 'koa';            // koa framework
+import handlebars from 'koa-handlebars'; // handlebars templating
+import flash      from 'koa-flash';      // flash messages
+import lusca      from 'koa-lusca';      // security header middleware
+import serve      from 'koa-static';     // static file serving middleware
+import jwt        from 'jsonwebtoken';   // JSON Web Token implementation
+import convert    from 'koa-convert';    // tmp for koa-flash, koa-lusca
+import koaRouter  from 'koa-router';     // router middleware for koa
+import MongoDB    from 'mongodb';        // MongoDB driver for Node.js
 const router      = koaRouter();
 const MongoClient = MongoDB.MongoClient;
 
 import HandlebarsHelpers from '../lib/handlebars-helpers.js';
+import log               from '../lib/log.js';
+
 
 const app = new Koa(); // admin app
 
@@ -26,6 +26,16 @@ const app = new Koa(); // admin app
 // as opposed to files in /static which are outside the repository and may be large and/or sensitive
 const maxage = app.env=='production' ? 1000*60*60*24 : 1000;
 app.use(serve('public', { maxage: maxage }));
+
+
+// log requests (excluding static files, into capped collection)
+app.use(async function logAccess(ctx, next) {
+    const t1 = Date.now();
+    await next();
+    const t2 = Date.now();
+
+    await log(ctx, 'access', t1, t2);
+});
 
 
 // handlebars templating
@@ -59,12 +69,12 @@ app.use(async function handleErrors(ctx, next) {
                 break;
             default:
             case 500: // Internal Server Error
-                console.error(ctx.status, e.message);
                 const context500 = app.env=='production' ? {} : { e: e };
                 await ctx.render('500-internal-server-error', context500);
                 ctx.app.emit('error', e, ctx); // github.com/koajs/koa/wiki/Error-Handling
                 break;
         }
+        await log(ctx, 'error', null, null, e);
     }
 });
 
@@ -123,13 +133,6 @@ app.use(async function ctxAddDomain(ctx, next) {
 });
 
 
-// logging
-const access = { type: 'rotating-file', path: './logs/admin-access.log', level: 'trace', period: '1d', count: 4 };
-const error  = { type: 'rotating-file', path: './logs/admin-error.log',  level: 'error', period: '1d', count: 4 };
-const logger = bunyan.createLogger({ name: 'admin', streams: [ access, error ] });
-app.use(koaLogger(logger, {}));
-
-
 // ------------ routing
 
 
@@ -163,11 +166,9 @@ app.use(async function isSignedIn(ctx, next) {
 app.use(serve('static', { maxage: maxage }));
 
 import routesApp  from './routes-app.js';
-import routesLogs from './routes-logs.js';
-import routesDev  from './routes-dev.js'
+import routesDev  from './routes-dev.js';
 
 app.use(routesApp);
-app.use(routesLogs);
 app.use(routesDev);
 
 
@@ -223,7 +224,6 @@ async function verifyJwt(ctx, next) {
                 ctx.cookies.set('koa:jwt', replacementToken, options);
             } catch (e) {
                 if (e.message == 'invalid token') ctx.throw(401, 'Invalid authentication'); // verify (both!) failed
-                console.error(e);
                 ctx.throw(e.status||500, e.message); // Internal Server Error
             }
         }
@@ -256,6 +256,7 @@ async function setupUser(ctx, jwtPayload) {
         }
     }
 }
+
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 

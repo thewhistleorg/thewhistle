@@ -61,13 +61,16 @@ class Dev {
             .filter(e => ctx.query.time ? e.ms > ctx.query.time : true)
             .filter(e => ctx.query.status ? e.status==ctx.query.status : true);
 
+        // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
+        entriesFiltered.forEach(e => e.ua.os = e.ua.os || e.ua.platform);
+
         // add in extra fields to each entry
         const entries = entriesFiltered
             .map(e => { e.time = dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM'); return e; })
             .map(e => { e.path = e.url.split('?')[0] + (e.url.split('?').length>1 ? '?…' : ''); return e; })
             .map(e => { e.qs = e.url.split('?')[1]; return e; })
             .map(e => { e.env = e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env); return e; })
-            .map(e => { e.os = Number(e.ua.platform.major) ? `${e.ua.platform.family} ${e.ua.platform.major}` : e.ua.platform.family; return e; })
+            .map(e => { e.os = Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family; return e; })
             .map(e => { e.ua = Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family; return e; });
 
         for (const e of entries) {

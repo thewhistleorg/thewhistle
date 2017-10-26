@@ -16,6 +16,11 @@ notes set out in detail the developer workflow used in the project, in order tha
 successfully collaborate on development. The notes also explain the use of continuous integration 
 tests, and review apps.
 
+## [Form generation wizard](/dev/notes/form-wizard)
+
+The long-term objective is that incident report submission forms should be created by NGO staff with
+potentially no technical expertise at all. These notes set out plans for this may be achieved.
+
 ## [Redgate down-tools week](/dev/notes/redgate-dtw)
 
 Technical notes made during the Redgate down-tools week detailing the work done by Redgate staff, 

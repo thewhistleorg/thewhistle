@@ -19,9 +19,10 @@ router.get('/dev/log-access', Dev.logAccess);
 router.get('/dev/log-error',  Dev.logError);
 
 
-router.get('/dev/notes',        Dev.notesIndex);
-router.get('/dev/notes/readme', Dev.notesReadme);
-router.get('/dev/notes/:notes', Dev.notes);
+router.get('/dev/notes',                    Dev.notesIndex);
+router.get('/dev/notes/readme',             Dev.notesReadme);
+router.get('/dev/notes/form-wizard/:notes', Dev.notesFormWizard);
+router.get('/dev/notes/:notes',             Dev.notes);
 
 router.get('/dev/throw', Dev.throw);
 

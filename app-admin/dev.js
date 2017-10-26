@@ -6,11 +6,13 @@ import nodeinfo   from 'nodejs-info'; // node info
 import dateFormat from 'dateformat';  // Steven Levithan's dateFormat()
 import jsdom      from 'jsdom';       // DOM Document interface in Node!
 
-import fs       from 'fs-extra';           // fs with extra functions & promise interface
-import markdown from 'markdown-it';        // markdown parser
-import mda      from 'markdown-it-anchor'; // header anchors for markdown-it
+import fs       from 'fs-extra';            // fs with extra functions & promise interface
+import markdown from 'markdown-it';         // markdown parser
+import mda      from 'markdown-it-anchor';  // header anchors for markdown-it
+import mdi      from 'markdown-it-include'; // include markdown fragment files
 const md = markdown();
 md.use(mda);
+md.use(mdi, 'dev/form-wizard');
 
 import useragent  from '../lib/user-agent.js';
 
@@ -181,6 +183,26 @@ class Dev {
             const content = md.render(notesMarkdown);
             const document = new jsdom.JSDOM(content).window.document;
             await ctx.render('dev-notes', { content, title: document.querySelector('h1').textContent });
+        } catch (e) {
+            switch (e.code) {
+                case 'ENOENT': ctx.throw(404, 'Notes not found'); break;
+                default:       throw e;
+            }
+        }
+    }
+
+
+    /**
+     * Development notes relating to plans about form wizards.
+     */
+    static async notesFormWizard(ctx) {
+        const notesFile = `dev/form-wizard/${ctx.params.notes}.md`;
+        try {
+            const notesMarkdown = await fs.readFile(notesFile, 'utf8');
+            const content = md.render(notesMarkdown);
+            const document = new jsdom.JSDOM(content).window.document;
+            const title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'The Whistle Development Notes';
+            await ctx.render('dev-notes', { content, title });
         } catch (e) {
             switch (e.code) {
                 case 'ENOENT': ctx.throw(404, 'Notes not found'); break;

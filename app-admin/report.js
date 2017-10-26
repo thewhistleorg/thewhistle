@@ -154,7 +154,7 @@ class IncidentReport {
         const name = ctx.session.report['existing-name'] || ctx.session.report['generated-name'];
         const prettyReport = prettifyReport(ctx.session.report);
 
-        const id = await Report.insert(ctx.state.user.db, by, name, prettyReport, ctx.params.project, ctx.session.files, ctx.session.geocode);
+        const id = await Report.insert(ctx.state.user.db, by, name, prettyReport, ctx.params.project, ctx.session.files, ctx.session.geocode, ctx.headers['user-agent']);
 
         // record user-agent
         await useragent.log(ctx.state.user.db, ctx.ip, ctx.headers);

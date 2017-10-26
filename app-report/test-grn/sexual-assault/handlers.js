@@ -162,7 +162,7 @@ class Handlers {
 
         const prettyReport = prettifyReport(ctx.session.report);
 
-        const id = await Report.insert(ctx.params.database, undefined, name, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.session.geocode);
+        const id = await Report.insert(ctx.params.database, undefined, name, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.session.geocode, ctx.headers['user-agent']);
         ctx.set('X-Insert-Id', id); // for integration tests
 
         // record user-agent

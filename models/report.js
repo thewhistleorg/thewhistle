@@ -8,6 +8,7 @@ import fs         from 'fs-extra';          // fs with extra functions & promise
 import slug       from 'slug';              // make strings url-safe
 import dateFormat from 'dateformat';        // Steven Levithan's dateFormat()
 import exiftool   from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
+import useragent  from 'useragent';         // parse browser user agent string
 import MongoDB    from 'mongodb';           // MongoDB driver for Node.js
 const ObjectId = MongoDB.ObjectId;
 
@@ -257,10 +258,11 @@ class Report {
      * @param   {string}   project - Project report is part of.
      * @param   {Object[]} files - Uploaded files ('formidable' File objects).
      * @param   {Object}   geocode - Google geocoding results.
+     * @param   {string}   userAgent - User agent from http request header.
      * @returns {ObjectId} New report id.
      * @throws  Error on validation or referential integrity errors.
      */
-    static async insert(db, by, name, submitted, project, files, geocode) {
+    static async insert(db, by, name, submitted, project, files, geocode, userAgent) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         by = objectId(by); // allow id as string
@@ -301,6 +303,10 @@ class Report {
         if (submitted.Date && submitted.Date.getTime() && geocode) {
             values.analysis.weather = await Weather.fetchWeatherConditions(geocode.latitude, geocode.longitude, submitted.Date);
         }
+
+        // record user agent for potential later analyses
+        const ua = useragent.parse(userAgent);
+        values.ua = Object.assign({}, ua, { os: ua.os }); // trigger on-demand parsing of os
 
         //values._id = ObjectId(Math.floor(Date.now()/1000 - Math.random()*60*60*24*365).toString(16)+(Math.random()*2**64).toString(16)); // random date in past year
         const { insertedId } = await reports.insertOne(values);

@@ -91,7 +91,8 @@ describe('Report model', function() {
                 administrativeLevels: {},
             };
 
-            reportId = await Report.insert('test-cam', undefined, 'test test', submitted, 'test-project', files, geocode);
+            const ua = 'node-superagent/x.x.x';
+            reportId = await Report.insert('test-cam', undefined, 'test test', submitted, 'test-project', files, geocode, ua);
             console.info('report id:', reportId);
             expect(reportId.constructor.name).to.equal('ObjectID');
             const report = await Report.get('test-cam', reportId);

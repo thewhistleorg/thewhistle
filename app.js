@@ -16,7 +16,6 @@ import compress        from 'koa-compress';   // HTTP compression
 import session         from 'koa-session';    // session for flash messages
 import dateFormat      from 'dateformat';     // Steven Levithan's dateFormat()
 import MongoDB         from 'mongodb';
-import fs              from 'mz/fs';          // 'modernised' node api
 import Debug           from 'debug';          // small debugging utility
 const debug = Debug('app');
 const MongoClient = MongoDB.MongoClient;

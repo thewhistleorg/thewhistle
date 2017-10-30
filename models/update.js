@@ -56,13 +56,13 @@ class Update {
         }
 
         const updates = global.db[db].collection('updates');
-        const rpt = await updates.findOne(id);
-        return rpt;
+        const update = await updates.findOne(id);
+        return update;
     }
 
 
     /**
-     * Returns all Updates.
+     * Returns most recent Updates.
      *
      * @param   {string}   db - Database to use.
      * @param   {number}   limit - Limit on number of report details to be returned.
@@ -93,9 +93,9 @@ class Update {
     /**
      * Creates new Update record.
      *
-     * @param   {ObjectId} reportId - .
-     * @param   {ObjectId} userId - .
-     * @param   {Object}   update - .
+     * @param   {ObjectId} reportId - Report being updated.
+     * @param   {ObjectId} userId - User performing update.
+     * @param   {Object}   update - The 'query' object supplied to updateOne() (but without '$'). TODO: include '$'?
      * @returns {ObjectId} New update id.
      * @throws  Error on validation or referential integrity errors.
      */

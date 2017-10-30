@@ -95,6 +95,8 @@ const luscaCspTrustedCdns = [
     'fonts.gstatic.com',
     'cdnjs.cloudflare.com',
     'unpkg.com',
+    'www.googletagmanager.com',
+    'www.google-analytics.com',
 ].join(' ');
 const luscaCspDefaultSrc = `'self' 'unsafe-inline' ${luscaCspTrustedCdns}`; // 'unsafe-inline' required for <style> blocks
 app.use(convert(lusca({ // note koa-lusca@2.2.0 is v1 middleware which generates deprecation notice

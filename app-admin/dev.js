@@ -85,7 +85,7 @@ class Dev {
             filter:   ctx.query,
         };
 
-        await ctx.render('logs-access', context);
+        await ctx.render('dev-logs-access', context);
     }
 
 
@@ -139,7 +139,7 @@ class Dev {
             filter:   ctx.query,
         };
 
-        await ctx.render('logs-error', context);
+        await ctx.render('dev-logs-error', context);
     }
 
 
@@ -153,7 +153,7 @@ class Dev {
         const context = await useragent.counts(ctx.state.user.db, ctx.query.since);
         context.sinceDate = context.since ? dateFormat(context.since, 'd mmm yyyy') : '–';
 
-        await ctx.render('user-agents', context);
+        await ctx.render('dev-user-agents', context);
     }
 
 

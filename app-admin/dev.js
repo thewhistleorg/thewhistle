@@ -15,6 +15,7 @@ md.use(mda);
 md.use(mdi, 'dev/form-wizard');
 
 import useragent  from '../lib/user-agent.js';
+import Report     from '../models/report.js';
 
 
 class Dev {
@@ -24,17 +25,6 @@ class Dev {
      */
     static nodeinfo(ctx) {
         ctx.body = nodeinfo(ctx.req);
-    }
-
-
-    /**
-     * User agents used in submitting incident reports.
-     */
-    static async userAgents(ctx) {
-        const context = await useragent.counts(ctx.state.user.db, ctx.query.since);
-        context.sinceDate = context.since ? dateFormat(context.since, 'd mmm yyyy') : '–';
-
-        await ctx.render('user-agents', context);
     }
 
 
@@ -150,6 +140,105 @@ class Dev {
         };
 
         await ctx.render('logs-error', context);
+    }
+
+
+    /**
+     * User agents used in submitting incident reports.
+     *
+     * Note this uses the useragents collection within each organisation database, and is
+     * potentially redundant following the more recent access/error logging.
+     */
+    static async userAgentsV1(ctx) {
+        const context = await useragent.counts(ctx.state.user.db, ctx.query.since);
+        context.sinceDate = context.since ? dateFormat(context.since, 'd mmm yyyy') : '–';
+
+        await ctx.render('user-agents', context);
+    }
+
+
+    /**
+     * User agents used in accessing the admin app.
+     */
+    static async userAgentsAdmin(ctx) {
+        await Dev.userAgents(ctx, 'admin');
+    }
+
+
+    /**
+     * User agents used in accessing the report app.
+     */
+    static async userAgentsReport(ctx) {
+        await Dev.userAgents(ctx, 'report');
+    }
+
+
+    /**
+     * Private function to show user agents used for report/admin app.
+     *
+     * This works from the (capped) log-access collection.
+     */
+    static async userAgents(ctx, app) {
+        const db = ctx.state.user.db;
+        const log = global.db.users.collection('log-access');
+
+        const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
+        const entriesReport = entriesAll.filter(e => e.host.split('.')[0] == app);
+
+        // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
+        entriesReport.forEach(e => e.ua.os = e.ua.os || e.ua.platform);
+
+        const uas = entriesReport
+            .map(e => ({ month: dateFormat(e._id.getTimestamp(), 'yyyy-mm'), ua: e.ua }))
+            .map(e => { e.os = Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family; return e; })
+            .map(e => { e.ua = Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family; return e; })
+            .map(e => { e.ua = e.ua + '<br>' + e.os; return e; });
+
+        const counts = {};
+        for (const rpt of uas) {
+            if (!counts[rpt.month]) counts[rpt.month] = {};
+            if (!counts[rpt.month][rpt.ua]) counts[rpt.month][rpt.ua] = 0;
+            counts[rpt.month][rpt.ua]++;
+        }
+
+        const monthsList = Array.from(new Set(uas.map(e => e.month))).sort().reverse();
+        const uasList = Array.from(new Set(uas.map(e => e.ua))).sort();
+
+        const context = { uasList, monthsList, counts, app: app+' app' };
+
+        await ctx.render('dev-ua', context);
+    }
+
+
+    /**
+     * User agents used in submitting reports.
+     *
+     * This data is associated with submitted reports themselves and hence is persistent, unlike the
+     * report/admin app user agents pages which are based of the transient logs. It can therefore be
+     * used to track user agent usage over time.
+     */
+    static async userAgentsReports(ctx) {
+        const db = ctx.state.user.db;
+        const reports = (await Report.getAll(db, 'all')).filter(r => r.ua);
+        const uas = reports
+            .map(r => ({ month: dateFormat(r._id.getTimestamp(), 'yyyy-mm'), ua: r.ua }))
+            .map(r => { r.os = Number(r.ua.os.major) ? `${r.ua.os.family} ${r.ua.os.major}` : r.ua.os.family; return r; })
+            .map(r => { r.ua = Number(r.ua.major) ? r.ua.family+'-'+ r.ua.major : r.ua.family; return r; })
+            .map(r => { r.ua = r.ua + '<br>' + r.os; return r; });
+
+        const counts = [];
+        for (const rpt of uas) {
+            if (!counts[rpt.month]) counts[rpt.month] = [];
+            if (!counts[rpt.month][rpt.ua]) counts[rpt.month][rpt.ua] = 0;
+            counts[rpt.month][rpt.ua]++;
+        }
+
+        const monthsList = Array.from(new Set(uas.map(e => e.month))).sort().reverse();
+        const uasList = Array.from(new Set(uas.map(e => e.ua))).sort();
+
+        const context = { uasList, monthsList, counts, app: db+' submitted reports' };
+
+        await ctx.render('dev-ua', context);
     }
 
 

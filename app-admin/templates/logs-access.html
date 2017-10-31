@@ -8,13 +8,7 @@
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/admin.css">
     <style>
-        pre  {
-            font: 80% 'Lucida Console', Consolas, Monaco, 'Andale Mono', monospace;
-            line-height: 1.2;
-            overflow: visible;
-        }
         label:first-child { display: inline-block; min-width: 8em; }
-        .toggle { color: #999999; cursor: pointer; }
     </style>
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
     <script src="/js/admin/ga.js" async></script>
@@ -27,7 +21,6 @@
             });
 
             document.querySelectorAll('td[data-pathfull]').forEach(el => el.onclick = function() {
-                console.log(this.textContent, this.dataset.pathfull)
                 // swap displayed text and data-pathfull
                 const tmp = this.textContent;
                 this.textContent = this.dataset.pathfull;

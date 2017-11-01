@@ -2,14 +2,14 @@
 /* Dev tools handlers.                                                             C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import nodeinfo   from 'nodejs-info'; // node info
-import dateFormat from 'dateformat';  // Steven Levithan's dateFormat()
-import jsdom      from 'jsdom';       // DOM Document interface in Node!
-
-import fs       from 'fs-extra';            // fs with extra functions & promise interface
-import markdown from 'markdown-it';         // markdown parser
-import mda      from 'markdown-it-anchor';  // header anchors for markdown-it
-import mdi      from 'markdown-it-include'; // include markdown fragment files
+import nodeinfo   from 'nodejs-info';         // node info
+import dateFormat from 'dateformat';          // Steven Levithan's dateFormat()
+import jsdom      from 'jsdom';               // DOM Document interface in Node!
+import dns        from 'dns';                 // nodejs.org/api/dns.html
+import fs         from 'fs-extra';            // fs with extra functions & promise interface
+import markdown   from 'markdown-it';         // markdown parser
+import mda        from 'markdown-it-anchor';  // header anchors for markdown-it
+import mdi        from 'markdown-it-include'; // include markdown fragment files
 const md = markdown();
 md.use(mda);
 md.use(mdi, 'dev/form-wizard');
@@ -34,6 +34,8 @@ class Dev {
     static async logAccess(ctx) {
         // access logging uses capped collection log-access (size: 1000×1e3, max: 1000)
         const log = global.db.users.collection('log-access');
+
+        await Dev.ipLookup('log-access'); // lookup any IP addresses we don't already have (in background)
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 
@@ -63,12 +65,14 @@ class Dev {
             .map(e => { e.qs = e.url.split('?')[1]; return e; })
             .map(e => { e.env = e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env); return e; })
             .map(e => { e.os = Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family; return e; })
-            .map(e => { e.ua = Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family; return e; });
+            .map(e => { e.ua = Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family; return e; })
+            .map(e => { e.domain = e.ip ? global.ips.get(e.ip) : null; return e; });
 
+        // trim excessively long paths (with full path in 'title' rollover)
         for (const e of entries) {
-            if (e.path.length > 48) {
+            if (e.path.length > 36) {
                 e.pathFull = e.path;
-                e.path = e.path.slice(0, 48)+'…';
+                e.path = e.path.slice(0, 36)+'…';
             }
         }
 
@@ -95,6 +99,8 @@ class Dev {
     static async logError(ctx) {
         // error logging uses capped collection log-error (size: 1000×4e3, max: 1000)
         const log = global.db.users.collection('log-error');
+
+        await Dev.ipLookup('log-error'); // lookup any IP addresses we don't already have (in background)
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 
@@ -124,6 +130,7 @@ class Dev {
             .map(e => { e.env = e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env); return e; })
             .map(e => { e.os = Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family; return e; })
             .map(e => { e.ua = Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family; return e; })
+            .map(e => { e.domain = e.ip ? global.ips.get(e.ip) : null; return e; })
             .map(e => { e['status-colour'] = e.status==500 ? 'red' : ''; return e; });
 
         // for display, to defaults to today
@@ -140,6 +147,39 @@ class Dev {
         };
 
         await ctx.render('dev-logs-error', context);
+    }
+
+
+    /**
+     * Reverse lookup IP addresses in log and add to global.ips map.
+     *
+     * This returns immediately, having queued dns lookups to be performed in the background; so the
+     * first log page view may be missing domains. Any given IP will only be looked up once within
+     * the app lifetime (will subsequently get held in global.ips).
+     *
+     * @param {string} collection - The log collection to search ('log-access' or 'log-error')
+     */
+    static async ipLookup(collection) {
+        const log = global.db.users.collection(collection);
+
+        const entries = await log.find({}).toArray();
+
+        if (global.ips == undefined) global.ips = new Map(); // ip:domain mapping
+
+        // reverse lookup domain for all ips in log (if not already available)
+        for (const e of entries) {
+            if (!e.ip) continue;                // no ip recorded to look up
+            if (global.ips.has(e.ip)) continue; // already have domain looked up for this ip
+            if (e.domain) {                     // domain already recorded in logs
+                global.ips.set(e.ip, e.domain);
+                continue;
+            }
+            // otherwise, look up domain now (without bothering to wait for result
+            const domain = dns.reverse(e.ip.trim(), function(err, domains) { // TODO: remove trim() once test flushed out of logs 2017-11-01
+                if (err != null) callback(err);
+                global.ips.set(e.ip, domains[0]);
+            });
+        }
     }
 
 

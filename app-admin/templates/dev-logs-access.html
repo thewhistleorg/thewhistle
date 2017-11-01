@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="/css/admin.css">
     <style>
         label:first-child { display: inline-block; min-width: 8em; }
+        td.slow   { color: #cc0000; }
+        td.medium { color: #ff9900; }
     </style>
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
     <script src="/js/admin/ga.js" async></script>
@@ -104,7 +106,7 @@
         <td title="{{redir}}">{{status}}</td>
         <td class="grey nowrap">{{ua}}</td>
         <td class="grey nowrap" title="{{domain}}">{{os}}</td>
-        <td class="align-right">{{ms}}<span class="grey">ms</span></td>
+        <td class="align-right {{speed}}">{{ms}}<span class="grey">ms</span></td>
     </tr>
     {{/entries}}
 </table>

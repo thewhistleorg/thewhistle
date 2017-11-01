@@ -66,7 +66,8 @@ class Dev {
             .map(e => { e.env = e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env); return e; })
             .map(e => { e.os = Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family; return e; })
             .map(e => { e.ua = Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family; return e; })
-            .map(e => { e.domain = e.ip ? global.ips.get(e.ip) : null; return e; });
+            .map(e => { e.domain = e.ip ? global.ips.get(e.ip) : null; return e; })
+            .map(e => { e.speed = e.ms>500 ? 'slow' : e.ms>100 ? 'medium' : ''; return e; });
 
         // trim excessively long paths (with full path in 'title' rollover)
         for (const e of entries) {

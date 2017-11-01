@@ -183,12 +183,14 @@ class Dev {
         const log = global.db.users.collection('log-access');
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
-        const entriesReport = entriesAll.filter(e => e.host.split('.')[0] == app);
+        const entries = entriesAll
+            .filter(e => e.host.split('.')[0] == app)
+            .filter(e => ctx.query.organisation ? e.db==ctx.query.organisation : true);
 
         // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
-        entriesReport.forEach(e => e.ua.os = e.ua.os || e.ua.platform);
+        entries.forEach(e => e.ua.os = e.ua.os || e.ua.platform);
 
-        const uas = entriesReport
+        const uas = entries
             .map(e => ({ month: dateFormat(e._id.getTimestamp(), 'yyyy-mm'), ua: e.ua }))
             .map(e => { e.os = Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family; return e; })
             .map(e => { e.ua = Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family; return e; })

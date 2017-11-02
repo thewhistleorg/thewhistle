@@ -178,8 +178,9 @@ class Dev {
                 continue;
             }
             // otherwise, look up domain now (without bothering to wait for result
+            if (['127.0.0.1', '::ffff:127.0.0.1'].includes(e.ip)) continue;
             const domain = dns.reverse(e.ip.trim(), function(err, domains) { // TODO: remove trim() once test flushed out of logs 2017-11-01
-                if (err != null) callback(err);
+                if (err != null) console.log(err);
                 global.ips.set(e.ip, domains[0]);
             });
         }

@@ -58,6 +58,7 @@ class Dev {
         const entriesFiltered = entriesAll
             .filter(e => ctx.query.from ? e._id.getTimestamp() >= new Date(ctx.query.from) : true)
             .filter(e => ctx.query.to ? e._id.getTimestamp() <= toFilter : true)
+            .filter(e => ctx.query.app ? RegExp('^'+ctx.query.app).test(e.host) : true)
             .filter(e => ctx.query.organisation ? e.db==ctx.query.organisation : true)
             .filter(e => ctx.query.time ? e.ms > ctx.query.time : true)
             .filter(e => ctx.query.status ? e.status==ctx.query.status : true);

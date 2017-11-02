@@ -61,7 +61,7 @@ class Dev {
 
         // add in extra fields to each entry
         const entries = entriesFiltered
-            .map(e => { e.time = dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM'); return e; })
+            .map(e => { e.time = dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM:ss'); return e; })
             .map(e => { e.path = e.url.split('?')[0] + (e.url.split('?').length>1 ? '?…' : ''); return e; })
             .map(e => { e.qs = e.url.split('?')[1]; return e; })
             .map(e => { e.env = e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env); return e; })
@@ -127,7 +127,7 @@ class Dev {
 
         // add in extra fields to each entry
         const entries = entriesFiltered
-            .map(e => { e.time = dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM'); return e; })
+            .map(e => { e.time = dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM:ss'); return e; })
             .map(e => { e.path = e.url.split('?')[0] + (e.url.split('?').length>1 ? '?…' : ''); return e; })
             .map(e => { e.qs = e.url.split('?')[1]; return e; })
             .map(e => { e.env = e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env); return e; })

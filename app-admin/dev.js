@@ -35,7 +35,8 @@ class Dev {
         // access logging uses capped collection log-access (size: 1000×1e3, max: 1000)
         const log = global.db.users.collection('log-access');
 
-        await Dev.ipLookup('log-access'); // lookup any IP addresses we don't already have (in background)
+        // lookup any IP addresses we don't already have (in background) - except when testing
+        if (ctx.header.referer != 'mocha') await Dev.ipLookup('log-access');
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 
@@ -101,7 +102,8 @@ class Dev {
         // error logging uses capped collection log-error (size: 1000×4e3, max: 1000)
         const log = global.db.users.collection('log-error');
 
-        await Dev.ipLookup('log-error'); // lookup any IP addresses we don't already have (in background)
+        // lookup any IP addresses we don't already have (in background) - except when testing
+        if (ctx.header.referer != 'mocha') await Dev.ipLookup('log-error');
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 

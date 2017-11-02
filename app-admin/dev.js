@@ -44,14 +44,20 @@ class Dev {
         const users = [ ...new Set(entriesAll.map(e => e.user)) ].sort();
         const statuses = [ ...new Set(entriesAll.map(e => e.status)) ].sort();
 
-        // from defaults to 1 month ago, to defaults to true
-        const monthAgo = new Date().setMonth(new Date().getMonth() - 1);
-        ctx.query.from = ctx.query.from || dateFormat(monthAgo, 'yyyy-mm-dd');
+        // 'from' defaults to later of first entry or 1 month ago
+        const oldest = entriesAll.reduce((old, e) => e._id.getTimestamp()<old ? e._id.getTimestamp() : old, new Date());
+        const monthAgo = new Date(); monthAgo.setMonth(new Date().getMonth() - 1);
+        ctx.query.from = ctx.query.from || dateFormat(oldest<monthAgo ? monthAgo : oldest, 'yyyy-mm-dd');
+
+        // 'to' defaults to today
+        ctx.query.to = ctx.query.to || dateFormat('yyyy-mm-dd');
+        // filter needs 1 day added to 'to' to made it end of the day
+        const toFilter = new Date(ctx.query.to); toFilter.setDate(toFilter.getDate() + 1);
 
         // filter results according to query string
         const entriesFiltered = entriesAll
             .filter(e => ctx.query.from ? e._id.getTimestamp() >= new Date(ctx.query.from) : true)
-            .filter(e => ctx.query.to ? e._id.getTimestamp() <= new Date(ctx.query.to) : true)
+            .filter(e => ctx.query.to ? e._id.getTimestamp() <= toFilter : true)
             .filter(e => ctx.query.organisation ? e.db==ctx.query.organisation : true)
             .filter(e => ctx.query.time ? e.ms > ctx.query.time : true)
             .filter(e => ctx.query.status ? e.status==ctx.query.status : true);
@@ -78,17 +84,17 @@ class Dev {
             }
         }
 
-        // for display, to defaults to today
-        ctx.query.to = ctx.query.to || dateFormat('yyyy-mm-dd');
         // for display, time defaults to 0
         ctx.query.time = ctx.query.time || '0';
 
         const context = {
-            entries:  entries,
-            dbs:      dbs,
-            users:    users,
-            statuses: statuses,
-            filter:   ctx.query,
+            entries:   entries,
+            dbs:       dbs,
+            users:     users,
+            statuses:  statuses,
+            filter:    ctx.query,
+            filterMin: dateFormat(oldest, 'yyyy-mm-dd'),
+            filterMax: dateFormat('yyyy-mm-dd'),
         };
 
         await ctx.render('dev-logs-access', context);
@@ -111,14 +117,20 @@ class Dev {
         const users = [ ...new Set(entriesAll.map(e => e.user)) ].sort();
         const statuses = [ ...new Set(entriesAll.map(e => e.status)) ].sort();
 
-        // from defaults to 1 month ago, to defaults to true
-        const monthAgo = new Date().setMonth(new Date().getMonth() - 1);
-        ctx.query.from = ctx.query.from || dateFormat(monthAgo, 'yyyy-mm-dd');
+        // 'from' defaults to later of first entry or 1 month ago
+        const oldest = entriesAll.reduce((old, e) => e._id.getTimestamp()<old ? e._id.getTimestamp() : old, new Date());
+        const monthAgo = new Date(); monthAgo.setMonth(new Date().getMonth() - 1);
+        ctx.query.from = ctx.query.from || dateFormat(oldest<monthAgo ? monthAgo : oldest, 'yyyy-mm-dd');
+
+        // 'to' defaults to today
+        ctx.query.to = ctx.query.to || dateFormat('yyyy-mm-dd');
+        // filter needs 1 day added to 'to' to made it end of the day
+        const toFilter = new Date(ctx.query.to); toFilter.setDate(toFilter.getDate() + 1);
 
         // filter results according to query string
         const entriesFiltered = entriesAll
             .filter(e => ctx.query.from ? e._id.getTimestamp() >= new Date(ctx.query.from) : true)
-            .filter(e => ctx.query.to ? e._id.getTimestamp() <= new Date(ctx.query.to) : true)
+            .filter(e => ctx.query.to ? e._id.getTimestamp() <= toFilter : true)
             .filter(e => ctx.query.organisation ? e.db==ctx.query.organisation : true)
             .filter(e => ctx.query.status ? e.status==ctx.query.status : true);
 
@@ -136,17 +148,17 @@ class Dev {
             .map(e => { e.domain = e.ip ? global.ips.get(e.ip) : null; return e; })
             .map(e => { e['status-colour'] = e.status==500 ? 'red' : ''; return e; });
 
-        // for display, to defaults to today
-        ctx.query.to = ctx.query.to || dateFormat('yyyy-mm-dd');
         // for display, time defaults to 0
         ctx.query.time = ctx.query.time || '0';
 
         const context = {
-            entries:  entries,
-            dbs:      dbs,
-            users:    users,
-            statuses: statuses,
-            filter:   ctx.query,
+            entries:   entries,
+            dbs:       dbs,
+            users:     users,
+            statuses:  statuses,
+            filter:    ctx.query,
+            filterMin: dateFormat(oldest, 'yyyy-mm-dd'),
+            filterMax: dateFormat('yyyy-mm-dd'),
         };
 
         await ctx.render('dev-logs-error', context);
@@ -178,9 +190,9 @@ class Dev {
                 continue;
             }
             // otherwise, look up domain now (without bothering to wait for result
-            if (['127.0.0.1', '::ffff:127.0.0.1'].includes(e.ip)) continue;
-            const domain = dns.reverse(e.ip.trim(), function(err, domains) { // TODO: remove trim() once test flushed out of logs 2017-11-01
-                if (err != null) console.log(err);
+            if ([ '127.0.0.1', '::ffff:127.0.0.1' ].includes(e.ip)) continue;
+            dns.reverse(e.ip.trim(), function(err, domains) { // TODO: remove trim() once test flushed out of logs 2017-11-01
+                if (err != null) console.error(err);
                 global.ips.set(e.ip, domains[0]);
             });
         }
@@ -223,7 +235,6 @@ class Dev {
      * This works from the (capped) log-access collection.
      */
     static async userAgents(ctx, app) {
-        const db = ctx.state.user.db;
         const log = global.db.users.collection('log-access');
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());

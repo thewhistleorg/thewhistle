@@ -7,16 +7,13 @@ import handlebars from 'koa-handlebars'; // handlebars templating
 import flash      from 'koa-flash';      // flash messages
 import lusca      from 'koa-lusca';      // security header middleware
 import serve      from 'koa-static';     // static file serving middleware
-import jwt        from 'jsonwebtoken';   // JSON Web Token implementation
 import convert    from 'koa-convert';    // tmp for koa-flash, koa-lusca
 import koaRouter  from 'koa-router';     // router middleware for koa
-import MongoDB    from 'mongodb';        // MongoDB driver for Node.js
 const router      = koaRouter();
-const MongoClient = MongoDB.MongoClient;
 
 import HandlebarsHelpers from '../lib/handlebars-helpers.js';
 import log               from '../lib/log.js';
-
+import Middleware        from '../lib/middleware.js';
 
 const app = new Koa(); // admin app
 
@@ -138,7 +135,7 @@ app.use(async function ctxAddDomain(ctx, next) {
 
 // check if user is signed in; leaves id in ctx.status.user.id if JWT verified
 // (do this before login routes, as login page indicates if user is already logged in)
-app.use(verifyJwt);
+app.use(Middleware.verifyJwt());
 
 
 // public (unsecured) modules first (index, login)
@@ -185,77 +182,6 @@ app.use(router.routes());
 app.use(function notFound(ctx) { // note no 'next'
     ctx.throw(404);
 });
-
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-
-
-/**
- * Verify the JSON Web Token authentication supplied in (signed) cookie.
- *
- * If the token verifies, record the payload in ctx.state.user: the user id is held in ctx.state.user.id.
- *
- * Issued tokens have 24-hour validity. If the cookie contains an expired token, and the user logged
- * with using the 'remember-me' option, then issue a replacement 24-hour token, and renew the cookie
- * for a further 7 days. The 'remember-me' function will lapse after 7 days inactivity.
- */
-async function verifyJwt(ctx, next) {
-    const token = ctx.cookies.get('koa:jwt', { signed: true });
-
-    if (token) {
-        try {
-            const  payload = jwt.verify(token, 'the-whistle-jwt-signature-key'); // throws on invalid token
-
-            // valid token: accept it...
-            await setupUser(ctx, payload);
-        } catch (err) {
-            // verify failed - retry with ignore expire option
-            try {
-                const payload = jwt.verify(token, 'the-whistle-jwt-signature-key', { ignoreExpiration: true });
-
-                // valid token except for exp: accept it...
-                await setupUser(ctx, payload);
-
-                // ... and re-issue a replacement token for a further 24 hours
-                delete payload.exp;
-                const replacementToken = jwt.sign(payload, 'the-whistle-jwt-signature-key', { expiresIn: '24h' });
-                const options = { signed: true };
-                if (payload.remember) options.expires = new Date(Date.now() + 1000*60*60*24*7); // remember-me for 7d
-                ctx.cookies.set('koa:jwt', replacementToken, options);
-            } catch (e) {
-                if (e.message == 'invalid token') ctx.throw(401, 'Invalid authentication'); // verify (both!) failed
-                ctx.throw(e.status||500, e.message); // Internal Server Error
-            }
-        }
-    }
-
-    await next();
-}
-
-async function setupUser(ctx, jwtPayload) {
-    const roles = { g: 'guest', u: 'user', a: 'admin', r: 'reporter', s: 'su' };
-
-    ctx.state.user = Object.assign({}, jwtPayload);                           // for user id  to look up user details
-    if (!ctx.state.user.roles) ctx.state.user.roles = '';                     // avoid risk of exception due to unset roles!
-    ctx.state.user.roles = ctx.state.user.roles.split('').map(r => roles[r]); // abbreviated string -> array
-    ctx.state.user.isAdmin = ctx.state.user.roles.includes('admin');          // for nav menu
-    //ctx.state.user.jwt = token;                                             // for ajax->api calls
-
-    // if we don't have db connection for this user's (current) db, get it now (qv login.js)
-    // (these will remain in global for entire app, this doesn't happen per request)
-    const db = ctx.state.user.db;
-    if (!global.db[db]) {
-        try {
-            const connectionString = process.env[`DB_${db.toUpperCase().replace('-', '_')}`];
-            global.db[db] = await MongoClient.connect(connectionString);
-        } catch (e) {
-            const loginfailmsg = `Invalid database credentials for ‘${db}’`;
-            ctx.flash = { username: ctx.state.user.email, loginfailmsg: loginfailmsg };
-            ctx.redirect('/login');
-            return;
-        }
-    }
-}
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

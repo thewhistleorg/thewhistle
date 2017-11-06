@@ -4,6 +4,7 @@
 
 import nodeinfo   from 'nodejs-info';         // node info
 import dateFormat from 'dateformat';          // Steven Levithan's dateFormat()
+import json2csv   from 'json2csv';            // converts json into csv
 import jsdom      from 'jsdom';               // DOM Document interface in Node!
 import dns        from 'dns';                 // nodejs.org/api/dns.html
 import fs         from 'fs-extra';            // fs with extra functions & promise interface
@@ -74,7 +75,7 @@ class Dev {
             .map(e => { e.env = e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env); return e; })
             .map(e => { e.os = Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family; return e; })
             .map(e => { e.ua = Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family; return e; })
-            .map(e => { e.domain = e.ip ? global.ips.get(e.ip) : null; return e; })
+            .map(e => { e.domain = e.ip && global.ips ? global.ips.get(e.ip) : ''; return e; })
             .map(e => { e.speed = e.ms>500 ? 'slow' : e.ms>100 ? 'medium' : ''; return e; });
 
         // trim excessively long paths (with full path in 'title' rollover)
@@ -99,6 +100,40 @@ class Dev {
         };
 
         await ctx.render('dev-logs-access', context);
+    }
+
+
+    static async logAccessCsv(ctx) {
+        const log = global.db.users.collection('log-access');
+        const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
+
+        // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
+        entriesAll.forEach(e => e.ua.os = e.ua.os || e.ua.platform);
+
+        const entries = [];
+        for (const e of entriesAll) {
+            const fields = {
+                env:       e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env),
+                timestamp: dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM:ss'),
+                host:      e.host,
+                url:       e.url,
+                org:       e.db,
+                user:      e.user,
+                status:    e.status,
+                referrer:  e.referer,
+                domain:    e.ip && global.ips ? global.ips.get(e.ip) : '',
+                ua:        Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family,
+                os:        Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family,
+                ms:        e.ms,
+            };
+            entries.push(fields);
+        }
+
+        const csv = json2csv({ data: entries });
+        const filename = 'the whistle access log ' + dateFormat('yyyy-mm-dd HH:MM') + '.csv';
+        ctx.status = 200;
+        ctx.body = csv;
+        ctx.attachment(filename);
     }
 
 
@@ -146,7 +181,7 @@ class Dev {
             .map(e => { e.env = e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env); return e; })
             .map(e => { e.os = Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family; return e; })
             .map(e => { e.ua = Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family; return e; })
-            .map(e => { e.domain = e.ip ? global.ips.get(e.ip) : null; return e; })
+            .map(e => { e.domain = e.ip && global.ips ? global.ips.get(e.ip) : ''; return e; })
             .map(e => { e['status-colour'] = e.status==500 ? 'red' : ''; return e; });
 
         // for display, time defaults to 0
@@ -193,7 +228,7 @@ class Dev {
             // otherwise, look up domain now (without bothering to wait for result
             if ([ '127.0.0.1', '::ffff:127.0.0.1' ].includes(e.ip)) continue;
             dns.reverse(e.ip.trim(), function(err, domains) { // TODO: remove trim() once test flushed out of logs 2017-11-01
-                if (err != null) console.error(err);
+                if (err != null) { console.error('ipLookup', err.message); return; }
                 global.ips.set(e.ip, domains[0]);
             });
         }

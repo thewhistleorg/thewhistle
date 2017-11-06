@@ -18,8 +18,9 @@ router.get('/dev/user-agents/admin',   Dev.userAgentsAdmin);   // user agents fr
 router.get('/dev/user-agents/report',  Dev.userAgentsReport);  // user agents from reports.thewhistle.org
 router.get('/dev/user-agents/reports', Dev.userAgentsReports); // user agents from submitted reports
 
-router.get('/dev/log-access', Dev.logAccess);
-router.get('/dev/log-error',  Dev.logError);
+router.get('/dev/log-access',            Dev.logAccess);
+router.get('/dev/log-error',             Dev.logError);
+router.get('/dev/log-access/export-csv', Dev.logAccessCsv);
 
 router.get('/dev/notes',        Dev.notesIndex);
 router.get('/dev/notes/readme', Dev.notesReadme);

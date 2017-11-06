@@ -115,7 +115,7 @@ app.use(async function verifyJwt(ctx, next) {
     const roles = { g: 'guest', u: 'user', a: 'admin', r: 'reporter', s: 'su' };
 
     try {
-        const payload = jwt.verify(token, 'koa-sample-app-signature-key'); // throws on invalid token
+        const payload = jwt.verify(token, 'the-whistle-jwt-signature-key'); // throws on invalid token
 
         // valid token: accept it...
         ctx.state.user = payload;                                          // for user id  to look up user details

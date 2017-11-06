@@ -204,21 +204,21 @@ async function verifyJwt(ctx, next) {
 
     if (token) {
         try {
-            const  payload = jwt.verify(token, 'koa-sample-app-signature-key'); // throws on invalid token
+            const  payload = jwt.verify(token, 'the-whistle-jwt-signature-key'); // throws on invalid token
 
             // valid token: accept it...
             await setupUser(ctx, payload);
         } catch (err) {
             // verify failed - retry with ignore expire option
             try {
-                const payload = jwt.verify(token, 'koa-sample-app-signature-key', { ignoreExpiration: true });
+                const payload = jwt.verify(token, 'the-whistle-jwt-signature-key', { ignoreExpiration: true });
 
                 // valid token except for exp: accept it...
                 await setupUser(ctx, payload);
 
                 // ... and re-issue a replacement token for a further 24 hours
                 delete payload.exp;
-                const replacementToken = jwt.sign(payload, 'koa-sample-app-signature-key', { expiresIn: '24h' });
+                const replacementToken = jwt.sign(payload, 'the-whistle-jwt-signature-key', { expiresIn: '24h' });
                 const options = { signed: true };
                 if (payload.remember) options.expires = new Date(Date.now() + 1000*60*60*24*7); // remember-me for 7d
                 ctx.cookies.set('koa:jwt', replacementToken, options);

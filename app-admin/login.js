@@ -129,7 +129,7 @@ class LoginHandlers {
             db:       db,                                                       // currently selected database
             remember: body['remember-me'] ? true : false,                       // whether token can be renewed
         };
-        const token = jwt.sign(payload, 'koa-sample-app-signature-key', { expiresIn: '24h' });
+        const token = jwt.sign(payload, 'the-whistle-jwt-signature-key', { expiresIn: '24h' });
 
         // record token in signed cookie; if 'remember-me', set cookie for 1 week, otherwise set session only
         const options = { signed: true };

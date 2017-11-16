@@ -71,9 +71,10 @@ app.use(async function handleErrors(ctx, next) {
 
 // clean up post data - trim & convert blank fields to null
 app.use(async function cleanPost(ctx, next) {
-    // koa-body puts multipart/form-data form fields in request.body.{fields,files}
-    const body = 'fields' in ctx.request.body && 'files' in ctx.request.body ? ctx.request.body.fields : ctx.request.body;
-    if (body !== undefined) {
+    if (ctx.request.method == 'POST') {
+        // koa-body puts multipart/form-data form fields in request.body.{fields,files}
+        const multipart = 'fields' in ctx.request.body && 'files' in ctx.request.body;
+        const body =  multipart ? ctx.request.body.fields : ctx.request.body;
         for (const key in body) {
             if (typeof body[key] == 'string') {
                 body[key] = body[key].trim();
@@ -84,6 +85,47 @@ app.use(async function cleanPost(ctx, next) {
     await next();
 });
 
+
+// for x-www-form-urlencoded, koa-body will convert dotted keys to nested arrays (per co-body), but
+// for multipart/form-data, formidable doesn't convert, so we have to do it manually
+app.use(async function allowPostDots(ctx, next) {
+    if (ctx.request.method == 'POST') {
+        const multipart = 'fields' in ctx.request.body && 'files' in ctx.request.body;
+        const body = multipart ? ctx.request.body.fields : ctx.request.body;
+        for (const key in body) {
+            if (key.includes('.')) { // dotted key: convert to nested object
+                const obj = {};
+                let part = obj;
+                const keys = key.split('.');
+                for (let k=0; k<keys.length-1; k++) {
+                    part[keys[k]] = {};
+                    part = part[keys[k]];
+                }
+                part[keys[keys.length-1]] = body[key];
+                delete body[key];
+                mergeDeep(body, obj);
+            }
+        }
+    }
+    await next();
+});
+
+// deep merge equivalent of Object.assign; qv stackoverflow.com/questions/27936772.
+function mergeDeep(target, ...sources) {
+    if (sources.length == 0) return target;
+    const source = sources.shift();
+
+    for (const key in source) {
+        if (source[key] && typeof source[key] == 'object') {
+            if (!target[key]) Object.assign(target, {[key]: {}});
+            mergeDeep(target[key], source[key]);
+        } else {
+            Object.assign(target, {[key]: source[key]});
+        }
+    }
+
+    return mergeDeep(target, ...sources);
+}
 
 // flash messages
 app.use(convert(flash())); // note koa-flash@1.0.0 is v1 middleware which generates deprecation notice

@@ -44,7 +44,12 @@ class LoginHandlers {
      * GET /logout - logout user
      */
     static getLogout(ctx) {
-        ctx.cookies.set('koa:jwt', null, { signed: true }); // delete the cookie holding the JSON Web Token
+        // note cookies are held in top-level domain to enable common login between admin & report
+        const domain = ctx.request.hostname.replace('admin.', '');
+
+        // delete the cookie holding the JSON Web Token
+        ctx.cookies.set('koa:jwt', null, { signed: true, domain: domain });
+        ctx.cookies.set('koa:jwt', null, { signed: true, domain: 'admin.'+domain }); // TODO: tmp for transition period
         ctx.redirect('/');
     }
 
@@ -131,8 +136,10 @@ class LoginHandlers {
         };
         const token = jwt.sign(payload, 'the-whistle-jwt-signature-key', { expiresIn: '24h' });
 
-        // record token in signed cookie; if 'remember-me', set cookie for 1 week, otherwise set session only
-        const options = { signed: true };
+        // record token in signed cookie, in top-level domain to be available to both admin. and report. subdomains
+        const domain = ctx.request.hostname.replace('admin.', '');
+        const options = { signed: true, domain: domain };
+        // if 'remember-me', set cookie for 1 week, otherwise set session only
         if (body['remember-me']) options.expires = new Date(Date.now() + 1000*60*60*24*7);
 
         ctx.cookies.set('koa:jwt', token, options);

@@ -1,6 +1,8 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Admin app integration/acceptance tests.                                         C.Veness 2017  */
 /*                                                                                                */
+/* These tests require admin.localhost to be set in /etc/hosts.                                   */
+/*                                                                                                */
 /* Note that running this test will contribute to Weather Underground API invocation limits.      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
@@ -22,9 +24,7 @@ const testuser = process.env.TESTUSER; // note testuser must have access to test
 const testpass = process.env.TESTPASS; // (for successful login & sexual-assault report submission)
 
 
-const request = supertest.agent(app.listen());
-
-const headers = { Host: 'admin.localhost:3000', Referer: 'mocha' }; // set host header
+const request = supertest.agent(app.listen()).host('admin.localhost');
 
 // note that document.querySelector() works with CSS ids which are more restrictive than HTML5 ids,
 // so getElementById() has to be used to find ObjectId ids instead of querySelector()
@@ -36,14 +36,14 @@ describe('Admin app'+' ('+app.env+')', function() {
         let resetToken = null;
 
         it('sees password reset page', async function() {
-            const response = await request.get('/password/reset-request').set(headers);
+            const response = await request.get('/password/reset-request');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('input').name).to.equal('email');
         });
 
         it('makes password reset request', async function() {
-            const response = await request.post('/password/reset-request').set(headers).send({ email: testuser });
+            const response = await request.post('/password/reset-request').send({ email: testuser });
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/password/reset-request-confirm');
             resetToken = response.headers['x-reset-token'];
@@ -52,21 +52,21 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('sees password reset request confirmation page', async function() {
-            const response = await request.get('/password/reset-request-confirm').set(headers);
+            const response = await request.get('/password/reset-request-confirm');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('title').textContent).to.equal('Reset password request');
         });
 
         it('sees password reset page', async function() {
-            const response = await request.get(`/password/reset/${resetToken}`).set(headers);
+            const response = await request.get(`/password/reset/${resetToken}`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('input').name).to.equal('password');
         });
 
         it('throws out invalid token', async function() {
-            const response = await request.get('/password/reset/not-a-good-token').set(headers);
+            const response = await request.get('/password/reset/not-a-good-token');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('p').textContent).to.equal('This password reset link is either invalid, expired, or previously used.');
@@ -75,7 +75,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('throws out expired token', async function() {
             const [ timestamp, hash ] = resetToken.split('-');
             const expiredTimestamp = (parseInt(timestamp, 36) - 60*60*24 - 1).toString(36);
-            const response = await request.get(`/password/reset/${expiredTimestamp}-${hash}`).set(headers);
+            const response = await request.get(`/password/reset/${expiredTimestamp}-${hash}`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('p').textContent).to.equal('This password reset link is either invalid, expired, or previously used.');
@@ -84,7 +84,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('throws out token with valid timestamp but invalid hash', async function() {
             // the token is a timestamp in base36 and a hash separated by a hyphen
             const [ timestamp ] = resetToken.split('-'); // (we don't need the hash here)
-            const response = await request.get(`/password/reset/${timestamp}-abcdefgh`).set(headers);
+            const response = await request.get(`/password/reset/${timestamp}-abcdefgh`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('p').textContent).to.equal('This password reset link is either invalid, expired, or previously used.');
@@ -92,20 +92,20 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('chokes on different passwords', async function() {
             const values = { password: testpass, passwordConfirm: 'definitely-no-the-correct-password' };
-            const response = await request.post(`/password/reset/${resetToken}`).set(headers).send(values);
+            const response = await request.post(`/password/reset/${resetToken}`).send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal(`/password/reset/${resetToken}`);
         });
 
         it('resets password', async function() {
             const values = { password: testpass, passwordConfirm: testpass };
-            const response = await request.post(`/password/reset/${resetToken}`).set(headers).send(values);
+            const response = await request.post(`/password/reset/${resetToken}`).send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/password/reset/confirm');
         });
 
         it('sees password reset confirmation page', async function() {
-            const response = await request.get('/password/reset/confirm').set(headers);
+            const response = await request.get('/password/reset/confirm');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('title').textContent).to.equal('Reset password');
@@ -116,13 +116,13 @@ describe('Admin app'+' ('+app.env+')', function() {
         let location = null;
 
         it('forbids access to reports when not logged-in', async function() {
-            const response = await request.get('/reports').set(headers);
+            const response = await request.get('/reports');
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/login/reports');
         });
 
         it('has home page with login link in nav when not logged-in', async function() {
-            const response = await request.get('/').set(headers);
+            const response = await request.get('/');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('title').textContent.slice(0, 11)).to.equal('The Whistle');
@@ -130,21 +130,21 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('has login page with login fields when not logged-in', async function() {
-            const response = await request.get('/login').set(headers);
+            const response = await request.get('/login');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelectorAll('input')).to.have.lengthOf(3);
         });
 
         it('login page shows org’s for user arg', async function() {
-            const response = await request.get('/login?user=review@thewhistle.org').set(headers);
+            const response = await request.get('/login?user=review@thewhistle.org');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelectorAll('input').length).to.be.at.least(4);
         });
 
         it('ajax: lists user databases', async function() {
-            const response = await request.get(`/ajax/login/databases?user=${testuser}`).set(headers);
+            const response = await request.get(`/ajax/login/databases?user=${testuser}`);
             expect(response.status).to.equal(200);
             expect(response.body.databases).to.have.lengthOf(1);
             expect(response.body.databases[0]).to.equal('test-grn');
@@ -152,10 +152,10 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('shows e-mail/password not recognised on failed login', async function() {
             const values = { username: 'no-user-by-this-name', password: 'not-the-right-password' };
-            const responsePost = await request.post('/login').set(headers).send(values);
+            const responsePost = await request.post('/login').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/login');
-            const responseGet = await request.get('/login').set(headers);
+            const responseGet = await request.get('/login');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('button').nextElementSibling.textContent).to.equal('E-mail / password not recognised');
@@ -163,13 +163,13 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('redirects to / on login', async function() {
             const values = { username: testuser, password: testpass, 'remember-me': 'on' };
-            const response = await request.post('/login').set(headers).send(values);
+            const response = await request.post('/login').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/');
         });
 
         it('shows logged in user on login page when logged-in', async function() {
-            const response = await request.get('/login').set(headers);
+            const response = await request.get('/login');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('#name').textContent).to.equal('tester');
@@ -178,10 +178,10 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('has home page with full nav links when logged-in', async function() {
             // get from location supplied by home redirecgt
-            const res1 = await request.get('/').set(headers);
+            const res1 = await request.get('/');
             expect(res1.status).to.equal(302);
             location = res1.headers.location;
-            const response = await request.get(location).set(headers);
+            const response = await request.get(location);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             //expect(document.querySelector('title').textContent).to.match(/.*Activity.+/); home page is temporarily list of reports
@@ -201,27 +201,27 @@ describe('Admin app'+' ('+app.env+')', function() {
 
 
         it('gets test user id from e-mail (ajax)', async function() {
-            const response = await request.get(`/ajax/users?email=${testuser}`).set(headers);
+            const response = await request.get(`/ajax/users?email=${testuser}`);
             expect(response.status).to.equal(200);
             testUserDetails = response.body.users[0];
         });
 
         it('sees new case intake page', async function() {
-            const response = await request.get('/report/sexual-assault').set(headers);
+            const response = await request.get('/report/sexual-assault');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('New Case Intake');
         });
 
         it('reports new case intake invalid project', async function() {
-            const response = await request.get('/report/no-such-project').set(headers);
+            const response = await request.get('/report/no-such-project');
             expect(response.status).to.equal(404);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('p').textContent).to.equal('Project ‘no-such-project’ not found.');
         });
 
         it('reports submit without entering details', async function() {
-            const response = await request.post('/report/sexual-assault/submit').set(headers);
+            const response = await request.post('/report/sexual-assault/submit');
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/report/sexual-assault');
         });
@@ -236,7 +236,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             };
             // sadly, it seems that superagent doesn't allow request.attach() to be used with
             // request.send(), so instead we need to use request.field()
-            const response = await request.post('/report/sexual-assault').set(headers)
+            const response = await request.post('/report/sexual-assault')
                 .field('generated-name', values['generated-name'])
                 .field('date', values['date'])
                 .field('time', values['time'])
@@ -249,20 +249,20 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('gets new autogenerated name (ajax)', async function() {
-            const response = await request.get('/ajax/report/test-grn/names/new').set(headers);
+            const response = await request.get('/ajax/report/test-grn/names/new');
             expect(response.status).to.equal(200);
             expect(response.body.name.split(' ')).to.have.lengthOf(2);
         });
 
         it('sees review & submit page', async function() {
-            const response = await request.get('/report/sexual-assault/submit').set(headers);
+            const response = await request.get('/report/sexual-assault/submit');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Review & Submit');
         });
 
         it('submits incident report', async function() {
-            const response = await request.post('/report/sexual-assault/submit').set(headers).send();
+            const response = await request.post('/report/sexual-assault/submit').send();
             expect(response.status).to.equal(302);
             reportId = response.headers['x-insert-id'];
             expect(response.headers.location).to.equal(`/report/sexual-assault/${reportId}/confirm`);
@@ -272,21 +272,21 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('sees confirm page', async function() {
-            const response = await request.get(`/report/sexual-assault/${reportId}/confirm`).set(headers);
+            const response = await request.get(`/report/sexual-assault/${reportId}/confirm`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Report Submitted');
         });
 
         it('has new report in list of reports', async function() {
-            const response = await request.get('/reports').set(headers);
+            const response = await request.get('/reports');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(reportId)).to.not.be.null;
         });
 
         it('has new report in report-map page', async function() {
-            const response = await request.get('/reports-map').set(headers);
+            const response = await request.get('/reports-map');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             const script = document.querySelector('script:not([src])');
@@ -295,19 +295,19 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('gets map marker (newly built)', async function() {
             try { fs.unlinkSync('./static/map/marker-red-80.png'); } catch (e) {} // force regeneration of marker
-            const response = await request.get('/map-marker/red/80').set(headers);
+            const response = await request.get('/map-marker/red/80');
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('image/png');
         });
 
         it('gets map marker (prebuilt)', async function() {
-            const response = await request.get('/map-marker/red/80').set(headers);
+            const response = await request.get('/map-marker/red/80');
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('image/png');
         });
 
         it('sees report in reports list filtered by description', async function() {
-            const response = await request.get('/reports?description=test').set(headers);
+            const response = await request.get('/reports?description=test');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(reportId).nodeName).to.equal('TR');
@@ -315,21 +315,21 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('sees report in reports list filtered by date range', async function() {
             const dates = encodeURI(dateFormat(Date.now()-1000*60*60*24, 'dd-mmm-yyyy')+'–'+dateFormat('dd-mmm-yyyy'));
-            const response = await request.get('/reports?submitted='+dates).set(headers);
+            const response = await request.get('/reports?submitted='+dates);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(reportId).nodeName).to.equal('TR');
         });
 
         it('gets report page', async function() {
-            const response = await request.get('/reports/'+reportId).set(headers);
+            const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             // not much obvious to search for!
         });
 
         it('sees weather conditions in report page', async function() {
             return; // TODO investigate why wunderground is returning 400 Bad Request
-            const response = await request.get('/reports/'+reportId).set(headers); // eslint-disable-line no-unreachable
+            const response = await request.get('/reports/'+reportId); // eslint-disable-line no-unreachable
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             const iconRe = new RegExp('^/img/weather/underground/icons/black/png/32x32/[a-z]+.png$');
@@ -337,7 +337,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('sees uploaded image in report page', async function() {
-            const response = await request.get('/reports/'+reportId).set(headers);
+            const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             const src = `/uploaded/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
@@ -346,13 +346,13 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('fetches uploaded image from AWS S3', async function() {
-            const response = await request.get(`/uploaded/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/s_gps.jpg`).set(headers);
+            const response = await request.get(`/uploaded/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/s_gps.jpg`);
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('image/jpeg');
         });
 
         it('sees uploaded image exif metadata in report page', async function() {
-            const response = await request.get('/reports/'+reportId).set(headers);
+            const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             const distRe = new RegExp('^5400 km N from incident location');
@@ -360,34 +360,34 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('gets timestamp of new report (ajax)', async function() {
-            const response = await request.get('/ajax/reports/latest-timestamp').set(headers);
+            const response = await request.get('/ajax/reports/latest-timestamp');
             expect(response.status).to.equal(200);
             expect(response.body.latest.timestamp).to.equal(ObjectId(reportId).getTimestamp().toISOString());
         });
 
         it('gets reports in bounding box (ajax)', async function() {
-            const response = await request.get('/ajax/reports/within/6.5,3.3:6.6,3.4').set(headers);
+            const response = await request.get('/ajax/reports/within/6.5,3.3:6.6,3.4');
             expect(response.status).to.equal(200);
             expect(response.body.reports.filter(r => r._id == reportId).length).to.equal(1);
         });
 
         it('sees ‘testy terrain’ name is used (ajax)', async function() {
-            const response = await request.get('/ajax/report/test-grn/names/testy+terrain').set(headers);
+            const response = await request.get('/ajax/report/test-grn/names/testy+terrain');
             expect(response.status).to.equal(200);
         });
 
         // TODO: can 'test-grn' element of url be inferred from header credentials?
         it('sees unused name is not used (ajax)', async function() {
-            const response = await request.get('/ajax/report/test-grn/names/no+way+this+should+be+a+used+name').set(headers);
+            const response = await request.get('/ajax/report/test-grn/names/no+way+this+should+be+a+used+name');
             expect(response.status).to.equal(404);
         });
 
         // Summary function is disabled for this release
         // it('sets summary', async function() {
         //     const values = { summary: 'test report' };
-        //     const responsePost = await request.post('/reports'+reportId).set(headers).send(values);
+        //     const responsePost = await request.post('/reports'+reportId).send(values);
         //     expect(responsePost.status).to.equal(302);
-        //     const response = await request.get(responsePost.headers.location).set(headers);
+        //     const response = await request.get(responsePost.headers.location);
         //     expect(response.status).to.equal(200);
         //     const document = new jsdom.JSDOM(response.text).window.document;
         //     expect(document.querySelector('#summary').value).to.equal('test report');
@@ -397,13 +397,13 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('sets assigned-to', async function() {
             const values = { 'assigned-to': testUserDetails._id };
-            const response = await request.post('/reports/'+reportId).set(headers).send(values);
+            const response = await request.post('/reports/'+reportId).send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports/'+reportId);
         });
 
         it('sees assigned-to in audit trail', async function() {
-            const response = await request.get('/reports/'+reportId).set(headers);
+            const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             const matches = document.evaluate('count(//td[text()="Set assignedTo to @tester"])', document, null, 0, null);
@@ -411,7 +411,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('sees report in reports list filtered by assigned-to', async function() {
-            const response = await request.get('/reports?assigned=tester').set(headers);
+            const response = await request.get('/reports?assigned=tester');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(reportId).nodeName).to.equal('TR');
@@ -419,13 +419,13 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('sets status', async function() {
             const values = { 'status': 'test rpt' };
-            const response = await request.post('/reports/'+reportId).set(headers).send(values);
+            const response = await request.post('/reports/'+reportId).send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports/'+reportId);
         });
 
         it('sees status in audit trail', async function() {
-            const response = await request.get('/reports/'+reportId).set(headers);
+            const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             const matches = document.evaluate('count(//td[text()="Set status to ‘test rpt’"])', document, null, 0, null);
@@ -433,7 +433,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('sees report in reports list filtered by status', async function() {
-            const response = await request.get('/reports?status=test+rpt').set(headers);
+            const response = await request.get('/reports?status=test+rpt');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(reportId).nodeName).to.equal('TR');
@@ -441,26 +441,26 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('sets report tag (ajax)', async function() {
             const values = { tag: 'test' };
-            const response = await request.post(`/ajax/reports/${reportId}/tags`).set(headers).send(values);
+            const response = await request.post(`/ajax/reports/${reportId}/tags`).send(values);
             expect(response.status).to.equal(201);
         });
 
         it('sees report in reports list filtered by tag', async function() {
-            const response = await request.get('/reports?tag=test').set(headers);
+            const response = await request.get('/reports?tag=test');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(reportId).nodeName).to.equal('TR');
         });
 
         it('sees tag in report page', async function() {
-            const response = await request.get('/reports/'+reportId).set(headers);
+            const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelectorAll('span.tag')).to.have.lengthOf(1);
         });
 
         it('sees add tag in report page audit trail', async function() {
-            const response = await request.get('/reports/'+reportId).set(headers);
+            const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             const matches = document.evaluate('count(//td[text()="Add tag ‘test’"])', document, null, 0, null);
@@ -469,13 +469,13 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('adds a comment', async function() {
             const values = { comment: 'Testing testing 1-2-3', username: testUserDetails.username, userid: testUserDetails._id };
-            const response = await request.post(`/ajax/reports/${reportId}/comments`).set(headers).send(values);
+            const response = await request.post(`/ajax/reports/${reportId}/comments`).send(values);
             expect(response.status).to.equal(201);
             commentId = response.body.id;
         });
 
         it('sees comment in report page', async function() {
-            const response = await request.get('/reports/'+reportId).set(headers);
+            const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(commentId).querySelectorAll('div')[1].textContent).to.equal('Testing testing 1-2-3\n');
@@ -486,21 +486,21 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('downloads reports list as CSV', async function() {
-            const response = await request.get('/reports/export-csv').set(headers);
+            const response = await request.get('/reports/export-csv');
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('text/csv; charset=utf-8');
             expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${dateFormat('yyyy-mm-dd HH:MM')}.csv"`);
         });
 
         it('downloads reports list as PDF', async function() {
-            const response = await request.get('/reports/export-pdf').set(headers);
+            const response = await request.get('/reports/export-pdf');
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('application/pdf');
             expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${dateFormat('yyyy-mm-dd HH:MM')}.pdf"`);
         });
 
         it('downloads single report as PDF', async function() {
-            const response = await request.get('/reports/export-pdf/'+reportId).set(headers);
+            const response = await request.get('/reports/export-pdf/'+reportId);
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('application/pdf');
             expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident report ${dateFormat('yyyy-mm-dd HH:MM')}.pdf"`);
@@ -508,19 +508,19 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('deletes report tag (ajax)', async function() {
             const values = { tag: 'test' };
-            const response = await request.delete(`/ajax/reports/${reportId}/tags/test`).set(headers).send(values);
+            const response = await request.delete(`/ajax/reports/${reportId}/tags/test`).send(values);
             expect(response.status).to.equal(200);
         });
 
         it('no longer sees tag in report page', async function() {
-            const response = await request.get('/reports/'+reportId).set(headers);
+            const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelectorAll('span.tag')).to.have.lengthOf(0);
         });
 
         it('sees delete tag in report page audit trail', async function() {
-            const response = await request.get('/reports/'+reportId).set(headers);
+            const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             const matches = document.evaluate('count(//td[text()="Delete tag ‘test’"])', document, null, 0, null);
@@ -528,24 +528,24 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('deletes comment', async function() {
-            const response = await request.delete(`/ajax/reports/${reportId}/comments/${commentId}`).set(headers);
+            const response = await request.delete(`/ajax/reports/${reportId}/comments/${commentId}`);
             expect(response.status).to.equal(200);
         });
 
         it('no longer sees comment in report page', async function() {
-            const response = await request.get('/reports/'+reportId).set(headers);
+            const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(commentId)).to.be.null;
         });
 
         it('tidyup: deletes updates (ajax)', async function() {
-            const response = await request.delete(`/ajax/reports/${reportId}/updates/`).set(headers).send();
+            const response = await request.delete(`/ajax/reports/${reportId}/updates/`).send();
             expect(response.status).to.equal(200);
         });
 
         it('tidyup: deletes incident report', async function() {
-            const response = await request.post('/reports/'+reportId+'/delete').set(headers).send();
+            const response = await request.post('/reports/'+reportId+'/delete').send();
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
         });
@@ -564,28 +564,28 @@ describe('Admin app'+' ('+app.env+')', function() {
         };
 
         it('gets add new user page', async function() {
-            const response = await request.get('/users/add').set(headers);
+            const response = await request.get('/users/add');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('input').name).to.equal('firstname');
         });
 
         it('adds new user', async function() {
-            const response = await request.post('/users/add').set(headers).send(values);
+            const response = await request.post('/users/add').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/users');
             userId = response.headers['x-insert-id'];
         });
 
         it('lists users including test user', async function() {
-            const response = await request.get('/users').set(headers);
+            const response = await request.get('/users');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(userId).querySelector('td').textContent).to.equal('Test');
         });
 
         it('gets edit user page', async function() {
-            const response = await request.get('/users/'+userId+'/edit').set(headers);
+            const response = await request.get('/users/'+userId+'/edit');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Edit User Test User');
@@ -593,26 +593,26 @@ describe('Admin app'+' ('+app.env+')', function() {
 
         it('edits user', async function() {
             values.firstname = 'Test-bis';
-            const response = await request.post('/users/'+userId+'/edit').set(headers).send(values);
+            const response = await request.post('/users/'+userId+'/edit').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/users');
         });
 
         it('sees updated details', async function() {
-            const response = await request.get('/users/'+userId+'/edit').set(headers);
+            const response = await request.get('/users/'+userId+'/edit');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('input').value).to.equal('Test-bis');
         });
 
         it('deletes test user', async function() {
-            const response = await request.post('/users/'+userId+'/delete').set(headers);
+            const response = await request.post('/users/'+userId+'/delete');
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/users');
         });
 
         it('returns 404 for non-existent user', async function() {
-            const response = await request.get('/users/no-one-here-by-that-name').set(headers);
+            const response = await request.get('/users/no-one-here-by-that-name');
             expect(response.status).to.equal(404);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal(':(');
@@ -630,21 +630,21 @@ describe('Admin app'+' ('+app.env+')', function() {
         };
 
         it('gets adds new resource page', async function() {
-            const response = await request.get('/resources/add').set(headers);
+            const response = await request.get('/resources/add');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelectorAll('input')).to.have.lengthOf(8);
         });
 
         it('adds new resource', async function() {
-            const response = await request.post('/resources/add').set(headers).send(values);
+            const response = await request.post('/resources/add').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/resources');
             resourceId = response.headers['x-insert-id'];
         });
 
         it('lists resources including test resource', async function() {
-            const response = await request.get('/resources').set(headers);
+            const response = await request.get('/resources');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(resourceId).querySelectorAll('td')[0].textContent).to.equal('Test');
@@ -652,18 +652,18 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('edits test resource', async function() {
-            const response = await request.get('/resources/'+resourceId+'/edit').set(headers);
+            const response = await request.get('/resources/'+resourceId+'/edit');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Edit resource Test');
             values.services = 'testing; validation';
-            const responsePost = await request.post('/resources/'+resourceId+'/edit').set(headers).send(values);
+            const responsePost = await request.post('/resources/'+resourceId+'/edit').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/resources');
         });
 
         it('lists resources including updated test resource', async function() {
-            const response = await request.get('/resources').set(headers);
+            const response = await request.get('/resources');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(resourceId).querySelectorAll('td')[0].textContent).to.equal('Test');
@@ -671,13 +671,13 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('deletes test resource', async function() {
-            const response = await request.post('/resources/'+resourceId+'/delete').set(headers);
+            const response = await request.post('/resources/'+resourceId+'/delete');
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/resources');
         });
 
         it('returns 404 for non-existent resource', async function() {
-            const response = await request.get('/resources/no-one-here-by-that-name').set(headers);
+            const response = await request.get('/resources/no-one-here-by-that-name');
             expect(response.status).to.equal(404);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal(':(');
@@ -686,46 +686,46 @@ describe('Admin app'+' ('+app.env+')', function() {
 
     describe('dev', function() {
         it('sees dev/notes page', async function() {
-            const response = await request.get('/dev/notes').set(headers);
+            const response = await request.get('/dev/notes');
             expect(response.status).to.equal(200);
         });
 
         it('sees dev/notes/readme page', async function() {
-            const response = await request.get('/dev/notes/readme').set(headers);
+            const response = await request.get('/dev/notes/readme');
             expect(response.status).to.equal(200);
         });
 
         it('sees dev/notes md page', async function() {
-            const response = await request.get('/dev/notes/development-workflow').set(headers);
+            const response = await request.get('/dev/notes/development-workflow');
             expect(response.status).to.equal(200);
         });
 
         it('returns 404 for non-existent dev/notes md page', async function() {
-            const response = await request.get('/dev/notes/no-such-page').set(headers);
+            const response = await request.get('/dev/notes/no-such-page');
             expect(response.status).to.equal(404);
         });
 
         it('sees dev/nodeinfo page', async function() {
-            const response = await request.get('/dev/nodeinfo').set(headers);
+            const response = await request.get('/dev/nodeinfo');
             expect(response.status).to.equal(200);
         });
 
         it('sees dev/user-agents', async function() {
-            const response = await request.get('/dev/user-agents').set(headers);
+            const response = await request.get('/dev/user-agents');
             expect(response.status).to.equal(200);
         });
     });
 
     describe('misc', function() {
         it('returns 404 for non-existent page', async function() {
-            const response = await request.get('/zzzzzz').set(headers);
+            const response = await request.get('/zzzzzz');
             expect(response.status).to.equal(404);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal(':(');
         });
 
         it('returns 404 for non-existent ajax page', async function() {
-            const response = await request.get('/ajax/zzzzzz').set(headers);
+            const response = await request.get('/ajax/zzzzzz');
             expect(response.status).to.equal(404);
             expect(response.body.message).to.equal('Not Found');
         });
@@ -733,7 +733,7 @@ describe('Admin app'+' ('+app.env+')', function() {
 
     describe('logout', function() {
         it('logs out and redirects to /', async function() {
-            const response = await request.get('/logout').set(headers);
+            const response = await request.get('/logout');
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/');
         });

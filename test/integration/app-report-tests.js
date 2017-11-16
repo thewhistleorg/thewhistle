@@ -1,14 +1,14 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Report app integration/acceptance tests.                                        C.Veness 2017  */
 /*                                                                                                */
-/* Note that running this test will contribute to Weather Underground API invocation limits.      */
+/* These tests require report.localhost to be set in /etc/hosts.                                  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
 import chai       from 'chai';       // BDD/TDD assertion library
 import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-const expect   = chai.expect;
+const expect = chai.expect;
 
 import app from '../../app.js';
 
@@ -16,9 +16,7 @@ const testuser = process.env.TESTUSER; // note testuser must have access to test
 const testpass = process.env.TESTPASS; // (for successful login & sexual-assault report submission)
 
 
-const request = supertest.agent(app.listen());
-
-const headers = { Host: 'report.localhost:3000' }; // set host header
+const request = supertest.agent(app.listen()).host('report.localhost');
 
 describe('Report app'+' ('+app.env+')', function() {
     this.timeout(10e3); // 10 sec
@@ -27,7 +25,7 @@ describe('Report app'+' ('+app.env+')', function() {
 
     describe('report app home page', function() {
         it('sees home page', async function() {
-            const response = await request.get('/').set(headers);
+            const response = await request.get('/');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('title').textContent).to.equal('The Whistle Eyewitness Report');
@@ -36,45 +34,45 @@ describe('Report app'+' ('+app.env+')', function() {
 
     describe('404s', function() {
         it('fails on bad org’n', async function() {
-            const response = await request.get('/no-such-organisation').set(headers);
+            const response = await request.get('/no-such-organisation');
             expect(response.status).to.equal(404);
         });
 
         it('fails on bad org’n/project', async function() {
-            const response = await request.get('/no-such-organisation/no-such-project').set(headers);
+            const response = await request.get('/no-such-organisation/no-such-project');
             expect(response.status).to.equal(404);
         });
 
         it('fails on bad org’n/project/page', async function() {
-            const response = await request.get('/no-such-organisation/no-such-project/1').set(headers);
+            const response = await request.get('/no-such-organisation/no-such-project/1');
             expect(response.status).to.equal(404);
         });
 
         it('fails on bad project', async function() {
-            const response = await request.get('/test-grn/no-such-project').set(headers);
+            const response = await request.get('/test-grn/no-such-project');
             expect(response.status).to.equal(404);
         });
 
         it('ajax: returns 404 for unrecognised project', async function() {
-            const response = await request.get('/ajax/no-such-project').set(headers);
+            const response = await request.get('/ajax/no-such-project');
             expect(response.status).to.equal(404);
         });
 
         it('ajax: returns 404 for unrecognised function', async function() {
-            const response = await request.get('/ajax/test-grn/no-such-function').set(headers);
+            const response = await request.get('/ajax/test-grn/no-such-function');
             expect(response.status).to.equal(404);
         });
     });
 
     describe('text-grn/sexual-assault inaccessible pages', function() {
         it('request for page 2 gets redirected to home page', async function() {
-            const response = await request.get('/test-grn/sexual-assault/2').set(headers);
+            const response = await request.get('/test-grn/sexual-assault/2');
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/test-grn/sexual-assault');
         });
 
         it('submit with no session gets redirected to home page', async function() {
-            const response = await request.post('/test-grn/sexual-assault/submit').set(headers).send({});
+            const response = await request.post('/test-grn/sexual-assault/submit').send({});
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/test-grn/sexual-assault');
         });
@@ -82,20 +80,20 @@ describe('Report app'+' ('+app.env+')', function() {
 
     describe('text-grn/sexual-assault', function() {
         it('sees home page', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault').set(headers);
+            const responseGet = await request.get('/test-grn/sexual-assault');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('title').textContent).to.equal('The Whistle / Global Rights Nigeria Incident Report');
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Get started');
 
             const values = { 'nav-next': 'next' };
-            const responsePost = await request.post('/test-grn/sexual-assault').set(headers).send(values);
+            const responsePost = await request.post('/test-grn/sexual-assault').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/1');
         });
 
         it('sees/submits page 1', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/1').set(headers);
+            const responseGet = await request.get('/test-grn/sexual-assault/1');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('#progress').textContent.trim()).to.equal('Step 1 of 7');
@@ -106,25 +104,25 @@ describe('Report app'+' ('+app.env+')', function() {
                 'on-behalf-of': 'myself',
                 'nav-next':     'next',
             };
-            const responsePost = await request.post('/test-grn/sexual-assault/1').set(headers).send(values);
+            const responsePost = await request.post('/test-grn/sexual-assault/1').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/2');
         });
 
         it('doesn’t allow access beyond next page', async function() {
-            const response = await request.get('/test-grn/sexual-assault/3').set(headers);
+            const response = await request.get('/test-grn/sexual-assault/3');
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/test-grn/sexual-assault/2');
         });
 
         it('doesn’t allow post beyond next page', async function() {
-            const response = await request.post('/test-grn/sexual-assault/3').set(headers).send({});
+            const response = await request.post('/test-grn/sexual-assault/3').send({});
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/test-grn/sexual-assault/2');
         });
 
         it('sees/submits page 2', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/2').set(headers);
+            const responseGet = await request.get('/test-grn/sexual-assault/2');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('#progress').textContent.trim()).to.equal('Step 2 of 7');
@@ -138,13 +136,13 @@ describe('Report app'+' ('+app.env+')', function() {
                 'still-happening': 'n',
                 'nav-next':        'next',
             };
-            const responsePost = await request.post('/test-grn/sexual-assault/2').set(headers).send(values);
+            const responsePost = await request.post('/test-grn/sexual-assault/2').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/3');
         });
 
         it('sees/submits page 3', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/3').set(headers);
+            const responseGet = await request.get('/test-grn/sexual-assault/3');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('#progress').textContent.trim()).to.equal('Step 3 of 7');
@@ -155,13 +153,13 @@ describe('Report app'+' ('+app.env+')', function() {
                 'description': 'erroneous description',
                 'nav-next':    'next',
             };
-            const responsePost = await request.post('/test-grn/sexual-assault/3').set(headers).send(values);
+            const responsePost = await request.post('/test-grn/sexual-assault/3').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/4');
         });
 
         it('sees page 4 & goes back to page 3', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/4').set(headers);
+            const responseGet = await request.get('/test-grn/sexual-assault/4');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('#progress').textContent.trim()).to.equal('Step 4 of 7');
@@ -171,13 +169,13 @@ describe('Report app'+' ('+app.env+')', function() {
             const values = {
                 'nav-prev': 'prev',
             };
-            const responsePost = await request.post('/test-grn/sexual-assault/4').set(headers).send(values);
+            const responsePost = await request.post('/test-grn/sexual-assault/4').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/3');
         });
 
         it('sees page 3 & submits corrected description with file', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/3').set(headers);
+            const responseGet = await request.get('/test-grn/sexual-assault/3');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('#progress').textContent.trim()).to.equal('Step 3 of 7');
@@ -194,7 +192,7 @@ describe('Report app'+' ('+app.env+')', function() {
             const imgFldr = 'test/img/';
             const imgFile = 's_gps.jpg';
             // superagent doesn't allow request.attach() to be used with request.send(), so instead use request.field()
-            const responsePost = await request.post('/test-grn/sexual-assault/3').set(headers)
+            const responsePost = await request.post('/test-grn/sexual-assault/3')
                 .field('description', values['description'])
                 .field('nav-next', values['nav-next'])
                 .attach('documents', imgFldr+imgFile);
@@ -203,7 +201,7 @@ describe('Report app'+' ('+app.env+')', function() {
         });
 
         it('sees/submits page 4', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/4').set(headers);
+            const responseGet = await request.get('/test-grn/sexual-assault/4');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('#progress').textContent.trim()).to.equal('Step 4 of 7');
@@ -215,13 +213,13 @@ describe('Report app'+' ('+app.env+')', function() {
                 'at-address': 'University of Lagos',
                 'nav-next':   'next',
             };
-            const responsePost = await request.post('/test-grn/sexual-assault/4').set(headers).send(values);
+            const responsePost = await request.post('/test-grn/sexual-assault/4').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/5');
         });
 
         it('sees/submits page 5', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/5').set(headers);
+            const responseGet = await request.get('/test-grn/sexual-assault/5');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('#progress').textContent.trim()).to.equal('Step 5 of 7');
@@ -234,13 +232,13 @@ describe('Report app'+' ('+app.env+')', function() {
                 'who-description':  'A death eater',
                 'nav-next':         'next',
             };
-            const responsePost = await request.post('/test-grn/sexual-assault/5').set(headers).send(values);
+            const responsePost = await request.post('/test-grn/sexual-assault/5').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/6');
         });
 
         it('sees/submits page 6', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/6').set(headers);
+            const responseGet = await request.get('/test-grn/sexual-assault/6');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('#progress').textContent.trim()).to.equal('Step 6 of 7');
@@ -251,13 +249,13 @@ describe('Report app'+' ('+app.env+')', function() {
                 'action-taken-other-details': '',
                 'nav-next':                   'next',
             };
-            const responsePost = await request.post('/test-grn/sexual-assault/6').set(headers).send(values);
+            const responsePost = await request.post('/test-grn/sexual-assault/6').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/7');
         });
 
         it('sees/submits page 7', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/7').set(headers);
+            const responseGet = await request.get('/test-grn/sexual-assault/7');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('#progress').textContent.trim()).to.equal('Step 7 of 7');
@@ -270,24 +268,24 @@ describe('Report app'+' ('+app.env+')', function() {
                 'generated-name': 'testy terrain',
                 'nav-next':       'next',
             };
-            const responsePost = await request.post('/test-grn/sexual-assault/7').set(headers).send(values);
+            const responsePost = await request.post('/test-grn/sexual-assault/7').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/submit');
         });
 
         it('ajax: gets a new random name', async function() {
-            const response = await request.get('/ajax/test-grn/names/new').set(headers);
+            const response = await request.get('/ajax/test-grn/names/new');
             expect(response.status).to.equal(200);
             expect(response.body.name.split(' ')).to.have.lengthOf(2);
         });
 
         it('ajax: checks ‘testy terrain’ is not already used', async function() {
-            const response = await request.get('/ajax/test-grn/names/testy+terrain').set(headers);
+            const response = await request.get('/ajax/test-grn/names/testy+terrain');
             expect(response.status).to.equal(404);
         });
 
         it('sees review/submit page', async function() {
-            const response = await request.get('/test-grn/sexual-assault/submit').set(headers);
+            const response = await request.get('/test-grn/sexual-assault/submit');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Check before you send the report');
@@ -316,7 +314,7 @@ describe('Report app'+' ('+app.env+')', function() {
 
         it('submits review/submit page', async function() {
             const values = { 'submit': 'submit' };
-            const response = await request.post('/test-grn/sexual-assault/submit').set(headers).send(values);
+            const response = await request.post('/test-grn/sexual-assault/submit').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/test-grn/sexual-assault/whatnext');
             reportId = response.headers['x-insert-id'];
@@ -324,7 +322,7 @@ describe('Report app'+' ('+app.env+')', function() {
         });
 
         it('sees whatnext page', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/whatnext').set(headers);
+            const responseGet = await request.get('/test-grn/sexual-assault/whatnext');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
@@ -333,17 +331,17 @@ describe('Report app'+' ('+app.env+')', function() {
     });
 
     describe('submitted report in admin app', function() {
-        const headersAdmin = { Host: 'admin.localhost:3000' }; // set host header
+        const requestAdmin = supertest.agent(app.listen()).host('admin.localhost');
 
         it('redirects to /reports on login', async function() {
             const values = { username: testuser, password: testpass };
-            const response = await request.post('/login/reports').set(headersAdmin).send(values);
+            const response = await requestAdmin.post('/login/reports').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
         });
 
         it('sees new report with nicely formatted information', async function() {
-            const response = await request.get(`/reports/${reportId}`).set(headersAdmin);
+            const response = await requestAdmin.get(`/reports/${reportId}`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             const reportInfo = document.querySelector('div.js-obj-to-html');
@@ -367,13 +365,13 @@ describe('Report app'+' ('+app.env+')', function() {
         });
 
         it('deletes submitted incident report', async function() {
-            const response = await request.post(`/reports/${reportId}/delete`).set(headersAdmin).send();
+            const response = await requestAdmin.post(`/reports/${reportId}/delete`).send();
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
         });
 
         it('logs out', async function() {
-            const response = await request.get('/logout').set(headersAdmin);
+            const response = await requestAdmin.get('/logout');
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/');
         });

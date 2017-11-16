@@ -1,10 +1,12 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Twilio app integration/acceptance tests.                                        C.Veness 2017  */
+/*                                                                                                */
+/* These tests require admin.localhost to be set in /etc/hosts.                                   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import supertest from 'supertest'; // SuperAgent driven library for testing HTTP servers
-import chai      from 'chai';      // BDD/TDD assertion library
-import jsdom     from 'jsdom';     // JavaScript implementation of DOM and HTML standards
+import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
+import chai       from 'chai';       // BDD/TDD assertion library
+import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 const expect = chai.expect;
 
@@ -23,7 +25,7 @@ describe('Twilio app'+' ('+app.env+')', function() {
     let replyId = null;
 
     describe('receive message (spoofing message delivered by Twilio webhook)', function() {
-        const headers = { Host: 'twilio.localhost:3000' }; // set host header
+        const headers = { Host: 'twilio.localhost:3000' }; // set host header for subapp selection
 
         let messageId = null;
         let accountId = null;
@@ -59,16 +61,16 @@ describe('Twilio app'+' ('+app.env+')', function() {
     });
 
     describe('view message in admin app', function() {
-        const headers = { Host: 'admin.localhost:3000' }; // set host header
+        const requestAdmin = supertest.agent(app.listen()).host('admin.localhost');
 
         it('logs in', async function() {
             const values = { username: testuser, password: testpass };
-            const response = await request.post('/login').set(headers).send(values);
+            const response = await requestAdmin.post('/login').send(values);
             expect(response.status).to.equal(302);
         });
 
         it('views messages list page', async function() {
-            const response = await request.get('/messages').set(headers);
+            const response = await requestAdmin.get('/messages');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('title').textContent.slice(0, 8)).to.equal('Messages');
@@ -77,32 +79,32 @@ describe('Twilio app'+' ('+app.env+')', function() {
 
         it('sends reply', async function() {
             const values = { message: `Thank you for testing The Whistle (${dateFormat('d mmm yyyy HH:MM')})` };
-            const response = await request.post('/messages?number=~447973559336').set(headers).send(values);
+            const response = await requestAdmin.post('/messages?number=~447973559336').send(values);
             expect(response.status).to.equal(302);
             replyId = response.headers['x-insert-id'];
             expect(response.headers.location).to.equal('/messages?number=~447973559336');
         });
 
         it('gets latest timestamp (ajax)', async function() {
-            const response = await request.get('/ajax/messages/latest-timestamp').set(headers);
+            const response = await requestAdmin.get('/ajax/messages/latest-timestamp');
             expect(response.status).to.equal(200);
             // check timestamp?
         });
 
         it('deletes reply', async function() {
-            const response = await request.post('/messages/'+replyId+'/delete').set(headers).send();
+            const response = await requestAdmin.post('/messages/'+replyId+'/delete').send();
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/messages');
         });
 
         it('deletes message', async function() {
-            const response = await request.post(`/messages/${msgId}/delete`).set(headers).send();
+            const response = await requestAdmin.post(`/messages/${msgId}/delete`).send();
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/messages');
         });
 
         it('logs out', async function() {
-            const response = await request.get('/logout').set(headers);
+            const response = await requestAdmin.get('/logout');
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/');
         });

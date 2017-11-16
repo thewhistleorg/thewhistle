@@ -83,7 +83,7 @@
     "npm-check": "^5.5.0",
     "npm-check-updates": "^2.11.3",
     "stylelint": "^8.1.1",
-    "supertest": "^3.0.0"
+    "supertest": "https://github.com/mikec/supertest.git"
   },
   "@std/esm": {
     "esm": "js"

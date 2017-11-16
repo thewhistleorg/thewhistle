@@ -2,14 +2,11 @@
 /* Routes: test-cam/wwww (what-where-when-who).                                    C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import Koa    from 'koa';        // koa framework
 import Router from 'koa-router'; // router middleware for koa
 const router = new Router();
 
 import handlers from './handlers.js';
 
-
-const app = new Koa(); // report app
 
 router.get( '/:database/:project',           handlers.getIndex);
 router.get( '/:database/:project/warning',   handlers.getWarning);
@@ -25,8 +22,6 @@ router.post('/:database/:project/who',       handlers.postWho);
 router.get( '/:database/:project/submit',    handlers.getSubmit);
 router.post('/:database/:project/submit',    handlers.postSubmit);
 router.get( '/:database/:project/thank-you', ctx => ctx.render('thank-you'));
-
-app.use(router.routes());
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

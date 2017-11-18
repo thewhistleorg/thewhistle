@@ -186,8 +186,10 @@ describe('Admin app'+' ('+app.env+')', function() {
             const document = new jsdom.JSDOM(response.text).window.document;
             //expect(document.querySelector('title').textContent).to.match(/.*Activity.+/); home page is temporarily list of reports
             expect(document.querySelector('title').textContent).to.equal('Reports list');
-            // nav should be /, reports, analysis×2, users, resources, logout
-            expect(document.querySelectorAll('header nav li').length).to.equal(6);
+            // nav should be /, Reports, Users, Resources, Submit, user-name, Logout
+            expect(document.querySelectorAll('header nav > ul > li').length).to.equal(7);
+            // 'Submit' menu should have 'test-grn/sexual-assault (internal)' entry
+            expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('test-grn/sexual-assault (internal)');
         });
     });
 

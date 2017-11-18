@@ -14,6 +14,13 @@
         <li class="pure-menu-item"><a href="/users" class="pure-menu-link">Users</a></li>
         <li class="pure-menu-item"><a href="/resources" class="pure-menu-link">Resources</a></li>
         {{/if}}
+        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover"><a href="#" class="pure-menu-link">Submit</a>
+            <ul class="pure-menu-children">
+                {{#each @koa.state.user.projects}}
+                <li class="pure-menu-item"><a href="{{this}}" class="pure-menu-link">{{@key}}</a></li>
+                {{/each}}
+            </ul>
+        </li>
     </ul>
     <ul class="pure-menu-list float-right">
       <!-- TODO: add username here -->

@@ -122,7 +122,7 @@ class Handlers {
 
         const prettyReport = prettifyReport(ctx.session.report);
         const formattedAddress = ctx.session.geocode ? ctx.session.geocode.formattedAddress : '[unrecognised address]';
-        const files = ctx.session.report.files.map(f => f.name).join(', ');
+        const files = ctx.session.report.files ? ctx.session.report.files.map(f => f.name).join(', ') : null;
         const context = {
             reportHtml:       jsObjectToHtml.usingTable(prettyReport),
             formattedAddress: formattedAddress,
@@ -138,7 +138,7 @@ class Handlers {
      */
     static async postSubmit(ctx) {
         if (!ctx.session.report) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
-        if (ctx.request.body['nav-prev'] == 'prev') { ctx.redirect(nPages); return; }
+        if (ctx.request.body['nav-prev'] == 'prev') { ctx.redirect(ctx.session.completed); return; }
 
         // record this report
         delete ctx.request.body['submit'];
@@ -162,7 +162,8 @@ class Handlers {
 
         const prettyReport = prettifyReport(ctx.session.report);
 
-        const id = await Report.insert(ctx.params.database, undefined, name, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.session.geocode, ctx.headers['user-agent']);
+        const by = ctx.state.user ? ctx.state.user.id : null;
+        const id = await Report.insert(ctx.params.database, by, name, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.session.geocode, ctx.headers['user-agent']);
         ctx.set('X-Insert-Id', id); // for integration tests
 
         // record user-agent

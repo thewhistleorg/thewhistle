@@ -49,7 +49,7 @@ class LoginHandlers {
 
         // delete the cookie holding the JSON Web Token
         ctx.cookies.set('koa:jwt', null, { signed: true, domain: domain });
-        ctx.cookies.set('koa:jwt', null, { signed: true, domain: 'admin.'+domain }); // TODO: tmp for transition period
+        ctx.cookies.set('koa:jwt', null, { signed: true }); // TODO: tmp for transition period
         ctx.redirect('/');
     }
 
@@ -144,8 +144,15 @@ class LoginHandlers {
 
         ctx.cookies.set('koa:jwt', token, options);
 
-        // if we were provided with a redirect URL after the /login, redirect there, otherwise /
-        ctx.redirect(ctx.url=='/login' ? '/' : ctx.url.replace('/login', ''));
+        // if we were provided with a redirect URL after the /login, redirect there, otherwise to /
+        const href = ctx.url=='/login' ? '/' : ctx.url.replace('/login', '');
+        if (href.match(/^\/-\//)) {
+            // kludgy trick for paralegal single-page reporting login: if href starts /-/, redir to report. subdomain
+            const hrefReport = `${ctx.request.protocol}://${ctx.request.host.replace('admin', 'report')}${href.replace('/-', '')}`;
+            ctx.redirect(hrefReport);
+            return;
+        }
+        ctx.redirect(href);
     }
 
 

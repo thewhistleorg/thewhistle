@@ -785,11 +785,12 @@ class ReportsHandlers {
 
         const y = 1000*60*60*24*365;
         const desc = report.submitted['Description'] || report.submitted['brief-description']; // TODO: transition code until all early test report are deleted
+        const reportedBy = report.by ? await User.get(report.by) : '';
         const extra = {
             reportedOnDay:    dateFormat(report.reported, 'd mmm yyyy'),
             reportedOnFull:   dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
             reportedOnTz:     dateFormat(report.reported, 'Z'),
-            reportedBy:       report.by ? '@'+(await User.get(report.by)).username : report.name,
+            reportedBy:       report.by ? `${report.name} / @${reportedBy.username}` : report.name,
             reportHtml:       jsObjectToHtml.usingHeading(report.submitted, [ 'Anonymous id','files' ], 'h3'),
             geocodeHtml:      jsObjectToHtml.usingTable(report.geocode),
             formattedAddress: encodeURIComponent(report.geocode.formattedAddress),

@@ -197,6 +197,16 @@ router.get('/', async function indexPage(ctx) {
 });
 
 
+// logout page - replicates admin logout, but simpler to have it here than to redirect to admin.
+router.get('/logout', async function logout(ctx) {
+    const domain = ctx.request.hostname.replace('report.', '');
+
+    // delete the cookie holding the JSON Web Token
+    ctx.cookies.set('koa:jwt', null, { signed: true, domain: domain });
+    ctx.redirect('/');
+});
+
+
 // TODO: why doesn't router.all('/:database/:project', '/:database/:project/:page', ...) work?
 router.all('/:database/:project', async function composeDatabaseProject(ctx) {
     try {

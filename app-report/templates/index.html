@@ -12,10 +12,16 @@
 
 <header>
     <nav class="pure-menu pure-menu-horizontal">
-        <ul class="pure-menu-list">
+        <ul class="pure-menu-list {{#unless @koa.state.user}}block{{/unless}}">
             <li class="pure-menu-item">The Whistle Incident Reporting</li>
             <li class="pure-menu-item"><img alt="powered by the Whistle" src="/img/powered-by-the-whistle-horiz-white-180x20.png" height="20" width="180"></li>
         </ul>
+        {{#if @koa.state.user}}
+        <ul class="pure-menu-list float-right">
+            <li class="pure-menu-item">{{@koa.state.user.name}}</li>
+            <li class="pure-menu-item"><a href="/logout" class="pure-menu-link">Logout</a></li>
+        </ul>
+        {{/if}}
     </nav>
 </header>
 

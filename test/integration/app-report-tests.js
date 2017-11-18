@@ -312,7 +312,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(tds[7].textContent).to.equal('testy terrain');
         });
 
-        it('submits review/submit page', async function() {
+        it('submits report', async function() {
             const values = { 'submit': 'submit' };
             const response = await request.post('/test-grn/sexual-assault/submit').send(values);
             expect(response.status).to.equal(302);
@@ -331,17 +331,15 @@ describe('Report app'+' ('+app.env+')', function() {
     });
 
     describe('submitted report in admin app', function() {
-        const requestAdmin = supertest.agent(app.listen()).host('admin.localhost');
-
         it('redirects to /reports on login', async function() {
             const values = { username: testuser, password: testpass };
-            const response = await requestAdmin.post('/login/reports').send(values);
+            const response = await request.host('admin.localhost').post('/login/reports').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
         });
 
         it('sees new report with nicely formatted information', async function() {
-            const response = await requestAdmin.get(`/reports/${reportId}`);
+            const response = await request.host('admin.localhost').get(`/reports/${reportId}`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             const reportInfo = document.querySelector('div.js-obj-to-html');
@@ -365,13 +363,161 @@ describe('Report app'+' ('+app.env+')', function() {
         });
 
         it('deletes submitted incident report', async function() {
-            const response = await requestAdmin.post(`/reports/${reportId}/delete`).send();
+            const response = await request.host('admin.localhost').post(`/reports/${reportId}/delete`).send();
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
         });
 
         it('logs out', async function() {
-            const response = await requestAdmin.get('/logout');
+            const response = await request.host('report.localhost').get('/logout');
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/');
+        });
+    });
+
+    describe('single page report submission', function() {
+        const report = '/test-grn/sexual-assault/internal';
+        it('redirects to login page when not logged-in', async function() {
+            const response = await request.get(report);
+            expect(response.status).to.equal(302);
+            // note redirect has full url as it is changing subdomains
+            expect(response.headers.location.slice(-report.length-8)).to.equal('/login/-'+report);
+        });
+
+        it('logs in', async function() {
+            request.host('admin.localhost');
+            const values = { username: testuser, password: testpass };
+            const response = await request.post('/login/-'+report).send(values);
+            expect(response.status).to.equal(302);
+            // note redirect has full url as it is changing subdomains
+            expect(response.headers.location.slice(-report.length)).to.equal(report);
+        });
+        it('shows logged in user on login page when logged-in', async function() {
+            const response = await request.get('/login');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('#name').textContent).to.equal('tester');
+            expect(document.querySelector('#db').textContent).to.equal('test-grn');
+        });
+
+        it('sees report submission page', async function() {
+            request.host('report.localhost');
+            const response = await request.get(report);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('title').textContent).to.equal('The Whistle / Global Rights Nigeria Incident Report');
+        });
+
+        it('posts report details', async function() {
+            const values = {
+                'on-behalf-of':               'myself',
+                'when':                       'date',
+                'date.day':                   dateFormat('d'),
+                'date.month':                 dateFormat('mmm'),
+                'date.year':                  dateFormat('yyyy'),
+                'date.hour':                  '',
+                'date.minute':                '',
+                'within-options':             '',
+                'still-happening':            'n',
+                'description':                'Single-page submission test',
+                'where':                      'at',
+                'at-address':                 'University of Lagos',
+                'who-relationship':           '',
+                'who':                        'n',
+                'who-description':            'A death eater',
+                'action-taken-other-details': '',
+                'existing-name':              '',
+                'used-before':                'n',
+                'generated-name':             'testy terrain',
+                'nav-next':                   'next',
+            };
+            const response = await request.post(report).send(values);
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/test-grn/sexual-assault/submit');
+        });
+
+        it('sees report confirmation page', async function() {
+            const response = await request.get('/test-grn/sexual-assault/submit'); // note no 'internal'
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal('Check before you send the report');
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Send the report');
+
+            const reportInfo = document.querySelector('table.js-obj-to-html');
+            const ths = reportInfo.querySelectorAll('th');
+            const tds = reportInfo.querySelectorAll('td');
+            expect(ths[0].textContent).to.equal('On behalf of');
+            expect(tds[0].textContent).to.equal('myself');
+            expect(ths[1].textContent).to.equal('Date');
+            expect(tds[1].textContent).to.equal(dateFormat('d mmm yyyy')+' 00:00');
+            expect(ths[2].textContent).to.equal('Still happening');
+            expect(tds[2].textContent).to.equal('no');
+            expect(ths[3].textContent).to.equal('Description');
+            expect(tds[3].textContent).to.equal('Single-page submission test');
+            expect(ths[4].textContent).to.equal('Where');
+            expect(tds[4].textContent).to.equal('University of Lagos');
+            expect(ths[5].textContent).to.equal('Who');
+            expect(tds[5].textContent).to.equal('Not known: A death eater');
+            expect(ths[6].textContent).to.equal('Action taken');
+            expect(tds[6].textContent).to.equal('—');
+            expect(ths[7].textContent).to.equal('Generated name');
+            expect(tds[7].textContent).to.equal('testy terrain');
+        });
+
+
+        it('submits report', async function() {
+            const values = { 'submit': 'submit' };
+            const response = await request.post('/test-grn/sexual-assault/submit').send(values);
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/test-grn/sexual-assault/whatnext');
+            reportId = response.headers['x-insert-id'];
+            console.info('report id', reportId);
+        });
+
+        it('sees whatnext page', async function() {
+            const responseGet = await request.get('/test-grn/sexual-assault/whatnext');
+            expect(responseGet.status).to.equal(200);
+            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
+            expect(document.querySelectorAll('tr')).to.have.lengthOf(39); // local resources
+        });
+
+    });
+
+    describe('single page report in admin app', function() {
+        it('sees new report with nicely formatted information', async function() {
+            const response = await request.host('admin.localhost').get(`/reports/${reportId}`);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const reportInfo = document.querySelector('div.js-obj-to-html');
+            const h3s = reportInfo.querySelectorAll('h3');
+            expect(h3s[0].textContent).to.equal('On behalf of');
+            expect(h3s[0].nextSibling.textContent).to.equal('myself');
+            expect(h3s[1].textContent).to.equal('Date');
+            expect(h3s[1].nextSibling.textContent).to.equal(dateFormat('d mmm yyyy')+' 00:00');
+            expect(h3s[2].textContent).to.equal('Still happening');
+            expect(h3s[2].nextSibling.textContent).to.equal('no');
+            expect(h3s[3].textContent).to.equal('Description');
+            expect(h3s[3].nextSibling.textContent).to.equal('Single-page submission test');
+            expect(h3s[4].textContent).to.equal('Where');
+            expect(h3s[4].nextSibling.textContent).to.equal('University of Lagos');
+            expect(h3s[5].textContent).to.equal('Who');
+            expect(h3s[5].nextSibling.textContent).to.equal('Not known: A death eater');
+            expect(h3s[6].textContent).to.equal('Action taken');
+            expect(h3s[6].nextSibling.textContent).to.equal('—');
+            expect(h3s[7].textContent).to.equal('Generated name');
+            expect(h3s[7].nextSibling.textContent).to.equal('testy terrain');
+        });
+
+
+        it('deletes submitted incident report', async function() {
+            const response = await request.host('admin.localhost').post(`/reports/${reportId}/delete`).send();
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/reports');
+        });
+
+        it('logs out', async function() {
+            const response = await request.host('report.localhost').get('/logout');
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/');
         });

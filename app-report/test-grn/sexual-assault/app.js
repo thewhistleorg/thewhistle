@@ -19,6 +19,7 @@ import handlebars from 'koa-handlebars'; // handlebars templating
 
 import HandlebarsHelpers from '../../../lib/handlebars-helpers.js';
 import ReportMiddleware  from '../../middleware.js';
+import WhistleMiddleware from '../../../lib/middleware.js';
 
 const app = new Koa(); // report app
 
@@ -35,8 +36,27 @@ app.use(handlebars({
     helpers:       { selected: HandlebarsHelpers.selected, checked: HandlebarsHelpers.checked },
 }));
 
-import routes from './routes.js'
+import routes         from './routes.js'
+import routesLoggedIn from './routes-logged-in.js'
+
+app.use(WhistleMiddleware.verifyJwt()); // if user is logged in, make sure they are set up before index, submit
+
 app.use(routes); // routes/handlers are specific to this database/project)
+
+// verify user is signed in...
+app.use(async function isSignedIn(ctx, next) {
+    if (ctx.state.user) {
+        await next();
+    } else {
+        // authentication failed: redirect to login page
+        ctx.flash = { loginfailmsg: 'Session expired: please sign in again' };
+        const href = `${ctx.request.protocol}://${ctx.request.host.replace('report', 'admin')}/login/-${ctx.url}`;
+        ctx.redirect(href);
+    }
+});
+// ... as subsequent routes are for staff/paralegal submissions & require authentication
+app.use(routesLoggedIn);
+
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 

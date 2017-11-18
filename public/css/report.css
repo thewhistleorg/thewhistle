@@ -20,7 +20,6 @@ h1 {
     margin: 0 0 0.75em;
 }
 
-a            { color: #033549; }
 a, a:visited { color: #033549; }
 a.grey       { color: #999999; }
 
@@ -267,10 +266,13 @@ label.inline {
     }
 }
 
-header .pure-menu-horizontal ul.pure-menu-list {
+header .pure-menu-horizontal ul.pure-menu-list.block {
     /* max-width is 40em so that the header appears the same width as the body, which is defined as
      * max-width 48em; the difference is something to do with the ratio between the two font sizes. */
     max-width: 40em;
     margin: 0 auto;
     display: block;
+}
+header .pure-menu-item a, header .pure-menu-item a.visited {
+    color: #ffffff;
 }

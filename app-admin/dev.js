@@ -36,8 +36,8 @@ class Dev {
         // access logging uses capped collection log-access (size: 1000×1e3, max: 1000)
         const log = global.db.users.collection('log-access');
 
-        // lookup any IP addresses we don't already have (in background) - except when testing
-        if (ctx.header.referer != 'mocha') await Dev.ipLookup('log-access');
+        // lookup any IP addresses we don't already have (in background)
+        if (ctx.app.env != 'development') await Dev.ipLookup('log-access');
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 
@@ -60,7 +60,8 @@ class Dev {
             .filter(e => ctx.query.from ? e._id.getTimestamp() >= new Date(ctx.query.from) : true)
             .filter(e => ctx.query.to ? e._id.getTimestamp() <= toFilter : true)
             .filter(e => ctx.query.app ? RegExp('^'+ctx.query.app).test(e.host) : true)
-            .filter(e => ctx.query.organisation ? e.db==ctx.query.organisation : true)
+            .filter(e => ctx.query.organisation ? ctx.query.organisation=='-' ? e.db==undefined : e.db==ctx.query.organisation : true)
+            .filter(e => ctx.query.user ? ctx.query.user=='-' ? e.user==undefined : e.user==ctx.query.user : true)
             .filter(e => ctx.query.time ? e.ms > ctx.query.time : true)
             .filter(e => ctx.query.status ? e.status==ctx.query.status : true);
 
@@ -144,8 +145,8 @@ class Dev {
         // error logging uses capped collection log-error (size: 1000×4e3, max: 1000)
         const log = global.db.users.collection('log-error');
 
-        // lookup any IP addresses we don't already have (in background) - except when testing
-        if (ctx.header.referer != 'mocha') await Dev.ipLookup('log-error');
+        // lookup any IP addresses we don't already have (in background)
+        if (ctx.app.env != 'development') await Dev.ipLookup('log-error');
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 
@@ -167,7 +168,8 @@ class Dev {
         const entriesFiltered = entriesAll
             .filter(e => ctx.query.from ? e._id.getTimestamp() >= new Date(ctx.query.from) : true)
             .filter(e => ctx.query.to ? e._id.getTimestamp() <= toFilter : true)
-            .filter(e => ctx.query.organisation ? e.db==ctx.query.organisation : true)
+            .filter(e => ctx.query.organisation ? ctx.query.organisation=='-' ? e.db==undefined : e.db==ctx.query.organisation : true)
+            .filter(e => ctx.query.user ? ctx.query.user=='-' ? e.user==undefined : e.user==ctx.query.user : true)
             .filter(e => ctx.query.status ? e.status==ctx.query.status : true);
 
         // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log

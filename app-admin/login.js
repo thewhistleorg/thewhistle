@@ -48,7 +48,8 @@ class LoginHandlers {
         const domain = ctx.request.hostname.replace('admin.', '');
 
         // delete the cookie holding the JSON Web Token
-        ctx.cookies.set('koa:jwt', null, { signed: true, domain: domain });
+        const options = { signed: true, domain: domain };
+        ctx.cookies.set('koa:jwt', null, options);
         ctx.cookies.set('koa:jwt', null, { signed: true }); // TODO: tmp for transition period
         ctx.redirect('/');
     }

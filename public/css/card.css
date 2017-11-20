@@ -16,11 +16,6 @@ ul.card-list .card-header {
     border-bottom: 2px solid #f0f3f4;
 }
 
-ul.card-list table {
-    padding: 5px 10px;
-    display: block;
-}
-
 /*
 ul.card-list li:last-child:not(:nth-child(even)) {
     width: 95.5%;

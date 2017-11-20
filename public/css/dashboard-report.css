@@ -210,19 +210,49 @@ textarea {
     max-height: 80px;
 }
 
-/* for js-object-to-html */
+#files table {
+    margin: 15px;
+}
+
+/* js-object-to-html 'heading' version */
 
 .js-obj-to-html h3 {
     margin: 0;
     font-weight: lighter;
     color: #6c949e;
 }
-
 .js-obj-to-html p {
     margin: 0 0 15px;
     padding-bottom: 4px;
     font-size: 1.2em;
     border-bottom: 1px solid #f0f3f4;
+    color: #333333;
+}
+
+/* js-object-to-html 'table' version */
+
+.js-obj-to-html {
+    width: 100%;
+}
+.js-obj-to-html th {
+    color: #52727a;
+    font-size: 1.2em;
+    font-weight: lighter;
+    font-style: normal;
+    padding: 8px 8px 8px 0;
+    margin: 0;
+    border-bottom: 1px solid #f0f3f4;
+    width: 1%;
+    white-space: nowrap;
+}
+.js-obj-to-html td {
+    font-size: 1.2em;
+    padding: 8px 8px 8px 0;
+    border-bottom: 1px solid #f0f3f4;
+}
+
+#submitted p {
+    color: #52727a;
 }
 
 /* enable scroll; */

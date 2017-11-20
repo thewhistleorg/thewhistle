@@ -791,7 +791,7 @@ class ReportsHandlers {
             reportedOnFull:   dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
             reportedOnTz:     dateFormat(report.reported, 'Z'),
             reportedBy:       report.by ? `${report.name} / @${reportedBy.username}` : report.name,
-            reportHtml:       jsObjectToHtml.usingHeading(report.submitted, [ 'Anonymous id','files' ], 'h3'),
+            reportHtml:       jsObjectToHtml.usingTable(report.submitted, [ 'Anonymous id','files' ], 'h3'),
             geocodeHtml:      jsObjectToHtml.usingTable(report.geocode),
             formattedAddress: encodeURIComponent(report.geocode.formattedAddress),
             lat:              report.geocode.latitude  ? report.geocode.latitude  : 0,

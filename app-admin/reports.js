@@ -75,6 +75,7 @@ class ReportsHandlers {
             }
 
             const desc = rpt.submitted['Description'] || rpt.submitted['brief-description']; // TODO: transition code until all early test report are deleted
+            const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
             const fields = {
                 _id:              rpt._id,
                 updatedOn:        lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
@@ -82,7 +83,7 @@ class ReportsHandlers {
                 updatedAge:       lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
                 updatedAgo:       lastUpdate.on ? ago(lastUpdate.on) : '',
                 updatedBy:        lastUpdate.by,
-                assignedTo:       rpt.assignedTo ? users.get(rpt.assignedTo.toString()).username : '',
+                assignedTo:       assignedTo ? assignedTo.username : '',
                 status:           rpt.status || '', // ensure status is string
                 summary:          rpt.summary || `<span title="submitted description">${desc}</span>`,
                 submittedDesc:    truncate(desc,140)|| `<i title="submitted description" class="grey">No Description</i>`,
@@ -182,12 +183,13 @@ class ReportsHandlers {
         for (const rpt of rpts) {
             if (!rpt.geocode) continue;
             if (Object.keys(rpt.geocode).length == 0) continue;
+            const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
             const fields = {
                 _id:        rpt._id,
                 summary:    rpt.summary || '', // ensure summary is string
                 lat:        rpt.geocode.latitude || NaN,
                 lon:        rpt.geocode.longitude || NaN,
-                assignedTo: rpt.assignedTo ? users.get(rpt.assignedTo.toString()).username : '—',
+                assignedTo: assignedTo ? assignedTo.username : '—',
                 status:     rpt.status || '', // ensure status is string
                 date:       dateFormat(rpt._id.getTimestamp(), 'd mmm yyyy'),
                 highlight:  Math.round(100 * (rpt._id.getTimestamp() - new Date() + y) / y),
@@ -253,10 +255,11 @@ class ReportsHandlers {
         const reports = [];
         for (const rpt of rpts) {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
+            const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
             const fields = {
                 updatedOn:    lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
                 updatedBy:    lastUpdate.by,
-                assignedTo:   rpt.assignedTo ? users.get(rpt.assignedTo.toString()).username : '', // replace 'assignedTo' ObjectId with username
+                assignedTo:   assignedTo ? assignedTo.username : '', // replace 'assignedTo' ObjectId with username
                 status:       rpt.status,
                 summary:      rpt.summary,
                 tags:         rpt.tags.join(', '),
@@ -317,13 +320,14 @@ class ReportsHandlers {
                 comment.onTime = dateFormat(comment.on, 'HH:MM');
                 comment.comment = comment.comment ? MarkdownIt().render(comment.comment) : null;
             }
+            const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
             const fields = {
                 _id:           rpt._id,
                 reportHtml:    jsObjectToHtml.usingTable(rpt.submitted),
                 updatedDate:   lastUpdate.on ? dateFormat(lastUpdate.on, 'd mmm yyyy') : '—',
                 updatedTime:   lastUpdate.on ? dateFormat(lastUpdate.on, 'HH:MM') : '',
                 updatedBy:     lastUpdate.by ? '@'+lastUpdate.by : '',
-                assignedTo:    rpt.assignedTo ? '@'+users.get(rpt.assignedTo.toString()).username : '—', // replace 'assignedTo' ObjectId with username
+                assignedTo:    assignedTo ? assignedTo.username : '—', // replace 'assignedTo' ObjectId with username
                 status:        rpt.status,
                 summary:       rpt.summary,
                 summaryQuoted: rpt.summary ? `‘${rpt.summary}’` : '',
@@ -428,13 +432,14 @@ class ReportsHandlers {
             comment.onTime = dateFormat(comment.on, 'HH:MM');
             comment.comment = comment.comment ? MarkdownIt().render(comment.comment) : null;
         }
+        const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
         const fields = { // as per exportPdf()
             _id:           rpt._id,
             reportHtml:    jsObjectToHtml.usingTable(rpt.submitted),
             updatedDate:   lastUpdate.on ? dateFormat(lastUpdate.on, 'd mmm yyyy') : '—',
             updatedTime:   lastUpdate.on ? dateFormat(lastUpdate.on, 'HH:MM') : '',
             updatedBy:     lastUpdate.by ? '@'+lastUpdate.by : '',
-            assignedTo:    rpt.assignedTo ? '@'+users.get(rpt.assignedTo.toString()).username : '—', // replace 'assignedTo' ObjectId with username
+            assignedTo:    assignedTo ? assignedTo.username : '—', // replace 'assignedTo' ObjectId with username
             status:        rpt.status,
             summaryQuoted: rpt.summary ? `‘${rpt.summary}’` : '',
             tags:          rpt.tags,

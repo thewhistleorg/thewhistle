@@ -111,11 +111,13 @@ class LoginHandlers {
         // if we don't have db connection for this user's (current) db, get it now (qv app.admin.js)
         // (these will remain in global for entire app, this doesn't happen per request)
         if (!global.db[db]) {
+            const connectionString = process.env[`DB_${db.toUpperCase().replace('-', '_')}`];
             try {
-                const connectionString = process.env[`DB_${db.toUpperCase().replace('-', '_')}`];
                 global.db[db] = await MongoClient.connect(connectionString);
             } catch (e) {
-                const loginfailmsg = `Invalid database credentials for ‘${db}’`;
+                const loginfailmsg = connectionString
+                    ? `Invalid database credentials for ‘${db}’` // rejected credentials
+                    : `No database credentials for ‘${db}’`;     // connection string missing!
                 ctx.flash = { formdata: body, loginfailmsg: loginfailmsg };
                 ctx.redirect(ctx.url);
                 return;

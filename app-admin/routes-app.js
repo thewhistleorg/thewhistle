@@ -135,6 +135,7 @@ import users from './users.js';
 
 router.get('/users',             users.list);            // render list users page
 router.get('/users/add',         users.add);             // render add user page
+router.get('/users/:id',         users.view);            // render view user details page
 router.get('/users/:id/edit',    users.edit);            // render edit user page
 
 router.post('/users/add',        users.processAdd);      // process add user

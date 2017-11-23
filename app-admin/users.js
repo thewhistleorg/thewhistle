@@ -8,7 +8,10 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+
 import User   from '../models/user.js';
+import Report from '../models/report.js';
 
 /*
  * Note on roles:
@@ -65,7 +68,7 @@ class UsersHandlers {
 
 
     /**
-     * GET /users/edit - Render edit user page.
+     * GET /users/:id/edit - Render edit user page.
      */
     static async edit(ctx) {
         const isAdminUser = ctx.state.user.roles.includes('admin');
@@ -74,7 +77,11 @@ class UsersHandlers {
             ctx.redirect('/login');
         }
 
+        if (!ctx.params.id.match(/^[0-9a-f]{24}$/i)) ctx.throw(404, 'User not found');
+
         const user = await User.get(ctx.params.id);
+
+        if (!user) ctx.throw(404, 'User not found');
 
         const isSuUser = ctx.state.user.roles.includes('su') ? 'show' : 'hide';
         const context = {
@@ -83,6 +90,48 @@ class UsersHandlers {
         };
 
         await ctx.render('users-edit', Object.assign(user, context, ctx.flash.formdata));
+    }
+
+
+    /**
+     * GET /users/:id - Render view user details page (based on either user-id or user-name).
+     *
+     * This may or may not in time be superseded by the user's home/dashboard page, but in the
+     * meantime serves as a summary of user details, and a destination from the @mentions in
+     * comments.
+     */
+    static async view(ctx) {
+        const db = ctx.state.user.db;
+
+        let user = null;
+
+        if (ctx.params.id.match(/^[0-9a-f]{24}$/i)) {
+            user = await User.get(ctx.params.id);
+        }
+
+        if (!user) {
+            // try getting user by username instead of id
+            [user] = await User.getBy('username', ctx.params.id);
+        }
+
+        if (!user) ctx.throw(404, 'User not found');
+
+        const reports = await Report.find(db, { assignedTo: user._id, archived: false });
+
+        for (const report of reports) {
+            report.reportedOn = dateFormat(report._id.getTimestamp(), 'd mmm yyyy HH:MM');
+            report.reportedThrough = report.by ? (await User.get(report.by)).username : '';
+            const desc = report.submitted.Description || '';
+            report.desc = desc.length>36 ? desc.slice(0, 36)+'…' : desc;
+        }
+
+        reports.sort((a, b) => a._id > b._id); // sort by date submitted ascending
+
+        const context = Object.assign({}, user, {
+            db:      db,
+            reports: reports,
+        });
+        await ctx.render('users-view', context);
     }
 
 

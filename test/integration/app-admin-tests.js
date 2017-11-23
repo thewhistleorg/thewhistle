@@ -586,6 +586,16 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(document.getElementById(userId).querySelector('td').textContent).to.equal('Test');
         });
 
+        it('returns 404 for edit user page with invalid id', async function() {
+            const response = await request.get('/users/xxxx/edit');
+            expect(response.status).to.equal(404);
+        });
+
+        it('returns 404 for edit user page with unrecognised id', async function() {
+            const response = await request.get('/users/1234567890abcdef12345678/edit');
+            expect(response.status).to.equal(404);
+        });
+
         it('gets edit user page', async function() {
             const response = await request.get('/users/'+userId+'/edit');
             expect(response.status).to.equal(200);
@@ -605,6 +615,30 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('input').value).to.equal('Test-bis');
+        });
+
+        it('gets view user page (by id)', async function() {
+            const response = await request.get('/users/'+userId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal('Test-bis User (@test)');
+        });
+
+        it('gets view user page (by username)', async function() {
+            const response = await request.get('/users/test');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal('Test-bis User (@test)');
+        });
+
+        it('returns 404 for view user page with unrecognised username', async function() {
+            const response = await request.get('/users/abcdef');
+            expect(response.status).to.equal(404);
+        });
+
+        it('returns 404 for view user page with invalid user-id', async function() {
+            const response = await request.get('/users/1234567890abcdef12345678');
+            expect(response.status).to.equal(404);
         });
 
         it('deletes test user', async function() {

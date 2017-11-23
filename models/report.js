@@ -507,8 +507,9 @@ class Report {
     /**
      * Add comment to report.
      *
-     * This could currently be achieved with Report.update(), but will probably involve more
-     * processing in future. It also mirrors Report.deleteComment().
+     * @mentions get converted to markdown links with the userid as the target; eg '@chris' will be
+     * converted to something like '[@chris](591d91d204815c13b2211420). This ties down the username
+     * to the specific user who has that username at that time.
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report id.
@@ -520,11 +521,17 @@ class Report {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
-        userId = objectId(userId); // allow id as string
+        userId = objectId(userId); // allow userId as string
+
+        // convert @mentions to pseudo-links with user id as target
+        const users = await User.getAll();
+        for (const user of users) {
+            comment = comment.replace('@'+user.username, `[@${user.username}](${user._id})`);
+        }
 
         const reports = global.db[db].collection('reports');
         const user = await User.get(userId);
-        const values = { byId: userId, byName: user.username, on: new Date(), comment }
+        const values = { byId: userId, byName: user.username, on: new Date(), comment };
         await reports.updateOne({ _id: id }, { $push: { comments: values } });
 
         await Update.insert(db, id, userId, { push: { comments: comment } }); // audit trail

@@ -764,10 +764,15 @@ class ReportsHandlers {
         const comments = report.comments.map(c => {
             if (!c.comment) return; // shouldn't happen, but...
 
-            // make links for #tags and @mentions
+            // make links for #tags...
             let comment = c.comment;
-            for (const user of users) comment = comment.replace('@'+user.username, `[@${user.username}](/users/${user.username})`);
             for (const tag of tagList) comment = comment.replace('#'+tag, `[#${tag}](/reports?tag=${tag})`);
+            // ... and convert stored [@mention](id) references to actual links
+            const reMention = /\[@([a-z0-9]+)\]\(([0-9a-f]{24})\)/;
+            comment = comment.replace(reMention, '[@$1](/users/$2)');
+            // (note there is a certain inconsistency here, as non-existent #tags will not be made into
+            // links, but invalid @mentions will be turned into 404 links; this is probably the most
+            // valid affordance, in fact)
 
             // use appropriate date format for today, this year, older
             let format = 'd mmm yyyy';
@@ -1012,30 +1017,30 @@ class ReportsHandlers {
 
         if (!ctx.request.body.comment) { ctx.status = 403; return; } // Forbidden
 
-        try {
-            const comment = await Report.insertComment(db, ctx.params.report, ctx.request.body.comment, ctx.state.user.id);
+        const comment = await Report.insertComment(db, ctx.params.report, ctx.request.body.comment, ctx.state.user.id);
 
-            // for returned comment, make links for #tags and @mentions
-            const users = await User.getAll();
-            const tagList = await Report.tags(db);
-            for (const user of users) comment.comment = comment.comment.replace('@'+user.username, `[@${user.username}](/users/${user.username})`);
-            for (const tag of tagList) comment.comment = comment.comment.replace('#'+tag, `[#${tag}](/reports?tag=${tag})`);
+        // for returned comment, make links for #tags...
+        const tagList = await Report.tags(db);
+        for (const tag of tagList) comment.comment = comment.comment.replace('#'+tag, `[#${tag}](/reports?tag=${tag})`);
+        // ... and convert stored [@mention](id) references to actual links
+        const reMention = /\[@([a-z0-9]+)\]\(([0-9a-f]{24})\)/;
+        comment.comment = comment.comment.replace(reMention, '[@$1](/users/$2)');
+        // (note there is a certain inconsistency here, as non-existent #tags will not be made into
+        // links, but invalid @mentions will be turned into 404 links; this is probably the most
+        // valid affordance, in fact)
 
-            const body = {
-                id:       ctx.request.body.userid + '-' + comment.on.valueOf().toString(36), // commentary id = user id + timestamp
-                byId:     ctx.request.body.userid,
-                byName:   ctx.request.body.username,
-                on:       comment.on.toISOString(),
-                onPretty: dateFormat(comment.on, 'HH:MM'),
-                onFull:   dateFormat(comment.on, 'd mmm yyyy, HH:MM Z'),
-                comment:  MarkdownIt().render(comment.comment), // render any markdown formatting
-            };
-            ctx.status = 201;
-            ctx.body = body;
-        } catch (e) {
-            ctx.status = 500;
-            ctx.body = { message: e.message };
-        }
+        const body = {
+            id:       ctx.request.body.userid + '-' + comment.on.valueOf().toString(36), // commentary id = user id + timestamp
+            byId:     ctx.request.body.userid,
+            byName:   ctx.request.body.username,
+            on:       comment.on.toISOString(),
+            onPretty: dateFormat(comment.on, 'HH:MM'),
+            onFull:   dateFormat(comment.on, 'd mmm yyyy, HH:MM Z'),
+            comment:  MarkdownIt().render(comment.comment), // render any markdown formatting
+        };
+        ctx.status = 201;
+        ctx.body = body;
+
         ctx.body.root = 'reports';
     }
 

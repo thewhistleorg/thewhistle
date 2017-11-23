@@ -470,17 +470,24 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('adds a comment', async function() {
-            const values = { comment: 'Testing testing 1-2-3', username: testUserDetails.username, userid: testUserDetails._id };
+            const values = {
+                comment:  'Testing testing 1-2-3 including references to @tester and #test',
+                username: testUserDetails.username,
+                userid:   testUserDetails._id,
+            };
             const response = await request.post(`/ajax/reports/${reportId}/comments`).send(values);
             expect(response.status).to.equal(201);
             commentId = response.body.id;
         });
 
-        it('sees comment in report page', async function() {
+        it('sees comment in report page, with @mention/#tag links', async function() {
             const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.getElementById(commentId).querySelectorAll('div')[1].textContent).to.equal('Testing testing 1-2-3\n');
+            const commentDiv = document.getElementById(commentId).querySelectorAll('div')[1];
+            expect(commentDiv.textContent).to.equal('Testing testing 1-2-3 including references to @tester and #test\n');
+            expect(commentDiv.querySelectorAll('a')[0].href).to.equal('/users/'+testUserDetails._id);
+            expect(commentDiv.querySelectorAll('a')[1].href).to.equal('/reports?tag=test');
         });
 
         it('edits comment', async function() {

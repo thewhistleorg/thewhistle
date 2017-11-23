@@ -138,7 +138,7 @@ function setupCommentaryListeners(reportId, username, userid) {
             const html = `<div class="comment" id="${body.id}">
                              <div class="by"><b><a href="/users/${username}">${username}</a></b> commented <a href="#${body.id}">${body.onPretty}</a>
                                <button class="float-right fa fa-times delete"></button>
-                               <button class="float-right fa fa-pencil edit">
+                               <button class="float-right fa fa-pencil edit"></button>
                              </div>
                              <div>${body.comment}</div>
                            </div>`;

@@ -785,7 +785,7 @@ class ReportsHandlers {
                 on:       c.on,
                 onPretty: dateFormat(c.on, format),
                 onFull:   dateFormat(c.on, 'd mmm yyyy, HH:MM Z'),
-                owner:    c.byId == ctx.state.user._id,
+                owner:    c.byId == ctx.state.user.id,
                 comment:  MarkdownIt().render(comment),
             };
         });

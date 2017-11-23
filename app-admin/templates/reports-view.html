@@ -233,7 +233,10 @@
                         {{#comments}}
                         <div class="comment" id="{{id}}">
                             <div class="by"><b><a href="/users/{{byName}}">{{byName}}</a></b> commented <a href="#{{id}}" title="{{onFull}}">{{onPretty}}</a>
-                                <button class="float-right fa fa-times delete"></button> {{#if owner}}<button class="float-right fa fa-pencil edit"></button>{{/if}}
+                                {{#if owner}}
+                                <button class="float-right fa fa-times delete"></button>
+                                <button class="float-right fa fa-pencil edit"></button>
+                                {{/if}}
                             </div>
                             <div>{{{comment}}}</div>
                         </div>

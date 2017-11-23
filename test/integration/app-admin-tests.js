@@ -484,10 +484,13 @@ describe('Admin app'+' ('+app.env+')', function() {
             const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
-            const commentDiv = document.getElementById(commentId).querySelectorAll('div')[1];
-            expect(commentDiv.textContent).to.equal('Testing testing 1-2-3 including references to @tester and #test\n');
-            expect(commentDiv.querySelectorAll('a')[0].href).to.equal('/users/'+testUserDetails._id);
-            expect(commentDiv.querySelectorAll('a')[1].href).to.equal('/reports?tag=test');
+            const commentDivs = document.getElementById(commentId).querySelectorAll('div');
+            expect(commentDivs[0].textContent.slice(0, 16)).to.equal('tester commented'); // don't bother testing time!
+            expect(commentDivs[0].querySelectorAll('button')[0].classList.contains('fa-times'));  // delete button
+            expect(commentDivs[0].querySelectorAll('button')[1].classList.contains('fa-pencil')); // edit button
+            expect(commentDivs[1].textContent).to.equal('Testing testing 1-2-3 including references to @tester and #test\n');
+            expect(commentDivs[1].querySelectorAll('a')[0].href).to.equal('/users/'+testUserDetails._id);
+            expect(commentDivs[1].querySelectorAll('a')[1].href).to.equal('/reports?tag=test');
         });
 
         it('edits comment', async function() {

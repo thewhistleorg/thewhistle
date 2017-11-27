@@ -187,7 +187,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             //expect(document.querySelector('title').textContent).to.match(/.*Activity.+/); home page is temporarily list of reports
             expect(document.querySelector('title').textContent).to.equal('Reports list');
             // nav should be /, Reports, Users, Resources, Submit, user-name, Logout
-            expect(document.querySelectorAll('header nav > ul > li').length).to.equal(7);
+            expect(document.querySelectorAll('header nav > ul > li').length).to.equal(8);
             // 'Submit' menu should have 'test-grn/sexual-assault (internal)' entry
             expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('test-grn/sexual-assault (internal)');
         });

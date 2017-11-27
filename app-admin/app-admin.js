@@ -105,6 +105,7 @@ const luscaCspTrustedCdns = [
     'fonts.googleapis.com',
     'fonts.gstatic.com',
     'cdnjs.cloudflare.com',
+    'cdn.jsdelivr.net',
     'unpkg.com',
     'maxcdn.bootstrapcdn.com',
     'developers.google.com',

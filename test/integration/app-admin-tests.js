@@ -493,8 +493,43 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(commentDivs[1].querySelectorAll('a')[1].href).to.equal('/reports?tag=test');
         });
 
+        it('sees add comment in report page audit trail', async function() {
+            const response = await request.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const comment = `Testing testing 1-2-3 including references to [@tester](${testUserDetails._id}) and #test`;
+            const matches = document.evaluate(`count(//td[text()="Add comment ‘${comment}’"])`, document, null, 0, null);
+            expect(matches.numberValue).to.equal(1);
+        });
+
         it('edits comment', async function() {
-            // TBC
+            const values = { comment: 'Updated test including references to @tester and #test'}
+            const response = await request.put(`/ajax/reports/${reportId}/comments/${commentId}`).send(values);
+            expect(response.status).to.equal(200);
+        });
+
+        it('sees updated comment in report page, with @mention/#tag links', async function() {
+            const response = await request.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const commentDivs = document.getElementById(commentId).querySelectorAll('div');
+            expect(commentDivs[0].textContent.slice(0, 16)).to.equal('tester commented'); // don't bother testing time!
+            expect(commentDivs[0].querySelectorAll('button')[0].classList.contains('fa-times'));  // delete button
+            expect(commentDivs[0].querySelectorAll('button')[1].classList.contains('fa-pencil')); // edit button
+            expect(commentDivs[1].textContent).to.equal('Updated test including references to @tester and #test\n');
+            expect(commentDivs[1].querySelectorAll('a')[0].href).to.equal('/users/'+testUserDetails._id);
+            expect(commentDivs[1].querySelectorAll('a')[1].href).to.equal('/reports?tag=test');
+        });
+
+        it('sees updated comment in report page audit trail', async function() {
+            const response = await request.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const [ , onBase36 ] = commentId.split('-');
+            const on = dateFormat(new Date(parseInt(onBase36, 36)), 'yyyy-mm-dd@HH:MM');
+            const comment = 'Updated test including references to @tester and #test';
+            const matches = document.evaluate(`count(//td[text()="Set comment-${on} to ‘${comment}’"])`, document, null, 0, null);
+            expect(matches.numberValue).to.equal(1);
         });
 
         it('downloads reports list as CSV', async function() {

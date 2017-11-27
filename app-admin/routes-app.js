@@ -58,6 +58,7 @@ router.get(   '/ajax/reports/within/:s,:w::n,:e',        reports.ajaxReportsWith
 router.post(  '/ajax/reports/:id/tags',                  reports.ajaxReportPostTag);
 router.delete('/ajax/reports/:id/tags/:tag',             reports.ajaxReportDeleteTag);
 router.post(  '/ajax/reports/:report/comments',          reports.ajaxReportPostComment);
+router.put(   '/ajax/reports/:report/comments/:comment', reports.ajaxReportPutComment);
 router.delete('/ajax/reports/:report/comments/:comment', reports.ajaxReportDeleteComment);
 router.delete('/ajax/reports/:id/updates',               reports.ajaxReportDeleteUpdates);
 

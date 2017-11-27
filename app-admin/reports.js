@@ -1046,6 +1046,24 @@ class ReportsHandlers {
 
 
     /**
+     * PUT /ajax/reports/:report/comments - Update comment.
+     */
+    static async ajaxReportPutComment(ctx) {
+        const db = ctx.state.user.db;
+        const [ by, onBase36 ] = ctx.params.comment.split('-');
+        const on = new Date(parseInt(onBase36, 36));
+
+        if (!ctx.request.body.comment) { ctx.status = 403; return; } // Forbidden
+
+        await Report.updateComment(db, ctx.params.report, ObjectId(by), on, ctx.request.body.comment, ctx.state.user.id);
+
+        ctx.status = 200;
+        ctx.body = { comment: ctx.request.body.comment };
+        ctx.body.root = 'reports';
+    }
+
+
+    /**
      * DELETE /ajax/reports/:report/comments/:comment - Delete comment from report.
      *
      * Comment is identified by id of user making comment, and timestamp of comment in base 36.
@@ -1055,14 +1073,10 @@ class ReportsHandlers {
         const [ by, onBase36 ] = ctx.params.comment.split('-');
         const on = new Date(parseInt(onBase36, 36));
 
-        try {
-            await Report.deleteComment(db, ctx.params.report, ObjectId(by), on, ctx.state.user.id);
-            ctx.status = 200;
-            ctx.body = {};
-        } catch (e) {
-            ctx.status = 500;
-            ctx.body = { message: e.message };
-        }
+        await Report.deleteComment(db, ctx.params.report, ObjectId(by), on, ctx.state.user.id);
+
+        ctx.status = 200;
+        ctx.body = {};
         ctx.body.root = 'reports';
     }
 

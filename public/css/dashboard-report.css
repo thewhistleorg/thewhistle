@@ -184,8 +184,15 @@ div.by button {
 }
 
 div.by button:hover {
-    color: #3992ab;
     cursor: pointer;
+}
+
+div.by button.edit:hover {
+    color: #3992ab;
+}
+
+div.by button.delete:hover {
+    color: #990000;
 }
 
 #div-add-comment {

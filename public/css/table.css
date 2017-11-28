@@ -1,64 +1,115 @@
-/* Custom table */
-
-/* override pure striped background */
+/*
+Custom table styles:
+Override purecss striped table style
+*/
 
 .custom-table tr:nth-child(2n-1) td {
-    /* background-color: #fafbfd; */
+  /* we might need this selector so not removing it*/
+  /* background-color: #fafbfd; */
 }
 
 table.custom-table {
-    border-color: #f0f3f4;
-    background: #ffffff;
+  border-color: #f0f3f4;
+  background: #ffffff;
 }
 
 table.custom-table td, table.custom-table th {
-    border-color: #f0f3f4;
-    /* border-left: 0; */
-    text-align: left;
+  border-color: #f0f3f4;
+  border-left: 1px dotted #cbcbcb;
+  text-align: left;
 }
 
 table.custom-table th {
-    color: #50addb;
-    font-style: normal;
-    font-weight: bold;
-    padding: 10px;
-    background-color: #fafbfd;
-    border-bottom: 1px solid #f0f3f4;
+  color: #777;
+  font-style: normal;
+  font-weight: bold;
+  padding: 10px;
+  background-color: #fafbfd;
+  border-bottom: 1px solid #f0f3f4;
 }
 
 table.custom-table td {
-    padding: 16px 8px;
-    vertical-align: middle;
-    border-bottom: 1px solid #f0f3f4;
+  padding: 10px 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f0f3f4;
 }
 
 table.custom-table th .fa {
-    margin: 4px -6px;
-    opacity: 0.2;
+  margin: 4px -6px;
+  opacity: 0.6;
 }
 
 .clickable-row tr:hover {
-    background-color: #fafbfd;
-    cursor: pointer;
+  background-color: #fafbfd;
+  cursor: pointer;
 }
 
-table.custom-table td.action, table.custom-table th.action { padding: 0; }
-td.action { min-width: 0; }
+table.custom-table td.action, table.custom-table th.action {
+  padding: 0;
+}
+
+td.action {
+  min-width: 0;
+}
 
 td.action a {
-    font-size: 1.4em;
-    padding: 5px;
+  font-size: 1.4em;
+  padding: 5px;
 }
 
 th[data-sort] {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 th[data-sort]:hover {
-    background: #f6f7f9;
+  background: #f6f7f9;
 }
 
 /* tweak margin */
+
 .custom-table.margin-tweak {
-    margin-top: 3px;
+  margin-top: 3px;
+}
+
+/* New reports row */
+
+tr.new-report td {
+  border-color: #f9e1bc;
+}
+
+tr.new-report {
+  background: #fff8ee;
+  color: #000;
+}
+
+tr.new-report:hover {
+  background: #fffbf5;
+}
+
+/* new report indicators */
+
+table.reports-table {
+  border-left: 1px solid #ebebeb;
+}
+
+/*td .new-report-indicator {
+  color: #def4ff;
+  font-size: 2em;
+  position: absolute;
+  top: -13px;
+  display: table-footer-group;
+  left: -7px;
+  transform: rotate(-45deg);
+}*/
+
+td.report-identifier {
+  position: relative;
+}
+
+tr.new-report td.report-identifier {
+  border-left: 4px solid #FF9800;
+}
+
+tr.new-report .submitted-description {
+  font-weight: bold;
 }

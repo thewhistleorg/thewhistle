@@ -17,7 +17,7 @@
 }
 
 .report-header-content {
-    font-size: 1.5em;
+    font-size: 1.2em;
     font-weight: bold;
     padding: 6px 0;
     width: 98%;
@@ -69,7 +69,11 @@
 
 /* Report header div table */
 
-.card-header, .content-header {
+.content-header{
+  color: #000;
+  font-weight: lighter;
+}
+.card-header{
     color: #6c949e;
     font-weight: lighter;
 }

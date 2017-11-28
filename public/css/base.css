@@ -6,7 +6,7 @@ body {
     background: white;
     color: #333333;
     /* font-family: Verdana, Arial, Helvetica, sans-serif; */
-    font-size: 80%;  /* adjust from default 16px (!) to 9pt (@ 96ppi) */
+    font-size: 95%;  /* adjust from default 16px (!) to 9pt (@ 96ppi) */
     line-height: 1.6;
     margin: 0 auto; /* equal l/r margins */
     padding: 0 0.4em; /* small margin is good for phones */

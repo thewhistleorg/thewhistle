@@ -81,13 +81,14 @@ class ReportsHandlers {
                 updatedOn:        lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
                 updatedOnPretty:  lastUpdate.on ? prettyDate(lastUpdate.on.toDateString()) : '',
                 updatedAge:       lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
-                updatedAgo:       lastUpdate.on ? ago(lastUpdate.on) : '',
+                updatedAgo:       lastUpdate.on ? 'Updated ' + ago(lastUpdate.on) : '',
+                notViewed:        lastUpdate.on ? 0:1,
                 updatedBy:        lastUpdate.by,
-                assignedTo:       assignedTo ? assignedTo.username : '',
-                status:           rpt.status || '', // ensure status is string
+                assignedTo:       assignedTo ? '@'+assignedTo.username : `<i class="pale-grey small">Not assigned</i>`,
+                status:           rpt.status ||  `<i class="pale-grey small">None</i>`, // ensure status is string
                 summary:          rpt.summary || `<span title="submitted description">${desc}</span>`,
-                submittedDesc:    truncate(desc,140)|| `<i title="submitted description" class="grey">No Description</i>`,
-                tags:             rpt.tags,
+                submittedDesc:    truncate(desc,140)|| `<i title="submitted description" class="pale-grey small">No Description</i>`,
+                tags:             rpt.tags ,
                 reportedOnPretty: prettyDate(rpt._id.getTimestamp()),
                 reportedOnFull:   dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
                 reportedBy:       rpt.by ? '@'+users.get(rpt.by.toString()).username : rpt.name,
@@ -105,7 +106,7 @@ class ReportsHandlers {
             asc:    null,
         };
         switch (sort.column) {
-            case 'updated':   sort.field = 'updatedAge'; sort.asc = -1; break;
+            case 'updated':   sort.field = 'updatedAge'; sort.asc = -1; break; 
             case 'assigned':  sort.field = 'assignedTo'; sort.asc = -1; break;
             case 'status':    sort.field = 'status';     sort.asc = -1; break;
             case 'summary':   sort.field = 'summary';    sort.asc = -1; break;
@@ -1104,11 +1105,11 @@ function prettyDate(date) {
 
     // this year
     if (new Date(date).getFullYear() == new Date().getFullYear()) {
-        return `${dateFormat(date, 'd mmm')} <span style="opacity:0.6">${dateFormat(date, 'yyyy')}</span>`;
+        return `${dateFormat(date, 'd mmm')} <span>${dateFormat(date, 'yyyy')}</span>`;
     }
 
     // before this year
-    return `<span style="opacity:0.6">${dateFormat(date, 'd mmm')}</span> ${dateFormat(date, 'yyyy')}`;
+    return `<span>${dateFormat(date, 'd mmm')}</span> ${dateFormat(date, 'yyyy')}`;
 }
 
 

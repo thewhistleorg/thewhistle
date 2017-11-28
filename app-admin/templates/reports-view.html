@@ -70,7 +70,7 @@
             <div class="header-table-body">
               <div class="header-table-row">
                 <div class="header-table-cell report-header">
-                  <div class="content-header">&nbsp;</div>
+                  <div class="content-header"><a class="bold" href="{{@koa.headers.referer}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Report list</a></div>
                   <div class="report-header-content">“{{reportedBy}}” — {{reportedOnFull}}</div>
                 </div>
 
@@ -125,7 +125,7 @@
         </div>
 
 
-        <div id="scroll-container" class="pure-u-3-5 apply-scroll">
+        <div class="pure-u-3-5">
 
             <ul class="card-list">
                 <li id="submitted">
@@ -265,7 +265,7 @@
                 </li> -->
                 <li class="accordion-item">
                     <input type="checkbox" class="accordion-toggle" id="toggle-updates" />
-                    <label class="accordion-trigger" for="toggle-updates"><span class="card-header">Audit trail</span></label>
+                    <label class="accordion-trigger" for="toggle-updates"><span class="bold">Audit trail</span></label>
                     <div class="accordion-target">
                         <table id="updates">
                             {{#updates}}

@@ -9,9 +9,9 @@ ul.card-list {
 
 ul.card-list .card-header {
     display: block;
-    padding-left: 1em;
+    padding: 0.4em 0.4em;
     background: rgb(250, 251, 253);
-    font-size: 1.3em;
+    font-size: 1em;
     border: 0;
     border-bottom: 2px solid #f0f3f4;
 }

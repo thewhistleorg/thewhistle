@@ -57,7 +57,7 @@ ul.accordion input:checked + label::after {
 }
 
 .accordion-item {
-    border-bottom: 1px solid #fd665a;
+    padding: 15px 0px!important;
 }
 
 .accordion-item:last-of-type {
@@ -69,14 +69,15 @@ ul.accordion input:checked + label::after {
  */
 .accordion-trigger {
     display: block;
-    background-color: #ffffff;
+    background-color: #fafbfd;
     cursor: pointer;
     padding: 1rem;
     border: 1px solid #f0f3f4;
+    position: relative;
 }
 
 .accordion-trigger::after {
-    content: '+';
+    content: '';
     margin-right: 0;
     position: absolute;
     font-weight: bold;
@@ -84,17 +85,18 @@ ul.accordion input:checked + label::after {
     right: 0;
     top: 0;
     display: block;
-    color: #999999;
+    color: #333333;
     width: 3em;
     height: 3em;
-    line-height: 3;
+    line-height: 2.5;
     text-align: center;
     transition: all 0.35s;
+    font-family: "fontawesome";
 }
 
 .accordion-toggle:checked + .accordion-trigger::after {
     /* transform: rotateX(180deg); */
-    transform: rotate(315deg);
+    transform: rotate(90deg);
 }
 
 /**

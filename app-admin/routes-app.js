@@ -53,14 +53,14 @@ router.post('/reports/:id/delete',     reports.processDelete);   // process dele
 
 // ---- ajax routes
 
-router.get(   '/ajax/reports/latest-timestamp',          reports.ajaxReportLatestTimestamp);
-router.get(   '/ajax/reports/within/:s,:w::n,:e',        reports.ajaxReportsWithin);
-router.post(  '/ajax/reports/:id/tags',                  reports.ajaxReportPostTag);
-router.delete('/ajax/reports/:id/tags/:tag',             reports.ajaxReportDeleteTag);
-router.post(  '/ajax/reports/:report/comments',          reports.ajaxReportPostComment);
-router.put(   '/ajax/reports/:report/comments/:comment', reports.ajaxReportPutComment);
-router.delete('/ajax/reports/:report/comments/:comment', reports.ajaxReportDeleteComment);
-router.get   ('/ajax/reports/:id/updates',               reports.ajaxReportGetUpdates);
+router.get(   '/ajax/reports/latest-timestamp',      reports.ajaxReportLatestTimestamp);
+router.get(   '/ajax/reports/within/:s,:w::n,:e',    reports.ajaxReportsWithin);
+router.post(  '/ajax/reports/:id/tags',              reports.ajaxReportPostTag);
+router.delete('/ajax/reports/:id/tags/:tag',         reports.ajaxReportDeleteTag);
+router.post(  '/ajax/reports/:id/comments',          reports.ajaxReportPostComment);
+router.put(   '/ajax/reports/:id/comments/:comment', reports.ajaxReportPutComment);
+router.delete('/ajax/reports/:id/comments/:comment', reports.ajaxReportDeleteComment);
+router.get   ('/ajax/reports/:id/updates',           reports.ajaxReportGetUpdates);
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

@@ -1017,7 +1017,7 @@ class ReportsHandlers {
 
         if (!ctx.request.body.comment) { ctx.status = 403; return; } // Forbidden
 
-        const comment = await Report.insertComment(db, ctx.params.report, ctx.request.body.comment, ctx.state.user.id);
+        const comment = await Report.insertComment(db, ctx.params.id, ctx.request.body.comment, ctx.state.user.id);
 
         // for returned comment, make links for #tags...
         const tagList = await Report.tags(db);
@@ -1055,7 +1055,7 @@ class ReportsHandlers {
 
         if (!ctx.request.body.comment) { ctx.status = 403; return; } // Forbidden
 
-        await Report.updateComment(db, ctx.params.report, ObjectId(by), on, ctx.request.body.comment, ctx.state.user.id);
+        await Report.updateComment(db, ctx.params.id, ObjectId(by), on, ctx.request.body.comment, ctx.state.user.id);
 
         ctx.status = 200;
         ctx.body = { comment: ctx.request.body.comment };
@@ -1073,7 +1073,7 @@ class ReportsHandlers {
         const [ by, onBase36 ] = ctx.params.comment.split('-');
         const on = new Date(parseInt(onBase36, 36));
 
-        await Report.deleteComment(db, ctx.params.report, ObjectId(by), on, ctx.state.user.id);
+        await Report.deleteComment(db, ctx.params.id, ObjectId(by), on, ctx.state.user.id);
 
         ctx.status = 200;
         ctx.body = {};

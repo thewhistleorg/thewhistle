@@ -586,15 +586,22 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(document.getElementById(commentId)).to.be.null;
         });
 
-        it('tidyup: deletes updates (ajax)', async function() {
-            const response = await request.delete(`/ajax/reports/${reportId}/updates/`).send();
+        it('tidyup: sees full set of audit trail updates before report delete', async function() {
+            const response = await request.get(`/ajax/reports/${reportId}/updates/`).send();
             expect(response.status).to.equal(200);
+            expect(response.body.updates.length).to.equal(7);
         });
 
         it('tidyup: deletes incident report', async function() {
             const response = await request.post('/reports/'+reportId+'/delete').send();
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
+        });
+
+        it('tidyup: sees empty set of audit trail updates after report delete', async function() {
+            const response = await request.get(`/ajax/reports/${reportId}/updates/`).send();
+            expect(response.status).to.equal(200);
+            expect(response.body.updates.length).to.equal(0);
         });
     });
 

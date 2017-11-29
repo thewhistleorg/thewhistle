@@ -1082,17 +1082,17 @@ class ReportsHandlers {
 
 
     /**
-     * DELETE /ajax/reports/update/:id - Delete audit trail update records for given report.
+     * GET /ajax/reports/:id/updates - List audit trail update records for given report.
      *
      * This is just for testing purposes.
      */
-    static async ajaxReportDeleteUpdates(ctx) {
+    static async ajaxReportGetUpdates(ctx) {
         const db = ctx.state.user.db;
 
         try {
-            await Update.deleteForReport(db, ctx.params.id);
+            const updates = await Update.getByReport(db, ctx.params.id);
             ctx.status = 200;
-            ctx.body = {};
+            ctx.body = { updates: updates };
         } catch (e) {
             ctx.status = 500;
             ctx.body = { message: e.message };

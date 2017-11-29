@@ -60,7 +60,7 @@ router.delete('/ajax/reports/:id/tags/:tag',             reports.ajaxReportDelet
 router.post(  '/ajax/reports/:report/comments',          reports.ajaxReportPostComment);
 router.put(   '/ajax/reports/:report/comments/:comment', reports.ajaxReportPutComment);
 router.delete('/ajax/reports/:report/comments/:comment', reports.ajaxReportDeleteComment);
-router.delete('/ajax/reports/:id/updates',               reports.ajaxReportDeleteUpdates);
+router.get   ('/ajax/reports/:id/updates',               reports.ajaxReportGetUpdates);
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

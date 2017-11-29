@@ -12,7 +12,7 @@
 // forward, it is likely to be either 'import.meta' or 'import {url} from 'js:context'; see
 // - github.com/tc39/proposal-import-meta
 // - github.com/nodejs/node-eps/blob/master/002-es-modules.md#451-environment-variables
-const importMetaScriptElement = './app-report/test-cam/wwwww';
+const importMetaScriptElement = './app-report/test-cam/wwww';
 
 import Koa        from 'koa';            // koa framework
 import handlebars from 'koa-handlebars'; // handlebars templating

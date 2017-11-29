@@ -26,7 +26,7 @@ class Handlers {
         delete ctx.request.body['nav-next'];
 
         ctx.session.report = Object.assign(ctx.session.report, ctx.request.body);
-        ctx.redirect('/test-scr/scr/'+(go<=7 ? go : 'submit'));
+        ctx.redirect('/test-cam/scr/'+(go<=7 ? go : 'submit'));
     }
 
     // ---- submit
@@ -40,7 +40,7 @@ class Handlers {
         delete ctx.request.body['submit'];
         await Report.insert(ctx.params.database, undefined, '—', ctx.session.report, 'scr', ctx.session.files, null, ctx.headers['user-agent']);
         ctx.session = null;
-        ctx.redirect('/test-scr/scr');
+        ctx.redirect('/test-cam/scr');
     }
 
 }

@@ -34,7 +34,6 @@ button.nav {
     color: #033549;
     float: right;
     font-weight: bold;
-    margin-top: 1em;
     cursor: pointer;
 }
 
@@ -65,6 +64,7 @@ table.progress {
     border-collapse: collapse;
     float: right;
     font-size: 80%;
+    margin-bottom: 2em;
 }
 
 table.progress td {
@@ -75,7 +75,7 @@ table.progress td {
 }
 
 table.progress td.current {
-    background-color: #009900;
+    background-color: #033549;
     color: #ffffff;
 }
 
@@ -200,11 +200,6 @@ ul {
 
 .black-text {
     color: #000000;
-}
-
-.compact {
-    font-size: 9pt;
-    margin: 2px 0 0.9em 2px;
 }
 
 .tick {

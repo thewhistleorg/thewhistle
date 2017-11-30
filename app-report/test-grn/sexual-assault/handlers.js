@@ -44,8 +44,12 @@ class Handlers {
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num); // note '+' is allowed on windows, '*' is not
         if (page > ctx.session.completed+1) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); return; }
 
+        // progress indicator
+        const pages = Array(nPages).fill(null).map((p, i) => ({ page: i+1 }));
+        pages[page-1].class = 'current'; // to highlight current page
+
         const validYears = { thisyear: dateFormat('yyyy'), lastyear: dateFormat('yyyy')-1 }; // limit report to current or last year
-        const context = Object.assign({ p: page, n: nPages }, ctx.session.report, validYears);
+        const context = Object.assign({ pages: pages }, ctx.session.report, validYears);
 
         await ctx.render('page'+page, context);
     }

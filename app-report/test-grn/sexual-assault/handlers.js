@@ -244,6 +244,15 @@ class Handlers {
         await ctx.render('whatnext', context);
     }
 
+
+    /**
+     * Process 'what next' submission.
+     */
+    static async postWhatnext(ctx) {
+        // ignore submitted value, just skip back to beginning
+        ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`);
+    }
+
 }
 
 

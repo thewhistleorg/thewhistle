@@ -337,6 +337,13 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
             expect(document.querySelectorAll('tr')).to.have.lengthOf(39); // local resources
         });
+
+        it('submits whatnext page', async function() {
+            const values = { 'submit': 'end' };
+            const response = await request.post('/test-grn/sexual-assault/submit').send(values);
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/test-grn/sexual-assault');
+        });
     });
 
     describe('submitted report in admin app', function() {

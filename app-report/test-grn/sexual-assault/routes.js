@@ -15,6 +15,7 @@ router.post('/:database/:project/:num(\\d+)', handlers.postPage);
 router.get( '/:database/:project/submit',     handlers.getSubmit);
 router.post('/:database/:project/submit',     handlers.postSubmit);
 router.get( '/:database/:project/whatnext',   handlers.getWhatnext);
+router.post('/:database/:project/whatnext',   handlers.postWhatnext);
 router.get( '/:database/:project/reset', function(ctx) { ctx.session.report = {}; ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return;  }); // TODO; for testing only
 
 

@@ -84,12 +84,12 @@ class ReportsHandlers {
                 updatedAgo:       lastUpdate.on ? 'Updated ' + ago(lastUpdate.on) : '',
                 notViewed:        lastUpdate.on ? 0:1,
                 updatedBy:        lastUpdate.by,
-                assignedTo:       assignedTo ? '@'+assignedTo.username : `<i class="pale-grey small">Not assigned</i>`,
-                status:           rpt.status ||  `<i class="pale-grey small">None</i>`, // ensure status is string
+                assignedTo:       assignedTo ? '@'+assignedTo.username : `<i class="pale-grey">Not assigned</i>`,
+                status:           rpt.status ||  `<i class="pale-grey">None</i>`, // ensure status is string
                 summary:          rpt.summary || `<span title="submitted description">${desc}</span>`,
-                submittedDesc:    truncate(desc,140)|| `<i title="submitted description" class="pale-grey small">No Description</i>`,
+                submittedDesc:    truncate(desc,140)|| `<i title="submitted description" class="pale-grey">No Description</i>`,
                 tags:             rpt.tags ,
-                reportedOnPretty: prettyDate(rpt._id.getTimestamp()),
+                reportedOnDay: prettyDate(rpt._id.getTimestamp()),
                 reportedOnFull:   dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
                 reportedBy:       rpt.by ? '@'+users.get(rpt.by.toString()).username : rpt.name,
                 location:         rpt.location,
@@ -106,7 +106,7 @@ class ReportsHandlers {
             asc:    null,
         };
         switch (sort.column) {
-            case 'updated':   sort.field = 'updatedAge'; sort.asc = -1; break; 
+            case 'updated':   sort.field = 'updatedAge'; sort.asc = -1; break;
             case 'assigned':  sort.field = 'assignedTo'; sort.asc = -1; break;
             case 'status':    sort.field = 'status';     sort.asc = -1; break;
             case 'summary':   sort.field = 'summary';    sort.asc = -1; break;

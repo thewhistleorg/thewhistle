@@ -6,7 +6,7 @@ body {
     background: white;
     color: #333333;
     /* font-family: Verdana, Arial, Helvetica, sans-serif; */
-    font-size: 95%;  /* adjust from default 16px (!) to 9pt (@ 96ppi) */
+    font-size: 85%;  /* adjust from default 16px (!) to 9pt (@ 96ppi) */
     line-height: 1.6;
     margin: 0 auto; /* equal l/r margins */
     padding: 0 0.4em; /* small margin is good for phones */
@@ -71,6 +71,7 @@ th     { color: #666666; font-style: italic; font-weight: normal; text-align: le
 .rule-above td { border-top: 1px solid #999999; } /* to apply to tr */
 .small         { font-size: 80%; } /* like <small> */
 .bold          { font-weight: bold; }
+.primary-blue  { color: #50addb; }
 
 /* form input widths */
 .w2  { width: 2em; }

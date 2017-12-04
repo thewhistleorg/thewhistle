@@ -11,35 +11,6 @@
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/table.css">
     <link rel="stylesheet" href="/css/reports-filter.css">
-    <style>
-        /* TODO: maybe won't want to keep delete function on this page, but useful for testing */
-/*
-        button.fa-trash {
-            background: none;
-            border: none;
-            color: #990000;
-        }
-
-        button.fa-trash:hover {
-            cursor: pointer;
-        }
-
-        td.action, th.action {
-            border: none;
-            min-width: 2em;
-        }
-
-        td.assigned, span.tag {
-            color: #406591;
-            cursor: pointer;
-        }
-
-        td form {
-            margin: 0;
-        }
-
-        a.remove-desc-srch { margin-left: -1em; }*/
-    </style>
     <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.0/bootstrap-slider.min.js" integrity="sha256-Gdq5BxoczjhbEJLjrYKQ4fvBGx/EQrTWjDM2UrdTot0=" crossorigin="anonymous"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/qs/6.4.0/qs.min.js" integrity="sha256-Epo8Yj1phr7IExs51UisfSWpmD5bmSf/DMeCcIUoBbM=" crossorigin="anonymous"></script>
     <script src="//unpkg.com/dateformat@2.0.0/lib/dateformat.js"></script>
@@ -134,7 +105,7 @@
 
 <table class="pure-table w100pc custom-table clickable-row reports-table">
     <tr>
-        <th data-sort="from" class="w8">from <span  class="float-right fa fa-sort"></span></th>
+        <th data-sort="from" class="w12">from <span  class="float-right fa fa-sort"></span></th>
         <!-- <th data-sort="submitted" class="w6">submitted <span  class="float-right fa fa-sort"></span></th> -->
         <!-- <th data-sort="updated" class="w5">updated <span  class="float-right fa fa-sort"></span></th> -->
         <th data-sort="summary">description <span  class="float-right fa fa-sort"></span></th>
@@ -150,9 +121,10 @@
     {{#reports}}
     <tr id="{{_id}}" title="{{name}}@{{reportedOnFull}} by {{reportedBy}}" class="{{#if notViewed}}new-report{{/if}}">
         <td class="report-identifier">
+          {{#if notViewed}}<div class="fa fa-circle new-indicator"></div>{{/if}}
 
-          <span>{{name}}</span>
-          <br><span class="small">{{{reportedOnPretty}}}</span>
+          <span>{{reportedBy}}</span>
+          <br><span class="small">{{{reportedOnDay}}}</span>
           <br><i class="pale-grey small">{{{updatedAgo}}}</i>
         </td>
         <!-- <td title="{{reportedOnFull}} by {{reportedBy}}" class="pale-grey nowrap" style="text-align:right">
@@ -166,13 +138,13 @@
         </td>
 
         <td class="assigned">
-            {{#if assignedTo}}<span title="filter by assigned-to={{assignedTo}}">{{{assignedTo}}}</span>{{/if}}
+            <span title="filter by assigned-to={{assignedTo}}">{{{assignedTo}}}</span>
         </td>
         <td>
           <span>{{{status}}}</span>
         </td>
         <td>
-          {{#if tags}}{{#tags}}{{{this}}}{{/tags}}{{else}}<i class="pale-grey small">No tags</i>{{/if}}
+          {{#if tags}}{{#tags}}{{{this}}}{{/tags}}{{else}}<i class="pale-grey">No tags</i>{{/if}}
         </td>
         <td>
           <span>{{location}}</span>

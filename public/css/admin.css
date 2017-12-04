@@ -7,11 +7,13 @@ body {
   font-family: 'Open Sans', 'Segoe UI', Tahoma, sans-serif;
   padding: 0;
   background: #f0f3f4;
+  /*background-color: : #fff;*/
 }
 
 main {
   margin: 0 auto;
-  padding: 0 1.4%;
+  padding: 1.4%;
+  /*padding: 0;*/
   max-width: 1300px;
 }
 
@@ -241,12 +243,20 @@ span.tag, a.tag {
   height: 2.25em;
 }
 
+/* iverrude pure primary button colour */
+
+.pure-button-primary{
+  background-color: #50addb;
+}
+
 /*
  * Helper classes
  */
 
 .drop-shadow {
-  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.08);
+  -webkit-box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.08);
+  -moz-box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.08);
 }
 
 .border-top {
@@ -283,4 +293,8 @@ a.grey {
 
 .white-background{
   background-color: #fff;
+}
+
+.mt-1-5em{
+  margin-top: 1.5em;
 }

@@ -57,7 +57,7 @@ ul.accordion input:checked + label::after {
 }
 
 .accordion-item {
-    padding: 15px 0px!important;
+    padding: 0px!important;
 }
 
 .accordion-item:last-of-type {

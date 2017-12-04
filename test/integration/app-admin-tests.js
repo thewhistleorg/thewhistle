@@ -187,7 +187,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             //expect(document.querySelector('title').textContent).to.match(/.*Activity.+/); home page is temporarily list of reports
             expect(document.querySelector('title').textContent).to.equal('Reports list');
             // nav should be /, Reports, Users, Resources, Submit, user-name, Logout
-            expect(document.querySelectorAll('header nav > ul > li').length).to.equal(7);
+            expect(document.querySelectorAll('header nav > ul > li').length).to.equal(8);
             // 'Submit' menu should have 'test-grn/sexual-assault (internal)' entry
             expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('test-grn/sexual-assault (internal)');
         });
@@ -470,21 +470,66 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('adds a comment', async function() {
-            const values = { comment: 'Testing testing 1-2-3', username: testUserDetails.username, userid: testUserDetails._id };
+            const values = {
+                comment:  'Testing testing 1-2-3 including references to @tester and #test',
+                username: testUserDetails.username,
+                userid:   testUserDetails._id,
+            };
             const response = await request.post(`/ajax/reports/${reportId}/comments`).send(values);
             expect(response.status).to.equal(201);
             commentId = response.body.id;
         });
 
-        it('sees comment in report page', async function() {
+        it('sees comment in report page, with @mention/#tag links', async function() {
             const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.getElementById(commentId).querySelectorAll('div')[1].textContent).to.equal('Testing testing 1-2-3\n');
+            const commentDivs = document.getElementById(commentId).querySelectorAll('div');
+            expect(commentDivs[0].textContent.slice(0, 16)).to.equal('tester commented'); // don't bother testing time!
+            expect(commentDivs[0].querySelectorAll('button')[0].classList.contains('fa-times'));  // delete button
+            expect(commentDivs[0].querySelectorAll('button')[1].classList.contains('fa-pencil')); // edit button
+            expect(commentDivs[1].textContent).to.equal('Testing testing 1-2-3 including references to @tester and #test\n');
+            expect(commentDivs[1].querySelectorAll('a')[0].href).to.equal('/users/'+testUserDetails._id);
+            expect(commentDivs[1].querySelectorAll('a')[1].href).to.equal('/reports?tag=test');
+        });
+
+        it('sees add comment in report page audit trail', async function() {
+            const response = await request.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const comment = `Testing testing 1-2-3 including references to [@tester](${testUserDetails._id}) and #test`;
+            const matches = document.evaluate(`count(//td[text()="Add comment ‘${comment}’"])`, document, null, 0, null);
+            expect(matches.numberValue).to.equal(1);
         });
 
         it('edits comment', async function() {
-            // TBC
+            const values = { comment: 'Updated test including references to @tester and #test'}
+            const response = await request.put(`/ajax/reports/${reportId}/comments/${commentId}`).send(values);
+            expect(response.status).to.equal(200);
+        });
+
+        it('sees updated comment in report page, with @mention/#tag links', async function() {
+            const response = await request.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const commentDivs = document.getElementById(commentId).querySelectorAll('div');
+            expect(commentDivs[0].textContent.slice(0, 16)).to.equal('tester commented'); // don't bother testing time!
+            expect(commentDivs[0].querySelectorAll('button')[0].classList.contains('fa-times'));  // delete button
+            expect(commentDivs[0].querySelectorAll('button')[1].classList.contains('fa-pencil')); // edit button
+            expect(commentDivs[1].textContent).to.equal('Updated test including references to @tester and #test\n');
+            expect(commentDivs[1].querySelectorAll('a')[0].href).to.equal('/users/'+testUserDetails._id);
+            expect(commentDivs[1].querySelectorAll('a')[1].href).to.equal('/reports?tag=test');
+        });
+
+        it('sees updated comment in report page audit trail', async function() {
+            const response = await request.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const [ , onBase36 ] = commentId.split('-');
+            const on = dateFormat(new Date(parseInt(onBase36, 36)), 'yyyy-mm-dd@HH:MM');
+            const comment = 'Updated test including references to @tester and #test';
+            const matches = document.evaluate(`count(//td[text()="Set comment-${on} to ‘${comment}’"])`, document, null, 0, null);
+            expect(matches.numberValue).to.equal(1);
         });
 
         it('downloads reports list as CSV', async function() {
@@ -541,15 +586,22 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(document.getElementById(commentId)).to.be.null;
         });
 
-        it('tidyup: deletes updates (ajax)', async function() {
-            const response = await request.delete(`/ajax/reports/${reportId}/updates/`).send();
+        it('tidyup: sees full set of audit trail updates before report delete', async function() {
+            const response = await request.get(`/ajax/reports/${reportId}/updates/`).send();
             expect(response.status).to.equal(200);
+            expect(response.body.updates.length).to.equal(7);
         });
 
         it('tidyup: deletes incident report', async function() {
             const response = await request.post('/reports/'+reportId+'/delete').send();
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
+        });
+
+        it('tidyup: sees empty set of audit trail updates after report delete', async function() {
+            const response = await request.get(`/ajax/reports/${reportId}/updates/`).send();
+            expect(response.status).to.equal(200);
+            expect(response.body.updates.length).to.equal(0);
         });
     });
 
@@ -586,6 +638,16 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(document.getElementById(userId).querySelector('td').textContent).to.equal('Test');
         });
 
+        it('returns 404 for edit user page with invalid id', async function() {
+            const response = await request.get('/users/xxxx/edit');
+            expect(response.status).to.equal(404);
+        });
+
+        it('returns 404 for edit user page with unrecognised id', async function() {
+            const response = await request.get('/users/1234567890abcdef12345678/edit');
+            expect(response.status).to.equal(404);
+        });
+
         it('gets edit user page', async function() {
             const response = await request.get('/users/'+userId+'/edit');
             expect(response.status).to.equal(200);
@@ -605,6 +667,30 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('input').value).to.equal('Test-bis');
+        });
+
+        it('gets view user page (by id)', async function() {
+            const response = await request.get('/users/'+userId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal('Test-bis User (@test)');
+        });
+
+        it('gets view user page (by username)', async function() {
+            const response = await request.get('/users/test');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal('Test-bis User (@test)');
+        });
+
+        it('returns 404 for view user page with unrecognised username', async function() {
+            const response = await request.get('/users/abcdef');
+            expect(response.status).to.equal(404);
+        });
+
+        it('returns 404 for view user page with invalid user-id', async function() {
+            const response = await request.get('/users/1234567890abcdef12345678');
+            expect(response.status).to.equal(404);
         });
 
         it('deletes test user', async function() {

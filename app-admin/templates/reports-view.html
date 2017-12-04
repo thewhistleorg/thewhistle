@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/css/dashboard-report.css">
     <link rel="stylesheet" href="/css/card.css">
     <link rel="stylesheet" href="/css/accordion.css">
+    <script src="//cdn.jsdelivr.net/npm/element-closest@2.0.2/element-closest.min.js" defer>/* polyfill for element.closest() */</script>
     <script src="/js/admin/report-details.js" defer>/* scripts for managing user interaction on report details page */</script>
     <script>
         'use strict';
@@ -233,14 +234,34 @@
                     <div id="commentsContainer">
 
                         {{#comments}}
-                        <div class="comment" id="{{id}}">
+                        <div class="comment comment-container" id="{{id}}">
                             <div class="by"><b><a href="/users/{{byName}}">{{byName}}</a></b> commented <a href="#{{id}}" title="{{onFull}}">{{onPretty}}</a>
-                                <button class="float-right fa fa-times delete"></button> {{#if owner}}<button class="float-right fa fa-pencil edit"></button>{{/if}}
+                                {{#if owner}}
+                                <button class="float-right fa fa-times delete"></button>
+                                <button class="float-right fa fa-pencil edit"></button>
+                                {{/if}}
                             </div>
                             <div>{{{comment}}}</div>
                         </div>
                         {{/comments}}
 
+                        <div class="comment hide" id="div-edit-comment">
+                            <textarea name="comment" id="comment-edit"></textarea>
+                            <table>
+                                <tr>
+                                    <td class="small grey">
+                                        <svg aria-hidden="true" class="align-middle" height="12" version="1.1" viewBox="0 0 16 16" width="16">
+                                            <path fill-rule="evenodd" d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.92 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z"></path>
+                                        </svg>
+                                        Styling with <a href="https://daringfireball.net/projects/markdown/">Markdown</a> is supported; @mentions and #tags can be used
+                                    </td>
+                                    <td class="nowrap">
+                                        <button id="cancel-comment" class="pure-button pure-button-primary">Cancel</button>
+                                        <button id="update-comment" class="pure-button pure-button-primary">Update</button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                         <div class="comment" id="div-add-comment">
                             <span class="small grey">
                                 <svg aria-hidden="true" class="align-middle" height="12" version="1.1" viewBox="0 0 16 16" width="16">

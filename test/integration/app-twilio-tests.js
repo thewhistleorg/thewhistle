@@ -19,6 +19,8 @@ const testpass = process.env.TESTPASS;
 const request = supertest.agent(app.listen());
 
 describe('Twilio app'+' ('+app.env+')', function() {
+    return; // suspend twilio tests for now until functionality is required
+
     this.timeout(5e3); // 5 sec
 
     let msgId = null;

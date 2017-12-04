@@ -507,8 +507,9 @@ class Report {
     /**
      * Add comment to report.
      *
-     * This could currently be achieved with Report.update(), but will probably involve more
-     * processing in future. It also mirrors Report.deleteComment().
+     * @mentions get converted to markdown links with the userid as the target; eg '@chris' will be
+     * converted to something like '[@chris](591d91d204815c13b2211420). This ties down the username
+     * to the specific user who has that username at that time.
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report id.
@@ -520,11 +521,19 @@ class Report {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
-        userId = objectId(userId); // allow id as string
+        userId = objectId(userId); // allow userId as string
+
+        // convert @mentions to pseudo-links with user id as target
+        const users = await User.getAll();
+        for (const user of users) {
+            comment = comment.replace('@'+user.username, `[@${user.username}](${user._id})`);
+        }
 
         const reports = global.db[db].collection('reports');
+
         const user = await User.get(userId);
-        const values = { byId: userId, byName: user.username, on: new Date(), comment }
+        const values = { byId: userId, byName: user.username, on: new Date(), comment };
+
         await reports.updateOne({ _id: id }, { $push: { comments: values } });
 
         await Update.insert(db, id, userId, { push: { comments: comment } }); // audit trail
@@ -534,7 +543,50 @@ class Report {
 
 
     /**
+     * Update comment identified by 'by', 'on' from report 'id'.
+     *
+     * @mentions get converted to markdown links as per insertComment().
+     *
+     * Note: currently, 'userId' is redundant as users can only edit their own comments, but it is
+     * passed as a separate argument in case this should change in future.
+     *
+     * @param {string}   db - Database to use.
+     * @param {ObjectId} id - Report id.
+     * @param {ObjectId} by - Id of user who added comment.
+     * @param {Date}     on - Timestamp comment added.
+     * @param {string}   comment - Replacement comment with markdown formatting.
+     * @param {ObjectId} userId - User id (for update audit trail).
+     */
+    static async updateComment(db, id, by, on, comment, userId) {
+        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+
+        id = objectId(id);                            // allow id as string
+        by = objectId(by);                            // allow id as string
+        userId = objectId(userId);                    // allow userId as string
+        if (!(on instanceof Date)) on = new Date(on); // allow timestamp as string
+        if (isNaN(on.getTime())) throw new Error('invalid ‘on’ date');
+        const commentPlain = comment;
+
+        // convert @mentions to pseudo-links with user id as target
+        const users = await User.getAll();
+        let commentMd = comment
+        for (const user of users) {
+            comment = comment.replace('@'+user.username, `[@${user.username}](${user._id})`);
+        }
+
+        const reports = global.db[db].collection('reports');
+
+        await reports.updateOne({ _id: id, 'comments.byId': by, 'comments.on': on }, { $set: { 'comments.$.comment': comment } });
+
+        await Update.insert(db, id, userId, { set: { [`comment-${dateFormat(on, 'yyyy-mm-dd@HH:MM')}`]: commentPlain } }); // audit trail
+    }
+
+
+    /**
      * Delete comment identified by 'by', 'on' from report 'id'.
+     *
+     * Note: currently, 'userId' is redundant as users can only delete their own comments, but it is
+     * passed as a separate argument in case this should change in future.
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report id.

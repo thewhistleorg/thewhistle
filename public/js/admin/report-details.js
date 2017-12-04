@@ -124,6 +124,8 @@ function setupCommentaryListeners(reportId, username, userid) {
     document.querySelector('#add-comment').onclick = postComment;
     document.querySelectorAll('div.by button.edit').forEach(btn => btn.onclick = editComment);
     document.querySelectorAll('div.by button.delete').forEach(btn => btn.onclick = confirmDeleteComment);
+    document.querySelector('button#cancel-comment').onclick = editCommentCancel;
+    document.querySelector('button#update-comment').onclick = editCommentUpdate;
 
     async function postComment() {
         const comment = document.querySelector('#comment').value;
@@ -138,7 +140,7 @@ function setupCommentaryListeners(reportId, username, userid) {
             const html = `<div class="comment" id="${body.id}">
                              <div class="by"><b><a href="/users/${username}">${username}</a></b> commented <a href="#${body.id}">${body.onPretty}</a>
                                <button class="float-right fa fa-times delete"></button>
-                               <button class="float-right fa fa-pencil edit">
+                               <button class="float-right fa fa-pencil edit"></button>
                              </div>
                              <div>${body.comment}</div>
                            </div>`;
@@ -151,7 +153,44 @@ function setupCommentaryListeners(reportId, username, userid) {
     }
 
     function editComment() {
-        alert('Comment edit function TBC');
+        const commentContainerDiv = this.closest('div.comment-container');
+        const editCommentDiv = document.querySelector('#div-edit-comment');
+        commentContainerDiv.querySelectorAll('div').forEach(div => div.classList.add('hide'));
+        commentContainerDiv.insertAdjacentElement('beforeend', editCommentDiv);
+        editCommentDiv.classList.remove('hide');
+        editCommentDiv.querySelector('textarea').textContent = commentContainerDiv.querySelector('p').textContent;
+        editCommentDiv.querySelector('textarea').focus();
+        document.querySelector('#div-add-comment').classList.add('hide');
+    }
+
+    function editCommentCancel() {
+        const commentContainerDiv = this.closest('div.comment-container');
+        commentContainerDiv.querySelectorAll('div').forEach(div => div.classList.remove('hide'));
+        document.querySelector('#div-edit-comment').classList.add('hide');
+        document.querySelector('#div-add-comment').classList.remove('hide');
+    }
+
+    async function editCommentUpdate() {
+        const commentContainerDiv = this.closest('div.comment-container');
+        const editCommentDiv = document.querySelector('#div-edit-comment');
+
+        const comment = document.querySelector('#comment-edit').value;
+        const values = JSON.stringify({ comment });
+
+        const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+        const url = `/ajax/reports/${reportId}/comments/${commentContainerDiv.id}`;
+        const response = await fetch(url, { method: 'PUT', body: values, headers, credentials });
+        const body = await response.json();
+
+        if (response.ok) {
+            const commentContainerDiv = this.closest('div.comment-container');
+            commentContainerDiv.querySelector('p').textContent = body.comment;
+            commentContainerDiv.querySelectorAll('div').forEach(div => div.classList.remove('hide'));
+            document.querySelector('#div-edit-comment').classList.add('hide');
+            document.querySelector('#div-add-comment').classList.remove('hide');
+        } else {
+            alert(response.status+': ' + body.message);
+        }
     }
 
     async function confirmDeleteComment() {

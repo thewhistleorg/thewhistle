@@ -16,6 +16,7 @@ md.use(mda);
 md.use(mdi, 'dev/form-wizard');
 
 import useragent  from '../lib/user-agent.js';
+import ip         from '../lib/ip.js';
 import Report     from '../models/report.js';
 
 
@@ -68,16 +69,21 @@ class Dev {
         // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
         entriesFiltered.forEach(e => e.ua.os = e.ua.os || e.ua.platform);
 
-        // add in extra fields to each entry
-        const entries = entriesFiltered
-            .map(e => { e.time = dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM:ss'); return e; })
-            .map(e => { e.path = e.url.split('?')[0] + (e.url.split('?').length>1 ? '?…' : ''); return e; })
-            .map(e => { e.qs = e.url.split('?')[1]; return e; })
-            .map(e => { e.env = e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env); return e; })
-            .map(e => { e.os = Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family; return e; })
-            .map(e => { e.ua = Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family; return e; })
-            .map(e => { e.domain = e.ip && global.ips ? global.ips.get(e.ip) : ''; return e; })
-            .map(e => { e.speed = e.ms>500 ? 'slow' : e.ms>100 ? 'medium' : ''; return e; });
+        // add in extra fields to each entry (note cannot use Array.map due to async ip.getDomain function)
+        const entries = [];
+        for (const e of entriesFiltered) {
+            const fields = {
+                time:   dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM:ss'),
+                path:   e.url.split('?')[0] + (e.url.split('?').length>1 ? '?…' : ''),
+                qs:     e.url.split('?')[1],
+                env:    e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env),
+                os:     Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family,
+                ua:     Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family,
+                domain: await ip.getDomain(e.ip) || e.ip,
+                speed:  e.ms>500 ? 'slow' : e.ms>100 ? 'medium' : '',
+            };
+            entries.push(Object.assign({}, e, fields));
+        }
 
         // trim excessively long paths (with full path in 'title' rollover)
         for (const e of entries) {
@@ -122,7 +128,7 @@ class Dev {
                 user:      e.user,
                 status:    e.status,
                 referrer:  e.referer,
-                domain:    e.ip && global.ips ? global.ips.get(e.ip) : '',
+                domain:    await ip.getDomain(e.ip),
                 ua:        Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family,
                 os:        Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family,
                 ms:        e.ms,
@@ -175,16 +181,29 @@ class Dev {
         // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
         entriesFiltered.forEach(e => e.ua.os = e.ua.os || e.ua.platform);
 
-        // add in extra fields to each entry
-        const entries = entriesFiltered
-            .map(e => { e.time = dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM:ss'); return e; })
-            .map(e => { e.path = e.url.split('?')[0] + (e.url.split('?').length>1 ? '?…' : ''); return e; })
-            .map(e => { e.qs = e.url.split('?')[1]; return e; })
-            .map(e => { e.env = e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env); return e; })
-            .map(e => { e.os = Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family; return e; })
-            .map(e => { e.ua = Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family; return e; })
-            .map(e => { e.domain = e.ip && global.ips ? global.ips.get(e.ip) : ''; return e; })
-            .map(e => { e['status-colour'] = e.status==500 ? 'red' : ''; return e; });
+        // add in extra fields to each entry (note cannot use Array.map due to async ip.getDomain function)
+        const entries = [];
+        for (const e of entriesFiltered) {
+            const fields = {
+                time:            dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM:ss'),
+                path:            e.url.split('?')[0] + (e.url.split('?').length>1 ? '?…' : ''),
+                qs:              e.url.split('?')[1],
+                env:             e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env),
+                os:              Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family,
+                ua:              Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family,
+                domain:          await ip.getDomain(e.ip),
+                'status-colour': e.status==500 ? 'red' : '',
+            };
+            entries.push(Object.assign({}, e, fields));
+        }
+
+        // trim excessively long paths (with full path in 'title' rollover)
+        for (const e of entries) {
+            if (e.path.length > 36) {
+                e.pathFull = e.path;
+                e.path = e.path.slice(0, 36)+'…';
+            }
+        }
 
         // for display, time defaults to 0
         ctx.query.time = ctx.query.time || '0';
@@ -200,40 +219,6 @@ class Dev {
         };
 
         await ctx.render('dev-logs-error', context);
-    }
-
-
-    /**
-     * Reverse lookup IP addresses in log and add to global.ips map.
-     *
-     * This returns immediately, having queued dns lookups to be performed in the background; so the
-     * first log page view may be missing domains. Any given IP will only be looked up once within
-     * the app lifetime (will subsequently get held in global.ips).
-     *
-     * @param {string} collection - The log collection to search ('log-access' or 'log-error')
-     */
-    static async ipLookup(collection) {
-        const log = global.db.users.collection(collection);
-
-        const entries = await log.find({}).toArray();
-
-        if (global.ips == undefined) global.ips = new Map(); // ip:domain mapping
-
-        // reverse lookup domain for all ips in log (if not already available)
-        for (const e of entries) {
-            if (!e.ip) continue;                // no ip recorded to look up
-            if (global.ips.has(e.ip)) continue; // already have domain looked up for this ip
-            if (e.domain) {                     // domain already recorded in logs
-                global.ips.set(e.ip, e.domain);
-                continue;
-            }
-            // otherwise, look up domain now (without bothering to wait for result
-            if ([ '127.0.0.1', '::ffff:127.0.0.1' ].includes(e.ip)) continue;
-            dns.reverse(e.ip.trim(), function(err, domains) { // TODO: remove trim() once test flushed out of logs 2017-11-01
-                if (err != null) { console.error('ipLookup', err.message); return; }
-                global.ips.set(e.ip, domains[0]);
-            });
-        }
     }
 
 

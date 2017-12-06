@@ -1,130 +1,31 @@
 /* Stylesheet for public/civilian reporting app */
 
 body {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    background: white;
-    color: #444444;
-    padding: 0;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  background: white;
+  color: #444444;
+  padding: 0;
 }
 
 main {
-    margin: 0 auto;
-    max-width: 48em;
-    padding: 0 1em;
-}
-
-h1 {
-    font-size: 1.5em;
-    font-weight: 300;
-    line-height: 1;
-    margin: 0 0 0.75em;
-}
-
-a, a:visited { color: #033549; }
-a.grey       { color: #999999; }
-
-form li {
-    clear: both;
-    margin: 1.5em 1em;
-}
-
-button.nav {
-    background: none;
-    border: none;
-    color: #033549;
-    float: right;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-input[type=file].upload-file {
-    background: none;
-    border: none;
-    color: #406591;
-    font-weight: bold;
-    margin-top: 1em;
-    cursor: pointer;
-}
-
-label {
-    margin-top: 1em;
-    width: auto;
-}
-
-input[type=date], input[type=time] {
-    width: auto;
-}
-
-input[type=radio] {
-    float: none;
-    width: auto;
-}
-
-table.progress {
-    border-collapse: collapse;
-    float: right;
-    font-size: 80%;
-    margin-bottom: 2em;
-}
-
-table.progress td {
-    border: 1px solid #033549;
-    min-width: 3em;
-    padding: 0.1em 0.25em;
-    text-align: center;
-}
-
-table.progress td.current {
-    background-color: #033549;
-    color: #ffffff;
-}
-
-ul.validation-errors {
-    list-style: none;
-    color: #990000;
-}
-
-header {
-    background: #033549;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 1.2em;
-    font-weight: 300;
-    padding: 0.2em 0 0.1em 0.4em;
-    margin: 0 0 2em;
-    /* padding-top: 0.4em */
+  margin: 0 auto;
+  max-width: 48em;
+  padding: 0 1em;
 }
 
 button.inline-link {
-    background: none;
-    border: none;
-    color: #406591;
-    text-decoration: underline;
-    cursor: pointer;
-    padding: 0;
-    margin: 0;
-}
-
-@media (max-width: 400px) {
-    header {
-        font-size: 0.9em;
-    }
-}
-
-header {
-    color: #ffffff;
-}
-
-.progress-bar {
-    margin-bottom: 1em;
-}
-
-header nav img {
-    margin: 7px 0 0 15px;
+  background: none;
+  border: none;
+  color: #406591;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
 }
 
 /* Pure CSS enhancements, for the sake of Progress Bar */
 
-.pure-u-2-8 {
+/*.pure-u-2-8 {
     width: 25%;
 }
 
@@ -134,140 +35,349 @@ header nav img {
 
 .pure-u-6-8 {
     width: 75%;
-}
-
-.pure-form select {
-    height: auto;
-}
-
-input[type='checkbox'] {
-    margin-right: 0.5em;
-}
+}*/
 
 .nav-action-button {
-    color: white;
+  /*color: white;
     background-color: #416dbc;
     margin-top: 1em;
     font-weight: bold;
     padding: 4px 20px;
     border-radius: 5px;
-    border-width: 0;
+    border-width: 0;*/
 }
 
-ul.with-bullets li {
-    list-style-type: disc;
-    margin: 0 0 0 1em;
-}
-
-ul.with-margin li {
-    margin: 0 0 1em 1em;
-}
+/*
+Helper classes
+*/
 
 .width-2chars {
-    width: 2.5em;
+  width: 2.5em;
 }
 
 .width-4chars {
-    width: 5em;
-}
-
-div.bumper {
-    width: 1.5em;
-    min-height: 1px;
-}
-
-p {
-    margin-top: 0;
-}
-
-ul {
-    margin: 0;
-}
-
-.special-intro {
-    font-size: 16px;
-    line-height: 1.5;
+  width: 5em;
 }
 
 .hint-text {
-    font-size: 13px;
-    color: #767676;
+  font-size: 13px;
+  color: #767676;
 }
 
 .greyed, .greyed button.inline-link {
-    color: #888888;
+  color: #888888;
 }
 
 .black-text {
-    color: #000000;
+  color: #000000;
 }
 
-.tick {
-    width: 27px;
-    height: 22px;
+.text-center {
+  text-align: center;
 }
 
-.banner {
-    width: 100%;
-    height: 50px;
-    background-color: #0f2533;
-    text-align: center;
-    margin-bottom: 2em;
-    padding-top: 2em;
+.inline-block {
+  display: inline-block;
 }
 
-.banner h1 {
-    color: #ffffff;
-    font-weight: 500;
-    font-size: 2em;
+.button-small {
+  font-size: 80%;
 }
 
-.radio-margin {
-    margin-left: 2em;
-}
+/*
+Table
+*/
 
 table.inline {
-    display: inline-block;
-    vertical-align: bottom;
+  display: inline-block;
+  vertical-align: bottom;
 }
 
 tr.field-label {
-    font-size: 8pt;
-    color: #999999;
+  font-size: 8pt;
+  color: #999999;
+}
+
+/*
+Lists
+*/
+
+ul.validation-errors {
+  list-style: none;
+  color: #990000;
+}
+
+ul.with-bullets li {
+  list-style-type: disc;
+  margin: 0 0 0 1em;
+}
+
+ul.with-margin li {
+  margin: 0 0 1em 1em;
+}
+
+ul {
+  margin: 0;
+}
+
+/*
+Typography
+*/
+
+h1 {
+  font-size: 1.5em;
+  font-weight: 300;
+  line-height: 1;
+  margin: 0 0 0.75em;
+}
+
+p {
+  margin-top: 0;
+}
+
+.banner h1 {
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 2em;
+}
+
+/*
+Form elements
+*/
+
+input[type=password],
+input[type=email],
+input[type=url],
+input[type=date],
+input[type=month],
+input[type=time],
+input[type=datetime],
+input[type=datetime-local],
+input[type=week],
+input[type=tel],
+input[type=color],
+input[type=number],
+input[type=search],
+input[type=text], 
+select,
+textarea {
+  padding: .5em .6em;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 3px #ddd;
+  border-radius: 4px;
+  vertical-align: middle;
+  box-sizing: border-box;
 }
 
 label.inline {
-    display: inline;
+  display: inline;
 }
 
-/* 'existing-name' check */
-.name-available {
-    font-weight: bold;
-    margin-top: 1em;
+.radio-margin {
+  margin-left: 2em;
 }
-#name-ok  { color: #009900; }
-#name-nok { color: #990000; }
 
 /* sexual-assault pages 2, 5, 7 */
+
 .pure-form .pure-radio {
-    display: inline-block;
-    margin: 0;
+  display: inline-block;
+  margin: 0;
 }
 
+form li {
+  clear: both;
+  margin: 1em;
+  /*background: #fbfeff;
+  border-radius: 4px;
+  border: 1px solid #f0f0f1;*/
+  padding: 6px 4px;
+}
+
+/*button.nav {
+    background: none;
+    border: none;
+    color: #033549;
+    float: right;
+    font-weight: bold;
+    cursor: pointer;
+}*/
+
+input[type=file].upload-file {
+  background: none;
+  border: none;
+  color: #406591;
+  font-weight: bold;
+  margin-top: 1em;
+  cursor: pointer;
+}
+
+label {
+  margin-top: 1em;
+  width: auto;
+}
+
+input[type=date], input[type=time] {
+  width: auto;
+}
+
+input[type=radio] {
+  float: none;
+  width: auto;
+  /*margin-left: 10px;*/
+}
+
+.pure-form select {
+  height: auto;
+}
+
+input[type='checkbox'] {
+  margin-right: 0.5em;
+}
+
+input+label {
+  /*width: 95%;
+  display: inline-block;*/
+  /*padding: 4px 2px 10px;*/
+}
+
+/*
+Header
+*/
+
 @media screen and (max-width: 480px) {
-    header img {
-        width: 140px;
-        height: 16px;
-    }
+  header img {
+    width: 140px;
+    height: 16px;
+  }
 }
 
 header .pure-menu-horizontal ul.pure-menu-list.block {
-    /* max-width is 40em so that the header appears the same width as the body, which is defined as
+  /* max-width is 40em so that the header appears the same width as the body, which is defined as
      * max-width 48em; the difference is something to do with the ratio between the two font sizes. */
-    max-width: 40em;
-    margin: 0 auto;
-    display: block;
+  max-width: 40em;
+  margin: 0 auto;
+  display: block;
 }
+
 header .pure-menu-item a, header .pure-menu-item a.visited {
-    color: #ffffff;
+  color: #ffffff;
+}
+
+header {
+  font-weight: 300;
+  padding: 0.2em 0 0.1em 0.4em;
+  margin: 0 0 2em;
+  /* padding-top: 0.4em */
+}
+
+@media (max-width: 400px) {
+  header {
+    font-size: 0.9em;
+  }
+}
+
+header {
+  color: #ffffff;
+}
+
+header nav img {
+  margin: 7px 0 0 15px;
+}
+
+/*
+Progress-bar
+*/
+
+table.progress {
+  border-collapse: collapse;
+  /*float: right;*/
+  font-size: 80%;
+  margin: 1.5em;
+}
+
+table.progress td {
+  min-width: 3em;
+  padding: 0.1em 0.25em;
+  text-align: center;
+}
+
+.progress-bar {
+  margin-bottom: 1em;
+}
+
+/*
+Colours: Useful for theming
+*/
+
+header {
+  background: #033549;
+}
+
+#name-ok {
+  color: #009900;
+}
+
+#name-nok {
+  color: #990000;
+}
+
+a, a:visited {
+  color: #033549;
+}
+
+a.grey {
+  color: #999999;
+}
+
+table.progress td {
+  border: 1px solid #50addb;
+}
+
+table.progress td.current {
+  background-color: #50addb;
+  color: #ffffff;
+}
+
+/*
+Purecss overrides - Colours
+*/
+
+.pure-button-primary {
+  background-color: #50addb;
+}
+
+/*
+Misc
+*/
+
+div.bumper {
+  width: 1.5em;
+  min-height: 1px;
+}
+
+.special-intro {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.tick {
+  width: 27px;
+  height: 22px;
+}
+
+.banner {
+  width: 100%;
+  height: 50px;
+  background-color: #0f2533;
+  text-align: center;
+  margin-bottom: 2em;
+  padding-top: 2em;
+}
+
+/* 'existing-name' check */
+
+.name-available {
+  font-weight: bold;
+  margin-top: 1em;
 }

@@ -317,6 +317,51 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         request.send();
     }
+
+
+    /**
+     * Resources ('what next') page
+     */
+    if (document.querySelector('input[name=address]')) {
+        document.querySelector('input[name="address"]').oninput = function() {
+            const input = this;
+            const button = document.querySelector('#get');
+            const formatted = document.querySelector('#formatted-address');
+            if (input.value == '') {
+                button.setAttribute('disabled', '');
+                button.classList.add('grey');
+                return;
+            }
+            delay(async function() {
+                const response = await fetch(`/ajax/geocode?address=${encodeURI(input.value).replace(/%20/g, '+')}`);
+                switch (response.status) {
+                    case 200:
+                        const body = await response.json();
+                        button.removeAttribute('disabled');
+                        button.classList.remove('grey');
+                        formatted.innerHTML = `(for <i>${body.formattedAddress}</i>)`;
+                        break;
+                    case 404:
+                        button.setAttribute('disabled', '');
+                        button.classList.add('grey');
+                        formatted.innerHTML = '';
+                        break;
+                }
+            }, 330)
+        };
+
+        document.querySelector('form[name=get-resources]').onsubmit = function() {
+            this.get.disabled = true; // prevent '&get=' appearing in the url
+        }
+    }
+
+    const delay = (function(){
+        let timer = null;
+        return function(callback, ms){
+            clearTimeout (timer);
+            timer = setTimeout(callback, ms);
+        };
+    })();
 });
 
 

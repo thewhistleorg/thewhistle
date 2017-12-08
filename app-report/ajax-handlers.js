@@ -12,6 +12,8 @@
 
 import Report         from '../models/report.js';
 import autoIdentifier from '../lib/auto-identifier.js';
+import geocode        from '../lib/geocode.js';
+import ip             from '../lib/ip.js';
 
 const handler = {};
 
@@ -44,6 +46,23 @@ handler.getName = async function(ctx) {
     ctx.body = {};
     ctx.body.root = 'name';
     ctx.status = reports.length==0 && ctx.params.id!='' ? 404 : 200; // Not Found / Ok
+};
+
+
+/**
+ * Get geocode details for given address.
+ */
+handler.geocode = async function(ctx) {
+    const region = await ip.getCountry(ctx.ip);
+    const geocoded = await geocode(ctx.query.address, region);
+
+    if (geocoded) {
+        ctx.body = geocoded;
+        ctx.body.root = 'geocode';
+        ctx.status = 200; // Ok
+    } else {
+        ctx.status = 404; // Not Found
+    }
 };
 
 

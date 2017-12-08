@@ -335,10 +335,18 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
+            expect(document.querySelectorAll('tr')).to.have.lengthOf(0); // local resources
+        });
+
+        it('sees whatnext resources', async function() {
+            const responseGet = await request.get('/test-grn/sexual-assault/whatnext?address=university+of+lagos');
+            expect(responseGet.status).to.equal(200);
+            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
             expect(document.querySelectorAll('tr')).to.have.lengthOf(39); // local resources
         });
 
-        it('submits whatnext page', async function() {
+        it('submits whatnext "back to start"', async function() {
             const values = { 'submit': 'end' };
             const response = await request.post('/test-grn/sexual-assault/submit').send(values);
             expect(response.status).to.equal(302);
@@ -492,6 +500,14 @@ describe('Report app'+' ('+app.env+')', function() {
 
         it('sees whatnext page', async function() {
             const responseGet = await request.get('/test-grn/sexual-assault/whatnext');
+            expect(responseGet.status).to.equal(200);
+            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
+            expect(document.querySelectorAll('tr')).to.have.lengthOf(0); // local resources
+        });
+
+        it('sees whatnext resources', async function() {
+            const responseGet = await request.get('/test-grn/sexual-assault/whatnext?address=university+of+lagos');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');

@@ -13,15 +13,21 @@
 <p>Call us on <b>814-917-1224</b></p>
 <p>Visit us at <b>19, YPO Shodehinde Street, Utako, Abuja</b></p>
 
-{{#if @koa.session.geocode}}
-
 <hr>
 
 <h2>Local Resources</h2>
 
+{{#if categories}}
+
 <p>Based on what you have told us, we have gathered the closest and most helpful organisations and
     services for you. These can be of immediate help in concerns regarding health, mental health,
     legal issues and any other concerns. They are free, anonymous, and almost always available.</p>
+
+{{#if categories.length}}
+<p>These are resources close to <i>{{formattedAddress}}</i>.</p>
+{{else}}
+<p>No resources found close to <i>{{formattedAddress}}</i>.</p>
+{{/if}}
 
 <table>
     {{#each categories}}
@@ -50,6 +56,15 @@
 </table>
 {{/if}}
 
+{{#unless categories}}
+<p>To see local organisations and services which may be helpful for you, enter your address here.</p>
+<p>We will not record your address or your request for resources.</p>
+<form method="get" name="get-resources">
+    <p>Address: <input name="address" id="address" class="w16">
+        <button type="submit" name="get" id="get" disabled class="grey">Get resources</button>
+        <span id="formatted-address"></span></p>
+</form>
+{{/unless}}
 
 <form method="post" class="pure-form pure-form-aligned">
     <button type="submit" name="end" value="end" accesskey="e" class="float-right">

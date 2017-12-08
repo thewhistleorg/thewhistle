@@ -193,14 +193,14 @@ class Handlers {
         const context = {};
 
         // if we have a geocode result on the incident location, list local resources
-        if (ctx.session.geocode) {
-            const geocode = ctx.session.geocode;
+        const geocoded = ctx.query.address ? await geocode(ctx.query.address) : null;
 
+        if (geocoded) {
             // get all resources within 20km of geocoded location
-            const resources = await Resource.getNear(ctx.params.database, geocode.latitude, geocode.longitude, 20e3);
+            const resources = await Resource.getNear(ctx.params.database, geocoded.latitude, geocoded.longitude, 20e3);
 
             // add distance from geocoded location to each resource, & convert phone/email arrays to lists
-            const locn = new LatLon(geocode.latitude, geocode.longitude);
+            const locn = new LatLon(geocoded.latitude, geocoded.longitude);
             for (const resource of resources) {
                 const lat = resource.location.coordinates[1];
                 const lon = resource.location.coordinates[0];
@@ -239,6 +239,7 @@ class Handlers {
             }
 
             context.categories = resourcesGrouped;
+            context.formattedAddress = geocoded.formattedAddress;
         }
 
         await ctx.render('whatnext', context);

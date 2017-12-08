@@ -13,11 +13,10 @@ const router = new Router();
 import ajax from './ajax-handlers.js';
 
 
-/*
- * App-specific ajax routes go here
- */
-router.get( '/ajax/:db/names/new', ajax.getGenerateNewName); // note means 'new' cannot be used as a name
-router.get( '/ajax/:db/names/:id', ajax.getName);            // currently just used to verify if name exists
+router.get('/ajax/:db/names/new', ajax.getGenerateNewName); // note means 'new' cannot be used as a name
+router.get('/ajax/:db/names/:id', ajax.getName);            // currently just used to verify if name exists
+
+router.get('/ajax/geocode', ajax.geocode); // geocode an address
 
 
 /*

@@ -7,9 +7,9 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+import libphonenumber from 'google-libphonenumber'; // wrapper for Google's libphonenumber
 import fetch          from 'node-fetch';            // window.fetch in node.js
 import xmldom         from 'xmldom';                // DOMParser in node.js
-import libphonenumber from 'google-libphonenumber'; // wrapper for Google's libphonenumber
 const DOMParser = xmldom.DOMParser;
 
 import Message from '../models/message.js';
@@ -35,6 +35,7 @@ class MessagesHandlers {
             msg.fromEscaped = encodeURIComponent(msg.From.replace('+', '~'));
             msg.fromFormatted = phoneUtil.format(phoneUtil.parse(msg.From), PhoneNumberFormat.NATIONAL);
         }
+        messages.sort((a, b) => a.timestamp < b.timestamp ? 1 : -1);
         const latest = messages.reduce((prevVal, currVal) => Math.max(prevVal, currVal.timestamp), 0);
         const filtered = ctx.query.number ? true : false;
         const number = ctx.query.number ? ctx.query.number.replace('~', '+') : '';
@@ -78,9 +79,10 @@ class MessagesHandlers {
             const params = Object.keys(body).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(body[k])}`).join('&');
 
             const response = await fetch(url, { method: 'POST', body: params, headers: hdrs });
-
             const responseText = await response.text();
             const responseXml = new DOMParser().parseFromString(responseText, 'application/xml');
+            const exception = responseXml.getElementsByTagName('RestException');
+            if (exception.length > 0) throw new Error(exception[0].childNodes[1].childNodes[0].data); // !!
 
             const msg = {
                 direction: 'outgoing',

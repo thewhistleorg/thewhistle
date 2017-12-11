@@ -43,8 +43,6 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
         applyFilter();
     });
 
-
-    const submittedSlider2 = 
     // Toggle search filter list container
 
     document.getElementById('filter-toggle-button').onclick = toggleContainer;

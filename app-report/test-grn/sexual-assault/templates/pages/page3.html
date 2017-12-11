@@ -1,8 +1,8 @@
-<form method="post" enctype="multipart/form-data" class="pure-form pure-form-aligned">
+<form method="post" enctype="multipart/form-data" class="pure-form">
     {{> back}}{{> step}}
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
-    <div class="pure-u">
+    <div >
         <script>
             'use strict';
             document.addEventListener('DOMContentLoaded', function () {

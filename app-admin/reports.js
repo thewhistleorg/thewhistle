@@ -59,9 +59,14 @@ class ReportsHandlers {
         // geocoded location field or fields to use
         const lowestCommonLevel = lowestCommonGeographicLevel(rpts);
 
+        // const viewed = !!lastViewed;
+        // debugger;
         const reports = [];
+
         for (const rpt of rpts) {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
+            const lastViewed = rpt.views[ctx.state.user.id];
+
             if (Object.keys(rpt.geocode).length > 0) {
                 rpt.location = findBestLocnBelow(lowestCommonLevel, rpt);
             } else {
@@ -73,7 +78,6 @@ class ReportsHandlers {
             if (rpt.tags.length > 2) { // limit displayed tags to 2
                 rpt.tags.splice(2, rpt.tags.length, `<span class="nowrap">+${rpt.tags.length-2} more...</span>`);
             }
-
             const desc = rpt.submitted['Description'] || rpt.submitted['brief-description']; // TODO: transition code until all early test report are deleted
             const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
             const fields = {
@@ -82,7 +86,7 @@ class ReportsHandlers {
                 updatedOnPretty:  lastUpdate.on ? prettyDate(lastUpdate.on.toDateString()) : '',
                 updatedAge:       lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
                 updatedAgo:       lastUpdate.on ? 'Updated ' + ago(lastUpdate.on) : '',
-                notViewed:        lastUpdate.on ? 0:1,
+                viewed:           !!lastViewed,
                 updatedBy:        lastUpdate.by,
                 assignedTo:       assignedTo ? '@'+assignedTo.username : `<i class="pale-grey">Not assigned</i>`,
                 status:           rpt.status ||  `<i class="pale-grey">None</i>`, // ensure status is string
@@ -790,7 +794,7 @@ class ReportsHandlers {
                 comment:  MarkdownIt().render(comment),
             };
         });
-
+        const referer = ctx.headers.referer? ctx.headers.referer : "/reports";
         // audit trail
         const updates = await Update.getByReport(db, ctx.params.id);
 
@@ -818,6 +822,7 @@ class ReportsHandlers {
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
             submittedDesc:    truncate(desc,70) || `<i title="submitted description" class="grey">No Description</i>`,
             showDeleteButton: ctx.app.env != 'production',
+            referer         : referer,
         };
         extra.reportDescription = report.summary
             ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`

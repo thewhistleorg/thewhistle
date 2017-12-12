@@ -50,11 +50,11 @@
               var div = document.getElementById("filter-container");
               div.style.display = 'block';
             }
-            //TODO: Commenting the following as the table UI has changed.
-            // const sortIndicator = document.querySelector('th[data-sort={{sort.column}}] .fa');
-            // sortIndicator.style.color = '#666666';
-            // sortIndicator.classList.remove('fa-sort');
-            // sortIndicator.classList.add('{{sort.asc}}'=='+' ? 'fa-sort-asc' : 'fa-sort-desc');
+            const sortIndicator = document.querySelector('th[data-sort={{sort.column}}] .fa');
+            sortIndicator.style.color = '#000';
+            sortIndicator.parentElement.style.backgroundColor = '#e8f2f7';
+            sortIndicator.classList.remove('fa-sort');
+            sortIndicator.classList.add('{{sort.asc}}'=='+' ? 'fa-sort-asc' : 'fa-sort-desc');
 
             // keep updated-ago current every 10 secs
             function updateAgo() {
@@ -119,10 +119,9 @@
     </tr>
 
     {{#reports}}
-    <tr id="{{_id}}" title="{{name}}@{{reportedOnFull}} by {{reportedBy}}" class="{{#if notViewed}}new-report{{/if}}">
+    <tr id="{{_id}}" title="{{name}}@{{reportedOnFull}} by {{reportedBy}}" class="{{#unless viewed}}new-report{{/unless}}">
         <td class="report-identifier">
-          {{#if notViewed}}<div class="fa fa-circle new-indicator"></div>{{/if}}
-
+          {{#unless viewed}}<div class="fa fa-circle new-indicator"></div>{{/unless}}
           <span>{{reportedBy}}</span>
           <br><span class="small">{{{reportedOnDay}}}</span>
           <br><i class="pale-grey small">{{{updatedAgo}}}</i>

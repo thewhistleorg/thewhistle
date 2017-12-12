@@ -40,7 +40,7 @@ table.custom-table th .fa {
 }
 
 .clickable-row tr:hover {
-  background-color: #fafbfd;
+  background-color: #f5f5f5;
   cursor: pointer;
 }
 

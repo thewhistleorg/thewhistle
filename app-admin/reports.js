@@ -59,9 +59,14 @@ class ReportsHandlers {
         // geocoded location field or fields to use
         const lowestCommonLevel = lowestCommonGeographicLevel(rpts);
 
+        // const viewed = !!lastViewed;
+        // debugger;
         const reports = [];
+
         for (const rpt of rpts) {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
+            const lastViewed = rpt.views[ctx.state.user.id];
+
             if (Object.keys(rpt.geocode).length > 0) {
                 rpt.location = findBestLocnBelow(lowestCommonLevel, rpt);
             } else {
@@ -73,7 +78,6 @@ class ReportsHandlers {
             if (rpt.tags.length > 2) { // limit displayed tags to 2
                 rpt.tags.splice(2, rpt.tags.length, `<span class="nowrap">+${rpt.tags.length-2} more...</span>`);
             }
-
             const desc = rpt.submitted['Description'] || rpt.submitted['brief-description']; // TODO: transition code until all early test report are deleted
             const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
             const fields = {
@@ -81,14 +85,15 @@ class ReportsHandlers {
                 updatedOn:        lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
                 updatedOnPretty:  lastUpdate.on ? prettyDate(lastUpdate.on.toDateString()) : '',
                 updatedAge:       lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
-                updatedAgo:       lastUpdate.on ? ago(lastUpdate.on) : '',
+                updatedAgo:       lastUpdate.on ? 'Updated ' + ago(lastUpdate.on) : '',
+                viewed:           !!lastViewed,
                 updatedBy:        lastUpdate.by,
-                assignedTo:       assignedTo ? assignedTo.username : '',
-                status:           rpt.status || '', // ensure status is string
+                assignedTo:       assignedTo ? '@'+assignedTo.username : `<i class="pale-grey">Not assigned</i>`,
+                status:           rpt.status ||  `<i class="pale-grey">None</i>`, // ensure status is string
                 summary:          rpt.summary || `<span title="submitted description">${desc}</span>`,
-                submittedDesc:    truncate(desc,140)|| `<i title="submitted description" class="grey">No Description</i>`,
-                tags:             rpt.tags,
-                reportedOnPretty: prettyDate(rpt._id.getTimestamp()),
+                submittedDesc:    truncate(desc,140)|| `<i title="submitted description" class="pale-grey">No Description</i>`,
+                tags:             rpt.tags ,
+                reportedOnDay: prettyDate(rpt._id.getTimestamp()),
                 reportedOnFull:   dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
                 reportedBy:       rpt.by ? '@'+users.get(rpt.by.toString()).username : rpt.name,
                 location:         rpt.location,
@@ -789,7 +794,7 @@ class ReportsHandlers {
                 comment:  MarkdownIt().render(comment),
             };
         });
-
+        const referer = ctx.headers.referer? ctx.headers.referer : "/reports";
         // audit trail
         const updates = await Update.getByReport(db, ctx.params.id);
 
@@ -817,6 +822,7 @@ class ReportsHandlers {
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
             submittedDesc:    truncate(desc,70) || `<i title="submitted description" class="grey">No Description</i>`,
             showDeleteButton: ctx.app.env != 'production',
+            referer         : referer,
         };
         extra.reportDescription = report.summary
             ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`
@@ -1123,11 +1129,11 @@ function prettyDate(date) {
 
     // this year
     if (new Date(date).getFullYear() == new Date().getFullYear()) {
-        return `${dateFormat(date, 'd mmm')} <span style="opacity:0.6">${dateFormat(date, 'yyyy')}</span>`;
+        return `${dateFormat(date, 'd mmm')} <span>${dateFormat(date, 'yyyy')}</span>`;
     }
 
     // before this year
-    return `<span style="opacity:0.6">${dateFormat(date, 'd mmm')}</span> ${dateFormat(date, 'yyyy')}`;
+    return `<span>${dateFormat(date, 'd mmm')}</span> ${dateFormat(date, 'yyyy')}`;
 }
 
 

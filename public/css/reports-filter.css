@@ -1,40 +1,20 @@
+/*
+ * Search and filter interface
+ */
+
 #search {
     border: 1px solid #e0e6e8;
     background: #ffffff;
-    margin-bottom: 0.4em;
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+    /*margin-top: 1em;*/
 }
 
 #search a.bold {
     font-weight: bold; /* assigned to current user */
 }
 
-/*
-#search input {
-    background-color: #eeeeee;
-    border: 1px solid #999999;
-}
-*/
-
 #search-display {
     min-height: 2.4em;
-}
-
-.magnifying-glass { /* pretty icon in search bar */
-    color: #99b2c1;
-    padding: 0.9em;
-    display: inline-block;
-    /* border-right: 1px solid #F0F3F4; */
-    background-color: #fafbfd;
-}
-
-#search-display span { /* current filter criteria */
-    background-color: #e0edf5;
-    color: #2f5d92;
-    display: inline-block;
-    margin: 0.4em;
-    padding: 0.1em 0.2em;
-    white-space: nowrap;
+    background: #fafbfd;
 }
 
 #search-display span a.remove-filter { /* remove filter criterion */
@@ -48,18 +28,30 @@
 
 input.description-filter {
     background-color: #ffffff;
-    border-right: 1px solid #e0e6e8;
-    padding: 13px 6px 11px;
-    border-left: 1px solid #e0e6e8;
-    margin: -4px;
-    width: 20%;
-    border-bottom: 0;
-    border-top: 0;
+    padding: 10px;
+    border: 1px solid #e0e6e8;
+    width: 50%;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.11) inset;
 }
 
 input.description-filter::placeholder {
     color: #99b2c1;
+}
+
+.magnifying-glass { /* pretty icon in search bar */
+    color: #99b2c1;
+    padding: 0.9em;
+    display: inline-block;
+    background-color: #fafbfd;
+}
+
+.selected-filter { /* current filter criteria */
+    background-color: #e0edf5;
+    color: #2f5d92;
+    display: inline-block;
+    margin: 0.4em;
+    padding: 0.1em 0.2em;
+    white-space: nowrap;
 }
 
 /* Override bootstrap slider styles */
@@ -99,4 +91,9 @@ input.description-filter::placeholder {
 
 a.pure-menu-link {
     color: #50addb;
+}
+
+.filter-toggle {
+  float: right;
+  margin: 8px;
 }

@@ -43,6 +43,21 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
         applyFilter();
     });
 
+    // Toggle search filter list container
+
+    document.getElementById('filter-toggle-button').onclick = toggleContainer;
+    function toggleContainer(e){
+      var el = document.getElementById('filter-toggle-button');
+      var div = document.getElementById('filter-container');
+        if (div.style.display === 'none') {
+            div.style.display = 'block';
+            el.innerHTML = 'Hide filters';
+        } else {
+            div.style.display = 'none';
+            el.innerHTML = 'Show filters';
+        }
+    }
+
     // auto-submit form on any change of filter selection
     document.querySelectorAll('#search .pure-menu-item li a').forEach(el => el.onclick = function filterAdd(event) {
         event.preventDefault(); // don't follow link
@@ -105,8 +120,8 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
         }
         const displayText = key.slice(0,6)=='field:' ? `field <i>${key.slice(6)}</i>: ${value}` : `${key}: ${value}`;
         const removeLink = '<a href="#" class="remove-filter">×</a>';
-        const filterSpan = `<span data-key="${key}" data-value="${value}">${displayText} ${removeLink}</span>`;
-        document.querySelector('#search-display').insertAdjacentHTML('beforeend', filterSpan);
+        const filterSpan = `<span data-key="${key}" data-value="${value}"  class="selected-filter">${displayText} ${removeLink}</span>`;
+        document.querySelector('#filter-container').insertAdjacentHTML('beforeend', filterSpan);
     }
 
     // add filter span for searching within report fields, into which user can enter text to be searched for

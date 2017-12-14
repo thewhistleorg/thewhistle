@@ -1,7 +1,7 @@
 /* Individual Report Page */
 
 #individual-report {
-    padding: 0 1px;
+    padding: 0px;
 }
 
 .report-container {
@@ -17,7 +17,7 @@
 }
 
 .report-header-content {
-    font-size: 1.5em;
+    font-size: 1.2em;
     font-weight: bold;
     padding: 6px 0;
     width: 98%;
@@ -69,7 +69,11 @@
 
 /* Report header div table */
 
-.card-header, .content-header {
+.content-header{
+  color: #000;
+  font-weight: bold;
+}
+.card-header{
     color: #6c949e;
     font-weight: lighter;
 }
@@ -157,7 +161,7 @@ h1 {
 
 div.comment {
     border: 1px solid #f0f3f4;
-    margin: 0.5em 0;
+    /*margin: 0.5em 0;*/
     max-width: 640px;
 }
 
@@ -196,7 +200,7 @@ div.by button.delete:hover {
 }
 
 #div-add-comment {
-    padding: 0.5em;
+    /*padding: 0.5em;*/
     max-width: calc(640px - 1em);
 }
 
@@ -232,7 +236,7 @@ textarea {
     margin: 0 0 15px;
     padding-bottom: 4px;
     font-size: 1.2em;
-    border-bottom: 1px solid #f0f3f4;
+    /*border-bottom: 1px solid #f0f3f4;*/
     color: #333333;
 }
 
@@ -248,14 +252,14 @@ textarea {
     font-style: normal;
     padding: 8px 8px 8px 0;
     margin: 0;
-    border-bottom: 1px solid #f0f3f4;
+    /*border-bottom: 1px solid #f0f3f4;*/
     width: 1%;
     white-space: nowrap;
 }
 .js-obj-to-html td {
-    font-size: 1.2em;
+    /*font-size: 1.2em;*/
     padding: 8px 8px 8px 0;
-    border-bottom: 1px solid #f0f3f4;
+    /*border-bottom: 1px solid #f0f3f4;*/
 }
 
 #submitted p {

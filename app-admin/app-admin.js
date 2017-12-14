@@ -40,7 +40,7 @@ app.use(handlebars({
     extension:   [ 'html' ],
     viewsDir:    'app-admin/templates',
     partialsDir: 'app-admin/templates/partials',
-    helpers:     { selected: HandlebarsHelpers.selected, checked: HandlebarsHelpers.checked },
+    helpers:     { selected: HandlebarsHelpers.selected, checked: HandlebarsHelpers.checked, contains: HandlebarsHelpers.contains },
 }));
 
 

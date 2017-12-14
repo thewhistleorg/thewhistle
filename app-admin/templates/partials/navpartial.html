@@ -1,8 +1,8 @@
 {{#if @koa.state.user}}
-<nav class="pure-menu pure-menu-horizontal">
+<nav class="pure-menu pure-menu-horizontal drop-shadow">
     <ul class="pure-menu-list">
         <li class="pure-menu-item"><a href="/" class="pure-menu-link logo-container"></a></li>
-        <li class="pure-menu-item"><a href="/reports" class="pure-menu-link">Reports</a></li>
+        <li class="pure-menu-item {{#contains @koa.request.url '/reports'}} pure-menu-active {{/contains}}"><a href="/reports" class="pure-menu-link">Reports</a></li>
         <!-- Analysis not needed for now -->
         <!-- <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
             <a href="#" class="pure-menu-link">analysis</a>
@@ -11,8 +11,8 @@
             </ul>
         </li> -->
         {{#if @koa.state.user.isAdmin}}
-        <li class="pure-menu-item"><a href="/users" class="pure-menu-link">Users</a></li>
-        <li class="pure-menu-item"><a href="/resources" class="pure-menu-link">Resources</a></li>
+        <li class="pure-menu-item {{#contains @koa.request.url '/users'}} pure-menu-active {{/contains}}"><a href="/users" class="pure-menu-link">Users</a></li>
+        <li class="pure-menu-item {{#contains @koa.request.url '/resources'}} pure-menu-active {{/contains}}"><a href="/resources" class="pure-menu-link">Resources</a></li>
         {{/if}}
         <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover"><a href="#" class="pure-menu-link">Submit</a>
             <ul class="pure-menu-children">

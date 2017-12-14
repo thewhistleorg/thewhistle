@@ -62,7 +62,7 @@
     {{>navpartial}}
 </header>
 
-<main id="individual-report">
+<main id="individual-report" class="drop-shadow">
 
     <div class="pure-g report-container">
 
@@ -71,8 +71,8 @@
             <div class="header-table-body">
               <div class="header-table-row">
                 <div class="header-table-cell report-header">
-                  <div class="content-header">&nbsp;</div>
-                  <div class="report-header-content">“{{reportedBy}}” — {{reportedOnFull}}</div>
+                  <div class="content-header"><a class="bold" href="{{referer}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Report list</a></div>
+                  <div class="report-header-content">{{reportedBy}} - <span class="small">{{reportedOnDay}}</span></div>
                 </div>
 
                 <div class="header-table-cell">
@@ -126,7 +126,7 @@
         </div>
 
 
-        <div id="scroll-container" class="pure-u-3-5 apply-scroll">
+        <div class="pure-u-3-5">
 
             <ul class="card-list">
                 <li id="submitted">
@@ -191,6 +191,7 @@
                     <div class="padding-15">
                         <!-- <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p> -->
                         <div id="map"></div>
+                        <br>
                         <ul class="accordion-2">
                             <li class="accordion-item">
                                 <input type="checkbox" class="accordion-toggle" id="toggle-geo" />
@@ -216,10 +217,10 @@
                     <span class="card-header">Tags</span>
                     <div id="tag-list">{{#tags}}
                         <span class="tag">{{this}} <button title="remove tag" class="tag-del hide fa fa-trash red"></button></span> {{/tags}}
-                        <button id="tag-add" title="add tag" class="fa fa-plus green"></button></div>
+                        <button id="tag-add" title="add tag" class="fa fa-plus primary-blue"></button></div>
                     <div id="new-tag" class="hide">
                         <span class="grey">#</span><input name="tag" id="tag" list="tags" placeholder="enter tag">
-                        <button id="tag-save" title="add tag" class="fa fa-check green"></button>
+                        <button id="tag-save" title="add tag" class="fa fa-check primary-blue"></button>
                         <button id="tag-cancel" title="cancel" class="fa fa-times red"></button>
                     </div>
                     <datalist id="tags">
@@ -230,7 +231,8 @@
                 </li>
                 <li>
                     <span class="card-header">Notes</span>
-                    <div>
+                    <div id="commentsContainer">
+
                         {{#comments}}
                         <div class="comment comment-container" id="{{id}}">
                             <div class="by"><b><a href="/users/{{byName}}">{{byName}}</a></b> commented <a href="#{{id}}" title="{{onFull}}">{{onPretty}}</a>
@@ -261,22 +263,18 @@
                             </table>
                         </div>
                         <div class="comment" id="div-add-comment">
+                            <span class="small grey">
+                                <svg aria-hidden="true" class="align-middle" height="12" version="1.1" viewBox="0 0 16 16" width="16">
+                                    <path fill-rule="evenodd" d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.92 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z"></path>
+                                </svg>
+                                Styling with <a href="https://daringfireball.net/projects/markdown/">Markdown</a> is supported; @mentions and #tags can be used
+                            </span>
                             <textarea name="comment" id="comment" placeholder="Add a comment"></textarea>
-                            <table>
-                                <tr>
-                                    <td class="small grey">
-                                        <svg aria-hidden="true" class="align-middle" height="12" version="1.1" viewBox="0 0 16 16" width="16">
-                                            <path fill-rule="evenodd" d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.92 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z"></path>
-                                        </svg>
-                                        Styling with <a href="https://daringfireball.net/projects/markdown/">Markdown</a> is supported; @mentions and #tags can be used
-                                    </td>
-                                    <td>
-                                        <button id="add-comment" class="pure-button pure-button-primary">Add comment</button>
-                                    </td>
-                                </tr>
-                            </table>
+                            <button id="add-comment" class="pure-button pure-button-primary">Add comment</button>
+
                         </div>
                     </div>
+                    <br>
                 </li>
 
                 <!-- <li>
@@ -292,7 +290,7 @@
                 </li> -->
                 <li class="accordion-item">
                     <input type="checkbox" class="accordion-toggle" id="toggle-updates" />
-                    <label class="accordion-trigger" for="toggle-updates"><span class="card-header">Audit trail</span></label>
+                    <label class="accordion-trigger" for="toggle-updates"><span class="bold">Audit trail</span></label>
                     <div class="accordion-target">
                         <table id="updates">
                             {{#updates}}

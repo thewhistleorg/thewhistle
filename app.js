@@ -120,7 +120,7 @@ app.use(async function composeSubapp(ctx) { // note no 'next' after composed sub
             if (process.env.SUBAPP) {
                 // eg for Heroku review apps where subdomain cannot be supplied, take subapp from env
                 const subapp = await import(`./app-${process.env.SUBAPP}/app-${process.env.SUBAPP}.js`);
-                await compose(subapp.middleware)(ctx); break;
+                await compose(subapp.default.middleware)(ctx); break;
             }
             if (ctx.state.subapp == 'localhost') { ctx.status = 403; break; } // avoid redirect loop
             // otherwise redirect to www static site (which should not be this app)

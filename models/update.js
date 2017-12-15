@@ -15,11 +15,18 @@ import Report from './report.js';
 /*
  * An update record records all updates made to incident reports.
  */
-const validator = { $and: [
-    { reportId: { $type: 'objectId', $exists: true } }, // report updated
-    { userId:   { $type: 'objectId', $exists: true } }, // user making update
-    { update:   { $type: 'object',   $exists: true } }, // update details as per update() update object
-] };
+/* eslint-disable no-unused-vars, key-spacing */
+const schema = {
+    type: 'object',
+    required: [ 'reportId', 'userId', 'update' ],
+    properties: {
+        reportId: { bsonType: 'objectId' }, // report updated
+        userId:   { bsonType: 'objectId' }, // user making update
+        update:   { bsonType: 'objectId' }, // update details as per update() update object
+    },
+};
+/* eslint-enable no-unused-vars, key-spacing */
+/* once we have MongoDB 3.6, we can use db.runCommand({ 'collMod': 'reports' , validator: { $jsonSchema: schema } }); */
 
 class Update {
 

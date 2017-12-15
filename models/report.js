@@ -23,27 +23,53 @@ import Update  from './update.js';
  * The submitted report may be any format, though will generally be an array of name-value pairs
  * from a web form (held as a standard JavaScript object).
  *
- * This validator specifies the metadata which the app expects to find as part of the report.
- *
- * Of course, no operation should fail validation at this level: full validation should be done both
- * front-end and by the back-end app.
+ * This schema is used for validation, specifying the metadata which the app expects to find as part
+ * of the report. Of course, no operation should fail validation at this level: full validation
+ * should be done both front-end and by the back-end app.
  */
-const validator = { $and: [ // TODO: validation for string or null
-    { project:    { $type: 'string',   $exists: true } }, // name of project report belongs to
-    { submitted:  { $type: 'object',   $exists: true } }, // flexible format following incident reporting format
-    { by:         { $type: 'objectId'                } }, // user entering incident report
-    { name:       { $type: 'string',   $exists: true } }, // auto-generated name of victim/survivor
-    { geocode:    { $type: 'object'                  } }, // google geocoding data
-    { location:   { $type: 'object',   $exists: true } }, // GeoJSON (with spatial index)
-    { analysis:   { $type: 'object'                  } }, // exif data, weather, etc
-//  { summary:    { $type: 'string'                  } }, // single-line summary for identification (not currently used)
-    { assignedTo: { $type: 'objectId'                } }, // user report is assigned to
-    { status:     { $type: 'string'                  } },
-    { tags:       { $type: 'array'                   } }, // array of strings
-    { comments:   { $type: 'array'                   } }, // array of { byId, byName, on, comment }
-    { views:      { $type: 'object'                  } }, // associative array of timestamps indexed by user id
-    { archived:   { $type: 'bool',     $exists: true } }, // archived flag
-] };
+/* eslint-disable no-unused-vars, key-spacing */
+const schema = {
+    type: 'object',
+    required: [ '_id', 'project', 'alias', 'assignedTo', 'status', 'tags', 'archived' ],
+    properties: {
+        project:    { type:     'string' },               // name of project report belongs to
+        by:         { bsonType: [ 'objectId', 'null' ] }, // user entering incident report
+        alias:      { type:     'string' },               // auto-generated alias of victim/survivor
+        submitted:  { type:     'object' },               // originally submitted report (flexible format following incident reporting format)
+        files:      { type:     'array',                  // uploaded files
+            items: { type: 'object' },                    // ...
+        },
+        geocode:    { type:     'object' },               // google geocoding data
+        location:   { type:     'object' },               // GeoJSON (with spatial index)
+        // location:   { type: 'object',
+        //     properties: {
+        //         address: { type: 'string' },
+        //         geocode: { type: 'object' },
+        //         geojson: { type: 'object' }
+        //     }
+        // },
+        analysis:   { type:     'object' },               // exif data, weather, etc
+        assignedTo: { bsonType: [ 'objectId', 'null' ] },   // user report is assigned to
+        status:     { type:     [ 'string', 'null' ] },     // free-text status (to accomodate any workflow)
+        tags:       { type:     'array',                  // tags to classify/group reports
+            items: { type: 'string' },
+        },
+        comments:   { type: 'array',                      // notes/commentary documenting management of report
+            items: { type: 'object',
+                properties: {
+                    byId:    { bsonType: 'objectId' },    // ... user making comment
+                    byName:  { type:     'string' },      // ... username of user making comment (in case user gets deleted)
+                    on:      { bsonType: 'date' },        // ... timestamp comment added
+                    comment: { type:     'string' },      // ... comment in markdown format
+                },
+            },
+        },
+        archived:   { type: 'boolean' },                 // archived flag
+        views:      { type: 'object' },                  // associative array of timestamps indexed by user id
+    },
+};
+/* eslint-enable no-unused-vars, key-spacing */
+/* once we have MongoDB 3.6, we can use db.runCommand({ 'collMod': 'reports' , validator: { $jsonSchema: schema } }); */
 
 class Report {
 

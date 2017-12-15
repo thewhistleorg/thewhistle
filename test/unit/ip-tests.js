@@ -44,7 +44,7 @@ describe('IP caching', function() {
         });
     });
 
-    describe('domain', async function() {
+    describe('domain', function() {
         test('IP domain cache starts empty', function() {
             expect(global.ipsDomain.size).to.equal(0);
         });
@@ -72,7 +72,7 @@ describe('IP caching', function() {
             const ipsCountry = await ip.getDomain('not an ip address!');
             expect(ipsCountry).to.be.null;
         });
-        test('IP domain cache has 3 entries', async function() {
+        test('IP domain cache has 3 entries', function() {
             expect(global.ipsDomain.size).to.equal(3);
         });
     });

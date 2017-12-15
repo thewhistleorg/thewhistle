@@ -45,13 +45,13 @@
                 window.location.href = window.location.pathname + (Qs.stringify(qs) ? '?'+Qs.stringify(qs) : '');
             });
 
-            var hasFilter = document.querySelectorAll('#filter-container span[data-key]').length > 0;
-            if(hasFilter) {
-              var div = document.getElementById("filter-container");
-              div.style.display = 'block';
+            const hasFilter = document.querySelectorAll('#filter-container span[data-key]').length > 0;
+            if (hasFilter) {
+                const div = document.getElementById('filter-container');
+                div.style.display = 'block';
             }
             const sortIndicator = document.querySelector('th[data-sort={{sort.column}}] .fa');
-            sortIndicator.style.color = '#000';
+            sortIndicator.style.color = '#000000';
             sortIndicator.parentElement.style.backgroundColor = '#e8f2f7';
             sortIndicator.classList.remove('fa-sort');
             sortIndicator.classList.add('{{sort.asc}}'=='+' ? 'fa-sort-asc' : 'fa-sort-desc');
@@ -81,80 +81,87 @@
 <!-- <h2 class="page-header-title">Reports</h2> -->
 
 {{>errpartial}}
+
 <div class="white-background drop-shadow">
-{{>filterpartial}}
-<div class="container-header">
-  <span class="grey">Search Result ({{count}})</span>
-  <div class="float-right bold">
-      <span>Export to</span>
-      <a href="{{exportCsv}}" title="Save as CSV"> CSV </a>
-      <span>/</span>
-      <a href="{{exportPdf}}" title="Save as PDF">PDF</a>
-  </div>
+
+    {{>filterpartial}}
+
+    <div class="container-header">
+      <span class="grey">Search Result ({{count}})</span>
+        <div class="float-right bold">
+            <span>Export to</span>
+            <a href="{{exportCsv}}" title="Save as CSV"> CSV </a>
+            <span>/</span>
+            <a href="{{exportPdf}}" title="Save as PDF">PDF</a>
+        </div>
+    </div>
+    <!-- "The map wont be relevant until we start on Gen 2"  -->
+    <!-- Disabling the tabs since we don't have map for now -->
+
+    <!-- <nav class="tabs">
+        <ul>
+            <li class="active"><a href="/reports">List ({{count}})</a></li>
+            <li><a href="/reports-map{{@koa.request.search}}">Map</a></li>
+        </ul>
+    </nav> -->
+
+
+    <table class="pure-table w100pc custom-table clickable-row reports-table">
+        <tr>
+            <th data-sort="from" class="w12">from <span  class="float-right fa fa-sort"></span></th>
+            <!-- <th data-sort="submitted" class="w6">submitted <span  class="float-right fa fa-sort"></span></th> -->
+            <!-- <th data-sort="updated" class="w5">updated <span  class="float-right fa fa-sort"></span></th> -->
+            <th data-sort="summary">description <span  class="float-right fa fa-sort"></span></th>
+            <th data-sort="assigned" class="w6">assigned to <span  class="float-right fa fa-sort"></span></th>
+            <th data-sort="status" class="w6">status <span  class="float-right fa fa-sort"></span></th>
+            <th class="w8">tags</th>
+            <th data-sort="location" class="w6">location <span  class="float-right fa fa-sort"></span></th>
+            <!-- <th></th>
+            <th class="action"></th>
+            <th class="action"></th> -->
+        </tr>
+
+        {{#reports}}
+        <tr id="{{_id}}" title="{{name}}@{{reportedOnFull}} by {{reportedBy}}" class="{{#unless viewed}}new-report{{/unless}}">
+            <td class="report-identifier">
+                {{#unless viewed}}<div class="fa fa-circle new-indicator"></div>{{/unless}}
+                <span>{{reportedBy}}</span>
+                <br><span class="small">{{{reportedOnDay}}}</span>
+                <br><i class="pale-grey small">{{{updatedAgo}}}</i>
+            </td>
+            <!-- <td title="{{reportedOnFull}} by {{reportedBy}}" class="pale-grey nowrap" style="text-align:right">
+              <span></span>
+            </td> -->
+            <!-- <td data-ago="{{updatedOn}}" title="{{updatedOnPretty}} by @{{updatedBy}}" class="pale-grey">
+              <span>{{{updatedAgo}}}</span>
+            </td> -->
+            <td class="submitted-description">
+                <span>{{{submittedDesc}}}</span>
+            </td>
+
+            <td class="assigned">
+                <span title="filter by assigned-to={{assignedTo}}">{{{assignedTo}}}</span>
+            </td>
+            <td>
+                <span>{{{status}}}</span>
+            </td>
+            <td>
+                {{#if tags}}
+                    {{#tags}}{{{this}}}{{/tags}}
+                {{else}}
+                    <i class="pale-grey">No tags</i>
+                {{/if}}
+            </td>
+            <td>
+                <span>{{location}}</span>
+            </td>
+
+        </tr>
+        {{/reports}}
+    </table>
 </div>
-<!-- "The map wont be relevant until we start on Gen 2"  -->
-<!-- Disabling the tabs since we don't have map for now -->
-
-<!-- <nav class="tabs">
-    <ul>
-        <li class="active"><a href="/reports">List ({{count}})</a></li>
-        <li><a href="/reports-map{{@koa.request.search}}">Map</a></li>
-    </ul>
-</nav> -->
-
-
-<table class="pure-table w100pc custom-table clickable-row reports-table">
-    <tr>
-        <th data-sort="from" class="w12">from <span  class="float-right fa fa-sort"></span></th>
-        <!-- <th data-sort="submitted" class="w6">submitted <span  class="float-right fa fa-sort"></span></th> -->
-        <!-- <th data-sort="updated" class="w5">updated <span  class="float-right fa fa-sort"></span></th> -->
-        <th data-sort="summary">description <span  class="float-right fa fa-sort"></span></th>
-        <th data-sort="assigned" class="w6">assigned to <span  class="float-right fa fa-sort"></span></th>
-        <th data-sort="status" class="w6">status <span  class="float-right fa fa-sort"></span></th>
-        <th class="w8">tags</th>
-        <th data-sort="location" class="w6">location <span  class="float-right fa fa-sort"></span></th>
-        <!-- <th></th>
-        <th class="action"></th>
-        <th class="action"></th> -->
-    </tr>
-
-    {{#reports}}
-    <tr id="{{_id}}" title="{{name}}@{{reportedOnFull}} by {{reportedBy}}" class="{{#unless viewed}}new-report{{/unless}}">
-        <td class="report-identifier">
-          {{#unless viewed}}<div class="fa fa-circle new-indicator"></div>{{/unless}}
-          <span>{{reportedBy}}</span>
-          <br><span class="small">{{{reportedOnDay}}}</span>
-          <br><i class="pale-grey small">{{{updatedAgo}}}</i>
-        </td>
-        <!-- <td title="{{reportedOnFull}} by {{reportedBy}}" class="pale-grey nowrap" style="text-align:right">
-          <span></span>
-        </td> -->
-        <!-- <td data-ago="{{updatedOn}}" title="{{updatedOnPretty}} by @{{updatedBy}}" class="pale-grey">
-          <span>{{{updatedAgo}}}</span>
-        </td> -->
-        <td class="submitted-description">
-          <span>{{{submittedDesc}}}</span>
-        </td>
-
-        <td class="assigned">
-            <span title="filter by assigned-to={{assignedTo}}">{{{assignedTo}}}</span>
-        </td>
-        <td>
-          <span>{{{status}}}</span>
-        </td>
-        <td>
-          {{#if tags}}{{#tags}}{{{this}}}{{/tags}}{{else}}<i class="pale-grey">No tags</i>{{/if}}
-        </td>
-        <td>
-          <span>{{location}}</span>
-        </td>
-
-    </tr>
-    {{/reports}}
-</table>
-</div>
-<!-- Disabling the dev notes for now -->
-<!-- <p class="grey"><b>Notes</b></p>
+<!-- Disabling the dev notes for now
+<p class="grey"><b>Notes</b></p>
 <p class="grey"><i>Updated</i> filter: the <i>updated</i> column shows 'ago' vaues: should the
     <i>updated</i> filter also be by 'ago' values, or by dates?</p>
 <p class="grey">Formatting issues to be addressed on <i>submitted</i> range filter.</p>
@@ -164,7 +171,8 @@
     entirely sure).</p>
 <p class="grey">If number of <i>report fields</i> is likely to be very large, perhaps that should be
     implemented using some form of autocomplete.</p>
-<p class="grey">Think about use of history.</p> -->
+<p class="grey">Think about use of history.</p>
+-->
 
 </main>
 

@@ -12,7 +12,6 @@ import fs         from 'fs-extra';     // fs with extra functions & promise inte
 import crypto     from 'crypto';       // nodejs.org/api/crypto.html
 import dateFormat from 'dateformat';   // Steven Levithan's dateFormat()
 
-import Report from '../models/report.js';
 
 // nodemailer transporter config
 const transporter = nodemailer.createTransport({
@@ -21,10 +20,10 @@ const transporter = nodemailer.createTransport({
     port:             process.env.SMTP_PORT,
     requiresAuth:     true,
     secure:           false,
-    auth: {
+    auth:             {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-    }
+        pass: process.env.SMTP_PASS,
+    },
 });
 
 class Email {
@@ -67,9 +66,9 @@ class Email {
         try {
             //const info = await transporter.verify();
             const info = await transporter.sendMail(message);
-            console.log('info', info)
+            console.info('info', info);
         } catch (e) {
-            console.log('ERROR', e)
+            console.error('ERROR', e);
         }
 
         await ctx.render('email/confirm');
@@ -81,7 +80,7 @@ class Email {
     static async verify(ctx) {
         const token = ctx.params.token;
 
-        const [ hash, timestamp ] = token.split('-');
+        const [ hash, timestamp ] = token.split('-'); // eslint-disable-line no-unused-vars
 
         // check token is not expired
         if (Date.now()/1000 - parseInt(timestamp, 36) > 60*60*24) {

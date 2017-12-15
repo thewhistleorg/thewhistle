@@ -19,6 +19,7 @@ const testpass = process.env.TESTPASS;
 const request = supertest.agent(app.listen());
 
 describe('Twilio app'+' ('+app.env+')', function() {
+    /* eslint no-unreachable: off */
     return; // suspend twilio tests for now until functionality is required
 
     this.timeout(5e3); // 5 sec

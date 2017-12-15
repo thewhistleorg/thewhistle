@@ -117,10 +117,10 @@ function mergeDeep(target, ...sources) {
 
     for (const key in source) {
         if (source[key] && typeof source[key] == 'object') {
-            if (!target[key]) Object.assign(target, {[key]: {}});
+            if (!target[key]) Object.assign(target, { [key]: {} });
             mergeDeep(target[key], source[key]);
         } else {
-            Object.assign(target, {[key]: source[key]});
+            Object.assign(target, { [key]: source[key] });
         }
     }
 
@@ -163,7 +163,7 @@ app.use(async function ctxAddDomain(ctx, next) {
 
 // TODO: any way to invoke project routes directly, rather than composing app?
 
-import ajaxRoutes from './ajax-routes.js'
+import ajaxRoutes from './ajax-routes.js';
 app.use(ajaxRoutes);
 
 
@@ -198,7 +198,7 @@ router.get('/', async function indexPage(ctx) {
 
 
 // logout page - replicates admin logout, but simpler to have it here than to redirect to admin.
-router.get('/logout', async function logout(ctx) {
+router.get('/logout', function logout(ctx) {
     const domain = ctx.request.hostname.replace('report.', '');
 
     // delete the cookie holding the JSON Web Token

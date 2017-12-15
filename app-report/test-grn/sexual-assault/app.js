@@ -36,8 +36,8 @@ app.use(handlebars({
     helpers:       { selected: HandlebarsHelpers.selected, checked: HandlebarsHelpers.checked },
 }));
 
-import routes         from './routes.js'
-import routesLoggedIn from './routes-logged-in.js'
+import routes         from './routes.js';
+import routesLoggedIn from './routes-logged-in.js';
 
 app.use(WhistleMiddleware.verifyJwt()); // if user is logged in, make sure they are set up before index, submit
 

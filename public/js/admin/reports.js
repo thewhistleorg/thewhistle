@@ -3,7 +3,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';
-/* eslint-env browser */
 
 
 document.addEventListener('DOMContentLoaded', function() {

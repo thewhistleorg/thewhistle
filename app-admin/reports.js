@@ -59,10 +59,7 @@ class ReportsHandlers {
         // geocoded location field or fields to use
         const lowestCommonLevel = lowestCommonGeographicLevel(rpts);
 
-        // const viewed = !!lastViewed;
-        // debugger;
         const reports = [];
-
         for (const rpt of rpts) {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
             const lastViewed = rpt.views[ctx.state.user.id];
@@ -78,27 +75,28 @@ class ReportsHandlers {
             if (rpt.tags.length > 2) { // limit displayed tags to 2
                 rpt.tags.splice(2, rpt.tags.length, `<span class="nowrap">+${rpt.tags.length-2} more...</span>`);
             }
+
             const desc = rpt.submitted['Description'] || rpt.submitted['brief-description']; // TODO: transition code until all early test report are deleted
             const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
             const fields = {
-                _id:              rpt._id,
-                updatedOn:        lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
-                updatedOnPretty:  lastUpdate.on ? prettyDate(lastUpdate.on.toDateString()) : '',
-                updatedAge:       lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
-                updatedAgo:       lastUpdate.on ? 'Updated ' + ago(lastUpdate.on) : '',
-                viewed:           !!lastViewed,
-                updatedBy:        lastUpdate.by,
-                assignedTo:       assignedTo ? '@'+assignedTo.username : `<i class="pale-grey">Not assigned</i>`,
-                status:           rpt.status ||  `<i class="pale-grey">None</i>`, // ensure status is string
-                summary:          rpt.summary || `<span title="submitted description">${desc}</span>`,
-                submittedDesc:    truncate(desc,140)|| `<i title="submitted description" class="pale-grey">No Description</i>`,
-                tags:             rpt.tags ,
-                reportedOnDay: prettyDate(rpt._id.getTimestamp()),
-                reportedOnFull:   dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
-                reportedBy:       rpt.by ? '@'+users.get(rpt.by.toString()).username : rpt.name,
-                location:         rpt.location,
-                name:             rpt.name,
-                comments:         rpt.comments,
+                _id:             rpt._id,
+                updatedOn:       lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
+                updatedOnPretty: lastUpdate.on ? prettyDate(lastUpdate.on.toDateString()) : '',
+                updatedAge:      lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
+                updatedAgo:      lastUpdate.on ? 'Updated ' + ago(lastUpdate.on) : '',
+                viewed:          !!lastViewed,
+                updatedBy:       lastUpdate.by,
+                assignedTo:      assignedTo ? '@'+assignedTo.username : `<i class="pale-grey">Not assigned</i>`, // eslint-disable-line quotes
+                status:          rpt.status ||  `<i class="pale-grey">None</i>`,                                 // eslint-disable-line quotes
+                summary:         rpt.summary || `<span title="submitted description">${desc}</span>`,
+                submittedDesc:   truncate(desc,140)|| `<i title="submitted description" class="pale-grey">No Description</i>`, // eslint-disable-line quotes
+                tags:            rpt.tags,
+                reportedOnDay:   prettyDate(rpt._id.getTimestamp()),
+                reportedOnFull:  dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
+                reportedBy:      rpt.by ? '@'+users.get(rpt.by.toString()).username : rpt.name,
+                location:        rpt.location,
+                name:            rpt.name,
+                comments:        rpt.comments,
             };
             reports.push(fields);
         }
@@ -221,7 +219,7 @@ class ReportsHandlers {
             if (reportsByWeek[week] == undefined) reportsByWeek[week] = 0;
             reportsByWeek[week]++;
         }
-        const maxReportsByWeek = Math.max(...Object.values(reportsByWeek)) + 1; // TODO
+        // const maxReportsByWeek = Math.max(...Object.values(reportsByWeek)) + 1; // TODO
 
         // show number of reports in results
         const count = reports.length == 0
@@ -363,7 +361,7 @@ class ReportsHandlers {
         for (const q in ctx.request.query) {
             if (Array.isArray(ctx.request.query[q])) {
                 // if filter given multiple times eg tag=a&tag=b;
-                for (const filter of ctx.request.query[q]) filters.push(q.slice(0,6)=='field:' ? `field <i>${q.slice(6)}</i>: ${filter}` : `${q}: ${filter}`);
+                for (const f of ctx.request.query[q]) filters.push(q.slice(0,6)=='field:' ? `field <i>${q.slice(6)}</i>: ${f}` : `${q}: ${f}`);
             } else {
                 filters.push(q.slice(0,6)=='field:' ? `field <i>${q.slice(6)}</i>: ${ctx.request.query[q]}` : `${q}: ${ctx.request.query[q]}`);
             }
@@ -794,7 +792,7 @@ class ReportsHandlers {
                 comment:  MarkdownIt().render(comment),
             };
         });
-        const referer = ctx.headers.referer? ctx.headers.referer : "/reports";
+
         // audit trail
         const updates = await Update.getByReport(db, ctx.params.id);
 
@@ -820,9 +818,9 @@ class ReportsHandlers {
             files:            report.submitted.files, // for tabs
             updates:          updates,
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
-            submittedDesc:    truncate(desc,70) || `<i title="submitted description" class="grey">No Description</i>`,
+            submittedDesc:    truncate(desc,70) || `<i title="submitted description" class="grey">No Description</i>`, // eslint-disable-line quotes
             showDeleteButton: ctx.app.env != 'production',
-            referer         : referer,
+            referer:          ctx.headers.referer || '/reports',
         };
         extra.reportDescription = report.summary
             ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`
@@ -848,9 +846,11 @@ class ReportsHandlers {
                 if (file.exif && file.exif.CreateDate) {
                     const date = file.exif.CreateDate;
                     file.time = new Date(Date.UTC(date.year, date.month-1, date.day, date.hour, date.minute - date.tzoffsetMinutes)); // TODO: exif tz?
-                    if (file.time) file.timeDesc = !isNaN(incidentTime)
-                        ? moment(file.time).from(incidentTime)+' from incident'
-                        : moment(file.time).from(submissionTime)+' from submission';
+                    if (file.time) {
+                        file.timeDesc = !isNaN(incidentTime)
+                            ? moment(file.time).from(incidentTime)+' from incident'
+                            : moment(file.time).from(submissionTime)+' from submission';
+                    }
                 }
             }
         }
@@ -1129,11 +1129,11 @@ function prettyDate(date) {
 
     // this year
     if (new Date(date).getFullYear() == new Date().getFullYear()) {
-        return `${dateFormat(date, 'd mmm')} <span>${dateFormat(date, 'yyyy')}</span>`;
+        return `${dateFormat(date, 'd mmm')} <span style="opacity:0.6">${dateFormat(date, 'yyyy')}</span>`;
     }
 
     // before this year
-    return `<span>${dateFormat(date, 'd mmm')}</span> ${dateFormat(date, 'yyyy')}`;
+    return `<span style="opacity:0.6">${dateFormat(date, 'd mmm')}</span> ${dateFormat(date, 'yyyy')}`;
 }
 
 
@@ -1199,7 +1199,7 @@ function lowestCommonGeographicLevel(reports) {
     if (level2.length == 1) return 'level2long';
 
     // common city?
-    const city = [ ...new Set(rpts.map(rpt => rpt.geocode.city ? rpt.geocode.city : undefined)) ].filter(city => city != undefined);
+    const city = [ ...new Set(rpts.map(rpt => rpt.geocode.city ? rpt.geocode.city : undefined)) ].filter(c => c != undefined);
     if (city.length == 1) return 'city';
 
     // common level1 address?
@@ -1207,7 +1207,7 @@ function lowestCommonGeographicLevel(reports) {
     if (level1.length == 1) return 'level1long';
 
     // common country?
-    const country = [ ...new Set(rpts.map(rpt => rpt.geocode.country ? rpt.geocode.country : undefined)) ].filter(country => country != undefined);
+    const country = [ ...new Set(rpts.map(rpt => rpt.geocode.country ? rpt.geocode.country : undefined)) ].filter(c => c != undefined);
     if (country.length == 1) return 'country';
 
     return ''; // multiple countries!

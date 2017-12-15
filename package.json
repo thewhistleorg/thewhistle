@@ -12,7 +12,9 @@
     "test": "mocha --exit -r @std/esm test/*/*.js",
     "test-unit": "mocha --exit -r @std/esm test/unit/*.js",
     "test-intgn": "mocha --exit -r @std/esm test/integration/*.js",
-    "lint": "eslint --ignore-pattern app-api/apidoc .",
+    "lint": "npm run lint-node && npm run lint-browser",
+    "lint-node": "eslint --env node --ignore-pattern public --ignore-pattern app-api/apidoc .",
+    "lint-browser": "eslint --env browser public/",
     "stylelint": "stylelint public/css/*.css",
     "cover": "istanbul cover node_modules/.bin/_mocha test/*/ -- --exit -r @std/esm",
     "cover-unit": "istanbul cover node_modules/.bin/_mocha test/unit/ -- --exit -r @std/esm",
@@ -76,6 +78,7 @@
   },
   "devDependencies": {
     "apidoc": "^0.17.5",
+    "babel-eslint": "8.0.3",
     "base-64": "^0.1.0",
     "chai": "^4.0.2",
     "eslint": "^4.10.0",
@@ -85,6 +88,7 @@
     "npm-check": "^5.5.0",
     "npm-check-updates": "^2.11.3",
     "stylelint": "^8.1.1",
+    "stylelint-config-standard": "^18.0.0",
     "supertest": "https://github.com/mikec/supertest.git"
   },
   "@std/esm": {
@@ -92,10 +96,10 @@
   },
   "eslintConfig": {
     "env": {
-      "node": true,
       "es6": true,
       "mocha": true
     },
+    "parser": "babel-eslint",
     "parserOptions": {
       "ecmaVersion": 2017,
       "sourceType": "module"
@@ -118,6 +122,7 @@
       "quotes": [ "error", "single", "avoid-escape" ],
       "require-await": "error",
       "semi": [ "error", "always" ],
+      "space-before-blocks": [ "error", "always" ],
       "strict": [ "error", "global" ]
     }
   },

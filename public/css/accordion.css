@@ -57,7 +57,7 @@ ul.accordion input:checked + label::after {
 }
 
 .accordion-item {
-    padding: 0px!important;
+    padding: 0 !important;
 }
 
 .accordion-item:last-of-type {
@@ -91,7 +91,7 @@ ul.accordion input:checked + label::after {
     line-height: 2.5;
     text-align: center;
     transition: all 0.35s;
-    font-family: "fontawesome";
+    font-family: 'fontawesome';
 }
 
 .accordion-toggle:checked + .accordion-trigger::after {

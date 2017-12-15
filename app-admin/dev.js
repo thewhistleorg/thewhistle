@@ -6,7 +6,6 @@ import nodeinfo   from 'nodejs-info';         // node info
 import dateFormat from 'dateformat';          // Steven Levithan's dateFormat()
 import json2csv   from 'json2csv';            // converts json into csv
 import jsdom      from 'jsdom';               // DOM Document interface in Node!
-import dns        from 'dns';                 // nodejs.org/api/dns.html
 import fs         from 'fs-extra';            // fs with extra functions & promise interface
 import markdown   from 'markdown-it';         // markdown parser
 import mda        from 'markdown-it-anchor';  // header anchors for markdown-it

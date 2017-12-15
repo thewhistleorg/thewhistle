@@ -1,122 +1,119 @@
 /*
-Custom table styles:
-Override purecss striped table style
-*/
+ * Custom table styles:
+ * Override purecss striped table style
+ */
 
 .custom-table tr:nth-child(2n-1) td {
-  /* we might need this selector so not removing it*/
-  /* background-color: #fafbfd; */
+    /* we might need this selector so not removing it */
+    /* background-color: #fafbfd; */
 }
 
 table.custom-table {
-  border-color: #f0f3f4;
-  background: #ffffff;
+    border-color: #f0f3f4;
+    background: #ffffff;
 }
 
 table.custom-table td, table.custom-table th {
-  border-color: #f0f3f4;
-  /*border-left: 1px dotted #cbcbcb;*/
-  text-align: left;
+    border-color: #f0f3f4;
+    /* border-left: 1px dotted #cbcbcb; */
+    text-align: left;
 }
 
 table.custom-table th {
-  color: #777;
-  font-style: normal;
-  padding: 10px;
-  background-color: #fafbfd;
-  border-bottom: 1px solid #f0f3f4;
-  font-size: 80%;
+    color: #777777;
+    font-style: normal;
+    padding: 10px;
+    background-color: #fafbfd;
+    border-bottom: 1px solid #f0f3f4;
+    font-size: 80%;
 }
 
 table.custom-table td {
-  padding: 5px 12px;
-  vertical-align: middle;
-  border-bottom: 1px solid #f0f3f4;
+    padding: 5px 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f3f4;
 }
 
 table.custom-table th .fa {
-  margin: 4px -6px;
-  opacity: 0.6;
+    margin: 4px -6px;
+    opacity: 0.6;
 }
 
 .clickable-row tr:hover {
-  background-color: #f5f5f5;
-  cursor: pointer;
+    background-color: #f5f5f5;
+    cursor: pointer;
 }
 
 table.custom-table td.action, table.custom-table th.action {
-  padding: 0;
+    padding: 0;
 }
 
 td.action {
-  min-width: 0;
+    min-width: 0;
 }
 
 td.action a {
-  font-size: 1.4em;
-  padding: 5px;
+    font-size: 1.4em;
+    padding: 5px;
 }
 
 th[data-sort] {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 th[data-sort]:hover {
-  background: #f6f7f9;
+    background: #f6f7f9;
 }
 
 /* tweak margin */
 
 .custom-table.margin-tweak {
-  margin-top: 3px;
+    margin-top: 3px;
 }
-
 
 /* New reports row */
 
-
 table.reports-table {
-  border: 1px solid #e0e6e8;
+    border: 1px solid #e0e6e8;
 }
 
 td.report-identifier {
-  position: relative;
-  padding-left: 32px;
+    position: relative;
+    padding-left: 32px;
 }
 
 tr.new-report td {
-  /*border-color: #f9e1bc;*/
+    /* border-color: #f9e1bc; */
 }
 
 table.reports-table tr {
-  background-color: #fafafa;
+    background-color: #fafafa;
 }
 
 table.reports-table tr.new-report {
-  background: #fff; /*#fff8ee;*/
-  color: #000;
-}
-table.reports-table tr.new-report:hover {
-  background: #fefefe; /*#fff8ee;*/
+    background: #ffffff; /* #fff8ee; */
+    color: #000000;
 }
 
+table.reports-table tr.new-report:hover {
+    background: #fefefe; /* #fff8ee; */
+}
 
 table.custom-table td.report-identifier {
     position: relative;
     padding-left: 32px;
 }
-/*
+
 tr.new-report:hover {
-  background: #fffbf5;
-}*/
+    /* background: #fffbf5; */
+}
 
 tr.new-report td.report-identifier {
-  /*border-left: 4px solid #FF9800;*/
-
+    /* border-left: 4px solid #FF9800; */
 }
 
 tr.new-report .submitted-description {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .new-indicator {

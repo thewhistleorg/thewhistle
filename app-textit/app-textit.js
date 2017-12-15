@@ -106,6 +106,7 @@ app.use(routes);
 // remaining routes require JWT auth (obtained from /auth and supplied in bearer authorization header)
 
 app.use(async function verifyJwt(ctx, next) {
+    /* eslint no-unreachable: off */
     await next(); return;
 
     if (!ctx.header.authorization) ctx.throw(401, 'Authorisation required');

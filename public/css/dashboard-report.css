@@ -1,7 +1,7 @@
 /* Individual Report Page */
 
 #individual-report {
-    padding: 0px;
+    padding: 0;
 }
 
 .report-container {
@@ -69,11 +69,12 @@
 
 /* Report header div table */
 
-.content-header{
-  color: #000;
-  font-weight: bold;
+.content-header {
+    color: #000000;
+    font-weight: bold;
 }
-.card-header{
+
+.card-header {
     color: #6c949e;
     font-weight: lighter;
 }
@@ -161,7 +162,7 @@ h1 {
 
 div.comment {
     border: 1px solid #f0f3f4;
-    /*margin: 0.5em 0;*/
+    /* margin: 0.5em 0; */
     max-width: 640px;
 }
 
@@ -200,7 +201,7 @@ div.by button.delete:hover {
 }
 
 #div-add-comment {
-    /*padding: 0.5em;*/
+    /* padding: 0.5em; */
     max-width: calc(640px - 1em);
 }
 
@@ -232,11 +233,12 @@ textarea {
     font-weight: lighter;
     color: #6c949e;
 }
+
 .js-obj-to-html p {
     margin: 0 0 15px;
     padding-bottom: 4px;
     font-size: 1.2em;
-    /*border-bottom: 1px solid #f0f3f4;*/
+    /* border-bottom: 1px solid #f0f3f4; */
     color: #333333;
 }
 
@@ -245,6 +247,7 @@ textarea {
 .js-obj-to-html {
     width: 100%;
 }
+
 .js-obj-to-html th {
     color: #52727a;
     font-size: 1.2em;
@@ -252,14 +255,15 @@ textarea {
     font-style: normal;
     padding: 8px 8px 8px 0;
     margin: 0;
-    /*border-bottom: 1px solid #f0f3f4;*/
+    /* border-bottom: 1px solid #f0f3f4; */
     width: 1%;
     white-space: nowrap;
 }
+
 .js-obj-to-html td {
-    /*font-size: 1.2em;*/
+    /* font-size: 1.2em; */
     padding: 8px 8px 8px 0;
-    /*border-bottom: 1px solid #f0f3f4;*/
+    /* border-bottom: 1px solid #f0f3f4; */
 }
 
 #submitted p {

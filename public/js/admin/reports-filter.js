@@ -3,7 +3,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';
-/* eslint-env browser *//* global Qs, Slider, slider, dateFormat */
+/* global Qs, Slider, slider, dateFormat */
 
 
 document.addEventListener('DOMContentLoaded', function() { // filtering
@@ -21,9 +21,9 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
                 document.querySelector('a.remove-desc-srch').classList.toggle('hide');
             } else {
                 // any other filter goes in the general filters field
-            addFilter(q, qs[q]);
+                addFilter(q, qs[q]);
+            }
         }
-    }
     }
 
     // use range slider for filtering submitted/updated dates
@@ -43,12 +43,11 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
         applyFilter();
     });
 
-    // Toggle search filter list container
-
+    // toggle search filter list container
     document.getElementById('filter-toggle-button').onclick = toggleContainer;
-    function toggleContainer(e){
-      var el = document.getElementById('filter-toggle-button');
-      var div = document.getElementById('filter-container');
+    function toggleContainer() {
+        const el = document.getElementById('filter-toggle-button');
+        const div = document.getElementById('filter-container');
         if (div.style.display === 'none') {
             div.style.display = 'block';
             el.innerHTML = 'Hide filters';

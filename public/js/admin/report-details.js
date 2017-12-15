@@ -3,7 +3,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';
-/* eslint-env browser *//* eslint no-unused-vars: [ warn, { vars: local } ] *//* TODO: 'vars: local' ignored? */
+/* exported setupMetadataAutosubmitListeners, setupTagsListeners, setupCommentaryListeners, initialiseMap, resizeElementHeight */
 
 
 /**
@@ -172,7 +172,6 @@ function setupCommentaryListeners(reportId, username, userid) {
 
     async function editCommentUpdate() {
         const commentContainerDiv = this.closest('div.comment-container');
-        const editCommentDiv = document.querySelector('#div-edit-comment');
 
         const comment = document.querySelector('#comment-edit').value;
         const values = JSON.stringify({ comment });
@@ -183,7 +182,6 @@ function setupCommentaryListeners(reportId, username, userid) {
         const body = await response.json();
 
         if (response.ok) {
-            const commentContainerDiv = this.closest('div.comment-container');
             commentContainerDiv.querySelector('p').textContent = body.comment;
             commentContainerDiv.querySelectorAll('div').forEach(div => div.classList.remove('hide'));
             document.querySelector('#div-edit-comment').classList.add('hide');

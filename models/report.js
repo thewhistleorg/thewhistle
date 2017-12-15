@@ -279,7 +279,7 @@ class Report {
             geocode:    geocode || {},
             location:   {},
             analysis:   {},
-//          summary:    undefined,
+            // summary: undefined,
             assignedTo: undefined,
             status:     undefined,
             tags:       [],
@@ -295,7 +295,7 @@ class Report {
         if (geocode) {
             values.location = {
                 type:        'Point',
-                coordinates: [Number(geocode.longitude), Number(geocode.latitude)],
+                coordinates: [ Number(geocode.longitude), Number(geocode.latitude) ],
             };
         }
 
@@ -321,7 +321,7 @@ class Report {
                     const dst = slug(file.name, { lower: true, remove: null });
 
                     // upload /tmp file to S3
-                    await AwsS3.put(db, project, date, insertedId, dst, src)
+                    await AwsS3.put(db, project, date, insertedId, dst, src);
 
                     // replace submitted.files.name with slug & .path with S3 folder
                     const filter = { _id: insertedId, 'submitted.files.path': src };
@@ -569,14 +569,14 @@ class Report {
 
         // convert @mentions to pseudo-links with user id as target
         const users = await User.getAll();
-        let commentMd = comment
+        let commentMd = comment;
         for (const user of users) {
-            comment = comment.replace('@'+user.username, `[@${user.username}](${user._id})`);
+            commentMd = commentMd.replace('@'+user.username, `[@${user.username}](${user._id})`);
         }
 
         const reports = global.db[db].collection('reports');
 
-        await reports.updateOne({ _id: id, 'comments.byId': by, 'comments.on': on }, { $set: { 'comments.$.comment': comment } });
+        await reports.updateOne({ _id: id, 'comments.byId': by, 'comments.on': on }, { $set: { 'comments.$.comment': commentMd } });
 
         await Update.insert(db, id, userId, { set: { [`comment-${dateFormat(on, 'yyyy-mm-dd@HH:MM')}`]: commentPlain } }); // audit trail
     }

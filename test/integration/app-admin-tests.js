@@ -296,7 +296,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('gets map marker (newly built)', async function() {
-            try { fs.unlinkSync('./static/map/marker-red-80.png'); } catch (e) {} // force regeneration of marker
+            try { fs.unlinkSync('./static/map/marker-red-80.png'); } catch (e) { /* ignore if not present */} // force regeneration of marker
             const response = await request.get('/map-marker/red/80');
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('image/png');
@@ -503,7 +503,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         });
 
         it('edits comment', async function() {
-            const values = { comment: 'Updated test including references to @tester and #test'}
+            const values = { comment: 'Updated test including references to @tester and #test' };
             const response = await request.put(`/ajax/reports/${reportId}/comments/${commentId}`).send(values);
             expect(response.status).to.equal(200);
         });

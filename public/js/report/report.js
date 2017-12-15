@@ -1,18 +1,17 @@
 'use strict';
-/* eslint no-var: off *//* global document, XMLHttpRequest, alert */
 
 document.addEventListener('DOMContentLoaded', function() {
 
     // add 'required' indicators for form labels
     document.querySelectorAll('[required]').forEach(function(input) {
-        var req = '<sup class="required" title="required">*</sup>';
-        var prev = input.previousSibling;
+        const req = '<sup class="required" title="required">*</sup>';
+        let prev = input.previousSibling;
         while (prev && prev.localName != 'label' && prev.previousSibling != null) prev = prev.previousSibling;
         if (prev && prev.localName=='label' && prev.textContent!='&nbsp;') prev.insertAdjacentHTML('beforeend', req);
     });
 
     // remove 'required' attributes if going back to prev page
-    var prevButton = document.querySelector('button.prev');
+    const prevButton = document.querySelector('button.prev');
     if (prevButton) {
         prevButton.onclick = function () {
             document.querySelectorAll('input,textarea').forEach(function(i) { i.required = false; });
@@ -23,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * 'when' page
      */
     if (document.querySelector('input[name=when]')) {
-        var months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
+        const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
 
         // set focus to hour/day field if any 'when' radio button clicked
         document.querySelectorAll('input[name=when]').forEach(function(input) {
@@ -70,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // auto-advance day field when completed
         document.querySelector('input[name="date.day"]').addEventListener('keypress', function(event) {
             if (!event.key.match(/\d/)) { event.preventDefault(); return; }
-            var newValue = this.value + event.key;
+            const newValue = this.value + event.key;
             if (newValue.length==2 || newValue>3) {
                 document.querySelector('input[name="date.month"]').focus();
                 document.querySelector('input[name="date.month"]').select();
@@ -80,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // auto-advance month field when completed
         document.querySelector('input[name="date.month"]').addEventListener('keypress', function(event) {
             //if (this.value.length == 3) { event.preventDefault(); return; }
-            var newValue = this.value + event.key;
+            const newValue = this.value + event.key;
             if (months.indexOf(newValue.toLowerCase()) >= 0) {
                 document.querySelector('input[name="date.year"]').focus();
                 document.querySelector('input[name="date.year"]').select();
@@ -90,8 +89,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // month field validation
         document.querySelector('input[name="date.month"]').addEventListener('change', function() {
             if (this.setCustomValidity == undefined) return;
-            var err = 'Please enter a valid three-letter abbreviation of a month';
-            var ok = months.indexOf(this.value.toLowerCase()) >= 0;
+            const err = 'Please enter a valid three-letter abbreviation of a month';
+            const ok = months.indexOf(this.value.toLowerCase()) >= 0;
             this.setCustomValidity(ok ? '' : err);
         });
 
@@ -119,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // auto-advance hour field when completed (date)
         document.querySelector('input[name="date.hour"]').addEventListener('keypress', function(event) {
-            var newValue = this.value + event.key;
+            const newValue = this.value + event.key;
             if (newValue.length==2 || newValue>2) {
                 document.querySelector('input[name="date.minute"]').focus();
                 document.querySelector('input[name="date.minute"]').select();
@@ -266,13 +265,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function generateName() {
-        var db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path
-        var request = new XMLHttpRequest();
-        request.open('GET', `/ajax/${db}/names/new`);
+        const db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path
+        const request = new XMLHttpRequest();
+        request.open('GET', '/ajax/'+db+'/names/new');
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
                 if (request.status == 200) {
-                    var data = JSON.parse(request.responseText);
+                    const data = JSON.parse(request.responseText);
                     document.querySelector('output[name="generated-name"]').textContent = data.name;
                     document.querySelector('input[name="generated-name"]').value = data.name;
                 } // TODO: or?
@@ -289,9 +288,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('#generated-name').classList.remove('hide');
             return;
         }
-        var db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path
-        var request = new XMLHttpRequest();
-        request.open('GET', `/ajax/${db}/names/${name.replace(' ', '+')}`);
+        const db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path
+        const request = new XMLHttpRequest();
+        request.open('GET', '/ajax/'+db+'/names/'+name.replace(' ', '+'));
         request.setRequestHeader('Accept', 'application/json');
         request.onreadystatechange = function () {
             if (request.readyState == 4) {
@@ -303,7 +302,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (this.setCustomValidity) this.setCustomValidity('');
                         break;
                     case 404: // name not found
-                        var err = 'Name not found';
+                        const err = 'Name not found';
                         if (this.setCustomValidity) document.querySelector('input[name="existing-name"]').setCustomValidity(err);
                         document.querySelector('#name-ok').classList.add('hide');
                         document.querySelector('#name-nok').classList.remove('hide');
@@ -347,17 +346,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         formatted.innerHTML = '';
                         break;
                 }
-            }, 330)
+            }, 330);
         };
 
         document.querySelector('form[name=get-resources]').onsubmit = function() {
             this.get.disabled = true; // prevent '&get=' appearing in the url
-        }
+        };
     }
 
-    const delay = (function(){
+    const delay = (function() {
         let timer = null;
-        return function(callback, ms){
+        return function(callback, ms) {
             clearTimeout (timer);
             timer = setTimeout(callback, ms);
         };

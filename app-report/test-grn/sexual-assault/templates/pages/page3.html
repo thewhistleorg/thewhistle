@@ -2,7 +2,7 @@
     {{> back}}{{> step}}
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
-    <div >
+    <div>
         <script>
             'use strict';
             document.addEventListener('DOMContentLoaded', function () {
@@ -11,7 +11,7 @@
                     const fileInputs = document.querySelectorAll('input[type=file]');
                     const el = event.target;
                     // if we already have a 'no file chosen' input, don't clone another
-                    for (var i of fileInputs) if (i.files.length == 0) return;
+                    for (const i of fileInputs) if (i.files.length == 0) return;
                     // if same file has already been chosen, clear the filename & don't clone
                     const inputsWithThisName = [...fileInputs].filter(f => f.files[0].name == el.files[0].name)
                     if (inputsWithThisName.length > 1) { el.value = ''; return; }

@@ -249,7 +249,7 @@ class Handlers {
     /**
      * Process 'what next' submission.
      */
-    static async postWhatnext(ctx) {
+    static postWhatnext(ctx) {
         // ignore submitted value, just skip back to beginning
         ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`);
     }

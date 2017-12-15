@@ -13,7 +13,7 @@ class Handlers {
 
         if (page==1 && !ctx.session.report) ctx.session.report = {};
 
-        const context = { ['xxx']: 'checked' }; // TODO: ???
+        // const context = { ['xxx']: 'checked' }; // TODO: ???
 
         await ctx.render('page'+page, ctx.session.report);
     }

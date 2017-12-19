@@ -113,7 +113,8 @@ class LoginHandlers {
         if (!global.db[db]) {
             const connectionString = process.env[`DB_${db.toUpperCase().replace('-', '_')}`];
             try {
-                global.db[db] = await MongoClient.connect(connectionString);
+                const client = await MongoClient.connect(connectionString);
+                global.db[db] = client.db(client.s.options.dbName);
             } catch (e) {
                 const loginfailmsg = connectionString
                     ? `Invalid database credentials for ‘${db}’` // rejected credentials

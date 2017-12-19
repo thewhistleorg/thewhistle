@@ -82,7 +82,9 @@ global.db = {}; // initialise global.db to empty object on app startup
 app.use(async function(ctx, next) {
     if (!global.db.users) {
         try {
-            global.db.users = await MongoClient.connect(process.env.DB_USERS);
+            const connectionString = process.env.DB_USERS;
+            const client = await MongoClient.connect(connectionString);
+            global.db.users = client.db(client.s.options.dbName);
         } catch (e) {
             console.error('Mongo connection error', e.toString());
             process.exit(1);

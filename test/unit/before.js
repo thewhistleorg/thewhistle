@@ -6,15 +6,18 @@
 /* 'mocha test/unit/*.js'!                                                                        */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import MongoDB         from 'mongodb'; // MongoDB driver for Node.js
+import MongoDB from 'mongodb'; // MongoDB driver for Node.js
 const MongoClient = MongoDB.MongoClient;
 
 before(async function() {
     this.timeout(10e3); // 10 sec
     try {
-        const userDb = await MongoClient.connect(process.env['DB_USERS']);
-        const testDb = await MongoClient.connect(process.env['DB_TEST_CAM']);
-        global.db = { users: userDb, 'test-cam': testDb };
+        global.db = {};
+        for (const db of [ 'users', 'test-cam' ]) {
+            const connectionString = process.env['DB_'+db.toUpperCase().replace('-', '_')];
+            const client = await MongoClient.connect(connectionString);
+            global.db[db] = client.db(client.s.options.dbName);
+        }
     } catch (e) {
         console.error(e.message);
         process.exit(1);

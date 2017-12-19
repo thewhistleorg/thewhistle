@@ -272,24 +272,24 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
 
             const values = {
-                'existing-name':  '',
-                'used-before':    'n',
-                'generated-name': 'testy terrain',
-                'nav-next':       'next',
+                'existing-alias':  '',
+                'used-before':     'n',
+                'generated-alias': 'testy terrain',
+                'nav-next':        'next',
             };
             const responsePost = await request.post('/test-grn/sexual-assault/7').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/submit');
         });
 
-        it('ajax: gets a new random name', async function() {
-            const response = await request.get('/ajax/test-grn/names/new');
+        it('ajax: gets a new random alias', async function() {
+            const response = await request.get('/ajax/test-grn/aliases/new');
             expect(response.status).to.equal(200);
-            expect(response.body.name.split(' ')).to.have.lengthOf(2);
+            expect(response.body.alias.split(' ')).to.have.lengthOf(2);
         });
 
         it('ajax: checks ‘testy terrain’ is not already used', async function() {
-            const response = await request.get('/ajax/test-grn/names/testy+terrain');
+            const response = await request.get('/ajax/test-grn/aliases/testy+terrain');
             expect(response.status).to.equal(404);
         });
 
@@ -317,7 +317,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(tds[5].textContent).to.equal('Not known: A death eater');
             expect(ths[6].textContent).to.equal('Action taken');
             expect(tds[6].textContent).to.equal('—');
-            expect(ths[7].textContent).to.equal('Generated name');
+            expect(ths[7].textContent).to.equal('Generated alias');
             expect(tds[7].textContent).to.equal('testy terrain');
         });
 
@@ -382,7 +382,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(ths[5].nextSibling.textContent).to.equal('Not known: A death eater');
             expect(ths[6].textContent).to.equal('Action taken');
             expect(ths[6].nextSibling.textContent).to.equal('—');
-            expect(ths[7].textContent).to.equal('Generated name');
+            expect(ths[7].textContent).to.equal('Generated alias');
             expect(ths[7].nextSibling.textContent).to.equal('testy terrain');
         });
 
@@ -450,9 +450,9 @@ describe('Report app'+' ('+app.env+')', function() {
                 'who':                        'n',
                 'who-description':            'A death eater',
                 'action-taken-other-details': '',
-                'existing-name':              '',
+                'existing-alias':             '',
                 'used-before':                'n',
-                'generated-name':             'testy terrain',
+                'generated-alias':            'testy terrain',
                 'nav-next':                   'next',
             };
             const response = await request.post(report).send(values);
@@ -484,7 +484,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(tds[5].textContent).to.equal('Not known: A death eater');
             expect(ths[6].textContent).to.equal('Action taken');
             expect(tds[6].textContent).to.equal('—');
-            expect(ths[7].textContent).to.equal('Generated name');
+            expect(ths[7].textContent).to.equal('Generated alias');
             expect(tds[7].textContent).to.equal('testy terrain');
         });
 
@@ -537,7 +537,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(ths[5].nextSibling.textContent).to.equal('Not known: A death eater');
             expect(ths[6].textContent).to.equal('Action taken');
             expect(ths[6].nextSibling.textContent).to.equal('—');
-            expect(ths[7].textContent).to.equal('Generated name');
+            expect(ths[7].textContent).to.equal('Generated alias');
             expect(ths[7].nextSibling.textContent).to.equal('testy terrain');
         });
 

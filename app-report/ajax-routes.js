@@ -13,8 +13,8 @@ const router = new Router();
 import ajax from './ajax-handlers.js';
 
 
-router.get('/ajax/:db/names/new', ajax.getGenerateNewName); // note means 'new' cannot be used as a name
-router.get('/ajax/:db/names/:id', ajax.getName);            // currently just used to verify if name exists
+router.get('/ajax/:db/aliases/new', ajax.getNewAlias); // note means 'new' cannot be used as a name
+router.get('/ajax/:db/aliases/:alias', ajax.getAlias); // currently just used to verify if name exists
 
 router.get('/ajax/geocode', ajax.geocode); // geocode an address
 

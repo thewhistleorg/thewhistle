@@ -259,11 +259,11 @@ header {
     background: #033549;
 }
 
-#name-ok {
+#alias-ok {
     color: #009900;
 }
 
-#name-nok {
+#alias-nok {
     color: #990000;
 }
 
@@ -320,9 +320,9 @@ div.bumper {
     padding-top: 2em;
 }
 
-/* 'existing-name' check */
+/* 'existing-alias' check */
 
-.name-available {
+.alias-available {
     font-weight: bold;
     margin-top: 1em;
 }

@@ -279,7 +279,7 @@ class Report {
      *
      * @param   {string}   db - Database to use.
      * @param   {ObjectId} [by] - User recording incident report (undefined for public submission).
-     * @param   {string}   name - Generated name used to refer to victim/survivor.
+     * @param   {string}   alias - Generated alias used to refer to victim/survivor.
      * @param   {Object}   submitted - Report details (values depend on project).
      * @param   {string}   project - Project report is part of.
      * @param   {Object[]} files - Uploaded files ('formidable' File objects).
@@ -288,7 +288,7 @@ class Report {
      * @returns {ObjectId} New report id.
      * @throws  Error on validation or referential integrity errors.
      */
-    static async insert(db, by, name, submitted, project, files, geocode, userAgent) {
+    static async insert(db, by, alias, submitted, project, files, geocode, userAgent) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         by = objectId(by); // allow id as string
@@ -301,7 +301,7 @@ class Report {
             project:    project,
             submitted:  submitted,
             by:         by,
-            name:       name,
+            alias:      alias,
             geocode:    geocode || {},
             location:   {},
             analysis:   {},

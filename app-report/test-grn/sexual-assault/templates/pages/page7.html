@@ -10,21 +10,21 @@
                 <input type="radio" name="used-before" id="used-before-y" value="y">
                 <label for="used-before-y" class="pure-radio greyed-out-unless-checked">Yes</label>
                 <br>
-                <label for="existing-name">Enter your anonymous name</label>
-                <input type="text" name="existing-name" id="existing-name" value="{{existing-name}}">
-                <span id="name-ok" title="name available" class="name-available hide">✓</span>
-                <span id="name-nok" title="name not available" class="name-available hide">✗</span>
+                <label for="existing-alias">Enter your anonymous alias</label>
+                <input type="text" name="existing-alias" id="existing-alias" value="{{existing-alias}}">
+                <span id="alias-ok" title="alias available" class="alias-available hide">✓</span>
+                <span id="alias-nok" title="alias not available" class="alias-available hide">✗</span>
             </li>
             <li>
                 <input type="radio" name="used-before" id="used-before-n" value="n" checked>
                 <label for="used-before-n" class="pure-radio greyed-out-unless-checked">No</label>
                 <br>
-                <p>We make sure that your report is anonymous by creating a random identification name.</p>
-                <p>If you want to follow up, use the anonymous name below so we can access any relevant information.</p>
+                <p>We make sure that your report is anonymous by creating a random identification alias.</p>
+                <p>If you want to follow up, use the anonymous alias below so we can access any relevant information.</p>
                 <div id="usegenerated">
-                <p>This report will use <b><output name="generated-name">{{generated-name}}</output></b>
-                <input type="hidden" name="generated-name" value="{{generated-name}}"></p>
-                <button type="button" id="get-alt-name" class="inline-link">Generate another random name</button>
+                <p>This report will use <b><output name="generated-alias">{{generated-alias}}</output></b>
+                <input type="hidden" name="generated-alias" value="{{generated-alias}}"></p>
+                <button type="button" id="get-alt-alias" class="inline-link">Generate another random alias</button>
                 </div>
             </li>
             {{/checked}}

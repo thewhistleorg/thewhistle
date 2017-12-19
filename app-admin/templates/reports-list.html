@@ -122,10 +122,10 @@
         </tr>
 
         {{#reports}}
-        <tr id="{{_id}}" title="{{name}}@{{reportedOnFull}} by {{reportedBy}}" class="{{#unless viewed}}new-report{{/unless}}">
+        <tr id="{{_id}}" title="{{alias}} {{reportedOnFull}} {{reportedBy}}" class="{{#unless viewed}}new-report{{/unless}}">
             <td class="report-identifier">
                 {{#unless viewed}}<div class="fa fa-circle new-indicator"></div>{{/unless}}
-                <span>{{reportedBy}}</span>
+                <span>{{alias}}</span>
                 <br><span class="small">{{{reportedOnDay}}}</span>
                 <br><i class="pale-grey small">{{{updatedAgo}}}</i>
             </td>

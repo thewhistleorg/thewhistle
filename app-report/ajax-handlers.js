@@ -19,32 +19,32 @@ const handler = {};
 
 
 /**
- * Generate a random anonymous name.
+ * Generate a random anonymous alias.
  *
- * For efficiency, this doesn't check if the name is already in use (should be very small
+ * For efficiency, this doesn't check if the alias is already in use (should be very small
  * probability), but such check should be done when submitting report.
  */
-handler.getGenerateNewName = async function(ctx) {
-    let name = null;
+handler.getNewAlias = async function(ctx) {
+    let alias = null;
     do {
-        name = await autoIdentifier(12);
-    } while (name.length > 12); // avoid excessively long names
-    ctx.body = { name: name };
-    ctx.body.root = 'generateName';
+        alias = await autoIdentifier(12);
+    } while (alias.length > 12); // avoid excessively long aliases
+    ctx.body = { alias: alias };
+    ctx.body.root = 'generateAlias';
     ctx.status = 200; // Ok
-    ctx.set('Cache-Control', 'no-cache'); // stop IE caching generated names.
+    ctx.set('Cache-Control', 'no-cache'); // stop IE caching generated aliases.
 };
 
 
 /**
- * Get details of name - currently just used to check if name is available.
+ * Get details of alias - currently just used to check if alias is available.
  */
-handler.getName = async function(ctx) {
+handler.getAlias = async function(ctx) {
     const db = ctx.params.db;
-    const id = ctx.params.id.replace('+', ' ');
-    const reports = await Report.getBy(db, 'name', id);
+    const id = ctx.params.alias.replace('+', ' ');
+    const reports = await Report.getBy(db, 'alias', id);
     ctx.body = {};
-    ctx.body.root = 'name';
+    ctx.body.root = 'alias';
     ctx.status = reports.length==0 && ctx.params.id!='' ? 404 : 200; // Not Found / Ok
 };
 

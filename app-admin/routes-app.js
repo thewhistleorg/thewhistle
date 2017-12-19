@@ -23,16 +23,16 @@ const router = new Router();
 
 import report from './report.js';
 
-router.get( '/report/:project',             report.getReportEntry);      // render incident report entry page
-router.post('/report/:project',             report.processReportEntry);  // process incident report entry
-router.get( '/report/:project/submit',      report.getReportSubmit);     // render incident report review+submit page
-router.post('/report/:project/submit',      report.processReportSubmit); // process incident report review+submit
-router.get( '/report/:project/:id/confirm', report.getReportConfirm);    // render incident report confirm page
+router.get( '/report/:project',               report.getReportEntry);      // render incident report entry page
+router.post('/report/:project',               report.processReportEntry);  // process incident report entry
+router.get( '/report/:project/submit',        report.getReportSubmit);     // render incident report review+submit page
+router.post('/report/:project/submit',        report.processReportSubmit); // process incident report review+submit
+router.get( '/report/:project/:id/confirm',   report.getReportConfirm);    // render incident report confirm page
 
 // ---- ajax routes
 
-router.get('/ajax/report/:db/names/new',     report.getGenerateNewName); // get newly generated name
-router.get('/ajax/report/:db/names/:name',   report.getName);            // check previously used name does exist
+router.get('/ajax/report/:db/aliases/new',    report.getNewAlias);         // get newly generated alias
+router.get('/ajax/report/:db/aliases/:alias', report.getAlias);            // get alias details (to check previously used alias does exist)
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

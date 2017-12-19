@@ -211,102 +211,103 @@ document.addEventListener('DOMContentLoaded', function() {
      * 'used-before' page
      */
     if (document.querySelector('input[name="used-before"]')) {
-        // if we have no name on opening page (ie we're not coming back to page with filled name), fetch a random one
-        // (use ajax to initialise name so that no special treatment is required within handlers)
-        if (document.querySelector('output[name="generated-name"]').textContent == '') generateName();
+        // if we have no alias on opening page (ie we're not coming back to page with filled alias),
+        // fetch a random one (use ajax to initialise alias so that no special treatment is required
+        // within handlers)
+        if (document.querySelector('output[name="generated-alias"]').textContent == '') generateAlias();
 
-        // if existing name is already filled in, verify it
-        if (document.querySelector('input[name="existing-name"]').value.trim() != '') {
-            verifyExistingName(document.querySelector('input[name="existing-name"]').value);
+        // if existing alias is already filled in, verify it
+        if (document.querySelector('input[name="existing-alias"]').value.trim() != '') {
+            verifyExistingAlias(document.querySelector('input[name="existing-alias"]').value);
         }
 
-        // listener to set focus to existing-name if used-before-y selected
+        // listener to set focus to existing-alias if used-before-y selected
         document.querySelector('#used-before-y').addEventListener('click', function() {
             if (this.checked) {
                 document.querySelector('#usegenerated').classList.add('hide');
-                document.querySelector('input[name="existing-name"]').focus();
-                document.querySelector('input[name="existing-name"]').select();
+                document.querySelector('input[name="existing-alias"]').focus();
+                document.querySelector('input[name="existing-alias"]').select();
             } else {
                 document.querySelector('#usegenerated').classList.remove('hide');
-                document.querySelector('input[name="existing-name"]').value = '';
+                document.querySelector('input[name="existing-alias"]').value = '';
             }
         });
 
-        // listener to display usegenerated and clear existing-name if used-before-n clicked
+        // listener to display usegenerated and clear existing-alias if used-before-n clicked
         document.querySelector('#used-before-n').addEventListener('click', function() {
             if (this.checked) {
                 document.querySelector('#usegenerated').classList.remove('hide');
-                document.querySelector('input[name="existing-name"]').value = '';
-                document.querySelector('#name-ok').classList.add('hide');
-                document.querySelector('#name-nok').classList.add('hide');
+                document.querySelector('input[name="existing-alias"]').value = '';
+                document.querySelector('#alias-ok').classList.add('hide');
+                document.querySelector('#alias-nok').classList.add('hide');
                 if (this.setCustomValidity) this.setCustomValidity('');
             } else {
                 document.querySelector('#usegenerated').classList.add('hide');
-                document.querySelector('input[name="existing-name"]').focus();
-                document.querySelector('input[name="existing-name"]').select();
+                document.querySelector('input[name="existing-alias"]').focus();
+                document.querySelector('input[name="existing-alias"]').select();
             }
         });
 
-        // listener to get alternative generated name
-        document.querySelector('#get-alt-name').addEventListener('click', function() {
-            generateName();
+        // listener to get alternative generated alias
+        document.querySelector('#get-alt-alias').addEventListener('click', function() {
+            generateAlias();
         });
 
-        // listener to check #used-before-y if existing-name entered
-        document.querySelector('input[name="existing-name"]').addEventListener('change', function() {
+        // listener to check #used-before-y if existing-alias entered
+        document.querySelector('input[name="existing-alias"]').addEventListener('change', function() {
             document.querySelector('#used-before-y').checked = this.value != '';
             document.querySelector('#usegenerated').classList.add('hide');
         });
 
-        // check entered existing name letter-by-letter
-        document.querySelector('input[name="existing-name"]').oninput = function() {
-            verifyExistingName(this.value);
+        // check entered existing alias letter-by-letter
+        document.querySelector('input[name="existing-alias"]').oninput = function() {
+            verifyExistingAlias(this.value);
         };
     }
 
-    function generateName() {
+    function generateAlias() {
         const db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path
         const request = new XMLHttpRequest();
-        request.open('GET', '/ajax/'+db+'/names/new');
+        request.open('GET', '/ajax/'+db+'/aliases/new');
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
                 if (request.status == 200) {
                     const data = JSON.parse(request.responseText);
-                    document.querySelector('output[name="generated-name"]').textContent = data.name;
-                    document.querySelector('input[name="generated-name"]').value = data.name;
+                    document.querySelector('output[name="generated-alias"]').textContent = data.alias;
+                    document.querySelector('input[name="generated-alias"]').value = data.alias;
                 } // TODO: or?
             }
         };
         request.send();
     }
 
-    function verifyExistingName(name) {
-        if (name.trim() == '') {
-            if (this.setCustomValidity) document.querySelector('input[name="existing-name"]').setCustomValidity('');
-            document.querySelector('#name-ok').classList.add('hide');
-            document.querySelector('#name-nok').classList.add('hide');
-            document.querySelector('#generated-name').classList.remove('hide');
+    function verifyExistingAlias(alias) {
+        if (alias.trim() == '') {
+            if (this.setCustomValidity) document.querySelector('input[name="existing-alias"]').setCustomValidity('');
+            document.querySelector('#alias-ok').classList.add('hide');
+            document.querySelector('#alias-nok').classList.add('hide');
+            document.querySelector('#generated-alias').classList.remove('hide');
             return;
         }
         const db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path
         const request = new XMLHttpRequest();
-        request.open('GET', '/ajax/'+db+'/names/'+name.replace(' ', '+'));
+        request.open('GET', '/ajax/'+db+'/aliases/'+alias.replace(' ', '+'));
         request.setRequestHeader('Accept', 'application/json');
         request.onreadystatechange = function () {
             if (request.readyState == 4) {
                 switch (request.status) {
-                    case 200: // name exists
-                        if (this.setCustomValidity) document.querySelector('input[name="existing-name"]').setCustomValidity('');
-                        document.querySelector('#name-ok').classList.remove('hide');
-                        document.querySelector('#name-nok').classList.add('hide');
+                    case 200: // alias exists
+                        if (this.setCustomValidity) document.querySelector('input[name="existing-alias"]').setCustomValidity('');
+                        document.querySelector('#alias-ok').classList.remove('hide');
+                        document.querySelector('#alias-nok').classList.add('hide');
                         if (this.setCustomValidity) this.setCustomValidity('');
                         break;
-                    case 404: // name not found
-                        const err = 'Name not found';
-                        if (this.setCustomValidity) document.querySelector('input[name="existing-name"]').setCustomValidity(err);
-                        document.querySelector('#name-ok').classList.add('hide');
-                        document.querySelector('#name-nok').classList.remove('hide');
-                        if (this.setCustomValidity) this.setCustomValidity('Name not found');
+                    case 404: // alias not found
+                        const err = 'Alias not found';
+                        if (this.setCustomValidity) document.querySelector('input[name="existing-alias"]').setCustomValidity(err);
+                        document.querySelector('#alias-ok').classList.add('hide');
+                        document.querySelector('#alias-nok').classList.remove('hide');
+                        if (this.setCustomValidity) this.setCustomValidity('Alias not found');
                         break;
                     default: // ?? eg 500?
                         alert(request.responseText);

@@ -28,10 +28,10 @@
         }
         li.nav { padding-bottom: 4em; }
         output { border: 1px solid #999999; display: inline-block;  font-weight: bold; min-width: 8em; padding: 0 0.4em; }
-        button#get-alt-name { margin-left: 1em;  margin-top: 1em; }
-        .name-available { font-weight: bold; margin-top: 1em; }
-        #name-ok { color: #009900; }
-        #name-nok { color: #990000; }
+        button#get-alt-alias { margin-left: 1em;  margin-top: 1em; }
+        .alias-available { font-weight: bold; margin-top: 1em; }
+        #alias-ok { color: #009900; }
+        #alias-nok { color: #990000; }
         .expire-notice { color: #990000; }
         /* override pure form checkbox labels */
         .pure-form-aligned .pure-control-group input + label {
@@ -42,68 +42,68 @@
     <script>
         'use strict';
 
-        // use ajax to fill in name so that no special treatment is required within handlers
+        // use ajax to fill in alias so that no special treatment is required within handlers
 
         document.addEventListener('DOMContentLoaded', async function() {
 
-            // if we have no name on opening page, fetch a random one
-            if (document.querySelector('#generated-name').value == '') generateName();
+            // if we have no alias on opening page, fetch a random one
+            if (document.querySelector('#generated-alias').value == '') generateAlias();
 
-            if (document.querySelector('#existing-name').value.trim() != '') {
-                await verifyExistingName(document.querySelector('#existing-name').value);
+            if (document.querySelector('#existing-alias').value.trim() != '') {
+                await verifyExistingAlias(document.querySelector('#existing-alias').value);
             }
 
-            // listener for 'get alternative' name button
-            document.querySelector('#get-alt-name').onclick = generateName;
+            // listener for 'get alternative' alias button
+            document.querySelector('#get-alt-alias').onclick = generateAlias;
 
-            // check entered existing name letter-by-letter
-            document.querySelector('#existing-name').oninput = async function() {
-                await verifyExistingName(this.value);
+            // check entered existing alias letter-by-letter
+            document.querySelector('#existing-alias').oninput = async function() {
+                await verifyExistingAlias(this.value);
             };
 
         });
 
-        async function generateName() {
+        async function generateAlias() {
             const headers = { Accept: 'application/json' };
             const credentials = 'same-origin';
-            const response = await fetch('/ajax/report/test/names/new', { method: 'GET', headers, credentials });
+            const response = await fetch('/ajax/report/test/aliases/new', { method: 'GET', headers, credentials });
             const body = await response.json();
             if (response.ok) {
-                document.querySelector('#generated-name').value = body.name;
-                document.querySelector('input[name=generated-name]').value = body.name;
-                //await verifyExistingName(body.name);
+                document.querySelector('#generated-alias').value = body.alias;
+                document.querySelector('input[name=generated-alias]').value = body.alias;
+                //await verifyExistingAlias(body.alias);
             } else {
                 alert(body.message);
             }
         }
 
-        async function verifyExistingName(name) {
-            if (name.trim() == '') {
-                document.querySelector('#existing-name').setCustomValidity('');
-                document.querySelector('#name-ok').classList.add('hide');
-                document.querySelector('#name-nok').classList.add('hide');
-                document.querySelector('#generated-name').classList.remove('hide');
+        async function verifyExistingAlias(alias) {
+            if (alias.trim() == '') {
+                document.querySelector('#existing-alias').setCustomValidity('');
+                document.querySelector('#alias-ok').classList.add('hide');
+                document.querySelector('#alias-nok').classList.add('hide');
+                document.querySelector('#generated-alias').classList.remove('hide');
                 return;
             }
             const headers = { Accept: 'application/json' };
             const credentials = 'same-origin';
-            const response = await fetch('/ajax/report/test/names/'+name, { method: 'GET', headers, credentials });
+            const response = await fetch('/ajax/report/test/aliases/'+alias, { method: 'GET', headers, credentials });
             const body = await response.json();
             switch (response.status) {
-                case 200: // name exists
-                    document.querySelector('#existing-name').setCustomValidity('');
-                    document.querySelector('#name-ok').classList.remove('hide');
-                    document.querySelector('#name-nok').classList.add('hide');
-                    document.querySelector('#generated-name').classList.add('hide');
-                    document.querySelector('#get-alt-name').classList.add('hide');
+                case 200: // alias exists
+                    document.querySelector('#existing-alias').setCustomValidity('');
+                    document.querySelector('#alias-ok').classList.remove('hide');
+                    document.querySelector('#alias-nok').classList.add('hide');
+                    document.querySelector('#generated-alias').classList.add('hide');
+                    document.querySelector('#get-alt-alias').classList.add('hide');
                     break;
-                case 404: // name not found
-                    const err = 'Name not found';
-                    document.querySelector('#existing-name').setCustomValidity(err);
-                    document.querySelector('#name-ok').classList.add('hide');
-                    document.querySelector('#name-nok').classList.remove('hide');
-                    document.querySelector('#generated-name').classList.remove('hide');
-                    document.querySelector('#get-alt-name').classList.remove('hide');
+                case 404: // alias not found
+                    const err = 'Alias not found';
+                    document.querySelector('#existing-alias').setCustomValidity(err);
+                    document.querySelector('#alias-ok').classList.add('hide');
+                    document.querySelector('#alias-nok').classList.remove('hide');
+                    document.querySelector('#generated-alias').classList.remove('hide');
+                    document.querySelector('#get-alt-alias').classList.remove('hide');
                     break;
                 default: // ?? eg 500?
                     alert(response.body);
@@ -210,18 +210,18 @@
         <legend>Victim</legend>
         <ul>
             <li class="pure-control-group">
-                <label>Auto-generated identifier name
+                <label>Auto-generated identifying alias
                     <div>Used to refer back to person seeking assistance in future</div></label>
-                <output id="generated-name">{{generated-name}}</output>
-                <button type="button" id="get-alt-name">get alternative name</button>
-                <input type="hidden" name="generated-name" value="{{generated-name}}">
+                <output id="generated-alias">{{generated-alias}}</output>
+                <button type="button" id="get-alt-alias">get alternative alias</button>
+                <input type="hidden" name="generated-alias" value="{{generated-alias}}">
             </li>
             <li class="pure-control-group">
-                <label for="existing-name">...or existing identifier name
+                <label for="existing-alias">...or existing identifying alias
                     <div>If this person has previously submitted an incident report</div></label>
-                <input type="text" name="existing-name" id="existing-name" value="{{existing-name}}" autocomplete="off">
-                <span id="name-ok" title="name available" class="name-available hide">✓</span>
-                <span id="name-nok" title="name not available" class="name-available hide">✗</span>
+                <input type="text" name="existing-alias" id="existing-alias" value="{{existing-alias}}" autocomplete="off">
+                <span id="alias-ok" title="alias available" class="alias-available hide">✓</span>
+                <span id="alias-nok" title="alias not available" class="alias-available hide">✗</span>
             </li>
         </ul>
     </fieldset>

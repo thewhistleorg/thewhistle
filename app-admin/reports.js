@@ -93,9 +93,9 @@ class ReportsHandlers {
                 tags:            rpt.tags,
                 reportedOnDay:   prettyDate(rpt._id.getTimestamp()),
                 reportedOnFull:  dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
-                reportedBy:      rpt.by ? '@'+users.get(rpt.by.toString()).username : rpt.name,
+                reportedBy:      rpt.by ? 'by @'+users.get(rpt.by.toString()).username : '',
                 location:        rpt.location,
-                name:            rpt.name,
+                alias:           rpt.alias,
                 comments:        rpt.comments,
             };
             reports.push(fields);
@@ -113,7 +113,7 @@ class ReportsHandlers {
             case 'status':    sort.field = 'status';     sort.asc = -1; break;
             case 'summary':   sort.field = 'summary';    sort.asc = -1; break;
             case 'submitted': sort.field = '_id';        sort.asc =  1; break;
-            case 'from':      sort.field = 'name';       sort.asc = -1; break;
+            case 'from':      sort.field = 'alias';       sort.asc = -1; break;
             default:          sort.field = 'updatedAge'; sort.asc = -1; sort.column = 'updated'; break;
         }
         sort.asc = ctx.request.query.sort && ctx.request.query.sort.slice(-1)=='-' ? -sort.asc : sort.asc;
@@ -260,17 +260,17 @@ class ReportsHandlers {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
             const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
             const fields = {
-                updatedOn:    lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
-                updatedBy:    lastUpdate.by,
-                assignedTo:   assignedTo ? assignedTo.username : '', // replace 'assignedTo' ObjectId with username
-                status:       rpt.status,
-                summary:      rpt.summary,
-                tags:         rpt.tags.join(', '),
-                reportedOn:   rpt._id.getTimestamp().toISOString().replace('T', ' ').replace('.000Z', ''),
-                reportedBy:   rpt.by ? '@'+(await User.get(rpt.by)).username : rpt.name,
-                reporterName: rpt.name,
-                archived:     rpt.archived,
-                url:          ctx.origin + '/reports/'+rpt._id,
+                updatedOn:  lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
+                updatedBy:  lastUpdate.by,
+                assignedTo: assignedTo ? assignedTo.username : '', // replace 'assignedTo' ObjectId with username
+                status:     rpt.status,
+                summary:    rpt.summary,
+                tags:       rpt.tags.join(', '),
+                reportedOn: rpt._id.getTimestamp().toISOString().replace('T', ' ').replace('.000Z', ''),
+                reportedBy: rpt.by ? '@'+(await User.get(rpt.by)).username : '',
+                alias:      rpt.alias,
+                archived:   rpt.archived,
+                url:        ctx.origin + '/reports/'+rpt._id,
             };
             reports.push(fields);
         }
@@ -337,9 +337,9 @@ class ReportsHandlers {
                 tags:          rpt.tags,
                 reportedDate:  dateFormat(rpt._id.getTimestamp(), 'd mmm yyyy'),
                 reportedTime:  dateFormat(rpt._id.getTimestamp(), 'HH:MM'),
-                reportedBy:    rpt.by ? '@'+(await User.get(rpt.by)).username : rpt.name,
+                reportedBy:    rpt.by ? '@'+(await User.get(rpt.by)).username : rpt.alias,
                 location:      rpt.location,
-                name:          rpt.name,
+                alias:         rpt.alias,
                 comments:      rpt.comments,
                 geocode:       rpt.geocode,
                 url:           ctx.origin + '/reports/'+rpt._id,
@@ -448,7 +448,7 @@ class ReportsHandlers {
             tags:          rpt.tags,
             reportedDate:  dateFormat(rpt._id.getTimestamp(), 'd mmm yyyy'),
             reportedTime:  dateFormat(rpt._id.getTimestamp(), 'HH:MM'),
-            reportedBy:    rpt.by ? '@'+(await User.get(rpt.by)).username : rpt.name,
+            reportedBy:    rpt.by ? '@'+(await User.get(rpt.by)).username : '',
             comments:      rpt.comments,
             geocode:       rpt.geocode,
         };
@@ -642,7 +642,7 @@ class ReportsHandlers {
             filterDesc.add('description');
         }
 
-        // assigned filtering: filter by assignee user name - if there is no assigned query argument,
+        // assigned filtering: filter by assignee username - if there is no assigned query argument,
         // then all reports are listed; if it is an empty string, unassigned reports are  listed;
         // otherwise reports assigned to given user
         if (q.assigned != undefined) {
@@ -755,7 +755,7 @@ class ReportsHandlers {
         const statuses = await Report.statuses(db); // for status datalist
 
         // other reports from same reporter
-        const otherReports = await Report.find(db, { $and: [ { name: report.name }, { _id: { $ne: ObjectId(ctx.params.id) } } ] });
+        const otherReports = await Report.find(db, { $and: [ { alias: report.alias }, { _id: { $ne: ObjectId(ctx.params.id) } } ] });
         for (const rpt of otherReports) {
             rpt.reported = dateFormat(rpt._id.getTimestamp(), 'yyyy-mm-dd HH:MM');
         }
@@ -803,7 +803,7 @@ class ReportsHandlers {
             reportedOnDay:    dateFormat(report.reported, 'd mmm yyyy'),
             reportedOnFull:   dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
             reportedOnTz:     dateFormat(report.reported, 'Z'),
-            reportedBy:       report.by ? `${report.name} / @${reportedBy.username}` : report.name,
+            reportedBy:       report.by ? `${report.alias} / @${reportedBy.username}` : report.alias,
             reportHtml:       jsObjectToHtml.usingTable(report.submitted, [ 'Anonymous id','files' ], 'h3'),
             geocodeHtml:      jsObjectToHtml.usingTable(report.geocode),
             formattedAddress: encodeURIComponent(report.geocode.formattedAddress),

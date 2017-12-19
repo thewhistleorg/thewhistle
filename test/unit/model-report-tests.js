@@ -97,7 +97,7 @@ describe('Report model', function() {
             expect(reportId.constructor.name).to.equal('ObjectID');
             const report = await Report.get('test-cam', reportId);
             expect(report).to.be.an('object');
-            expect(report).to.have.property('name');
+            expect(report).to.have.property('alias');
         });
         it('has uploaded file data in submitted report', async function() {
             const report = await Report.get('test-cam', reportId);
@@ -125,11 +125,11 @@ describe('Report model', function() {
 
     describe('find', function() {
         it('finds reports by "test test"', async function() {
-            const query = { name: 'test test' };
+            const query = { alias: 'test test' };
             const rpts = await Report.find('test-cam', query);
             expect(rpts).to.be.an('array');
             expect(rpts.length).to.equal(1);
-            expect(rpts[0].name).to.equal('test test');
+            expect(rpts[0].alias).to.equal('test test');
         });
     });
 
@@ -137,12 +137,12 @@ describe('Report model', function() {
         it('gets newly created report', async function() {
             const rpt = await Report.get('test-cam', reportId);
             expect(rpt).to.be.an('object');
-            expect(rpt.name).to.equal('test test');
+            expect(rpt.alias).to.equal('test test');
         });
         it('gets newly created report with string id', async function() {
             const rpt = await Report.get('test-cam', reportId.toString());
             expect(rpt).to.be.an('object');
-            expect(rpt.name).to.equal('test test');
+            expect(rpt.alias).to.equal('test test');
         });
         it('gets all active reports', async function() {
             const rpts = await Report.getAll('test-cam');
@@ -151,7 +151,7 @@ describe('Report model', function() {
             // TODO: any way to test rpts includes reportId?
         });
         it('gets reports with field matching value', async function() {
-            const rpts = await Report.getBy('test-cam', 'name', 'test test');
+            const rpts = await Report.getBy('test-cam', 'alias', 'test test');
             expect(rpts).to.be.an('array');
             expect(rpts.length).to.be.equal(1);
         });
@@ -172,7 +172,7 @@ describe('Report model', function() {
             const rpts = await Report.find('test-cam', query);
             expect(rpts).to.be.an('array');
             expect(rpts.length).to.equal(1);
-            expect(rpts[0].name).to.equal('test test');
+            expect(rpts[0].alias).to.equal('test test');
         });
     });
 

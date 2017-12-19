@@ -120,9 +120,9 @@ class Handlers {
             ? await geocode(ctx.session.report['at-address'])
             : null;
 
-        // make sure only one of generated-name and existing-name are recorded, and make it 1st property of report
-        if (ctx.session.report['existing-name']) { delete ctx.session.report['generated-name']; ctx.session.report = Object.assign({ 'existing-name': null }, ctx.session.report); }
-        if (ctx.session.report['generated-name']) { delete ctx.session.report['existing-name']; ctx.session.report = Object.assign({ 'generated-name': null }, ctx.session.report); }
+        // make sure only one of generated-alias and existing-alias are recorded, and make it 1st property of report
+        if (ctx.session.report['existing-alias']) { delete ctx.session.report['generated-alias']; ctx.session.report = Object.assign({ 'existing-alias': null }, ctx.session.report); }
+        if (ctx.session.report['generated-alias']) { delete ctx.session.report['existing-alias']; ctx.session.report = Object.assign({ 'generated-alias': null }, ctx.session.report); }
 
         const prettyReport = prettifyReport(ctx.session.report);
         const formattedAddress = ctx.session.geocode ? ctx.session.geocode.formattedAddress : '[unrecognised address]';
@@ -147,27 +147,27 @@ class Handlers {
         // record this report
         delete ctx.request.body['submit'];
 
-        // check generated name not already used, or existing name does exist
+        // check generated alias not already used, or existing alias does exist
         switch (ctx.session.report['used-before']) {
             case 'y':
-                // verify existing name does exist
-                const reportsY = await Report.getBy(ctx.params.database, 'name', ctx.session.report['existing-name']);
-                if (reportsY.length == 0) { ctx.flash = { name: 'Anonymous name not found' }; ctx.redirect(ctx.url); return; }
+                // verify existing alias does exist
+                const reportsY = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['existing-alias']);
+                if (reportsY.length == 0) { ctx.flash = { alias: 'Anonymous alias not found' }; ctx.redirect(ctx.url); return; }
                 break;
             case 'n':
-                // verify generated name does not exist
-                if (ctx.session.report['generated-name'] == null) { ctx.flash = 'Name not given'; ctx.redirect(ctx.url); }
-                const reportsN = await Report.getBy(ctx.params.database, 'name', ctx.session.report['generated-name']);
-                if (reportsN.length > 0) { ctx.flash = { name: 'Generated name not available: please select another' }; ctx.redirect(ctx.url); return; }
+                // verify generated alias does not exist
+                if (ctx.session.report['generated-alias'] == null) { ctx.flash = 'Alias not given'; ctx.redirect(ctx.url); }
+                const reportsN = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['generated-alias']);
+                if (reportsN.length > 0) { ctx.flash = { alias: 'Generated alias not available: please select another' }; ctx.redirect(ctx.url); return; }
                 break;
         }
 
-        const name = ctx.session.report['existing-name'] || ctx.session.report['generated-name'];
+        const alias = ctx.session.report['existing-alias'] || ctx.session.report['generated-alias'];
 
         const prettyReport = prettifyReport(ctx.session.report);
 
         const by = ctx.state.user ? ctx.state.user.id : null;
-        const id = await Report.insert(ctx.params.database, by, name, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.session.geocode, ctx.headers['user-agent']);
+        const id = await Report.insert(ctx.params.database, by, alias, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.session.geocode, ctx.headers['user-agent']);
         ctx.set('X-Insert-Id', id); // for integration tests
 
         // record user-agent
@@ -336,10 +336,10 @@ function prettifyReport(report) {
     if (typeof report['action-taken'] == 'string') report['action-taken'] = [ report['action-taken'] ];
     rpt['Action taken'] = report['action-taken'].map(a => action[a]);
 
-    // used-before: either Generated name or Existing name is set as appropriate
+    // used-before: either Generated alias or Existing alias is set as appropriate
     switch (report['used-before']) {
-        case 'n': rpt['Generated name'] = report['generated-name']; break;
-        case 'y': rpt['Existing name'] = report['existing-name']; break;
+        case 'n': rpt['Generated alias'] = report['generated-alias']; break;
+        case 'y': rpt['Existing alias'] = report['existing-alias']; break;
     }
 
     return rpt;

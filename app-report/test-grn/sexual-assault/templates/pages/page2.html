@@ -21,19 +21,38 @@
                         <td>YYYY</td>
                     </tr>
                     <tr>
-                        <td><input type="number" name="date.day" id="date.day" value="{{date.day}}"
+                        <td><input type="number" name="date.day" id="date.day" value="{{date.day}}" list="days"
                                    class="w4" min="1" max="31"></td>
                         <td><input type="text" name="date.month" id="date.month" value="{{date.month}}" list="months"
                                    class="w5" maxlength="3"></td>
-                        <td><input type="number" name="date.year" id="date.year" value="{{date.year}}"
+                        <td><input type="number" name="date.year" id="date.year" value="{{date.year}}" list="years"
                                    class="w5" min="{{lastyear}}" max="{{thisyear}}"></td>
                     </tr>
                 </table>
+                <datalist id="days">
+                    <option value="1"><option value="2"><option value="3">
+                    <option value="4"><option value="5"><option value="6">
+                    <option value="7"><option value="8"><option value="9">
+                    <option value="10"><option value="11"><option value="12">
+                    <option value="13"><option value="14"><option value="15">
+                    <option value="16"><option value="17"><option value="18">
+                    <option value="19"><option value="20"><option value="21">
+                    <option value="22"><option value="23"><option value="24">
+                    <option value="25"><option value="26"><option value="27">
+                    <option value="28"><option value="29"><option value="30">
+                    <option value="31">
+                </datalist>
                 <datalist id="months">
                     <option value="Jan"><option value="Feb"><option value="Mar">
                     <option value="Apr"><option value="May"><option value="Jun">
                     <option value="Jul"><option value="Aug"><option value="Sep">
                     <option value="Oct"><option value="Nov"><option value="Dec">
+                </datalist>
+                <datalist id="years">
+                    <option value="2009"><option value="2010"><option value="2011">
+                    <option value="2012"><option value="2013"><option value="2014">
+                    <option value="2015"><option value="2016"><option value="2017">
+                    <option value="2018">
                 </datalist>
                 at
                 <table class="inline">
@@ -42,6 +61,35 @@
                         <td>MM</td>
                     </tr>
                     <tr>
+
+                        <select name="date.time" id="within-options">
+                            <option value="">&nbsp;</option>
+                            <option value="12:00 am">12:00 am</option>
+                            <option value="01:00 am">01:00 am</option>
+                            <option value="02:00 am">02:00 am</option>
+                            <option value="03:00 am">03:00 am</option>
+                            <option value="04:00 am">04:00 am</option>
+                            <option value="05:00 am">05:00 am</option>
+                            <option value="06:00 am">06:00 am</option>
+                            <option value="07:00 am">07:00 am</option>
+                            <option value="08:00 am">08:00 am</option>
+                            <option value="09:00 am">09:00 am</option>
+                            <option value="10:00 am">10:00 am</option>
+                            <option value="11:00 am">11:00 am</option>
+                            <option value="12:00 pm">12:00 pm</option>
+                            <option value="01:00 pm">01:00 pm</option>
+                            <option value="02:00 pm">02:00 pm</option>
+                            <option value="03:00 pm">03:00 pm</option>
+                            <option value="04:00 pm">04:00 pm</option>
+                            <option value="05:00 pm">05:00 pm</option>
+                            <option value="06:00 pm">06:00 pm</option>
+                            <option value="07:00 pm">07:00 pm</option>
+                            <option value="08:00 pm">08:00 pm</option>
+                            <option value="09:00 pm">09:00 pm</option>
+                            <option value="10:00 pm">10:00 pm</option>
+                            <option value="11:00 pm">11:00 pm</option>
+                        </select>
+
                         <td><input type="number" name="date.hour" id="date.hour" value="{{date.hour}}"
                                    class="w4" min="0" max="23" title="24h"></td>
                         <td><input type="number" name="date.minute" id="date.minute" value="{{date.minute}}"
@@ -76,8 +124,10 @@
             <li>
                 <input type="radio" name="still-happening" id="still-y" value="y">
                 <label for="still-y">Yes</label>
-                <input type="radio" name="still-happening" id="still-n" value="n" class="radio-margin">
-                <label for="still-n">No</label>
+            </li>
+            <li>
+              <input type="radio" name="still-happening" id="still-n" value="n" class="radio-margin">
+              <label for="still-n">No</label>
             </li>
             {{/checked}}
         </ul>

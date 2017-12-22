@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // check when-date if any date fields receive focus
-        document.querySelectorAll('input[name^=date]').forEach(function(input) {
+        document.querySelectorAll('input[name^=date], select[name^=date]').forEach(function(input) {
             input.addEventListener('focus', function() {
                 document.querySelector('#when-date').checked = true;
             });
@@ -363,5 +363,3 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     })();
 });
-
-

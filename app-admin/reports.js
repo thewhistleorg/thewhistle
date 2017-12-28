@@ -64,10 +64,10 @@ class ReportsHandlers {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
             const lastViewed = rpt.views[ctx.state.user.id];
 
-            if (Object.keys(rpt.geocode).length > 0) {
-                rpt.location = findBestLocnBelow(lowestCommonLevel, rpt);
+            if (rpt.location.geocode && Object.keys(rpt.location.geocode).length > 0) {
+                rpt.locn = findBestLocnBelow(lowestCommonLevel, rpt);
             } else {
-                rpt.location = '—';
+                rpt.locn = '—';
             }
             for (let t=0; t<rpt.tags.length; t++) { // style tags in cartouches
                 rpt.tags.splice(t, 1, `<span class="tag" title="filter by tag=‘${rpt.tags[t]}’">${rpt.tags[t]}</span>`);
@@ -94,7 +94,7 @@ class ReportsHandlers {
                 reportedOnDay:   prettyDate(rpt._id.getTimestamp()),
                 reportedOnFull:  dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
                 reportedBy:      rpt.by ? 'by @'+users.get(rpt.by.toString()).username : '',
-                location:        rpt.location,
+                locn:            rpt.locn,
                 alias:           rpt.alias,
                 comments:        rpt.comments,
             };
@@ -184,14 +184,14 @@ class ReportsHandlers {
         const reports = [];
         const y = 1000*60*60*24*365; // one year
         for (const rpt of rpts) {
-            if (!rpt.geocode) continue;
-            if (Object.keys(rpt.geocode).length == 0) continue;
+            if (!rpt.location.geocode) continue;
+            if (Object.keys(rpt.location.geocode).length == 0) continue;
             const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
             const fields = {
                 _id:        rpt._id,
                 summary:    rpt.summary || '', // ensure summary is string
-                lat:        rpt.geocode.latitude || NaN,
-                lon:        rpt.geocode.longitude || NaN,
+                lat:        rpt.location.geocode.latitude || NaN,
+                lon:        rpt.location.geocode.longitude || NaN,
                 assignedTo: assignedTo ? assignedTo.username : '—',
                 status:     rpt.status || '', // ensure status is string
                 date:       dateFormat(rpt._id.getTimestamp(), 'd mmm yyyy'),
@@ -310,10 +310,10 @@ class ReportsHandlers {
         const reports = [];
         for (const rpt of rpts) {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
-            if (Object.keys(rpt.geocode).length > 0) {
-                rpt.location = findBestLocnBelow(lowestCommonLevel, rpt);
+            if (rpt.location.geocode && Object.keys(rpt.location.geocode).length > 0) {
+                rpt.locn = findBestLocnBelow(lowestCommonLevel, rpt);
             } else {
-                rpt.location = '—';
+                rpt.locn = '—';
             }
             for (let t=0; t<rpt.tags.length; t++) { // style tags in cartouches
                 rpt.tags.splice(t, 1, `<span class="tag">${rpt.tags[t]}</span>`);
@@ -338,10 +338,10 @@ class ReportsHandlers {
                 reportedDate:  dateFormat(rpt._id.getTimestamp(), 'd mmm yyyy'),
                 reportedTime:  dateFormat(rpt._id.getTimestamp(), 'HH:MM'),
                 reportedBy:    rpt.by ? '@'+(await User.get(rpt.by)).username : rpt.alias,
-                location:      rpt.location,
+                locn:          rpt.locn,
                 alias:         rpt.alias,
                 comments:      rpt.comments,
-                geocode:       rpt.geocode,
+                geocode:       rpt.location.geocode,
                 url:           ctx.origin + '/reports/'+rpt._id,
             };
             reports.push(fields);
@@ -450,7 +450,7 @@ class ReportsHandlers {
             reportedTime:  dateFormat(rpt._id.getTimestamp(), 'HH:MM'),
             reportedBy:    rpt.by ? '@'+(await User.get(rpt.by)).username : '',
             comments:      rpt.comments,
-            geocode:       rpt.geocode,
+            geocode:       rpt.location.geocode,
         };
 
         const context = {
@@ -805,10 +805,10 @@ class ReportsHandlers {
             reportedOnTz:     dateFormat(report.reported, 'Z'),
             reportedBy:       report.by ? `${report.alias} / @${reportedBy.username}` : report.alias,
             reportHtml:       jsObjectToHtml.usingTable(report.submitted, [ 'Anonymous id','files' ], 'h3'),
-            geocodeHtml:      jsObjectToHtml.usingTable(report.geocode),
-            formattedAddress: encodeURIComponent(report.geocode.formattedAddress),
-            lat:              report.geocode.latitude  ? report.geocode.latitude  : 0,
-            lng:              report.geocode.longitude ? report.geocode.longitude : 0,
+            geocodeHtml:      jsObjectToHtml.usingTable(report.location.geocode),
+            formattedAddress: report.location.geocode ? encodeURIComponent(report.location.geocode.formattedAddress) : '',
+            lat:              report.location.geocode ? report.location.geocode.latitude  : 0,
+            lng:              report.location.geocode ? report.location.geocode.longitude : 0,
             highlight:        Math.max(Math.round(100 * (report._id.getTimestamp() - new Date() + y) / y), 0),
             comments:         comments,
             users:            users,                  // for select
@@ -828,10 +828,11 @@ class ReportsHandlers {
 
         // uploaded files
         if (report.analysis.files) {
-            const incidentLocn = new LatLon(report.geocode.latitude, report.geocode.longitude);
+            const incidentLocn = report.location.geocode ? new LatLon(report.location.geocode.latitude, report.location.geocode.longitude) : null;
             const incidentTime = new Date(report.submitted.Date);
             const submissionTime = report._id.getTimestamp();
             for (const file of report.analysis.files) {
+                if (!incidentLocn) continue;
                 // proxy url
                 file.url = `/uploaded/${report.project}/${dateFormat(report._id.getTimestamp(), 'yyyy-mm')}/${report._id}/${file.name}`;
                 // exif location
@@ -855,7 +856,8 @@ class ReportsHandlers {
             }
         }
 
-        if (Object.keys(report.geocode).length == 0) report.geocode = false;
+        // TODO: ??
+        //if (Object.keys(report.location.geocode).length == 0) report.location.geocode = false;
 
         await ctx.render('reports-view', Object.assign(report, extra));
         Report.flagView(db, ctx.params.id, ctx.state.user.id);
@@ -959,12 +961,12 @@ class ReportsHandlers {
         try {
             const bounds = { s: Number(ctx.params.s), w: Number(ctx.params.w), n: Number(ctx.params.n), e: Number(ctx.params.e) };
             const coords = [ [ [ bounds.w, bounds.s ], [ bounds.w, bounds.n ], [ bounds.e, bounds.n ], [ bounds.e, bounds.s ], [ bounds.w, bounds.s ] ] ];
-            const query = { location: { $geoWithin: { $geometry: { type: 'Polygon', coordinates: coords } } } };
+            const query = { 'location.geojson': { $geoWithin: { $geometry: { type: 'Polygon', coordinates: coords } } } };
             const reports = await Report.find(db, query);
             const y = 1000*60*60*24*365;
             for (const report of reports) {
-                report.lat = report.location.coordinates[1];
-                report.lng = report.location.coordinates[0];
+                report.lat = report.location.geojson.coordinates[1];
+                report.lng = report.location.geojson.coordinates[0];
                 report.reported = dateFormat(report._id.getTimestamp(), 'd mmm yyyy');
                 report.highlight = Math.round(100 * (report._id.getTimestamp() - new Date() + y) / y);
             }
@@ -1188,26 +1190,26 @@ function ago(date, short=false) {
  * @returns {string} Lowest geographic level which is common to all reports.
  */
 function lowestCommonGeographicLevel(reports) {
-    const rpts = reports.filter(rpt => Object.keys(rpt.geocode).length > 0); // ignore reports with no geocoding available
+    const rpts = reports.filter(rpt => rpt.location && rpt.location.geocode && Object.keys(rpt.location.geocode).length > 0); // ignore reports with no geocoding available
 
     // common street name?
-    const street = [ ...new Set(rpts.map(rpt => rpt.geocode.streetName ? rpt.geocode.streetName : undefined)) ].filter(str => str != undefined);
+    const street = [ ...new Set(rpts.map(rpt => rpt.location.geocode.streetName ? rpt.location.geocode.streetName : undefined)) ].filter(str => str != undefined);
     if (street.length == 1) return 'streetName';
 
     // common level2 address?
-    const level2 = [ ...new Set(rpts.map(rpt => rpt.geocode.administrativeLevels.level2long ? rpt.geocode.administrativeLevels.level2long : undefined)) ].filter(l2 => l2 != undefined);
+    const level2 = [ ...new Set(rpts.map(rpt => rpt.location.geocode.administrativeLevels.level2long ? rpt.location.geocode.administrativeLevels.level2long : undefined)) ].filter(l2 => l2 != undefined);
     if (level2.length == 1) return 'level2long';
 
     // common city?
-    const city = [ ...new Set(rpts.map(rpt => rpt.geocode.city ? rpt.geocode.city : undefined)) ].filter(c => c != undefined);
+    const city = [ ...new Set(rpts.map(rpt => rpt.location.geocode.city ? rpt.location.geocode.city : undefined)) ].filter(c => c != undefined);
     if (city.length == 1) return 'city';
 
     // common level1 address?
-    const level1 = [ ...new Set(rpts.map(rpt => rpt.geocode.administrativeLevels.level1long ? rpt.geocode.administrativeLevels.level1long : undefined)) ].filter(l1 => l1 != undefined);
+    const level1 = [ ...new Set(rpts.map(rpt => rpt.location.geocode.administrativeLevels.level1long ? rpt.location.geocode.administrativeLevels.level1long : undefined)) ].filter(l1 => l1 != undefined);
     if (level1.length == 1) return 'level1long';
 
     // common country?
-    const country = [ ...new Set(rpts.map(rpt => rpt.geocode.country ? rpt.geocode.country : undefined)) ].filter(c => c != undefined);
+    const country = [ ...new Set(rpts.map(rpt => rpt.location.geocode.country ? rpt.location.geocode.country : undefined)) ].filter(c => c != undefined);
     if (country.length == 1) return 'country';
 
     return ''; // multiple countries!
@@ -1227,29 +1229,30 @@ function lowestCommonGeographicLevel(reports) {
 function findBestLocnBelow(level, report) {
     switch (level) {
         case '':
-            return report.geocode.country;
+            return report.location.geocode.country;
         case 'country':
-            if (report.geocode.city) return report.geocode.city;
-            if (report.geocode.administrativeLevels.level1long) return report.geocode.administrativeLevels.level1long;
+            if (report.location.geocode.city) return report.location.geocode.city;
+            if (report.location.geocode.administrativeLevels.level1long) return report.location.geocode.administrativeLevels.level1long;
             break;
         case 'level1long':
-            if (report.geocode.city) return report.geocode.city;
-            if (report.geocode.administrativeLevels.level2long) return report.geocode.administrativeLevels.level2long;
-            if (report.geocode.streetName) return report.geocode.streetName;
+            if (report.location.geocode.city) return report.location.geocode.city;
+            if (report.location.geocode.administrativeLevels.level2long) return report.location.geocode.administrativeLevels.level2long;
+            if (report.location.geocode.streetName) return report.location.geocode.streetName;
             break;
         case 'city':
-            if (report.geocode.administrativeLevels.level2long) return report.geocode.administrativeLevels.level2long;
-            if (report.geocode.extra.establishment) return report.geocode.extra.establishment;
-            if (report.geocode.streetName) return report.geocode.streetName;
+            if (report.location.geocode.administrativeLevels.level2long) return report.location.geocode.administrativeLevels.level2long;
+            if (report.location.geocode.extra.establishment) return report.location.geocode.extra.establishment;
+            if (report.location.geocode.streetName) return report.location.geocode.streetName;
+            if (report.location.geocode.extra.neighborhood) return report.location.geocode.extra.neighborhood;
             break;
         case 'level2long':
         case 'extra.neighborhood':
-            if (report.geocode.streetName) return report.geocode.streetName;
-            if (report.geocode.extra.establishment) return report.geocode.extra.establishment;
+            if (report.location.geocode.streetName) return report.location.geocode.streetName;
+            if (report.location.geocode.extra.establishment) return report.location.geocode.extra.establishment;
             break;
         case 'streetName':
-            if (report.geocode.extra.establishment) return report.geocode.extra.establishment;
-            return report.geocode.streetNumber + ' ' + report.geocode.streetName;
+            if (report.location.geocode.extra.establishment) return report.location.geocode.extra.establishment;
+            return report.location.geocode.streetNumber + ' ' + report.location.geocode.streetName;
     }
     return '!!'; // shouldn't happen!
 }

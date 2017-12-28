@@ -69,8 +69,8 @@ class IncidentReport {
     static async getReportConfirm(ctx) {
         const report = await Report.get(ctx.state.user.db, ctx.params.id);
 
-        report.lat = report.location.coordinates[1];
-        report.lon = report.location.coordinates[0];
+        report.lat = report.location.geojson.coordinates[1];
+        report.lon = report.location.geojson.coordinates[0];
 
         const resources = await Resource.getNear(ctx.state.user.db, report.lat, report.lon, 10e3);
         resources.forEach(resource => {

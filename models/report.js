@@ -39,15 +39,13 @@ const schema = {
         files:      { type:     'array',                  // uploaded files
             items: { type: 'object' },                    // ...
         },
-        geocode:    { type:     'object' },               // google geocoding data
-        location:   { type:     'object' },               // GeoJSON (with spatial index)
-        // location:   { type: 'object',
-        //     properties: {
-        //         address: { type: 'string' },
-        //         geocode: { type: 'object' },
-        //         geojson: { type: 'object' }
-        //     }
-        // },
+        location:   { type: 'object',
+            properties: {
+                address: { type: 'string' },
+                geocode: { type: [ 'object', 'null' ] },  // google geocoding data
+                geojson: { type: [ 'object', 'null' ] },  // GeoJSON (with spatial index)
+            },
+        },
         analysis:   { type:     'object' },               // exif data, weather, etc
         assignedTo: { bsonType: [ 'objectId', 'null' ] },   // user report is assigned to
         status:     { type:     [ 'string', 'null' ] },     // free-text status (to accomodate any workflow)
@@ -106,7 +104,7 @@ class Report {
 
         // geospatial index
 
-        reports.createIndex({ location: '2dsphere' });
+        reports.createIndex({ 'location.geojson': '2dsphere' });
 
         // free-text index for submitted information (ie fields in report.submitted)
 
@@ -302,8 +300,7 @@ class Report {
             submitted:  submitted,
             by:         by,
             alias:      alias,
-            geocode:    geocode || {},
-            location:   {},
+            location:   { address: '', geocode: geocode, geojson: null },
             analysis:   {},
             // summary: undefined,
             assignedTo: undefined,
@@ -319,7 +316,7 @@ class Report {
 
         // if successful geocode, record (geoJSON) location for (indexed) geospatial queries
         if (geocode) {
-            values.location = {
+            values.location.geojson = {
                 type:        'Point',
                 coordinates: [ Number(geocode.longitude), Number(geocode.latitude) ],
             };
@@ -500,7 +497,7 @@ class Report {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
-        userId = objectId(userId); // allow id as string
+        userId = objectId(userId); // allow userId as string
 
         const reports = global.db[db].collection('reports');
         await reports.updateOne({ _id: id }, { $addToSet: { tags: tag } });

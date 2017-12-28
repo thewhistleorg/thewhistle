@@ -18,7 +18,7 @@
         'use strict';
 
         // map
-        {{#if geocode}}
+        {{#if location.geocode}}
         function initMap() {
             initialiseMap(google, '{{_id}}', '{{name}}', {{lat}}, {{lng}}, '{{reportedOnDay}}', '{{reportedOnFull}}', {{highlight}});
         }
@@ -186,7 +186,7 @@
                 </li>
 
                 <li id="geocoding">
-                    {{#if geocode}}
+                    {{#if location.geocode}}
                     <span class="card-header">LOCATION MAP <a href="https://maps.google.com/maps/search/{{formattedAddress}}" class="fa fa-globe"></a></span>
                     <div class="padding-15">
                         <!-- <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p> -->

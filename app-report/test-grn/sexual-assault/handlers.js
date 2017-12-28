@@ -190,7 +190,7 @@ class Handlers {
      * Shows local resources grouped by services they offer.
      */
     static async getWhatnext(ctx) {
-        const context = {};
+        const context = { address: ctx.query.address };
 
         // if we have a geocode result on the incident location, list local resources
         const geocoded = ctx.query.address ? await geocode(ctx.query.address) : null;
@@ -238,7 +238,7 @@ class Handlers {
                 resourcesGrouped[category] = resourcesGrouped[category].slice(0, 3); // TODO: ??
             }
 
-            context.categories = resourcesGrouped;
+            context.categories = Object.keys(resourcesGrouped).length>0 ? resourcesGrouped : null; // readily identify 'no resources' in template
             context.formattedAddress = geocoded.formattedAddress;
         }
 

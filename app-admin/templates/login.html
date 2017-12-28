@@ -102,10 +102,12 @@
             <button type="submit" title="Login" class="pure-button pure-button-primary">Login</button>
             {{#if @koa.flash.loginfailmsg}}<span class="error-msg">{{@koa.flash.loginfailmsg}}</span>{{/if}}
         </li>
+        <li class="pure-control-group">
+            <label></label>
+            <a href="/password/reset-request">Forgotten password</a>
+        </li>
     </ul>
 </form>
-
-<p><a href="/password/reset-request">Forgotten password</a></p>
 
 {{/if}}
 

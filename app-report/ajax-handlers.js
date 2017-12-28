@@ -57,7 +57,7 @@ handler.getAlias = async function(ctx) {
  * authenticated proxy for Google's geolocation service.
  */
 handler.geocode = async function(ctx) {
-    const region = await ip.getCountry(ctx.ip);
+    const region = ctx.query.region ? ctx.query.region : await ip.getCountry(ctx.ip);
     const geocoded = await geocode(ctx.query.address, region);
 
     if (geocoded) {

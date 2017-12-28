@@ -50,14 +50,18 @@ handler.getAlias = async function(ctx) {
 
 
 /**
- * Get geocode details for given address.
+ * Get geocode details for given address. Results are weighted to country of originating request,
+ * determined from IP address.
+ *
+ * This only returns the formattedAddress field, as otherwise it could be used as a free
+ * authenticated proxy for Google's geolocation service.
  */
 handler.geocode = async function(ctx) {
     const region = await ip.getCountry(ctx.ip);
     const geocoded = await geocode(ctx.query.address, region);
 
     if (geocoded) {
-        ctx.body = geocoded;
+        ctx.body = { formattedAddress: geocoded.formattedAddress };
         ctx.body.root = 'geocode';
         ctx.status = 200; // Ok
     } else {

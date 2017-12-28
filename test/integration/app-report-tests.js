@@ -331,17 +331,17 @@ describe('Report app'+' ('+app.env+')', function() {
         });
 
         it('sees whatnext page', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/whatnext');
-            expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            const response = await request.get('/test-grn/sexual-assault/whatnext');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
             expect(document.querySelectorAll('tr')).to.have.lengthOf(0); // local resources
         });
 
         it('sees whatnext resources', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/whatnext?address=university+of+lagos');
-            expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            const response = await request.get('/test-grn/sexual-assault/whatnext?address=university+of+lagos,+nigeria');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
             expect(document.querySelectorAll('tr')).to.have.lengthOf(39); // local resources
         });
@@ -499,17 +499,17 @@ describe('Report app'+' ('+app.env+')', function() {
         });
 
         it('sees whatnext page', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/whatnext');
-            expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            const response = await request.get('/test-grn/sexual-assault/whatnext');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
             expect(document.querySelectorAll('tr')).to.have.lengthOf(0); // local resources
         });
 
         it('sees whatnext resources', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/whatnext?address=university+of+lagos');
-            expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            const response = await request.get('/test-grn/sexual-assault/whatnext?address=university+of+lagos');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
             expect(document.querySelectorAll('tr')).to.have.lengthOf(39); // local resources
         });

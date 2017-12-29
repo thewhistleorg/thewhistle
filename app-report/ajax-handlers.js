@@ -57,12 +57,18 @@ handler.getAlias = async function(ctx) {
  * authenticated proxy for Google's geolocation service.
  */
 handler.geocode = async function(ctx) {
+    const corsAllow = [ 'http://www.rapeisacrime.org', 'http://www.movable-type.co.uk' ];
     const region = ctx.query.region ? ctx.query.region : await ip.getCountry(ctx.ip);
     const geocoded = await geocode(ctx.query.address, region);
 
     if (geocoded) {
         ctx.body = { formattedAddress: geocoded.formattedAddress };
         ctx.body.root = 'geocode';
+        // if this is a CORS request, check it comes from acceptable source
+        if (corsAllow.includes(ctx.request.get('Origin'))) {
+            ctx.response.set('Vary', 'Origin');
+            ctx.response.set('Access-Control-Allow-Origin', ctx.request.get('Origin'));
+        }
         // if region is specified, treat it as a requirement not just as bias as Google does (after CORS check!)
         if (ctx.query.region && ctx.query.region.toUpperCase()!=geocoded.countryCode) { ctx.status = 404; return; }
         ctx.status = 200; // Ok

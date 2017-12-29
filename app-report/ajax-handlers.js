@@ -63,6 +63,8 @@ handler.geocode = async function(ctx) {
     if (geocoded) {
         ctx.body = { formattedAddress: geocoded.formattedAddress };
         ctx.body.root = 'geocode';
+        // if region is specified, treat it as a requirement not just as bias as Google does (after CORS check!)
+        if (ctx.query.region && ctx.query.region.toUpperCase()!=geocoded.countryCode) { ctx.status = 404; return; }
         ctx.status = 200; // Ok
     } else {
         ctx.status = 404; // Not Found

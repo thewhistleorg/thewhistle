@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const button = document.querySelector('#get');
             const formatted = document.querySelector('#formatted-address');
             if (input.value == '') {
-                button.setAttribute('disabled', '');
+                button.disabled = true;
                 button.classList.add('grey');
                 return;
             }
@@ -337,12 +337,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 switch (response.status) {
                     case 200:
                         const body = await response.json();
-                        button.removeAttribute('disabled');
+                        button.disabled = false;
                         button.classList.remove('grey');
                         formatted.innerHTML = `(for <i>${body.formattedAddress}</i>)`;
                         break;
                     case 404:
-                        button.setAttribute('disabled', '');
+                        button.disabled = true;
                         button.classList.add('grey');
                         formatted.innerHTML = '';
                         break;

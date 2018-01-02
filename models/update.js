@@ -243,6 +243,7 @@ class Update {
             case 'set':
                 switch (fld) {
                     case 'assignedTo': description = `Set ${fld} to ${val?'@'+names.get(val.toString()):'<none>'}`; break;
+                    case 'location':   description = `Set ${fld} to ‘${val.address}’`; break;
                     default:           description = `Set ${fld} to ‘${val}’`; break;
                 }
                 break;

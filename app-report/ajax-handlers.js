@@ -55,6 +55,8 @@ handler.getAlias = async function(ctx) {
  *
  * This only returns the formattedAddress field, as otherwise it could be used as a free
  * authenticated proxy for Google's geolocation service.
+ *
+ * Mirrors similar function in admin app.
  */
 handler.geocode = async function(ctx) {
     const corsAllow = [ 'http://www.rapeisacrime.org', 'http://www.movable-type.co.uk' ];

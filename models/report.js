@@ -41,14 +41,14 @@ const schema = {
         },
         location:   { type: 'object',
             properties: {
-                address: { type: 'string' },
+                address: { type: 'string' },              // entered address used for geocoding
                 geocode: { type: [ 'object', 'null' ] },  // google geocoding data
                 geojson: { type: [ 'object', 'null' ] },  // GeoJSON (with spatial index)
             },
         },
         analysis:   { type:     'object' },               // exif data, weather, etc
-        assignedTo: { bsonType: [ 'objectId', 'null' ] },   // user report is assigned to
-        status:     { type:     [ 'string', 'null' ] },     // free-text status (to accomodate any workflow)
+        assignedTo: { bsonType: [ 'objectId', 'null' ] }, // user report is assigned to
+        status:     { type:     [ 'string', 'null' ] },   // free-text status (to accomodate any workflow)
         tags:       { type:     'array',                  // tags to classify/group reports
             items: { type: 'string' },
         },
@@ -62,8 +62,8 @@ const schema = {
                 },
             },
         },
-        archived:   { type: 'boolean' },                 // archived flag
-        views:      { type: 'object' },                  // associative array of timestamps indexed by user id
+        archived:   { type: 'boolean' },                  // archived flag
+        views:      { type: 'object' },                   // associative array of timestamps indexed by user id
     },
 };
 /* eslint-enable no-unused-vars, key-spacing */

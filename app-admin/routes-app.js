@@ -60,7 +60,8 @@ router.delete('/ajax/reports/:id/tags/:tag',         reports.ajaxReportDeleteTag
 router.post(  '/ajax/reports/:id/comments',          reports.ajaxReportPostComment);
 router.put(   '/ajax/reports/:id/comments/:comment', reports.ajaxReportPutComment);
 router.delete('/ajax/reports/:id/comments/:comment', reports.ajaxReportDeleteComment);
-router.get   ('/ajax/reports/:id/updates',           reports.ajaxReportGetUpdates);
+router.get(   '/ajax/reports/:id/updates',           reports.ajaxReportGetUpdates);
+router.put(   '/ajax/reports/:id/location',          reports.ajaxReportPutLocation);
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -183,6 +184,39 @@ router.get('/uploaded/:project/:date/:id/:file', async function getUploadedFile(
         // TODO: Last-Modified?
     } catch (e) {
         ctx.throw(e.statusCode, e.message);
+    }
+});
+
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/*  Geocode address                                                                               */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+import ip from '../lib/ip';
+import geocode from '../lib/geocode';
+
+/**
+ * Get geocode details for given address. Results are weighted to country of originating request,
+ * determined from IP address.
+ *
+ * This only returns the formattedAddress field, as otherwise it could be used as a free
+ * authenticated proxy for Google's geolocation service.
+ *
+ * Mirrors similar function in report app.
+ */
+router.get('/ajax/geocode', async function getGeocode(ctx) {
+    const region = ctx.request.query.region ? ctx.request.query.region : await ip.getCountry(ctx.ip);
+    const geocoded = await geocode(ctx.request.query.address, region);
+
+    if (geocoded) {
+        // if region is specified, treat it as a requirement not just as bias as Google does
+        if (ctx.request.query.region && ctx.request.query.region.toUpperCase()!=geocoded.countryCode) { ctx.status = 404; return; }
+
+        ctx.body = { formattedAddress: geocoded.formattedAddress };
+        ctx.body.root = 'geocode';
+        ctx.status = 200; // Ok
+    } else {
+        ctx.status = 404; // Not Found
     }
 });
 

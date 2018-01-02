@@ -532,6 +532,29 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(matches.numberValue).to.equal(1);
         });
 
+        it('sets location', async function() {
+            const values = { address: 'University of Lagos' };
+            const response = await request.put(`/ajax/reports/${reportId}/location`).send(values);
+            expect(response.status).to.equal(200);
+            expect(response.body.formattedAddress).to.equal('University Road 101017 Akoka,, Yaba, Lagos State., Nigeria');
+        });
+
+        it('sees location in update address field', async function() {
+            const response = await request.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const input = document.querySelector('input#address');
+            expect(input.value).to.equal('University of Lagos');
+        });
+
+        it('sees location in audit trail', async function() {
+            const response = await request.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const matches = document.evaluate('count(//td[text()="Set location to ‘University of Lagos’"])', document, null, 0, null);
+            expect(matches.numberValue).to.equal(1);
+        });
+
         it('downloads reports list as CSV', async function() {
             const response = await request.get('/reports/export-csv');
             expect(response.status).to.equal(200);
@@ -589,7 +612,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('tidyup: sees full set of audit trail updates before report delete', async function() {
             const response = await request.get(`/ajax/reports/${reportId}/updates/`).send();
             expect(response.status).to.equal(200);
-            expect(response.body.updates.length).to.equal(7);
+            expect(response.body.updates.length).to.equal(8);
         });
 
         it('tidyup: deletes incident report', async function() {

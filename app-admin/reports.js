@@ -26,6 +26,7 @@ import User   from '../models/user.js';
 import Update from '../models/update.js';
 
 import jsObjectToHtml from '../lib/js-object-to-html';
+import geocode from '../lib/geocode';
 
 
 class ReportsHandlers {
@@ -811,6 +812,7 @@ class ReportsHandlers {
             lng:              report.location.geocode ? report.location.geocode.longitude : 0,
             highlight:        Math.max(Math.round(100 * (report._id.getTimestamp() - new Date() + y) / y), 0),
             comments:         comments,
+            location:         report.location,
             users:            users,                  // for select
             statuses:         statuses,               // for datalist
             otherReports:     otherReports,
@@ -1106,6 +1108,38 @@ class ReportsHandlers {
             ctx.body = { message: e.message };
         }
         ctx.body.root = 'reports';
+    }
+
+
+
+    /**
+     * PUT /ajax/reports/:report/location - geocode reported incident location.
+     *
+     * This records the original entered address, the geocoded details, and the geojson index in
+     * report.location.{ address, geocode, geojson }.
+     *
+     * If geocoding fails, current values are not changed and 404 is returned.
+     */
+    static async ajaxReportPutLocation(ctx) {
+        const db = ctx.state.user.db;
+        const address = ctx.request.body.address;
+
+        const geocoded = await geocode(address);
+
+        if (geocoded) {
+            const geojson = {
+                type:        'Point',
+                coordinates: [ Number(geocoded.longitude), Number(geocoded.latitude) ],
+            };
+            const location = { location: { address, geocode: geocoded, geojson } };
+            Report.update(db, ctx.params.id, location, ctx.state.user.id);
+
+            ctx.status = 200; // Ok
+            ctx.body = { formattedAddress: geocoded.formattedAddress };
+            ctx.body.root = 'reports';
+        } else {
+            ctx.status = 404; // Not Found
+        }
     }
 
 }

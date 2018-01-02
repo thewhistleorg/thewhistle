@@ -37,6 +37,9 @@
             // notes
             setupCommentaryListeners('{{_id}}', '{{@koa.state.user.name}}',  '{{@koa.state.user.id}}');
 
+            // location
+            setupLocationListeners('{{_id}}');
+
             // set scroll height
             resizeElementHeight(document.getElementById('scroll-container'));
 
@@ -186,8 +189,15 @@
                 </li>
 
                 <li id="geocoding">
+                    <span class="card-header">
+                        LOCATION
+                        <a href="https://maps.google.com/maps/search/{{formattedAddress}}" class="fa fa-globe"></a>
+                        <button type="button" name="location-edit" id="location-edit" title="edit location" class="fa fa-pencil"></button>
+                        <input type="text" name="address" id="address" value="{{location.address}}" placeholder="address to be geocoded" class="hide">
+                        <button type="button" name="location-cancel" id="location-cancel" title="cancel" class="fa fa-times red hide"></button>
+                        <button type="button" name="location-update" id="location-update" title="set location" class="fa fa-check green hide"></button>
+                    </span>
                     {{#if location.geocode}}
-                    <span class="card-header">LOCATION MAP <a href="https://maps.google.com/maps/search/{{formattedAddress}}" class="fa fa-globe"></a></span>
                     <div class="padding-15">
                         <!-- <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p> -->
                         <div id="map"></div>
@@ -203,7 +213,6 @@
                         </ul>
                     </div>
                     {{else}}
-                    <span class="card-header">LOCATION</span>
                     <div class="padding-15">No incident location identified</div>
                     {{/if}}
                 </li>

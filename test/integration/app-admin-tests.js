@@ -287,6 +287,13 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(document.getElementById(reportId)).to.not.be.null;
         });
 
+        it('sets location', async function() {
+            const values = { address: 'University of Lagos' };
+            const response = await request.put(`/ajax/reports/${reportId}/location`).send(values);
+            expect(response.status).to.equal(200);
+            expect(response.body.formattedAddress).to.equal('University Road 101017 Akoka,, Yaba, Lagos State., Nigeria');
+        });
+
         it('has new report in report-map page', async function() {
             const response = await request.get('/reports-map');
             expect(response.status).to.equal(200);
@@ -532,13 +539,6 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(matches.numberValue).to.equal(1);
         });
 
-        it('sets location', async function() {
-            const values = { address: 'University of Lagos' };
-            const response = await request.put(`/ajax/reports/${reportId}/location`).send(values);
-            expect(response.status).to.equal(200);
-            expect(response.body.formattedAddress).to.equal('University Road 101017 Akoka,, Yaba, Lagos State., Nigeria');
-        });
-
         it('sees location in update address field', async function() {
             const response = await request.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
@@ -612,7 +612,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('tidyup: sees full set of audit trail updates before report delete', async function() {
             const response = await request.get(`/ajax/reports/${reportId}/updates/`).send();
             expect(response.status).to.equal(200);
-            expect(response.body.updates.length).to.equal(8);
+            expect(response.body.updates.length).to.equal(9);
         });
 
         it('tidyup: deletes incident report', async function() {

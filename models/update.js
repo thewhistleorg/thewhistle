@@ -242,9 +242,10 @@ class Update {
         switch (op) {
             case 'set':
                 switch (fld) {
-                    case 'assignedTo': description = `Set ${fld} to ${val?'@'+names.get(val.toString()):'<none>'}`; break;
-                    case 'location':   description = `Set ${fld} to ‘${val.address}’`; break;
-                    default:           description = `Set ${fld} to ‘${val}’`; break;
+                    case 'assignedTo':       description = `Set ${fld} to ${val?'@'+names.get(val.toString()):'<none>'}`; break;
+                    case 'location':         description = `Set ${fld} to ‘${val.address}’`; break;
+                    case 'analysis.weather': description = `Set ${fld} to ‘${val.city}, ${val.country}’`; break;
+                    default:                 description = `Set ${fld} to ‘${val}’`; break;
                 }
                 break;
             case 'addToSet': description = `Add ${fld.slice(0,-1)} ‘${val}’`; break;

@@ -9,13 +9,11 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Report   from '../models/report.js';
-import Resource from '../models/resource.js';
 
 import autoIdentifier   from '../lib/auto-identifier.js';
 import jsObjectToHtml   from '../lib/js-object-to-html.js';
 import validationErrors from '../lib/validation-errors.js';
 import useragent        from '../lib/user-agent.js';
-import geocode          from '../lib/geocode.js';
 
 
 const validation = {
@@ -53,37 +51,20 @@ class IncidentReport {
         const prettyReport = prettifyReport(ctx.session.report);
 
         const context = {
-            reporter:            ctx.state.user.name,
-            reportHtml:          jsObjectToHtml.usingTable(prettyReport),
-            formattedAddress:    ctx.session.geocode ? ctx.session.geocode.formattedAddress : '[unrecognised address]',
-            formattedAddressUrl: encodeURIComponent(ctx.session.geocode ? ctx.session.geocode.formattedAddress : ''),
-            files:               ctx.session.files.map(f => f.name).join(', '),
+            reporter:   ctx.state.user.name,
+            reportHtml: jsObjectToHtml.usingTable(prettyReport),
+            files:      ctx.session.files.map(f => f.name).join(', '),
         };
 
         await ctx.render(ctx.state.user.db+'/'+ctx.params.project+'-submit', context);
     }
 
+
     /**
      * Render incident report confirm page.
      */
     static async getReportConfirm(ctx) {
-        const report = await Report.get(ctx.state.user.db, ctx.params.id);
-
-        report.lat = report.location.geojson.coordinates[1];
-        report.lon = report.location.geojson.coordinates[0];
-
-        const resources = await Resource.getNear(ctx.state.user.db, report.lat, report.lon, 10e3);
-        resources.forEach(resource => {
-            const lat1 = report.lat;
-            const lon1 = report.lon;
-            const lat2 = resource.location.coordinates[1];
-            const lon2 = resource.location.coordinates[0];
-            const φ1 = lat1*Math.PI/180, φ2 = lat2*Math.PI/180, Δλ = (lon2-lon1)*Math.PI/180, R = 6371e3;
-            const d = Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
-            resource.distance = (d/1000).toPrecision(2);
-        });
-
-        await ctx.render(ctx.state.user.db+'/'+ctx.params.project+'-confirm', { report, resources });
+        await ctx.render(ctx.state.user.db+'/'+ctx.params.project+'-confirm');
     }
 
 
@@ -132,11 +113,6 @@ class IncidentReport {
 
         ctx.session.report = body;
 
-        // geocode location
-        ctx.session.geocode = body['location-address']
-            ? await geocode(body['location-address'])
-            : null;
-
         ctx.redirect(`/report/${ctx.params.project}/submit`);
     }
 
@@ -154,7 +130,7 @@ class IncidentReport {
         const alias = ctx.session.report['existing-alias'] || ctx.session.report['generated-alias'];
         const prettyReport = prettifyReport(ctx.session.report);
 
-        const id = await Report.insert(ctx.state.user.db, by, alias, prettyReport, ctx.params.project, ctx.session.files, ctx.session.geocode, ctx.headers['user-agent']);
+        const id = await Report.insert(ctx.state.user.db, by, alias, prettyReport, ctx.params.project, ctx.session.files, ctx.headers['user-agent']);
 
         // record user-agent
         await useragent.log(ctx.state.user.db, ctx.ip, ctx.headers);

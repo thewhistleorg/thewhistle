@@ -109,7 +109,7 @@ class Handlers {
 
             // record this report (including uploaded docs)
             delete ctx.request.body['submit'];
-            await Report.insert(ctx.params.database, undefined, '—', ctx.session.report, 'wwww', ctx.session.files, null, ctx.headers['user-agent']);
+            await Report.insert(ctx.params.database, undefined, '—', ctx.session.report, 'wwww', ctx.session.files, ctx.headers['user-agent']);
             ctx.session = null;
             ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/thank-you`);
         }

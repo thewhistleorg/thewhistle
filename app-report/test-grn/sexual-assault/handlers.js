@@ -115,22 +115,15 @@ class Handlers {
     static async getSubmit(ctx) {
         if (!ctx.session.report) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
 
-        // geocode location
-        ctx.session.geocode = ctx.session.report['at-address']
-            ? await geocode(ctx.session.report['at-address'])
-            : null;
-
         // make sure only one of generated-alias and existing-alias are recorded, and make it 1st property of report
         if (ctx.session.report['existing-alias']) { delete ctx.session.report['generated-alias']; ctx.session.report = Object.assign({ 'existing-alias': null }, ctx.session.report); }
         if (ctx.session.report['generated-alias']) { delete ctx.session.report['existing-alias']; ctx.session.report = Object.assign({ 'generated-alias': null }, ctx.session.report); }
 
         const prettyReport = prettifyReport(ctx.session.report);
-        const formattedAddress = ctx.session.geocode ? ctx.session.geocode.formattedAddress : '[unrecognised address]';
         const files = ctx.session.report.files ? ctx.session.report.files.map(f => f.name).join(', ') : null;
         const context = {
-            reportHtml:       jsObjectToHtml.usingTable(prettyReport),
-            formattedAddress: formattedAddress,
-            files:            files ,
+            reportHtml: jsObjectToHtml.usingTable(prettyReport),
+            files:      files ,
         };
 
         await ctx.render('submit', context);
@@ -167,15 +160,14 @@ class Handlers {
         const prettyReport = prettifyReport(ctx.session.report);
 
         const by = ctx.state.user ? ctx.state.user.id : null;
-        const id = await Report.insert(ctx.params.database, by, alias, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.session.geocode, ctx.headers['user-agent']);
+        const id = await Report.insert(ctx.params.database, by, alias, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.headers['user-agent']);
         ctx.set('X-Insert-Id', id); // for integration tests
 
         // record user-agent
         await useragent.log(ctx.params.database, ctx.ip, ctx.headers);
 
         // remove all session data (to prevent duplicate submission)
-        // except geocoding result (to present local resources)
-        ctx.session = { geocode: ctx.session.geocode };
+        ctx.session = {};
 
         ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/whatnext`);
     }

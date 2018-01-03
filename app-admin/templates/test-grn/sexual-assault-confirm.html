@@ -12,42 +12,6 @@
     </style>
     <script src="//maps.googleapis.com/maps/api/js?callback=initMap&key=AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw" defer></script>
     <script defer src="/js/report/report.js"></script>
-    <script>
-        'use strict';
-        const report = { lat: {{report.lat}}, lng: {{report.lon}} };
-        const resources = [
-            {{#each resources}}
-            { resourceId: '{{_id}}', lat: {{location.coordinates.[1]}}, lng: {{location.coordinates.[0]}}, name: '{{name}}' },
-            {{/each}}
-        ];
-        function initMap() {
-
-            const map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 20,
-                center: { lat: 0, lng: 0 }
-            });
-
-            const markers = resources.map(function(resource, i) {
-                const m = new google.maps.Marker({
-                    position: resource,
-                    icon:     '/map-marker/blue/100',
-                    label:    resource.name,
-                    map:      map,
-                });
-                return m;
-            });
-            markers.push(new google.maps.Marker({
-                    position: report,
-                    icon:     '/map-marker/red/100',
-                    map:      map,
-                }))
-            const bounds = new google.maps.LatLngBounds();
-            for (const m of markers) bounds.extend(m.getPosition());
-            map.initialZoom = true;
-            map.fitBounds(bounds);
-        }
-
-    </script>
 </head>
 <body>
 
@@ -61,29 +25,10 @@
 
 <h1>Report Submitted</h1>
 
+<p>This page needs further consideration in light of changing of handling of resources in the
+    reporting app.</p>
+
 {{>errpartial}}
-
-<p>This page will have information about support which may be available, including support resources
-    close to the location of the reported incident.</p>
-
-<h2>Rape crisis resources</h2>
-
-<table>
-    <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Distance</th>
-    </tr>
-    {{#resources}}
-    <tr id="{{_id}}" class="resource">
-        <td>{{name}}</td>
-        <td>{{description}}</td>
-        <td class="align-right">{{distance}} km</td>
-    </tr>
-    {{/resources}}
-</table>
-
-<div id="map"></div>
 
 </main>
 

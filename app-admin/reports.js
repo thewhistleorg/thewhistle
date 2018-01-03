@@ -27,6 +27,7 @@ import Update from '../models/update.js';
 
 import jsObjectToHtml from '../lib/js-object-to-html';
 import geocode from '../lib/geocode';
+import Weather from '../lib/weather';
 
 
 class ReportsHandlers {
@@ -1115,8 +1116,9 @@ class ReportsHandlers {
     /**
      * PUT /ajax/reports/:report/location - geocode reported incident location.
      *
-     * This records the original entered address, the geocoded details, and the geojson index in
-     * report.location.{ address, geocode, geojson }.
+     * This records the original entered address, the geocoded details, and the GeoJSON index in
+     * report.location.{ address, geocode, geojson }. It also sets the weather conditions if the
+     * submitted details have a specific date.
      *
      * If geocoding fails, current values are not changed and 404 is returned.
      */
@@ -1127,12 +1129,20 @@ class ReportsHandlers {
         const geocoded = await geocode(address);
 
         if (geocoded) {
+            // set location
             const geojson = {
                 type:        'Point',
                 coordinates: [ Number(geocoded.longitude), Number(geocoded.latitude) ],
             };
-            const location = { location: { address, geocode: geocoded, geojson } };
-            Report.update(db, ctx.params.id, location, ctx.state.user.id);
+            const location = { address, geocode: geocoded, geojson };
+            Report.update(db, ctx.params.id, { location: location }, ctx.state.user.id);
+
+            // if we have a precise date for the incident, record weather conditions at location & date of incident
+            const report = await Report.get(db, ctx.params.id);
+            if (report.submitted.Date && report.submitted.Date.getTime()) {
+                const weather = await Weather.fetchWeatherConditions(geocoded.latitude, geocoded.longitude, report.submitted.Date);
+                if (weather) Report.update(db, ctx.params.id, { 'analysis.weather': weather }, ctx.state.user.id);
+            }
 
             ctx.status = 200; // Ok
             ctx.body = { formattedAddress: geocoded.formattedAddress };

@@ -13,7 +13,6 @@ import MongoDB    from 'mongodb';           // MongoDB driver for Node.js
 const ObjectId = MongoDB.ObjectId;
 
 import User    from '../models/user.js';
-import Weather from '../lib/weather.js';
 import AwsS3   from '../lib/aws-s3.js';
 import Update  from './update.js';
 
@@ -281,12 +280,11 @@ class Report {
      * @param   {Object}   submitted - Report details (values depend on project).
      * @param   {string}   project - Project report is part of.
      * @param   {Object[]} files - Uploaded files ('formidable' File objects).
-     * @param   {Object}   geocode - Google geocoding results.
      * @param   {string}   userAgent - User agent from http request header.
      * @returns {ObjectId} New report id.
      * @throws  Error on validation or referential integrity errors.
      */
-    static async insert(db, by, alias, submitted, project, files, geocode, userAgent) {
+    static async insert(db, by, alias, submitted, project, files, userAgent) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         by = objectId(by); // allow id as string
@@ -300,7 +298,7 @@ class Report {
             submitted:  submitted,
             by:         by,
             alias:      alias,
-            location:   { address: '', geocode: geocode, geojson: null },
+            location:   { address: '', geocode: null, geojson: null },
             analysis:   {},
             // summary: undefined,
             assignedTo: undefined,
@@ -313,19 +311,6 @@ class Report {
 
         // record uploaded files within the submitted report object
         values.submitted.files = files || [];
-
-        // if successful geocode, record (geoJSON) location for (indexed) geospatial queries
-        if (geocode) {
-            values.location.geojson = {
-                type:        'Point',
-                coordinates: [ Number(geocode.longitude), Number(geocode.latitude) ],
-            };
-        }
-
-        // record weather conditions at location & date of incident
-        if (submitted.Date && submitted.Date.getTime() && geocode) {
-            values.analysis.weather = await Weather.fetchWeatherConditions(geocode.latitude, geocode.longitude, submitted.Date);
-        }
 
         // record user agent for potential later analyses
         const ua = useragent.parse(userAgent);

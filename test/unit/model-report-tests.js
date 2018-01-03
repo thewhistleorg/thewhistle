@@ -83,16 +83,8 @@ describe('Report model', function() {
                 mtime: stat.mtime,
             } ];
 
-            // spoof geocode incident location (this subset of results is all we need)
-            const geocode = {
-                formattedAddress:     'Free School Ln, Cambridge CB2, UK',
-                latitude:             52.2031684,
-                longitude:            0.118871,
-                administrativeLevels: {},
-            };
-
             const ua = 'node-superagent/x.x.x';
-            reportId = await Report.insert('test-cam', undefined, 'test test', submitted, 'test-project', files, geocode, ua);
+            reportId = await Report.insert('test-cam', undefined, 'test test', submitted, 'test-project', files, ua);
             console.info('report id:', reportId);
             expect(reportId.constructor.name).to.equal('ObjectID');
             const report = await Report.get('test-cam', reportId);

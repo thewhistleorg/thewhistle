@@ -621,7 +621,8 @@ class ReportsHandlers {
 
         for (const arg in q) { // trap ?qry=a&qry=b, which will return an array
             if ([ 'tag', 'summary' ].includes(arg)) continue; // multiple filters for tag & summary are allowed & catered for
-            if (typeof q[arg] != 'string') throw new Error(`query string argument ${arg} is not a string`);
+            if (Array.isArray(q[arg])) [ q[arg] ] = q[arg].slice(-1); // if query key multiply defined, use the last one
+            if (typeof q[arg] != 'string') throw new Error(`query string argument ${arg} is not a string`); // !!
         }
 
         switch (q.active) {

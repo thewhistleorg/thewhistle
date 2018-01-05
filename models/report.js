@@ -29,7 +29,7 @@ import Update  from './update.js';
 /* eslint-disable no-unused-vars, key-spacing */
 const schema = {
     type: 'object',
-    required: [ '_id', 'project', 'alias', 'assignedTo', 'status', 'tags', 'archived' ],
+    required: [ '_id', 'project', 'alias', 'submitted', 'location', 'assignedTo', 'status', 'tags', 'comments', 'archived' ],
     properties: {
         project:    { type:     'string' },               // name of project report belongs to
         by:         { bsonType: [ 'objectId', 'null' ] }, // user entering incident report
@@ -38,6 +38,7 @@ const schema = {
         files:      { type:     'array',                  // uploaded files
             items: { type: 'object' },                    // ...
         },
+        ua:         { type: [ 'objectId', 'null' ] },     // user agent of browser used to report incident
         location:   { type: 'object',
             properties: {
                 address: { type: 'string' },              // entered address used for geocoding
@@ -45,7 +46,7 @@ const schema = {
                 geojson: { type: [ 'object', 'null' ] },  // GeoJSON (with spatial index)
             },
         },
-        analysis:   { type:     'object' },               // exif data, weather, etc
+        analysis:   { type:     [ 'object', 'null' ] },   // exif data, weather, etc
         assignedTo: { bsonType: [ 'objectId', 'null' ] }, // user report is assigned to
         status:     { type:     [ 'string', 'null' ] },   // free-text status (to accomodate any workflow)
         tags:       { type:     'array',                  // tags to classify/group reports
@@ -62,7 +63,7 @@ const schema = {
             },
         },
         archived:   { type: 'boolean' },                  // archived flag
-        views:      { type: 'object' },                   // associative array of timestamps indexed by user id
+        views:      { type: [ 'object', 'null' ] },       // associative array of timestamps indexed by user id
     },
 };
 /* eslint-enable no-unused-vars, key-spacing */

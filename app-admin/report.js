@@ -211,11 +211,7 @@ function prettifyReport(report) {
         'Assistance requested':          report['assistance-requested'],
     };
 
-    if (report['existing-alias']) {
-        rpt['Existing alias'] = report['existing-alias'];
-    } else {
-        rpt['Generated alias'] = report['generated-alias'];
-    }
+    rpt['Alias'] = report['existing-alias'] ? report['existing-alias'] : report['generated-alias'];
 
     return rpt;
 }

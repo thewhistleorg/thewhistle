@@ -317,7 +317,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(tds[5].textContent).to.equal('Not known: A death eater');
             expect(ths[6].textContent).to.equal('Action taken');
             expect(tds[6].textContent).to.equal('—');
-            expect(ths[7].textContent).to.equal('Generated alias');
+            expect(ths[7].textContent).to.equal('Alias');
             expect(tds[7].textContent).to.equal('testy terrain');
         });
 
@@ -400,7 +400,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(ths[5].nextSibling.textContent).to.equal('Not known: A death eater');
             expect(ths[6].textContent).to.equal('Action taken');
             expect(ths[6].nextSibling.textContent).to.equal('—');
-            expect(ths[7].textContent).to.equal('Generated alias');
+            expect(ths[7].textContent).to.equal('Alias');
             expect(ths[7].nextSibling.textContent).to.equal('testy terrain');
         });
 
@@ -502,7 +502,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(tds[5].textContent).to.equal('Not known: A death eater');
             expect(ths[6].textContent).to.equal('Action taken');
             expect(tds[6].textContent).to.equal('—');
-            expect(ths[7].textContent).to.equal('Generated alias');
+            expect(ths[7].textContent).to.equal('Alias');
             expect(tds[7].textContent).to.equal('testy terrain');
         });
 
@@ -555,7 +555,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(ths[5].nextSibling.textContent).to.equal('Not known: A death eater');
             expect(ths[6].textContent).to.equal('Action taken');
             expect(ths[6].nextSibling.textContent).to.equal('—');
-            expect(ths[7].textContent).to.equal('Generated alias');
+            expect(ths[7].textContent).to.equal('Alias');
             expect(ths[7].nextSibling.textContent).to.equal('testy terrain');
         });
 

@@ -328,11 +328,9 @@ function prettifyReport(report) {
     if (typeof report['action-taken'] == 'string') report['action-taken'] = [ report['action-taken'] ];
     rpt['Action taken'] = report['action-taken'].map(a => action[a]);
 
-    // used-before: either Generated alias or Existing alias is set as appropriate
-    switch (report['used-before']) {
-        case 'n': rpt['Generated alias'] = report['generated-alias']; break;
-        case 'y': rpt['Existing alias'] = report['existing-alias']; break;
-    }
+    // used-before: set Alias from generated-alias or existing-alias (don't record distinction in
+    // order to ensure homogeneous reports)
+    rpt['Alias'] = report['used-before']=='y' ? report['existing-alias'] : report['generated-alias'];
 
     return rpt;
 }

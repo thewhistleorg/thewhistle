@@ -249,7 +249,6 @@ class ReportsHandlers {
         // ---- filtering
         const { filter, filterDesc } = await ReportsHandlers.buildFilter(db, ctx.request.query);
 
-
         // ------------ find reports matching search criteria
 
         const rpts = await Report.find(db, { $and: filter });
@@ -257,35 +256,45 @@ class ReportsHandlers {
         // get list of users (indexed by id) for use in translating id's to usernames
         const users = await User.details(); // note users is a Map
 
+        // if we have homogeneous submitted details (eg for single project), include them in the CSV
+        const submittedFields = rpts.map(rpt => Object.keys(rpt.submitted).join(':'));
+        const submittedFieldsDistinct = submittedFields.filter((val, idx, me) => me.indexOf(val) == idx);
+
         const reports = [];
         for (const rpt of rpts) {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
             const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
+            const dateFmt = dateFormat(rpt.submitted.Date, 'HH:MM:ss:l') == '00:00:00:000' ? 'dd mmm yyyy' : 'dd mmm yyyy HH:MM';
             const fields = {
-                updatedOn:  lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
-                updatedBy:  lastUpdate.by,
-                assignedTo: assignedTo ? assignedTo.username : '', // replace 'assignedTo' ObjectId with username
-                status:     rpt.status,
-                summary:    rpt.summary,
-                tags:       rpt.tags.join(', '),
-                reportedOn: rpt._id.getTimestamp().toISOString().replace('T', ' ').replace('.000Z', ''),
-                reportedBy: rpt.by ? '@'+(await User.get(rpt.by)).username : '',
-                alias:      rpt.alias,
-                archived:   rpt.archived,
-                url:        ctx.origin + '/reports/'+rpt._id,
+                'project':       rpt.project,
+                'alias':         rpt.alias,
+                'incident date': rpt.submitted ? dateFormat(rpt.submitted.Date, dateFmt) : '',
+                'reported on':   dateFormat(rpt._id.getTimestamp(), 'dd mmm yyyy HH:MM'),
+                'reported by':   rpt.by ? (await User.get(rpt.by)).username : '',
+                'assigned to':   assignedTo ? assignedTo.username : '', // replace 'assignedTo' ObjectId with username
+                'status':        rpt.status,
+                'tags':          rpt.tags.join(', '),
+                'updated on':    lastUpdate.on ? dateFormat(lastUpdate.on, 'dd mmm yyyy HH:MM') : '',
+                'updated by':    lastUpdate.by,
+                'active?':       rpt.archived ? 'archived' : 'active',
+                'url':           ctx.origin + '/reports/'+rpt._id,
             };
+            if (submittedFieldsDistinct.length == 1) {
+                // we have homogeneous submitted fields, append them to the CSV
+                fields['submitted details'] = '';
+                Object.assign(fields, rpt.submitted);
+            }
             reports.push(fields);
         }
 
-        reports.sort((a, b) => a.reportedOn < b.reportedOn ? 1 : -1); // sort in reverse chronological order (match main list default)
+        reports.sort((a, b) => a['reported on'] < b['reported on'] ? 1 : -1); // sort in reverse chronological order (match main list default)
 
         const csv = json2csv({ data: reports });
-        const filenameFilter = filterDesc.size>0 ? ` (filtered by ${[ ...filterDesc ].join(', ')}) ` : ' ';
-        const filename = 'the whistle incident reports' + filenameFilter +  dateFormat('yyyy-mm-dd HH:MM') + '.csv';
+        const filenameFilter = filterDesc.size>0 ? `(filtered by ${[ ...filterDesc ].join(', ')}) ` : '';
+        const filename = `the whistle incident reports ${filenameFilter}${dateFormat('yyyy-mm-dd HH.MM')}.csv`;
         ctx.status = 200;
         ctx.body = csv;
         ctx.attachment(filename);
-
     }
 
 
@@ -406,7 +415,7 @@ class ReportsHandlers {
 
         // return PDF as attachment
         const filenameFilter = filterDesc.size>0 ? ` (filtered by ${[ ...filterDesc ].join(', ')}) ` : ' ';
-        const filename = 'the whistle incident reports' + filenameFilter +  dateFormat('yyyy-mm-dd HH:MM') + '.pdf';
+        const filename = 'the whistle incident reports' + filenameFilter +  dateFormat('yyyy-mm-dd HH.MM') + '.pdf';
         ctx.status = 200;
         ctx.body = await reportsPdf.toBufferPromise();
         ctx.attachment(filename);
@@ -488,7 +497,7 @@ class ReportsHandlers {
         };
 
         // return PDF as attachment
-        const filename = 'the whistle incident report ' +  dateFormat('yyyy-mm-dd HH:MM') + '.pdf';
+        const filename = 'the whistle incident report ' +  dateFormat('yyyy-mm-dd HH.MM') + '.pdf';
         ctx.status = 200;
         ctx.body = await reportsPdf.toBufferPromise();
         ctx.attachment(filename);

@@ -559,21 +559,21 @@ describe('Admin app'+' ('+app.env+')', function() {
             const response = await request.get('/reports/export-csv');
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('text/csv; charset=utf-8');
-            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${dateFormat('yyyy-mm-dd HH:MM')}.csv"`);
+            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${dateFormat('yyyy-mm-dd HH.MM')}.csv"`);
         });
 
         it('downloads reports list as PDF', async function() {
             const response = await request.get('/reports/export-pdf');
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('application/pdf');
-            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${dateFormat('yyyy-mm-dd HH:MM')}.pdf"`);
+            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${dateFormat('yyyy-mm-dd HH.MM')}.pdf"`);
         });
 
         it('downloads single report as PDF', async function() {
             const response = await request.get('/reports/export-pdf/'+reportId);
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('application/pdf');
-            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident report ${dateFormat('yyyy-mm-dd HH:MM')}.pdf"`);
+            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident report ${dateFormat('yyyy-mm-dd HH.MM')}.pdf"`);
         });
 
         it('deletes report tag (ajax)', async function() {

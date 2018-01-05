@@ -156,11 +156,13 @@ class Handlers {
         }
 
         const alias = ctx.session.report['existing-alias'] || ctx.session.report['generated-alias'];
+        const files = ctx.session.report.files;
+        delete ctx.session.report.files;
 
         const prettyReport = prettifyReport(ctx.session.report);
 
         const by = ctx.state.user ? ctx.state.user.id : null;
-        const id = await Report.insert(ctx.params.database, by, alias, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.headers['user-agent']);
+        const id = await Report.insert(ctx.params.database, by, alias, prettyReport, 'sexual-assault', files, ctx.headers['user-agent']);
         ctx.set('X-Insert-Id', id); // for integration tests
 
         // record user-agent

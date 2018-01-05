@@ -36,14 +36,14 @@ const schema = {
         alias:      { type:     'string' },               // auto-generated alias of victim/survivor
         submitted:  { type:     'object' },               // originally submitted report (flexible format following incident reporting format)
         files:      { type:     'array',                  // uploaded files
-            items: { type: 'object' },                    // ...
+            items: { type: 'object' },                    // ... 'formidable' File objects
         },
         ua:         { type: [ 'objectId', 'null' ] },     // user agent of browser used to report incident
-        location:   { type: 'object',
+        location:   { type: 'object',                     // geocoded incident location
             properties: {
-                address: { type: 'string' },              // entered address used for geocoding
-                geocode: { type: [ 'object', 'null' ] },  // google geocoding data
-                geojson: { type: [ 'object', 'null' ] },  // GeoJSON (with spatial index)
+                address: { type: 'string' },              // ... entered address used for geocoding
+                geocode: { type: [ 'object', 'null' ] },  // ... google geocoding data
+                geojson: { type: [ 'object', 'null' ] },  // ... GeoJSON (with spatial index)
             },
         },
         analysis:   { type:     [ 'object', 'null' ] },   // exif data, weather, etc

@@ -128,9 +128,11 @@ class IncidentReport {
 
         const by = ctx.state.user.id;
         const alias = ctx.session.report['existing-alias'] || ctx.session.report['generated-alias'];
+        const files = ctx.session.files;
+        delete ctx.session.files;
         const prettyReport = prettifyReport(ctx.session.report);
 
-        const id = await Report.insert(ctx.state.user.db, by, alias, prettyReport, ctx.params.project, ctx.session.files, ctx.headers['user-agent']);
+        const id = await Report.insert(ctx.state.user.db, by, alias, prettyReport, ctx.params.project, files, ctx.headers['user-agent']);
 
         // record user-agent
         await useragent.log(ctx.state.user.db, ctx.ip, ctx.headers);

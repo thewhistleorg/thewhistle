@@ -38,7 +38,9 @@ class Handlers {
     static async postSubmit(ctx) {
         // record this report
         delete ctx.request.body['submit'];
-        await Report.insert(ctx.params.database, undefined, '—', ctx.session.report, 'scr', ctx.session.files, ctx.headers['user-agent']);
+        const files = ctx.session.files;
+        delete ctx.session.files;
+        await Report.insert(ctx.params.database, undefined, '—', ctx.session.report, 'scr', files, ctx.headers['user-agent']);
         ctx.session = null;
         ctx.redirect('/test-cam/scr');
     }

@@ -165,7 +165,7 @@ class Update {
             u.description = Update.updateDescription(u.update, names);
         }
 
-        return upd;
+        return upd.sort((a, b) => a._id < b._id ? -1 : 1);
     }
 
 

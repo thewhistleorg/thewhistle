@@ -303,17 +303,16 @@ function setupLocationListeners(reportId) {
  *
  * @param {Object}   google - Google Map object returned by maps.googleapis.com/maps/api/js
  * @param {ObjectId} reportId - id of report being shown.
- * @param {string}   reporter - anonymous identifier name of reporter
+ * @param {string}   alias - anonymous identifier name of reporter
  * @param {number}   lat - latitude of incident
  * @param {number}   lon - longitude of incident
  * @param {string}   reportedOnDay - TODO: is this used?
- * @param {string}   reportedOnFull - date of incident submission, for icon title
  * @param {number}   highlight - opacity of marker, to indicate how long ago incident was reported
  */
-function initialiseMap(google, reportId, reporter, lat, lon, reportedOnDay, reportedOnFull, highlight) {
+function initialiseMap(google, reportId, alias, lat, lon, reportedOnDay, highlight) {
     // initialise array of reports markers with 'this' report
     const reports = {
-        [reportId]: { lat: lat, lng: lon, date: reportedOnDay, highlight: highlight, name: reporter },
+        [reportId]: { lat: lat, lng: lon, date: reportedOnDay, highlight: highlight, name: alias },
     };
 
     const mapStyles = [
@@ -392,13 +391,23 @@ function initialiseMap(google, reportId, reporter, lat, lon, reportedOnDay, repo
                     if (reports[report._id] == undefined) { // if we haven't already got marker for this report, add it
                         reports[report._id] = report;
                         const marker = new google.maps.Marker({
-                            position: { lat: report.lat, lng: report.lng },
-                            icon:     '/map-marker/blue/'+report.highlight,
-                            title:    report.reported + ' ' + report.name + ' ' + report.summary, // TODO: use info window for status, etc?
-                            url:      '/reports/'+report._id+'/location',
-                            map:      map,
+                            position:  { lat: report.lat, lng: report.lng },
+                            icon:      '/map-marker/blue/'+report.highlight,
+                            label:     { text: `${report.alias} ${report.reported}`, color: '#004466' },
+                            url:       '/reports/'+report._id,
+                            map:       map,
                         });
-                        google.maps.event.addListener(marker, 'click', function() {
+                        let info = report.assignedTo ? 'Assigned to: '+report.assignedToName : 'Not assigned';
+                        if (report.status) info += `<div>Status: ${report.status}</div>`;
+                        if (report.tags.length > 0) info += `<div>Tags: ${report.tags.join('; ')}</div>`;
+                        const infowindow = new google.maps.InfoWindow({ content: info });
+                        marker.addListener('mouseover', function() {
+                            infowindow.open(map, marker);
+                        });
+                        marker.addListener('mouseout', function() {
+                            infowindow.close(map, marker);
+                        });
+                        marker.addListener('click', function() {
                             window.location.href = marker.url;
                         });
                     }

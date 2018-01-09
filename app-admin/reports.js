@@ -1,6 +1,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Reports handlers - manage reports workflow including dashboard, searching/filtering, editing   */
-/* metadata, etc.                                                                  C.Veness 2017  */
+/* metadata, etc.                                                             C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */
@@ -813,14 +813,13 @@ class ReportsHandlers {
         const reportedBy = report.by ? await User.get(report.by) : '';
         const extra = {
             reportedOnDay:    dateFormat(report.reported, 'd mmm yyyy'),
-            reportedOnFull:   dateFormat(report.reported, 'ddd d mmm yyyy HH:MM'),
             reportedOnTz:     dateFormat(report.reported, 'Z'),
             reportedBy:       report.by ? `${report.alias} / @${reportedBy.username}` : report.alias,
             reportHtml:       jsObjectToHtml.usingTable(report.submitted, [ 'Anonymous id','files' ], 'h3'),
             geocodeHtml:      jsObjectToHtml.usingTable(report.location.geocode),
-            formattedAddress: report.location.geocode ? encodeURIComponent(report.location.geocode.formattedAddress) : '',
-            lat:              report.location.geocode ? report.location.geocode.latitude  : 0,
-            lng:              report.location.geocode ? report.location.geocode.longitude : 0,
+            formattedAddress: report.location.geocode ? encodeURIComponent(report.location.geocode.formattedAddress) : 'report.location.address',
+            lat:              report.location.geojson ? report.location.geojson.coordinates[1]  : 0,
+            lon:              report.location.geojson ? report.location.geojson.coordinates[0] : 0,
             highlight:        Math.max(Math.round(100 * (report._id.getTimestamp() - new Date() + y) / y), 0),
             comments:         comments,
             location:         report.location,
@@ -977,11 +976,14 @@ class ReportsHandlers {
             const query = { 'location.geojson': { $geoWithin: { $geometry: { type: 'Polygon', coordinates: coords } } } };
             const reports = await Report.find(db, query);
             const y = 1000*60*60*24*365;
+            // get list of users (indexed by id) for use in translating assigned-to id's to usernames
+            const users = await User.details(); // note users is a Map
             for (const report of reports) {
                 report.lat = report.location.geojson.coordinates[1];
                 report.lng = report.location.geojson.coordinates[0];
-                report.reported = dateFormat(report._id.getTimestamp(), 'd mmm yyyy');
+                report.reported = reported(report._id.getTimestamp());
                 report.highlight = Math.round(100 * (report._id.getTimestamp() - new Date() + y) / y);
+                report.assignedToName = report.assignedTo ? users.get(report.assignedTo.toString()).username : '';
             }
             ctx.status = 200;
             ctx.body = { reports };
@@ -990,6 +992,14 @@ class ReportsHandlers {
             ctx.body = e;
         }
         ctx.body.root = 'reports';
+
+        // format date according to how far it is in the past: time, weekday, day/month, month/year
+        function reported(date) {
+            if (dateFormat(date, 'yyyy-mm-dd') == dateFormat('yyyy-mm-dd')) return dateFormat(date, 'HH:MM'); // today
+            if ((new Date() - date) < 1000*60*60*24*7)  return dateFormat(date, 'ddd');                       // within past week
+            if ((new Date() - date) < 1000*60*60*24*365)  return dateFormat(date, 'd mmm');                   // within past year
+            return dateFormat(date, 'mmm yyyy');                                                              // over a year
+        }
     }
 
 

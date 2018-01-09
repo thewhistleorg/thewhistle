@@ -18,9 +18,9 @@
         'use strict';
 
         // map
-        {{#if location.geocode}}
+        {{#if location.geojson}}
         function initMap() {
-            initialiseMap(google, '{{_id}}', '{{name}}', {{lat}}, {{lng}}, '{{reportedOnDay}}', '{{reportedOnFull}}', {{highlight}});
+            initialiseMap(google, '{{_id}}', '{{alias}}', {{lat}}, {{lon}}, '{{reportedOnDay}}', {{highlight}});
         }
         {{else}}
         function initMap() {}
@@ -135,10 +135,7 @@
                 <li id="submitted">
                     <span class="card-header">SUBMITTED REPORT</span>
                     <div class="padding-15">
-
-                        <!-- <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p> -->
                         {{{reportHtml}}}
-
                         <p><i>Note the contents of the incident report will vary according to the organisation/project the
                             report is submitted for.</i></p>
                     </div>
@@ -207,7 +204,7 @@
                                 <input type="checkbox" class="accordion-toggle" id="toggle-geo" />
                                 <label class="accordion-trigger " for="toggle-geo"><span class="content-header bold"><strong>More about location</strong></span></label>
                                 <div class="accordion-target">
-                                  {{{geocodeHtml}}}
+                                    {{{geocodeHtml}}}
                                 </div>
                             </li>
                         </ul>

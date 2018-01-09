@@ -192,8 +192,8 @@ router.get('/uploaded/:project/:date/:id/:file', async function getUploadedFile(
 /*  Geocode address                                                                               */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import ip from '../lib/ip';
-import geocode from '../lib/geocode';
+import Ip       from '../lib/ip';
+import Geocoder from '../lib/geocode';
 
 /**
  * Get geocode details for given address. Results are weighted to country of originating request,
@@ -205,8 +205,8 @@ import geocode from '../lib/geocode';
  * Mirrors similar function in report app.
  */
 router.get('/ajax/geocode', async function getGeocode(ctx) {
-    const region = ctx.request.query.region ? ctx.request.query.region : await ip.getCountry(ctx.ip);
-    const geocoded = await geocode(ctx.request.query.address, region);
+    const region = ctx.request.query.region ? ctx.request.query.region : await Ip.getCountry(ctx.ip);
+    const geocoded = await Geocoder.geocode(ctx.request.query.address, region);
 
     if (geocoded) {
         // if region is specified, treat it as a requirement not just as bias as Google does

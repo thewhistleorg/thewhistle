@@ -12,8 +12,8 @@
 
 import Report         from '../models/report.js';
 import autoIdentifier from '../lib/auto-identifier.js';
-import geocode        from '../lib/geocode.js';
-import ip             from '../lib/ip.js';
+import Geocoder       from '../lib/geocode.js';
+import Ip             from '../lib/ip.js';
 
 const handler = {};
 
@@ -60,8 +60,8 @@ handler.getAlias = async function(ctx) {
  */
 handler.geocode = async function(ctx) {
     const corsAllow = [ 'http://rapeisacrime.org', 'http://www.rapeisacrime.org', 'http://www.movable-type.co.uk' ];
-    const region = ctx.query.region ? ctx.query.region : await ip.getCountry(ctx.ip);
-    const geocoded = await geocode(ctx.query.address, region);
+    const region = ctx.query.region ? ctx.query.region : await Ip.getCountry(ctx.ip);
+    const geocoded = await Geocoder.geocode(ctx.query.address, region);
 
     if (geocoded) {
         ctx.body = { formattedAddress: geocoded.formattedAddress };

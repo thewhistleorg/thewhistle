@@ -13,7 +13,7 @@ import Resource from '../../../models/resource.js';
 
 import jsObjectToHtml from '../../../lib/js-object-to-html.js';
 import useragent      from '../../../lib/user-agent.js';
-import geocode        from '../../../lib/geocode.js';
+import Geocoder       from '../../../lib/geocode.js';
 
 const nPages = 7;
 
@@ -187,7 +187,7 @@ class Handlers {
         const context = { address: ctx.query.address };
 
         // if we have a geocode result on the incident location, list local resources
-        const geocoded = ctx.query.address ? await geocode(ctx.query.address) : null;
+        const geocoded = ctx.query.address ? await Geocoder.geocode(ctx.query.address) : null;
 
         if (geocoded) {
             // get all resources within 20km of geocoded location

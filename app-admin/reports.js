@@ -26,8 +26,8 @@ import User   from '../models/user.js';
 import Update from '../models/update.js';
 
 import jsObjectToHtml from '../lib/js-object-to-html';
-import geocode from '../lib/geocode';
-import Weather from '../lib/weather';
+import Geocoder       from '../lib/geocode';
+import Weather        from '../lib/weather';
 
 
 class ReportsHandlers {
@@ -1136,7 +1136,7 @@ class ReportsHandlers {
         const db = ctx.state.user.db;
         const address = ctx.request.body.address;
 
-        const geocoded = await geocode(address);
+        const geocoded = await Geocoder.geocode(address);
 
         if (geocoded) {
             // set location

@@ -12,7 +12,7 @@ import isEmail        from 'isemail';               // email address validation 
 
 import Resource         from '../models/resource.js';
 import validationErrors from '../lib/validation-errors.js';
-import geocode          from '../lib/geocode.js';
+import Geocoder         from '../lib/geocode.js';
 
 const phoneUtil         = libphonenumber.PhoneNumberUtil.getInstance();
 const PhoneNumberFormat = libphonenumber.PhoneNumberFormat;
@@ -119,7 +119,7 @@ class Handlers {
 
         // geocode address
         const location = ctx.request.body.address
-            ? await geocode(ctx.request.body.address)
+            ? await Geocoder.geocode(ctx.request.body.address)
             : null;
 
         try {
@@ -168,7 +168,7 @@ class Handlers {
 
         // geocode address
         const location = ctx.request.body.address
-            ? await geocode(ctx.request.body.address)
+            ? await Geocoder.geocode(ctx.request.body.address)
             : null;
 
         try {

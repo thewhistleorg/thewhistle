@@ -15,7 +15,7 @@ md.use(mda);
 md.use(mdi, 'dev/form-wizard');
 
 import useragent  from '../lib/user-agent.js';
-import ip         from '../lib/ip.js';
+import Ip         from '../lib/ip.js';
 import Report     from '../models/report.js';
 
 
@@ -35,9 +35,6 @@ class Dev {
     static async logAccess(ctx) {
         // access logging uses capped collection log-access (size: 1000×1e3, max: 1000)
         const log = global.db.users.collection('log-access');
-
-        // lookup any IP addresses we don't already have (in background)
-        if (ctx.app.env != 'development') await Dev.ipLookup('log-access');
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 
@@ -68,7 +65,7 @@ class Dev {
         // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
         entriesFiltered.forEach(e => e.ua.os = e.ua.os || e.ua.platform);
 
-        // add in extra fields to each entry (note cannot use Array.map due to async ip.getDomain function)
+        // add in extra fields to each entry (note cannot use Array.map due to async Ip.getDomain function)
         const entries = [];
         for (const e of entriesFiltered) {
             const fields = {
@@ -78,7 +75,7 @@ class Dev {
                 env:    e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env),
                 os:     Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family,
                 ua:     Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family,
-                domain: await ip.getDomain(e.ip) || e.ip,
+                domain: await Ip.getDomain(e.ip) || e.ip,
                 speed:  e.ms>500 ? 'slow' : e.ms>100 ? 'medium' : '',
             };
             entries.push(Object.assign({}, e, fields));
@@ -127,7 +124,7 @@ class Dev {
                 user:      e.user,
                 status:    e.status,
                 referrer:  e.referer,
-                domain:    await ip.getDomain(e.ip),
+                domain:    await Ip.getDomain(e.ip),
                 ua:        Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family,
                 os:        Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family,
                 ms:        e.ms,
@@ -149,9 +146,6 @@ class Dev {
     static async logError(ctx) {
         // error logging uses capped collection log-error (size: 1000×4e3, max: 1000)
         const log = global.db.users.collection('log-error');
-
-        // lookup any IP addresses we don't already have (in background)
-        if (ctx.app.env != 'development') await Dev.ipLookup('log-error');
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 
@@ -180,7 +174,7 @@ class Dev {
         // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
         entriesFiltered.forEach(e => e.ua.os = e.ua.os || e.ua.platform);
 
-        // add in extra fields to each entry (note cannot use Array.map due to async ip.getDomain function)
+        // add in extra fields to each entry (note cannot use Array.map due to async Ip.getDomain function)
         const entries = [];
         for (const e of entriesFiltered) {
             const fields = {
@@ -190,7 +184,7 @@ class Dev {
                 env:             e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env),
                 os:              Number(e.ua.os.major) ? `${e.ua.os.family} ${e.ua.os.major}` : e.ua.os.family,
                 ua:              Number(e.ua.major) ? e.ua.family+'-'+ e.ua.major : e.ua.family,
-                domain:          await ip.getDomain(e.ip),
+                domain:          await Ip.getDomain(e.ip),
                 'status-colour': e.status==500 ? 'red' : '',
             };
             entries.push(Object.assign({}, e, fields));

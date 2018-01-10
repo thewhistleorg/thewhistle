@@ -9,6 +9,7 @@ import scrypt     from 'scrypt';       // scrypt library
 
 import User from '../models/user.js';
 import Mail from '../lib/mail.js';
+import log  from '../lib/log';
 
 
 /*
@@ -58,7 +59,11 @@ class PasswordResetHandlers {
         await User.update(user._id, { passwordResetRequest: token });
 
         // send e-mail with generated token
-        Mail.send(email, 'password-reset.email', { firstname: user.firstname, host: ctx.host, token: token });
+        try {
+            Mail.send(email, 'password-reset.email', { firstname: user.firstname, host: ctx.host, token: token });
+        } catch (e) {
+            await log(ctx, 'error', null, null, e);
+        }
 
         ctx.set('X-Reset-Token', token); // for testing
 

@@ -357,13 +357,24 @@ function initialiseMap(google, reportId, alias, lat, lon, reportedOnDay, highlig
 
     // add marker for 'this' report
     map.greatestExtent = new google.maps.LatLngBounds(map.getCenter(), map.getCenter());
-    new google.maps.Marker({
-        position: { lat: lat, lng: lon },
-        icon:     `/map-marker/red/${highlight}`,
-        label:    reporter,
-        title:    reportedOnFull, // TODO: use info window for status, etc
-        url:      `/reports/${reportId}`,
-        map:      map,
+    const markerThis = new google.maps.Marker({
+        position:  { lat: lat, lng: lon },
+        icon:      `/map-marker/red/${highlight}`,
+        zIndex:    google.maps.Marker.MAX_ZINDEX+1, // ensure this report on top on top if superposed
+        draggable: true,
+        map:       map,
+    });
+    // and allow marker to be repositioned
+    markerThis.addListener('dragend', async function(evt) {
+        const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+        const credentials = 'same-origin';
+        const url = `/ajax/reports/${reportId}/latlon`;
+        const values = JSON.stringify({ lat: evt.latLng.lat(), lon: evt.latLng.lng() });
+
+        const response = await fetch(url, { method: 'PUT', body: values, headers, credentials });
+        if (!response.ok) alert('Location update failed');
+
+        map.panTo(new google.maps.LatLng(evt.latLng.lat(), evt.latLng.lng()));
     });
 
     // after zoom/pan, check for any new reports not currently displayed on the map
@@ -391,11 +402,11 @@ function initialiseMap(google, reportId, alias, lat, lon, reportedOnDay, highlig
                     if (reports[report._id] == undefined) { // if we haven't already got marker for this report, add it
                         reports[report._id] = report;
                         const marker = new google.maps.Marker({
-                            position:  { lat: report.lat, lng: report.lng },
-                            icon:      '/map-marker/blue/'+report.highlight,
-                            label:     { text: `${report.alias} ${report.reported}`, color: '#004466' },
-                            url:       '/reports/'+report._id,
-                            map:       map,
+                            position: { lat: report.lat, lng: report.lng },
+                            icon:     '/map-marker/blue/'+report.highlight,
+                            label:    { text: `${report.alias} ${report.reported}`, color: '#004466' },
+                            url:      '/reports/'+report._id,
+                            map:      map,
                         });
                         let info = report.assignedTo ? 'Assigned to: '+report.assignedToName : 'Not assigned';
                         if (report.status) info += `<div>Status: ${report.status}</div>`;

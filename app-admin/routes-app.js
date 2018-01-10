@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Routes for main app (reports, messages, user-agents, notes).                    C.Veness 2017  */
+/* Routes for main app (reports, messages, user-agents, notes).               C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Router from 'koa-router'; // router middleware for koa
@@ -62,6 +62,7 @@ router.put(   '/ajax/reports/:id/comments/:comment', reports.ajaxReportPutCommen
 router.delete('/ajax/reports/:id/comments/:comment', reports.ajaxReportDeleteComment);
 router.get(   '/ajax/reports/:id/updates',           reports.ajaxReportGetUpdates);
 router.put(   '/ajax/reports/:id/location',          reports.ajaxReportPutLocation);
+router.put(   '/ajax/reports/:id/latlon',            reports.ajaxReportPutLatLon);
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

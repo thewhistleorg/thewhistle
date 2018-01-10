@@ -26,31 +26,31 @@
         function initMap() {}
         {{/if}}
 
-        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function() {
 
-            // metadata
-            setupMetadataAutosubmitListeners();
+                // metadata
+                setupMetadataAutosubmitListeners();
 
-            // tags
-            setupTagsListeners('{{_id}}');
+                // tags
+                setupTagsListeners('{{_id}}');
 
-            // notes
-            setupCommentaryListeners('{{_id}}', '{{@koa.state.user.name}}',  '{{@koa.state.user.id}}');
+                // notes
+                setupCommentaryListeners('{{_id}}', '{{@koa.state.user.name}}',  '{{@koa.state.user.id}}');
 
-            // location
-            setupLocationListeners('{{_id}}');
+                // location
+                setupLocationListeners('{{_id}}');
 
-            // set scroll height
-            resizeElementHeight(document.getElementById('scroll-container'));
+                // set scroll height
+                resizeElementHeight(document.getElementById('scroll-container'));
 
-            {{#if showDeleteButton}}
-            // report deletion confirmation pop-up
-            document.querySelector('form.delete').onsubmit = function confirmDelete() {
-                return confirm('Are you sure you want to delete this report?');
-            };
-            {{/if}}
+                {{#if showDeleteButton}}
+                // report deletion confirmation pop-up
+                document.querySelector('form.delete').onsubmit = function confirmDelete() {
+                    return confirm('Are you sure you want to delete this report?');
+                };
+                {{/if}}
 
-        });
+                });
 
     </script>
     <script src="//maps.googleapis.com/maps/api/js?callback=initMap&key=AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw" defer></script>
@@ -59,7 +59,7 @@
 </head>
 
 <body>
-  {{>errpartial}}
+{{>errpartial}}
 
 <header>
     {{>navpartial}}
@@ -70,62 +70,62 @@
     <div class="pure-g report-container">
 
         <div class="pure-u-1 report-header-container drop-shadow">
-          <div class="header-table">
-            <div class="header-table-body">
-              <div class="header-table-row">
-                <div class="header-table-cell report-header">
-                  <div class="content-header"><a class="bold" href="{{referer}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Report list</a></div>
-                  <div class="report-header-content">{{reportedBy}} - <span class="small">{{reportedOnDay}}</span></div>
-                </div>
+            <div class="header-table">
+                <div class="header-table-body">
+                    <div class="header-table-row">
+                        <div class="header-table-cell report-header">
+                            <div class="content-header"><a class="bold" href="{{referer}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Report list</a></div>
+                            <div class="report-header-content">{{reportedBy}} - <span class="small">{{reportedOnDay}}</span></div>
+                        </div>
 
-                <div class="header-table-cell">
-                  <div class="content-header">Assigned to</div>
-                  <form method="post" class="pure-form pure-form-aligned">
-                      <div class="pure-control-group">
-                          <!-- <label for="assigned-to">Assigned to:</label> -->
-                          <select name="assigned-to" id="assigned-to">
-                              {{#selected assignedTo}}
-                              <option value="">&nbsp;</option>
-                              {{#users}}
-                              <option value="{{_id}}">{{firstname}} {{lastname}}</option>
-                              {{/users}}
-                              {{/selected}}
-                          </select>
-                          <!-- <input name="assigned-to" id="assigned-to" value="" list="assignedTo">
-                          <datalist id="assignedTo">
-                            {{#selected assignedTo}}
-                            {{#users}}
-                              <option>{{firstname}} {{lastname}}</option>
-                            {{/users}}
-                            {{/selected}}
-                          </datalist> -->
-                      </div>
-                  </form>
-                </div>
+                        <div class="header-table-cell">
+                            <div class="content-header">Assigned to</div>
+                            <form method="post" class="pure-form pure-form-aligned">
+                                <div class="pure-control-group">
+                                    <!-- <label for="assigned-to">Assigned to:</label> -->
+                                    <select name="assigned-to" id="assigned-to">
+                                        {{#selected assignedTo}}
+                                        <option value="">&nbsp;</option>
+                                        {{#users}}
+                                        <option value="{{_id}}">{{firstname}} {{lastname}}</option>
+                                        {{/users}}
+                                        {{/selected}}
+                                    </select>
+                                    <!-- <input name="assigned-to" id="assigned-to" value="" list="assignedTo">
+                                    <datalist id="assignedTo">
+                                      {{#selected assignedTo}}
+                                      {{#users}}
+                                        <option>{{firstname}} {{lastname}}</option>
+                                      {{/users}}
+                                      {{/selected}}
+                                    </datalist> -->
+                                </div>
+                            </form>
+                        </div>
 
-                <div class="header-table-cell">
-                  <div class="content-header">Status</div>
-                  <form method="post" class="pure-form pure-form-aligned">
-                      <div class="pure-control-group">
-                          <!-- <label for="status" title="any status values can be used to suit your workflow">Status:</label> -->
-                          <input name="status" id="status" value="{{status}}" list="statuses">
-                          <datalist id="statuses">
-                              {{#statuses}}
-                              <option>{{this}}</option>
-                              {{/statuses}}
-                          </datalist>
-                      </div>
-                  </form>
-                </div>
-                <div class="header-table-cell export-link">
-                  <a href="{{exportPdf}}" title="Save as PDF" class="bold">
-                      <span>Export to PDF </span>
-                  </a>
-                </div>
+                        <div class="header-table-cell">
+                            <div class="content-header">Status</div>
+                            <form method="post" class="pure-form pure-form-aligned">
+                                <div class="pure-control-group">
+                                    <!-- <label for="status" title="any status values can be used to suit your workflow">Status:</label> -->
+                                    <input name="status" id="status" value="{{status}}" list="statuses">
+                                    <datalist id="statuses">
+                                        {{#statuses}}
+                                        <option>{{this}}</option>
+                                        {{/statuses}}
+                                    </datalist>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="header-table-cell export-link">
+                            <a href="{{exportPdf}}" title="Save as PDF" class="bold">
+                                <span>Export to PDF </span>
+                            </a>
+                        </div>
 
-              </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
 
 
@@ -194,11 +194,10 @@
                         <button type="button" name="location-cancel" id="location-cancel" title="cancel" class="fa fa-times red hide"></button>
                         <button type="button" name="location-update" id="location-update" title="set location" class="fa fa-check green hide"></button>
                     </span>
-                    {{#if location.geocode}}
+                    {{#if location.geojson}}
                     <div class="padding-15">
-                        <!-- <p><i>Report id</i>: {{_id}} <i>submitted</i>: {{reportedOnFull}} <span class="small grey">{{reportedOnTz}}</span> <i>by</i> {{reportedBy}}</p> -->
                         <div id="map"></div>
-                        <br>
+                        {{#if location.geocode}}
                         <ul class="accordion-2">
                             <li class="accordion-item">
                                 <input type="checkbox" class="accordion-toggle" id="toggle-geo" />
@@ -208,6 +207,7 @@
                                 </div>
                             </li>
                         </ul>
+                        {{/if}}
                     </div>
                     {{else}}
                     <div class="padding-15">No incident location identified</div>
@@ -219,7 +219,7 @@
 
         <div class="pure-u-2-5">
             <ul class="card-list-sidebar">
-                  <li>
+                <li>
                     <span class="card-header">Tags</span>
                     <div id="tag-list">{{#tags}}
                         <span class="tag">{{this}} <button title="remove tag" class="tag-del hide fa fa-trash red"></button></span> {{/tags}}
@@ -232,7 +232,7 @@
                     <datalist id="tags">
                         {{#tagList}}
                         <option value="{{this}}">
-                        {{/tagList}}
+                            {{/tagList}}
                     </datalist>
                 </li>
                 <li>

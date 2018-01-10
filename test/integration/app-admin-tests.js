@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Admin app integration/acceptance tests.                                         C.Veness 2017  */
+/* Admin app integration/acceptance tests.                                    C.Veness 2017-2018  */
 /*                                                                                                */
 /* These tests require admin.localhost to be set in /etc/hosts.                                   */
 /*                                                                                                */
@@ -287,11 +287,49 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(document.getElementById(reportId)).to.not.be.null;
         });
 
-        it('sets location', async function() {
+        it('sets location by geocoding address (ajax)', async function() {
             const values = { address: 'University of Lagos' };
             const response = await request.put(`/ajax/reports/${reportId}/location`).send(values);
             expect(response.status).to.equal(200);
             expect(response.body.formattedAddress).to.equal('University Road 101017 Akoka,, Yaba, Lagos State., Nigeria');
+        });
+
+        it('sees location in update address field', async function() {
+            const response = await request.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const input = document.querySelector('input#address');
+            expect(input.value).to.equal('University of Lagos');
+        });
+
+        it('sees location in audit trail', async function() {
+            const response = await request.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const matches = document.evaluate('count(//td[text()="Set location to ‘University of Lagos’"])', document, null, 0, null);
+            expect(matches.numberValue).to.equal(1);
+        });
+
+        it('refines location by dragging marker (ajax)', async function() {
+            const values = { lat: 6.51773, lon: 3.39671 };
+            const response = await request.put(`/ajax/reports/${reportId}/latlon`).send(values);
+            expect(response.status).to.equal(200);
+        });
+
+        it('sees refined location in update address field', async function() {
+            const response = await request.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const input = document.querySelector('input#address');
+            expect(input.value).to.equal('Department Of Mass Communication, Tafawa Balewa Way, University Of Lagos, Lagos, Nigeria');
+        });
+
+        it('sees refined location in audit trail', async function() {
+            const response = await request.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const matches = document.evaluate('count(//td[text()="Set location to ‘Department Of Mass Communication, Tafawa Balewa Way, University Of Lagos, Lagos, Nigeria’"])', document, null, 0, null);
+            expect(matches.numberValue).to.equal(1);
         });
 
         it('has new report in report-map page', async function() {
@@ -539,22 +577,6 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(matches.numberValue).to.equal(1);
         });
 
-        it('sees location in update address field', async function() {
-            const response = await request.get('/reports/'+reportId);
-            expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
-            const input = document.querySelector('input#address');
-            expect(input.value).to.equal('University of Lagos');
-        });
-
-        it('sees location in audit trail', async function() {
-            const response = await request.get('/reports/'+reportId);
-            expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
-            const matches = document.evaluate('count(//td[text()="Set location to ‘University of Lagos’"])', document, null, 0, null);
-            expect(matches.numberValue).to.equal(1);
-        });
-
         it('downloads reports list as CSV', async function() {
             const response = await request.get('/reports/export-csv');
             expect(response.status).to.equal(200);
@@ -612,7 +634,7 @@ describe('Admin app'+' ('+app.env+')', function() {
         it('tidyup: sees full set of audit trail updates before report delete', async function() {
             const response = await request.get(`/ajax/reports/${reportId}/updates/`).send();
             expect(response.status).to.equal(200);
-            expect(response.body.updates.length).to.equal(9);
+            expect(response.body.updates.length).to.equal(10);
         });
 
         it('tidyup: deletes incident report', async function() {

@@ -1145,6 +1145,7 @@ class ReportsHandlers {
     static async ajaxReportPutLocation(ctx) {
         const db = ctx.state.user.db;
         const address = ctx.request.body.address;
+        const reportId = ctx.params.id;
 
         const geocoded = await Geocoder.geocode(address);
 
@@ -1155,13 +1156,13 @@ class ReportsHandlers {
                 coordinates: [ Number(geocoded.longitude), Number(geocoded.latitude) ],
             };
             const location = { address, geocode: geocoded, geojson };
-            Report.update(db, ctx.params.id, { location: location }, ctx.state.user.id);
+            await Report.update(db, reportId, { location: location }, ctx.state.user.id);
 
             // if we have a precise date for the incident, record weather conditions at location & date of incident
-            const report = await Report.get(db, ctx.params.id);
+            const report = await Report.get(db, reportId);
             if (report.submitted.Date && report.submitted.Date.getTime()) {
                 const weather = await Weather.fetchWeatherConditions(geocoded.latitude, geocoded.longitude, report.submitted.Date);
-                if (weather) Report.update(db, ctx.params.id, { 'analysis.weather': weather }, ctx.state.user.id);
+                if (weather) Report.update(db, reportId, { 'analysis.weather': weather }, ctx.state.user.id);
             }
 
             ctx.status = 200; // Ok
@@ -1169,6 +1170,44 @@ class ReportsHandlers {
             ctx.body.root = 'reports';
         } else {
             ctx.status = 404; // Not Found
+        }
+    }
+
+
+
+    /**
+     * PUT /ajax/reports/:report/latlon - update reported incident latitude/longitude.
+     *
+     * When the marker representing an incident location is dragged on the map, this will update the
+     * report's location.geojson and reverse geocode the location in order to have location.geocode
+     * details available.
+     */
+    static async ajaxReportPutLatLon(ctx) {
+        const db = ctx.state.user.db;
+        const { lat, lon } = ctx.request.body;
+
+        try {
+            const geocoded = await Geocoder.reverse(lat, lon);
+
+            const address = geocoded.formattedAddress;
+
+            const geojson = {
+                type:        'Point',
+                coordinates: [ Number(lon), Number(lat) ], // note this will normally differ from geocoded lat/lon
+            };
+
+            const location = { address, geocode: geocoded, geojson };
+
+            await Report.update(db, ctx.params.id, { location: location }, ctx.state.user.id);
+
+            // note: don't bother re-fetching weather, most likely location won't have changed enough to matter
+
+            ctx.status = 200; // Ok
+            ctx.body = { lat, lon };
+            ctx.body.root = 'reports';
+        } catch (e) {
+            ctx.status = 500;
+            ctx.body = { message: e.message };
         }
     }
 

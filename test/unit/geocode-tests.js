@@ -14,31 +14,28 @@ import './before.js'; // set up database connections
 describe('Geocode', function() {
 
     it('geocodes Free School Lane', async function() {
-        const result = await Geocoder.geocode('Free School Lane, Cambridge', 'uk');
+        const result = await Geocoder.geocode('Department of Sociology, Free School Lane, Cambridge', 'uk');
         expect(result).to.be.an('object');
-        expect(result.latitude).to.equal(52.2032016);
-        expect(result.longitude).to.equal(0.1188354);
+        expect(result.latitude).to.equal(52.2033924);
+        expect(result.longitude).to.equal(0.1189126);
         expect(result.country).to.equal('United Kingdom');
-        expect(result.administrativeLevels.level1long).to.equal('England');
-        expect(result.administrativeLevels.level2long).to.equal('Cambridgeshire');
-        expect(result.extra.neighborhood).to.equal('Cambridgeshire');
         expect(result.city).to.equal('Cambridge');
         expect(result.streetName).to.equal('Free School Lane');
-        expect(result.formattedAddress).to.equal('Free School Ln, Cambridge CB2, UK');
+        expect(result.formattedAddress).to.equal('3QA, Free School Ln, Cambridge CB2, United Kingdom');
     });
 
     it('reverse geocodes Free School Lane', async function() {
-        const result = await Geocoder.reverse(52.2032016, 0.1188354);
+        const result = await Geocoder.reverse(52.2033924, 0.1189126);
         expect(result).to.be.an('object');
-        expect(result.latitude).to.equal(52.2032079);                                      // !!
-        expect(result.longitude).to.equal(0.118851);                                       // !!
+        expect(result.latitude).to.equal(52.2035043);            // !!
+        expect(result.longitude).to.equal(0.1187817);            // !!
         expect(result.country).to.equal('United Kingdom');
         expect(result.administrativeLevels.level1long).to.equal('England');
         expect(result.administrativeLevels.level2long).to.equal('Cambridgeshire');
-        expect(result.extra.neighborhood).to.equal('Cambridge');                           // !!
+        expect(result.extra.neighborhood).to.equal('Cambridge'); // !!
         expect(result.city).to.equal('Cambridge');
         expect(result.streetName).to.equal('Free School Lane');
-        expect(result.formattedAddress).to.equal('142 Free School Ln, Cambridge CB2, UK'); // !!
+        expect(result.formattedAddress).to.equal('The Large Examination Hall, Free School Ln, Cambridge CB2 3RF, UK'); // !!
     });
 
     it('geocodes University of Lagos', async function() {

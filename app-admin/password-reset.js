@@ -60,7 +60,7 @@ class PasswordResetHandlers {
 
         // send e-mail with generated token
         try {
-            Mail.send(email, 'password-reset.email', { firstname: user.firstname, host: ctx.host, token: token });
+            await Mail.send(email, 'password-reset.email', { firstname: user.firstname, host: ctx.host, token: token });
         } catch (e) {
             await log(ctx, 'error', null, null, e);
         }

@@ -1,6 +1,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Incident Reporting handlers - manage submission of incident reports by NGO staff / paralegals. */
-/*                                                                                 C.Veness 2017  */
+/*                                                                            C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */
@@ -8,12 +8,12 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import Report   from '../models/report.js';
+import Report    from '../models/report.js';
+import UserAgent from '../models/user-agent.js';
 
 import autoIdentifier   from '../lib/auto-identifier.js';
 import jsObjectToHtml   from '../lib/js-object-to-html.js';
 import validationErrors from '../lib/validation-errors.js';
-import useragent        from '../lib/user-agent.js';
 
 
 const validation = {
@@ -135,7 +135,7 @@ class IncidentReport {
         const id = await Report.insert(ctx.state.user.db, by, alias, prettyReport, ctx.params.project, files, ctx.headers['user-agent']);
 
         // record user-agent
-        await useragent.log(ctx.state.user.db, ctx.ip, ctx.headers);
+        await UserAgent.log(ctx.state.user.db, ctx.ip, ctx.headers);
 
         ctx.set('X-Insert-Id', id); // for integration tests
 

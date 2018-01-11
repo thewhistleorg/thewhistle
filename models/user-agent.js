@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Record browser user agent.                                                      C.Veness 2017  */
+/* Record browser user agent.                                                 C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import useragent from 'useragent'; // parse browser user agent string

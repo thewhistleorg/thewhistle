@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Handlers: test-grn/sexual-assault.                                              C.Veness 2017  */
+/* Handlers: test-grn/sexual-assault.                                         C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -8,11 +8,11 @@ import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 import geodesy    from 'geodesy';    // library of geodesy functions
 const LatLon = geodesy.LatLonSpherical;
 
-import Report   from '../../../models/report.js';
-import Resource from '../../../models/resource.js';
+import Report    from '../../../models/report.js';
+import Resource  from '../../../models/resource.js';
+import UserAgent from '../../../models/user-agent.js';
 
 import jsObjectToHtml from '../../../lib/js-object-to-html.js';
-import useragent      from '../../../lib/user-agent.js';
 import Geocoder       from '../../../lib/geocode.js';
 
 const nPages = 7;
@@ -166,7 +166,7 @@ class Handlers {
         ctx.set('X-Insert-Id', id); // for integration tests
 
         // record user-agent
-        await useragent.log(ctx.params.database, ctx.ip, ctx.headers);
+        await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
 
         // remove all session data (to prevent duplicate submission)
         ctx.session = {};

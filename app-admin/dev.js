@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Dev tools handlers.                                                             C.Veness 2017  */
+/* Dev tools handlers.                                                        C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import nodeinfo   from 'nodejs-info';         // node info
@@ -14,9 +14,10 @@ const md = markdown();
 md.use(mda);
 md.use(mdi, 'dev/form-wizard');
 
-import useragent  from '../lib/user-agent.js';
-import Ip         from '../lib/ip.js';
-import Report     from '../models/report.js';
+import UserAgent from '../models/user-agent.js';
+import Report    from '../models/report.js';
+
+import Ip from '../lib/ip.js';
 
 
 class Dev {
@@ -222,7 +223,7 @@ class Dev {
      * potentially redundant following the more recent access/error logging.
      */
     static async userAgentsV1(ctx) {
-        const context = await useragent.counts(ctx.state.user.db, ctx.query.since);
+        const context = await UserAgent.counts(ctx.state.user.db, ctx.query.since);
         context.sinceDate = context.since ? dateFormat(context.since, 'd mmm yyyy') : '–';
 
         await ctx.render('dev-user-agents', context);

@@ -346,13 +346,13 @@ describe('Report app'+' ('+app.env+')', function() {
         it('ajax: geocodes address', async function() {
             const response = await request.get('/ajax/geocode?address=university+of+lagos,+nigeria');
             expect(response.status).to.equal(200);
-            expect(response.body.formattedAddress).to.equal('University Road 101017 Akoka,, Yaba, Lagos State., Nigeria');
+            expect(response.body.formattedAddress).to.equal('University Road 101017 Akoka,, Yaba,, Lagos State., Nigeria');
         });
 
         it('ajax: geocodes address using CORS', async function() {
             const response = await request.get('/ajax/geocode?address=university+of+lagos,+nigeria').set('Origin', 'http://rapeisacrime.org');
             expect(response.status).to.equal(200);
-            expect(response.body.formattedAddress).to.equal('University Road 101017 Akoka,, Yaba, Lagos State., Nigeria');
+            expect(response.body.formattedAddress).to.equal('University Road 101017 Akoka,, Yaba,, Lagos State., Nigeria');
             expect(response.headers['access-control-allow-origin']).to.equal('http://rapeisacrime.org');
         });
 

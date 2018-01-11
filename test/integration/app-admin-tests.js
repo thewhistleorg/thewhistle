@@ -291,7 +291,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             const values = { address: 'University of Lagos' };
             const response = await request.put(`/ajax/reports/${reportId}/location`).send(values);
             expect(response.status).to.equal(200);
-            expect(response.body.formattedAddress).to.equal('University Road 101017 Akoka,, Yaba, Lagos State., Nigeria');
+            expect(response.body.formattedAddress).to.equal('University Road 101017 Akoka,, Yaba,, Lagos State., Nigeria');
         });
 
         it('sees location in update address field', async function() {

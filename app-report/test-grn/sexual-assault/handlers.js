@@ -11,6 +11,7 @@ const LatLon = geodesy.LatLonSpherical;
 import Report    from '../../../models/report.js';
 import Question  from '../../../models/question.js';
 import Resource  from '../../../models/resource.js';
+import Submission from '../../../models/submission.js';
 import UserAgent from '../../../models/user-agent.js';
 
 import jsObjectToHtml from '../../../lib/js-object-to-html.js';
@@ -31,6 +32,9 @@ class Handlers {
         ctx.session.report = { when: 'date', date: today };
 
         ctx.session.completed = 0; // number of pages completed; used to prevent users jumping ahead
+
+        // record new submission has been started
+        ctx.session.submissionId = await Submission.insert(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
 
         await ctx.render('index');
     }
@@ -64,7 +68,7 @@ class Handlers {
     /**
      * Process 'next' / 'previous' page submissions.
      */
-    static postPage(ctx) {
+    static async postPage(ctx) {
         // getIndex initialises ctx.session.report with date, so for this project ctx.session.report is never empty
         if (!ctx.session.report) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
         const page = ctx.params.num==undefined ? 0 : Number(ctx.params.num);
@@ -109,6 +113,9 @@ class Handlers {
                 ctx.redirect(ctx.url); return;
             }
         }
+
+        // record submission progress
+        await Submission.progress(ctx.params.database, ctx.session.submissionId, page);
 
         ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/`+(go<=nPages ? go : 'submit'));
     }
@@ -175,6 +182,9 @@ class Handlers {
 
         // record user-agent
         await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
+
+        // record submission complete
+        await Submission.complete(ctx.params.database, ctx.session.submissionId, id);
 
         // remove all session data (to prevent duplicate submission)
         ctx.session = {};

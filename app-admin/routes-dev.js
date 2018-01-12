@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Routes for dev tools.                                                           C.Veness 2017  */
+/* Routes for dev tools.                                                      C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Router from 'koa-router'; // router middleware for koa
@@ -25,6 +25,8 @@ router.get('/dev/notes',        Dev.notesIndex);
 router.get('/dev/notes/readme', Dev.notesReadme);
 router.get('/dev/notes/form-wizard/:notes', Dev.notesFormWizard);
 router.get('/dev/notes/:notes', Dev.notes);
+
+router.get('/dev/submissions', Dev.submissions);
 
 router.get('/dev/throw', Dev.throw);
 

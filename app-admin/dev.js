@@ -14,8 +14,9 @@ const md = markdown();
 md.use(mda);
 md.use(mdi, 'dev/form-wizard');
 
-import UserAgent from '../models/user-agent.js';
-import Report    from '../models/report.js';
+import UserAgent  from '../models/user-agent.js';
+import Report     from '../models/report.js';
+import Submission from '../models/submission.js';
 
 import Ip from '../lib/ip.js';
 
@@ -313,6 +314,40 @@ class Dev {
         const context = { uasList, monthsList, counts, app: db+' submitted reports' };
 
         await ctx.render('dev-ua', context);
+    }
+
+
+    /**
+     * Submission progress page. This is provisional for the moment: it just lists (partial or
+     * complete) submissions, consideration is required on what analytical reporting is required on
+     * incomplete submissions.
+     */
+    static async submissions(ctx) {
+        const db = ctx.state.user.db;
+        const submissions = await Submission.getAll(db);
+
+        const context = { submissions: [] };
+        for (const s in submissions) {
+            const date = submissions[s]._id.getTimestamp();
+            const progress = {};
+            for (const p in submissions[s].progress) {
+                // show time from start of process for each page submitted
+                const interval = dateFormat(new Date(submissions[s].progress[p] - date), '+HH:MM:ss');
+                progress[p=='complete' ? p : 'p'+p] = interval;
+            }
+            const ua = submissions[s].ua;
+            const submission = {
+                id:       submissions[s]._id,
+                date:     dateFormat(date, 'd mmm yyyy HH:MM'),
+                project:  submissions[s].project,
+                ua:       ua ?  ua.family + ( ua.agent ? ' / ' + ua.agent.os.family : '' ) : '',
+                progress: progress,
+                reportId: submissions[s].reportId, // will be undefined for incomplete submissions
+            };
+            context.submissions.push(submission);
+        }
+
+        await ctx.render('dev-submissions', context);
     }
 
 

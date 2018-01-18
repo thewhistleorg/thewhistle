@@ -22,22 +22,28 @@ document.addEventListener('DOMContentLoaded', function() {
     /*
      * 'when' page
      */
+
+
+
     if (document.querySelector('input[name=when]')) {
         var months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
-
         // set focus to hour/day field if any 'when' radio button clicked
         document.querySelectorAll('input[name=when]').forEach(function(input) {
             input.addEventListener('change', function() {
                 switch (this.value) {
                     case 'date':
-                        document.querySelector('input[name="date.day"]').focus();
-                        document.querySelector('input[name="date.day"]').select();
+                        document.querySelector('select[name="date.day"]').focus();
+                        // document.querySelector('select[name="date.day"]').select();
                         break;
                     case 'within':
                         document.querySelector('select[name="within-options"]').focus();
                         break;
                 }
             });
+        });
+
+        document.querySelector('#when-date').addEventListener('change', function() {
+         this.parentElement.querySelector(".when-form").style.display="block";
         });
 
         // check when-today if any today fields receive focus
@@ -54,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
+
         // check when-date if any date fields receive focus
         document.querySelectorAll('input[name^=date], select[name^=date]').forEach(function(input) {
             input.addEventListener('focus', function() {
@@ -68,27 +75,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // auto-advance day field when completed
-        document.querySelector('input[name="date.day"]').addEventListener('keypress', function(event) {
+        document.querySelector('select[name="date.day"]').addEventListener('keypress', function(event) {
             if (!event.key.match(/\d/)) { event.preventDefault(); return; }
             var newValue = this.value + event.key;
             if (newValue.length==2 || newValue>3) {
-                document.querySelector('input[name="date.month"]').focus();
-                document.querySelector('input[name="date.month"]').select();
+                document.querySelector('select[name="date.month"]').focus();
+                document.querySelector('select[name="date.month"]').select();
             }
         });
 
         // auto-advance month field when completed
-        document.querySelector('input[name="date.month"]').addEventListener('keypress', function(event) {
+        document.querySelector('select[name="date.month"]').addEventListener('keypress', function(event) {
             //if (this.value.length == 3) { event.preventDefault(); return; }
             var newValue = this.value + event.key;
             if (months.indexOf(newValue.toLowerCase()) >= 0) {
-                document.querySelector('input[name="date.year"]').focus();
-                document.querySelector('input[name="date.year"]').select();
+                document.querySelector('select[name="date.year"]').focus();
+                document.querySelector('select[name="date.year"]').select();
             }
         });
 
         // month field validation
-        document.querySelector('input[name="date.month"]').addEventListener('change', function() {
+        document.querySelector('select[name="date.month"]').addEventListener('change', function() {
             if (this.setCustomValidity == undefined) return;
             var err = 'Please enter a valid three-letter abbreviation of a month';
             var ok = months.indexOf(this.value.toLowerCase()) >= 0;
@@ -103,11 +110,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('input[name^=date]').forEach(function(el) { el.required = false; });
                 switch (input.value) {
                     case 'date':
-                        document.querySelector('input[name="date.day"]').required = true;
-                        document.querySelector('input[name="date.month"]').required = true;
-                        document.querySelector('input[name="date.year"]').required = true;
-                        document.querySelector('input[name="date.day"]').focus();
-                        document.querySelector('input[name="date.day"]').select();
+                        document.querySelector('select[name="date.day"]').required = true;
+                        document.querySelector('select[name="date.month"]').required = true;
+                        document.querySelector('select[name="date.year"]').required = true;
+                        document.querySelector('select[name="date.day"]').focus();
+                        // document.querySelector('select[name="date.day"]').select();
                         break;
                     case 'within':
                         document.querySelector('select[name="within-options"]').required = true;
@@ -118,17 +125,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // auto-advance hour field when completed (date)
-        document.querySelector('input[name="date.hour"]').addEventListener('keypress', function(event) {
-            var newValue = this.value + event.key;
-            if (newValue.length==2 || newValue>2) {
-                document.querySelector('input[name="date.minute"]').focus();
-                document.querySelector('input[name="date.minute"]').select();
-            }
-        });
+        // document.querySelector('input[name="date.hour"]').addEventListener('keypress', function(event) {
+        //     var newValue = this.value + event.key;
+        //     if (newValue.length==2 || newValue>2) {
+        //         document.querySelector('input[name="date.minute"]').focus();
+        //         document.querySelector('input[name="date.minute"]').select();
+        //     }
+        // });
 
         // don't tab out of empty date field (in case tab typed after auto-advance)
         document.querySelectorAll('input[name^=date]').forEach(function(elem) {
-            if (elem.name=='date.hour' || elem.name=='date.minute') return; // hour/min can be left blank
+            // if (elem.name=='date.hour' || elem.name=='date.minute') return; // hour/min can be left blank
+            if (elem.name=='date.time') return; // hour/min can be left blank
+
             elem.addEventListener('keydown', function (event) {
                 if (event.key == 'Tab' && this.value == '') event.preventDefault();
             });
@@ -139,6 +148,12 @@ document.addEventListener('DOMContentLoaded', function() {
      * 'where' page
      */
     if (document.querySelector('input[name=where]')) {
+
+        // Show where-at form when this option selected
+        // document.querySelector('#where-at').addEventListener('change', function() {
+        //  this.parentElement.querySelector("#at-address").style.display="block";
+        // });
+
         // check #where-at if at-address receives focus
         document.querySelector('#at-address').addEventListener('focus', function() {
             document.querySelector('#where-at').checked = true;
@@ -159,6 +174,18 @@ document.addEventListener('DOMContentLoaded', function() {
      * 'who' page
      */
     if (document.querySelector('input[name=who]')) {
+
+        // Show who-y-form when selected
+        document.querySelector('#who-y').addEventListener('change', function() {
+         this.parentElement.querySelector("#who-y-form").style.display="block";
+        });
+
+        // Show who-n-form when selected
+        document.querySelector('#who-n').addEventListener('change', function() {
+         this.parentElement.querySelector("#who-n-form").style.display="block";
+        });
+
+
         // check #who-y if who-relationship receives focus
         document.querySelector('#who-relationship').addEventListener('focus', function() {
             document.querySelector('#who-y').checked = true;

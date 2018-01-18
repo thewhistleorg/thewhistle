@@ -2,24 +2,27 @@
     {{> back}}{{> step}}
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
-    <div >
+    <div  class="margin-top-3">
         <h1>Do you know who did it?</h1>
         <p class="hint-text">This could be one person or multiple people or a company or organisation.</p>
         <ul>
-            {{#checked who}}
+            {{#checked who-x}}
             <li>
                 <input type="radio" name="who" id="who-y" value="y">
                 <label for="who-y" class="pure-radio greyed-out-unless-checked">Yes</label>
-                <br>
-                <label for="who-relationship">How do you know them?</label>
-                <p class="hint-text">For example, it could be a relative, colleague, or acquaintance.</p>
-                <input type="text" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="">
+                <div id="who-y-form" style="display:none">
+                  <label for="who-relationship">How do you know them?</label>
+                  <p class="hint-text">For example, it could be a relative, colleague, or acquaintance.</p>
+                  <input type="text" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="">
+                </div>
             </li>
             <li>
                 <input type="radio" name="who" id="who-n" value="n">
                 <label for="who-n" class="pure-radio greyed-out-unless-checked">No</label>
-                <p>Please give us a description of the person/people:</p>
-                <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
+                <div id="who-n-form" style="display:none">
+                  <p>Please give us any description of the person/people you are able:</p>
+                  <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
+                </div>
             </li>
             {{/checked}}
         </ul>

@@ -91,10 +91,13 @@ class Handlers {
         // if date specified, verify it is valid (to back up client-side validation)
         if (body.when == 'date') {
             const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
-            const date = new Date(body.date.year, months.indexOf(body.date.month.toLowerCase()), body.date.day, body.date.hour, body.date.minute);
+            const time = body.date.time ? body.date.time.split(":") : ["00","00","00"]
+            // const date = new Date(body.date.year, months.indexOf(body.date.month.toLowerCase()), body.date.day, body.date.hour, body.date.minute);
+            const date = new Date(body.date.year, months.indexOf(body.date.month.toLowerCase()),time[0],time[1],time[2]);
             if (isNaN(date.getTime())) {
                 ctx.flash = { validation: [ 'Invalid date' ] };
                 ctx.redirect(ctx.url); return;
+                console.log("THis is triggered")
             }
             if (date.getTime() > Date.now()) {
                 ctx.flash = { validation: [ 'Date is in the future' ] };

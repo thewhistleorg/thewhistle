@@ -2,19 +2,19 @@
     {{> back}}{{> step}}
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
-    <div >
+    <div  class="margin-top-3">
         <h1>Where did it happen?</h1>
         <p class="hint-text">Please be as precise as you are able</p>
         <ul>
             {{#checked where}}
             <li>
-                <input type="radio" name="where" id="where-at" value="at"> <label for="where-at">At</label>
-                <input type="text" name="at-address" id="at-address" value="{{at-address}}" class="">
+                <input type="radio" name="where" id="where-at" value="at"> <label for="where-at" style="width: 35px;">At</label>
+                <input type="text" name="at-address" id="at-address" value="{{at-address}}" class="" >
             </li>
-            <li>
+            <!-- <li>
                 <input type="radio" name="where" id="where-dont-remember" value="dont-remember">
                 <label for="where-dont-remember">I don’t exactly remember</label>
-            </li>
+            </li> -->
             <li>
                 <input type="radio" name="where" id="where-dont-know" value="dont-know">
                 <label for="where-dont-know">I don’t know where it happened</label>

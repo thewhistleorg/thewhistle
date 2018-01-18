@@ -1,35 +1,98 @@
 <form method="post" class="">
-    {{> back}}{{> step}}
-    <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+  {{> back}}{{> step}}
+  <ul class="validation-errors">{{#@koa.flash.validation}}
+    <li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
-    <div >
+  <div class="margin-top-3">
 
-        <p class="special-intro">We understand that this can be difficult.<br>
-            So please take your time and tell us what happened.</p>
+    <p class="special-intro">We understand that this can be difficult.<br> So please take your time and tell us what you remember.</p>
 
-        <h1>To begin with, when did it happen?</h1>
+    <!-- <h2>To begin with, when did it happen?</h2> -->
 
-        <ul>
-            {{#checked when}}
-            <li>
-                <input type="radio" name="when" id="when-date" value="date">
-                <label for="when-date" class="pure-radio">On</label>
-                <table class="inline">
-                    <tr class="field-label">
-                        <td>DD</td>
-                        <td>MMM</td>
-                        <td>YYYY</td>
-                    </tr>
-                    <tr>
-                        <td><input type="number" name="date.day" id="date.day" value="{{date.day}}" list="days"
-                                   class="w4" min="1" max="31"></td>
-                        <td><input type="text" name="date.month" id="date.month" value="{{date.month}}" list="months"
-                                   class="w5" maxlength="3"></td>
-                        <td><input type="number" name="date.year" id="date.year" value="{{date.year}}" list="years"
-                                   class="w5" min="{{lastyear}}" max="{{thisyear}}"></td>
-                    </tr>
-                </table>
-                <datalist id="days">
+    <ul>
+      {{#checked when-x}}
+      <li>
+        <input type="radio" name="when" id="when-date" value="date">
+        <label for="when-date" class="pure-radio">I remember exactly when it happened</label>
+        <div class="when-form" style="display:none;">
+          <p class="grey">Please select the date and approximate time</p>
+          <table class="inline">
+            <tr class="field-label">
+              <td>DD</td>
+              <td>MMM</td>
+              <td>YYYY</td>
+            </tr>
+            <!-- <tr>
+              <td><input type="number" name="date.day" id="date.day" value="{{date.day}}" list="days" class="w4" min="1" max="31"></td>
+              <td><input type="text" name="date.month" id="date.month" value="{{date.month}}" list="months" class="w5" maxlength="3"></td>
+              <td><input type="number" name="date.year" id="date.year" value="{{date.year}}" list="years" class="w5" min="{{lastyear}}" max="{{thisyear}}"></td>
+            </tr> -->
+
+            <tr>
+              <td>
+                <select name="date.day" id="date.day" value="{{date.day}}" list="days" class="w4" min="1" max="31">
+                   <option value="1">01</option>
+                   <option value="2">02</option>
+                   <option value="3">03</option>
+                   <option value="4">04</option>
+                   <option value="5">05</option>
+                   <option value="6">06</option>
+                   <option value="7">07</option>
+                   <option value="8">08</option>
+                   <option value="9">09</option>
+                   <option value="10">10</option>
+                   <option value="11">11</option>
+                   <option value="12">12</option>
+                   <option value="13">13</option>
+                   <option value="14">14</option>
+                   <option value="15">15</option>
+                   <option value="16">16</option>
+                   <option value="17">17</option>
+                   <option value="18">18</option>
+                   <option value="19">19</option>
+                   <option value="20">20</option>
+                   <option value="21">21</option>
+                   <option value="22">22</option>
+                   <option value="23">23</option>
+                   <option value="24">24</option>
+                   <option value="25">25</option>
+                   <option value="26">26</option>
+                   <option value="27">27</option>
+                   <option value="28">28</option>
+                   <option value="29">29</option>
+                   <option value="30">30</option>
+                   <option value="31">31</option>
+                <select>
+              </td>
+              <td>
+                <select name="date.month" id="date.month" value="{{date.month}}" list="months" class="w5" maxlength="3">
+                 <option value="Jan">Jan</option>
+                 <option value="Feb">Feb</option>
+                 <option value="Mar">Mar</option>
+                 <option value="Apr">Apr</option>
+                 <option value="May">May</option>
+                 <option value="Jun">Jun</option>
+                 <option value="Jul">Jul</option>
+                 <option value="Aug">Aug</option>
+                 <option value="Sep">Sep</option>
+                 <option value="Oct">Oct</option>
+                 <option value="Nov">Nov</option>
+                 <option value="Dec">Dec</option>
+                </select>
+              </td>
+              <td>
+                <select name="date.year" id="date.year" value="{{date.year}}" list="years" class="w5" min="{{lastyear}}" max="{{thisyear}}">
+                  <option value="2009">2009</option><option value="2010">2010</option><option value="2011">2011</option>
+                  <option value="2012">2012</option><option value="2013">2013</option><option value="2014">2014</option>
+                  <option value="2015">2015</option><option value="2016">2016</option><option value="2017">2017</option>
+                  <option value="2018">2018</option>
+                </select>
+              </td>
+            </tr>
+
+
+          </table>
+          <!-- <datalist id="days">
                     <option value="1"><option value="2"><option value="3">
                     <option value="4"><option value="5"><option value="6">
                     <option value="7"><option value="8"><option value="9">
@@ -42,95 +105,97 @@
                     <option value="28"><option value="29"><option value="30">
                     <option value="31">
                 </datalist>
-                <datalist id="months">
+          <datalist id="months">
                     <option value="Jan"><option value="Feb"><option value="Mar">
                     <option value="Apr"><option value="May"><option value="Jun">
                     <option value="Jul"><option value="Aug"><option value="Sep">
                     <option value="Oct"><option value="Nov"><option value="Dec">
                 </datalist>
-                <datalist id="years">
+          <datalist id="years">
                     <option value="2009"><option value="2010"><option value="2011">
                     <option value="2012"><option value="2013"><option value="2014">
                     <option value="2015"><option value="2016"><option value="2017">
                     <option value="2018">
-                </datalist>
-                at
-                <table class="inline">
-                    <tr class="field-label">
-                        <td>HH</td>
-                        <td>MM</td>
-                    </tr>
-                    <tr>
+                </datalist>  -->
+          <div class="inline">
+            <!-- <tr class="field-label">
+              <td>HH</td>
+              <td>MM</td>
+            </tr> -->
+            <!-- <tr> -->
 
-                        <select name="date.time" id="within-options">
+              <br>at
+                  <select name="date.time" id="date.time">
                             <option value="">&nbsp;</option>
-                            <option value="12:00 am">12:00 am</option>
-                            <option value="01:00 am">01:00 am</option>
-                            <option value="02:00 am">02:00 am</option>
-                            <option value="03:00 am">03:00 am</option>
-                            <option value="04:00 am">04:00 am</option>
-                            <option value="05:00 am">05:00 am</option>
-                            <option value="06:00 am">06:00 am</option>
-                            <option value="07:00 am">07:00 am</option>
-                            <option value="08:00 am">08:00 am</option>
-                            <option value="09:00 am">09:00 am</option>
-                            <option value="10:00 am">10:00 am</option>
-                            <option value="11:00 am">11:00 am</option>
-                            <option value="12:00 pm">12:00 pm</option>
-                            <option value="01:00 pm">01:00 pm</option>
-                            <option value="02:00 pm">02:00 pm</option>
-                            <option value="03:00 pm">03:00 pm</option>
-                            <option value="04:00 pm">04:00 pm</option>
-                            <option value="05:00 pm">05:00 pm</option>
-                            <option value="06:00 pm">06:00 pm</option>
-                            <option value="07:00 pm">07:00 pm</option>
-                            <option value="08:00 pm">08:00 pm</option>
-                            <option value="09:00 pm">09:00 pm</option>
-                            <option value="10:00 pm">10:00 pm</option>
-                            <option value="11:00 pm">11:00 pm</option>
+                            <option value="00:00:00">12:00 am</option>
+                            <option value="01:00:00">01:00 am</option>
+                            <option value="02:00:00">02:00 am</option>
+                            <option value="03:00:00">03:00 am</option>
+                            <option value="04:00:00">04:00 am</option>
+                            <option value="05:00:00">05:00 am</option>
+                            <option value="06:00:00">06:00 am</option>
+                            <option value="07:00:00">07:00 am</option>
+                            <option value="08:00:00">08:00 am</option>
+                            <option value="09:00:00">09:00 am</option>
+                            <option value="10:00:00">10:00 am</option>
+                            <option value="11:00:00">11:00 am</option>
+                            <option value="12:00:00">12:00 pm</option>
+                            <option value="13:00:00">01:00 pm</option>
+                            <option value="14:00:00">02:00 pm</option>
+                            <option value="15:00:00">03:00 pm</option>
+                            <option value="16:00:00">04:00 pm</option>
+                            <option value="17:00:00">05:00 pm</option>
+                            <option value="18:00:00">06:00 pm</option>
+                            <option value="19:00:00">07:00 pm</option>
+                            <option value="20:00:00">08:00 pm</option>
+                            <option value="21:00:00">09:00 pm</option>
+                            <option value="22:00:00">10:00 pm</option>
+                            <option value="23:00:00">11:00 pm</option>
                         </select>
 
-                        <td><input type="number" name="date.hour" id="date.hour" value="{{date.hour}}"
+              <!-- <td><input type="number" name="date.hour" id="date.hour" value="{{date.hour}}"
                                    class="w4" min="0" max="23" title="24h"></td>
                         <td><input type="number" name="date.minute" id="date.minute" value="{{date.minute}}"
-                                   class="w4" min="0" max="59"></td>
-                    </tr>
-                </table>
-            </li>
-            <li>
-                <input type="radio" name="when" id="when-within" value="within">
-                <label for="when-within">It was within</label>
-                <select name="within-options" id="within-options">
+                                   class="w4" min="0" max="59"></td> -->
+            <!-- </tr> -->
+          </div>
+        </div>
+      </li>
+      <li>
+        <input type="radio" name="when" id="when-within" value="within">
+        <label for="when-within">It was within</label>
+        <p class="grey">(last month, a few years ago, ...)</p>
+        <select name="within-options" id="within-options">
                     <option value="">&nbsp;</option>
                     <option value="within last month">Last month</option>
                     <option value="within last 6 months">Last six months</option>
                     <option value="within last year">Last year</option>
                     <option value="more than a year ago">More than a year ago</option>
                 </select>
-            </li>
-            <li>
-                <input type="radio" name="when" id="when-dont-remember" value="dont-remember">
-                <label for="when-dont-remember">I don't exactly remember</label>
-            </li>
-            <li>
+      </li>
+      <li>
+        <input type="radio" name="when" id="when-dont-remember" value="dont-remember">
+        <label for="when-dont-remember">I don't remember</label>
+      </li>
+      <!-- <li>
                 <input type="radio" name="when" id="when-dont-know" value="dont-know">
                 <label for="when-dont-know">I don't know when it happened</label>
-            </li>
-            {{/checked}}
-        </ul>
-        <h1>Is it still happening?</h1>
-        <ul>
-            {{#checked still-happening}}
-            <li>
-                <input type="radio" name="still-happening" id="still-y" value="y">
-                <label for="still-y">Yes</label>
-            </li>
-            <li>
-              <input type="radio" name="still-happening" id="still-n" value="n" class="radio-margin">
-              <label for="still-n">No</label>
-            </li>
-            {{/checked}}
-        </ul>
-        {{> continue}}
-    </div>
+            </li> -->
+      {{/checked}}
+    </ul>
+    <h1>Is it still happening?</h1>
+    <ul>
+      {{#checked still-happening}}
+      <li>
+        <input type="radio" name="still-happening" id="still-y" value="y">
+        <label for="still-y">Yes</label>
+      </li>
+      <li>
+        <input type="radio" name="still-happening" id="still-n" value="n" class="radio-margin">
+        <label for="still-n">No</label>
+      </li>
+      {{/checked}}
+    </ul>
+    {{> continue}}
+  </div>
 </form>

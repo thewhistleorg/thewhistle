@@ -23,7 +23,7 @@ class Webhooks {
      */
     static postParseWhen(ctx) {
         const when = ctx.request.method=='GET' ? chrono.parseDate(ctx.request.query.when) : chrono.parseDate(ctx.request.body.text);
-        //console.log('postParseWhen', ctx.request.body.text, chrono.parseDate(ctx.request.query.when), chrono.parse(ctx.request.query.when)[0])
+        console.info('postParseWhen', ctx.request.body.text, chrono.parseDate(ctx.request.query.when), chrono.parse(ctx.request.query.when)[0]);
         ctx.body = { datetime: when };
         ctx.body.root = 'when';
         ctx.status = 200; // Ok

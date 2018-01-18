@@ -91,11 +91,11 @@ class DashboardHandlers {
             report.reportedFull = dateFormat(report.reported, 'ddd d mmm yyyy HH:MM');
             report.reportedPretty = prettyDate(report.reported);
             report.reportedBy = report.by ? (await User.get(report.by)).username : '';
-            // check for 'newly mentioned'
-            const lastViewed = await Report.lastViewed(db, report._id, ctx.state.user.id);
-            const updates = await Update.getByReport(db, report._id);
-            const mentionedDates = updates.filter(u => u.update.push && u.update.push.comments && u.update.push.comments.match(new RegExp('@'+user.username))).map(u => u.on);
-            const mentionedOn = new Date(Math.max(...mentionedDates)); // in case mentioned multiple times
+            // check for 'newly mentioned' TODO: still required?
+            // const lastViewed = await Report.lastViewed(db, report._id, ctx.state.user.id);
+            // const reportUpdates = await Update.getByReport(db, report._id);
+            // const mentionedDates = reportUpdates.filter(u => u.update.push && u.update.push.comments && u.update.push.comments.match(new RegExp('@'+user.username))).map(u => u.on);
+            // const mentionedOn = new Date(Math.max(...mentionedDates)); // in case mentioned multiple times
         }
 
         // most recently viewed reports

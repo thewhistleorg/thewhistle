@@ -10,15 +10,22 @@ const ObjectId = MongoDB.ObjectId;
 /*
  * Rape crisis resources are provided as support information e.g. after incident report submission.
  */
-const validator = { $and: [
-    { name:     { $type: 'string', $exists: true } },
-    { address:  { $type: 'string'                } },
-    { phone:    { $type: 'array'                 } },
-    { email:    { $type: 'array'                 } },
-    { services: { $type: 'array'                 } },
-    { category: { $type: 'string'                } },
-    { location: { $type: 'object'                } }, // GeoJSON (with spatial index)
-] };
+/* eslint-disable no-unused-vars, key-spacing */
+const schema = {
+    type: 'object',
+    required: [ '_id', 'name' ],
+    properties: {
+        name:     { type: 'string' },                          // name of organisation
+        address:  { type: 'string' },                          // full address (geocodable)
+        phone:    { type: 'array', items: { type: 'text' }  }, // list of phone numbers
+        email:    { type: 'array', items: { type: 'text' }  }, // list of e-mail addresses
+        services: { type: 'array', items: { type: 'text' }  }, // list of services offered
+        category: { type: 'string', enum: [ 'Legal aid', 'Medical help', 'Mental health counselling' ] },
+        location: { type: 'object' },                          // GeoJSON (with spatial index)
+    },
+};
+/* eslint-enable no-unused-vars, key-spacing */
+/* once we have MongoDB 3.6, we can use db.runCommand({ 'collMod': 'reports' , validator: { $jsonSchema: schema } }); */
 
 
 class Resource {

@@ -7,15 +7,22 @@
 import MongoDB from 'mongodb'; // MongoDB driver for Node.js
 const ObjectId = MongoDB.ObjectId;
 
-const validator = { $and: [ // TODO: validation for string or null
-    { firstname: { $type: 'string', $exists: true } },
-    { lastname:  { $type: 'string', $exists: true } },
-    { email:     { $type: 'string', $exists: true } },
-    { password:  { $type: 'string', $exists: true } },
-    { username:  { $type: 'string', $exists: true } },
-    { roles:     { $type: 'array',  $exists: true } },
-    { databases: { $type: 'array',  $exists: true } },
-] };
+/* eslint-disable no-unused-vars, key-spacing */
+const schema = {
+    type: 'object',
+    required: [ 'firstname', 'lastname', 'email', 'password', 'username', 'roles', 'databases' ],
+    properties: {
+        firstname: { type: 'string' },                            // first name
+        lastname:  { type: 'string' },                            // last name
+        email:     { type: 'string' },                            // e-mail address used for loggin in
+        password:  { type: [ 'string', 'null' ] },                // scrypt-encoded password
+        username:  { type: 'string' },                            // username for @mentions etc
+        roles:     { type: 'array', items: { type: 'string', enum: [ 'reporter', 'user', 'admin', 'su' ] }  },
+        databases: { type: 'array', items: { type: 'string' }  }, // databases (organisations) user has access to
+    },
+};
+/* eslint-enable no-unused-vars, key-spacing */
+/* once we have MongoDB 3.6, we can use db.runCommand({ 'collMod': 'reports' , validator: { $jsonSchema: schema } }); */
 
 // note email and username should have unique indexes
 

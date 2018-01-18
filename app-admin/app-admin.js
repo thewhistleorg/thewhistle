@@ -98,12 +98,8 @@ app.use(convert(flash())); // note koa-flash@1.0.0 is v1 middleware which genera
 
 // lusca security headers
 const luscaCspTrustedCdns = [
-    'maps.googleapis.com',
-    'maps.gstatic.com',
-    'www.gstatic.com',
-    'csi.gstatic.com',
-    'fonts.googleapis.com',
-    'fonts.gstatic.com',
+    '*.googleapis.com',
+    '*.gstatic.com',
     'cdnjs.cloudflare.com',
     'cdn.jsdelivr.net',
     'unpkg.com',

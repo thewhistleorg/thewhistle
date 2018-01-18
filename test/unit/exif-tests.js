@@ -13,14 +13,14 @@ describe('EXIF', function() {
             expect(exif.GPSLatitude).to.equal(54.98966667);
             expect(exif.GPSLongitude).to.equal(-1.91416667);
             expect(exif.CreateDate).to.deep.include({
-                year: 2002,
-                month:   7,
+                year:   2002,
+                month:  7,
                 day:    13,
                 hour:   15,
                 minute: 58,
                 second: 28,
                 //tzoffsetMinutes: undefined, [fails deep.equal!]
-                millis:  0,
+                millis: 0,
             });
         });
     });

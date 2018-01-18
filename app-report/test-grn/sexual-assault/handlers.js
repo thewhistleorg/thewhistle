@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Handlers: test-grn/sexual-assault.                                              C.Veness 2017  */
+/* Handlers: test-grn/sexual-assault.                                         C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -8,12 +8,12 @@ import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 import geodesy    from 'geodesy';    // library of geodesy functions
 const LatLon = geodesy.LatLonSpherical;
 
-import Report   from '../../../models/report.js';
-import Resource from '../../../models/resource.js';
+import Report    from '../../../models/report.js';
+import Resource  from '../../../models/resource.js';
+import UserAgent from '../../../models/user-agent.js';
 
 import jsObjectToHtml from '../../../lib/js-object-to-html.js';
-import useragent      from '../../../lib/user-agent.js';
-import geocode        from '../../../lib/geocode.js';
+import Geocoder       from '../../../lib/geocode.js';
 
 const nPages = 7;
 
@@ -118,22 +118,15 @@ class Handlers {
     static async getSubmit(ctx) {
         if (!ctx.session.report) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
 
-        // geocode location
-        ctx.session.geocode = ctx.session.report['at-address']
-            ? await geocode(ctx.session.report['at-address'])
-            : null;
-
-        // make sure only one of generated-name and existing-name are recorded, and make it 1st property of report
-        if (ctx.session.report['existing-name']) { delete ctx.session.report['generated-name']; ctx.session.report = Object.assign({ 'existing-name': null }, ctx.session.report); }
-        if (ctx.session.report['generated-name']) { delete ctx.session.report['existing-name']; ctx.session.report = Object.assign({ 'generated-name': null }, ctx.session.report); }
+        // make sure only one of generated-alias and existing-alias are recorded, and make it 1st property of report
+        if (ctx.session.report['existing-alias']) { delete ctx.session.report['generated-alias']; ctx.session.report = Object.assign({ 'existing-alias': null }, ctx.session.report); }
+        if (ctx.session.report['generated-alias']) { delete ctx.session.report['existing-alias']; ctx.session.report = Object.assign({ 'generated-alias': null }, ctx.session.report); }
 
         const prettyReport = prettifyReport(ctx.session.report);
-        const formattedAddress = ctx.session.geocode ? ctx.session.geocode.formattedAddress : '[unrecognised address]';
         const files = ctx.session.report.files ? ctx.session.report.files.map(f => f.name).join(', ') : null;
         const context = {
-            reportHtml:       jsObjectToHtml.usingTable(prettyReport),
-            formattedAddress: formattedAddress,
-            files:            files ,
+            reportHtml: jsObjectToHtml.usingTable(prettyReport),
+            files:      files ,
         };
 
         await ctx.render('submit', context);
@@ -150,35 +143,36 @@ class Handlers {
         // record this report
         delete ctx.request.body['submit'];
 
-        // check generated name not already used, or existing name does exist
+        // check generated alias not already used, or existing alias does exist
         switch (ctx.session.report['used-before']) {
             case 'y':
-                // verify existing name does exist
-                const reportsY = await Report.getBy(ctx.params.database, 'name', ctx.session.report['existing-name']);
-                if (reportsY.length == 0) { ctx.flash = { name: 'Anonymous name not found' }; ctx.redirect(ctx.url); return; }
+                // verify existing alias does exist
+                const reportsY = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['existing-alias']);
+                if (reportsY.length == 0) { ctx.flash = { alias: 'Anonymous alias not found' }; ctx.redirect(ctx.url); return; }
                 break;
             case 'n':
-                // verify generated name does not exist
-                if (ctx.session.report['generated-name'] == null) { ctx.flash = 'Name not given'; ctx.redirect(ctx.url); }
-                const reportsN = await Report.getBy(ctx.params.database, 'name', ctx.session.report['generated-name']);
-                if (reportsN.length > 0) { ctx.flash = { name: 'Generated name not available: please select another' }; ctx.redirect(ctx.url); return; }
+                // verify generated alias does not exist
+                if (ctx.session.report['generated-alias'] == null) { ctx.flash = 'Alias not given'; ctx.redirect(ctx.url); }
+                const reportsN = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['generated-alias']);
+                if (reportsN.length > 0) { ctx.flash = { alias: 'Generated alias not available: please select another' }; ctx.redirect(ctx.url); return; }
                 break;
         }
 
-        const name = ctx.session.report['existing-name'] || ctx.session.report['generated-name'];
+        const alias = ctx.session.report['existing-alias'] || ctx.session.report['generated-alias'];
+        const files = ctx.session.report.files;
+        delete ctx.session.report.files;
 
         const prettyReport = prettifyReport(ctx.session.report);
 
         const by = ctx.state.user ? ctx.state.user.id : null;
-        const id = await Report.insert(ctx.params.database, by, name, prettyReport, 'sexual-assault', ctx.session.report.files, ctx.session.geocode, ctx.headers['user-agent']);
+        const id = await Report.insert(ctx.params.database, by, alias, prettyReport, 'sexual-assault', files, ctx.headers['user-agent']);
         ctx.set('X-Insert-Id', id); // for integration tests
 
         // record user-agent
-        await useragent.log(ctx.params.database, ctx.ip, ctx.headers);
+        await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
 
         // remove all session data (to prevent duplicate submission)
-        // except geocoding result (to present local resources)
-        ctx.session = { geocode: ctx.session.geocode };
+        ctx.session = {};
 
         ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/whatnext`);
     }
@@ -193,10 +187,10 @@ class Handlers {
      * Shows local resources grouped by services they offer.
      */
     static async getWhatnext(ctx) {
-        const context = {};
+        const context = { address: ctx.query.address };
 
         // if we have a geocode result on the incident location, list local resources
-        const geocoded = ctx.query.address ? await geocode(ctx.query.address) : null;
+        const geocoded = ctx.query.address ? await Geocoder.geocode(ctx.query.address) : null;
 
         if (geocoded) {
             // get all resources within 20km of geocoded location
@@ -241,7 +235,7 @@ class Handlers {
                 resourcesGrouped[category] = resourcesGrouped[category].slice(0, 3); // TODO: ??
             }
 
-            context.categories = resourcesGrouped;
+            context.categories = Object.keys(resourcesGrouped).length>0 ? resourcesGrouped : null; // readily identify 'no resources' in template
             context.formattedAddress = geocoded.formattedAddress;
         }
 
@@ -252,7 +246,7 @@ class Handlers {
     /**
      * Process 'what next' submission.
      */
-    static async postWhatnext(ctx) {
+    static postWhatnext(ctx) {
         // ignore submitted value, just skip back to beginning
         ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`);
     }
@@ -339,11 +333,9 @@ function prettifyReport(report) {
     if (typeof report['action-taken'] == 'string') report['action-taken'] = [ report['action-taken'] ];
     rpt['Action taken'] = report['action-taken'].map(a => action[a]);
 
-    // used-before: either Generated name or Existing name is set as appropriate
-    switch (report['used-before']) {
-        case 'n': rpt['Generated name'] = report['generated-name']; break;
-        case 'y': rpt['Existing name'] = report['existing-name']; break;
-    }
+    // used-before: set Alias from generated-alias or existing-alias (don't record distinction in
+    // order to ensure homogeneous reports)
+    rpt['Alias'] = report['used-before']=='y' ? report['existing-alias'] : report['generated-alias'];
 
     return rpt;
 }

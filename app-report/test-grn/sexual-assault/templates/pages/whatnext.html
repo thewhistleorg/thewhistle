@@ -8,7 +8,7 @@
 <h2>For any further help...</h2>
 
 <p>If you'd like any more help, or would like to follow up, you can get in touch with us.</p>
-<p>Make sure to mention your anonymous name <output id="user-id">{{user-id}}</output> so we can
+<p>Make sure to mention your anonymous alias <output id="user-id">{{user-id}}</output> so we can
     access any relevant information.</p>
 <p>Call us on <b>814-917-1224</b></p>
 <p>Visit us at <b>19, YPO Shodehinde Street, Utako, Abuja</b></p>
@@ -23,11 +23,7 @@
     services for you. These can be of immediate help in concerns regarding health, mental health,
     legal issues and any other concerns. They are free, anonymous, and almost always available.</p>
 
-{{#if categories.length}}
-<p>These are resources close to <i>{{formattedAddress}}</i>.</p>
-{{else}}
-<p>No resources found close to <i>{{formattedAddress}}</i>.</p>
-{{/if}}
+<p>Resources found close to <i>{{formattedAddress}}</i>:</p>
 
 <table>
     {{#each categories}}
@@ -54,9 +50,13 @@
     {{/each}}
     {{/each}}
 </table>
+
+{{else}}
+
+{{#if address}}
+<p>No resources found close to <i>{{address}}</i>.</p>
 {{/if}}
 
-{{#unless categories}}
 <p>To see local organisations and services which may be helpful for you, enter your address here.</p>
 <p>We will not record your address or your request for resources.</p>
 <form method="get" name="get-resources">
@@ -64,7 +64,7 @@
         <button type="submit" name="get" id="get" disabled class="grey">Get resources</button>
         <span id="formatted-address"></span></p>
 </form>
-{{/unless}}
+{{/if}}
 
 <form method="post" class="pure-form pure-form-aligned">
     <button type="submit" name="end" value="end" accesskey="e" class="float-right">

@@ -13,7 +13,6 @@ import MongoDB    from 'mongodb';           // MongoDB driver for Node.js
 const ObjectId = MongoDB.ObjectId;
 
 import User    from '../models/user.js';
-import Weather from '../lib/weather.js';
 import AwsS3   from '../lib/aws-s3.js';
 import Update  from './update.js';
 
@@ -23,27 +22,52 @@ import Update  from './update.js';
  * The submitted report may be any format, though will generally be an array of name-value pairs
  * from a web form (held as a standard JavaScript object).
  *
- * This validator specifies the metadata which the app expects to find as part of the report.
- *
- * Of course, no operation should fail validation at this level: full validation should be done both
- * front-end and by the back-end app.
+ * This schema is used for validation, specifying the metadata which the app expects to find as part
+ * of the report. Of course, no operation should fail validation at this level: full validation
+ * should be done both front-end and by the back-end app.
  */
-const validator = { $and: [ // TODO: validation for string or null
-    { project:    { $type: 'string',   $exists: true } }, // name of project report belongs to
-    { submitted:  { $type: 'object',   $exists: true } }, // flexible format following incident reporting format
-    { by:         { $type: 'objectId'                } }, // user entering incident report
-    { name:       { $type: 'string',   $exists: true } }, // auto-generated name of victim/survivor
-    { geocode:    { $type: 'object'                  } }, // google geocoding data
-    { location:   { $type: 'object',   $exists: true } }, // GeoJSON (with spatial index)
-    { analysis:   { $type: 'object'                  } }, // exif data, weather, etc
-//  { summary:    { $type: 'string'                  } }, // single-line summary for identification (not currently used)
-    { assignedTo: { $type: 'objectId'                } }, // user report is assigned to
-    { status:     { $type: 'string'                  } },
-    { tags:       { $type: 'array'                   } }, // array of strings
-    { comments:   { $type: 'array'                   } }, // array of { byId, byName, on, comment }
-    { views:      { $type: 'object'                  } }, // associative array of timestamps indexed by user id
-    { archived:   { $type: 'bool',     $exists: true } }, // archived flag
-] };
+/* eslint-disable no-unused-vars, key-spacing */
+const schema = {
+    type: 'object',
+    required: [ '_id', 'project', 'alias', 'submitted', 'location', 'assignedTo', 'status', 'tags', 'comments', 'archived' ],
+    properties: {
+        project:    { type:     'string' },               // name of project report belongs to
+        by:         { bsonType: [ 'objectId', 'null' ] }, // user entering incident report
+        alias:      { type:     'string' },               // auto-generated alias of victim/survivor
+        submitted:  { type:     'object' },               // originally submitted report (flexible format following incident reporting format)
+        files:      { type:     'array',                  // uploaded files
+            items: { type: 'object' },                    // ... 'formidable' File objects
+        },
+        ua:         { type: [ 'objectId', 'null' ] },     // user agent of browser used to report incident
+        location:   { type: 'object',                     // geocoded incident location
+            properties: {
+                address: { type: 'string' },              // ... entered address used for geocoding
+                geocode: { type: [ 'object', 'null' ] },  // ... google geocoding data
+                geojson: { type: [ 'object', 'null' ] },  // ... GeoJSON (with spatial index)
+            },
+        },
+        analysis:   { type:     [ 'object', 'null' ] },   // exif data, weather, etc
+        assignedTo: { bsonType: [ 'objectId', 'null' ] }, // user report is assigned to
+        status:     { type:     [ 'string', 'null' ] },   // free-text status (to accomodate any workflow)
+        tags:       { type:     'array',                  // tags to classify/group reports
+            items: { type: 'string' },
+        },
+        comments:   { type: 'array',                      // notes/commentary documenting management of report
+            items: { type: 'object',
+                properties: {
+                    byId:    { bsonType: 'objectId' },    // ... user making comment
+                    byName:  { type:     'string' },      // ... username of user making comment (in case user gets deleted)
+                    on:      { bsonType: 'date' },        // ... timestamp comment added
+                    comment: { type:     'string' },      // ... comment in markdown format
+                },
+            },
+        },
+        archived:   { type: 'boolean' },                  // archived flag
+        views:      { type: [ 'object', 'null' ] },       // associative array of timestamps indexed by user id
+    },
+};
+/* eslint-enable no-unused-vars, key-spacing */
+/* once we have MongoDB 3.6, we can use db.runCommand({ 'collMod': 'reports' , validator: { $jsonSchema: schema } }); */
 
 class Report {
 
@@ -80,7 +104,7 @@ class Report {
 
         // geospatial index
 
-        reports.createIndex({ location: '2dsphere' });
+        reports.createIndex({ 'location.geojson': '2dsphere' });
 
         // free-text index for submitted information (ie fields in report.submitted)
 
@@ -253,16 +277,15 @@ class Report {
      *
      * @param   {string}   db - Database to use.
      * @param   {ObjectId} [by] - User recording incident report (undefined for public submission).
-     * @param   {string}   name - Generated name used to refer to victim/survivor.
+     * @param   {string}   alias - Generated alias used to refer to victim/survivor.
      * @param   {Object}   submitted - Report details (values depend on project).
      * @param   {string}   project - Project report is part of.
      * @param   {Object[]} files - Uploaded files ('formidable' File objects).
-     * @param   {Object}   geocode - Google geocoding results.
      * @param   {string}   userAgent - User agent from http request header.
      * @returns {ObjectId} New report id.
      * @throws  Error on validation or referential integrity errors.
      */
-    static async insert(db, by, name, submitted, project, files, geocode, userAgent) {
+    static async insert(db, by, alias, submitted, project, files, userAgent) {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         by = objectId(by); // allow id as string
@@ -275,11 +298,10 @@ class Report {
             project:    project,
             submitted:  submitted,
             by:         by,
-            name:       name,
-            geocode:    geocode || {},
-            location:   {},
+            alias:      alias,
+            location:   { address: '', geocode: null, geojson: null },
             analysis:   {},
-//          summary:    undefined,
+            // summary: undefined,
             assignedTo: undefined,
             status:     undefined,
             tags:       [],
@@ -290,19 +312,6 @@ class Report {
 
         // record uploaded files within the submitted report object
         values.submitted.files = files || [];
-
-        // if successful geocode, record (geoJSON) location for (indexed) geospatial queries
-        if (geocode) {
-            values.location = {
-                type:        'Point',
-                coordinates: [Number(geocode.longitude), Number(geocode.latitude)],
-            };
-        }
-
-        // record weather conditions at location & date of incident
-        if (submitted.Date && submitted.Date.getTime() && geocode) {
-            values.analysis.weather = await Weather.fetchWeatherConditions(geocode.latitude, geocode.longitude, submitted.Date);
-        }
 
         // record user agent for potential later analyses
         const ua = useragent.parse(userAgent);
@@ -321,7 +330,7 @@ class Report {
                     const dst = slug(file.name, { lower: true, remove: null });
 
                     // upload /tmp file to S3
-                    await AwsS3.put(db, project, date, insertedId, dst, src)
+                    await AwsS3.put(db, project, date, insertedId, dst, src);
 
                     // replace submitted.files.name with slug & .path with S3 folder
                     const filter = { _id: insertedId, 'submitted.files.path': src };
@@ -474,7 +483,7 @@ class Report {
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
-        userId = objectId(userId); // allow id as string
+        userId = objectId(userId); // allow userId as string
 
         const reports = global.db[db].collection('reports');
         await reports.updateOne({ _id: id }, { $addToSet: { tags: tag } });
@@ -569,14 +578,14 @@ class Report {
 
         // convert @mentions to pseudo-links with user id as target
         const users = await User.getAll();
-        let commentMd = comment
+        let commentMd = comment;
         for (const user of users) {
-            comment = comment.replace('@'+user.username, `[@${user.username}](${user._id})`);
+            commentMd = commentMd.replace('@'+user.username, `[@${user.username}](${user._id})`);
         }
 
         const reports = global.db[db].collection('reports');
 
-        await reports.updateOne({ _id: id, 'comments.byId': by, 'comments.on': on }, { $set: { 'comments.$.comment': comment } });
+        await reports.updateOne({ _id: id, 'comments.byId': by, 'comments.on': on }, { $set: { 'comments.$.comment': commentMd } });
 
         await Update.insert(db, id, userId, { set: { [`comment-${dateFormat(on, 'yyyy-mm-dd@HH:MM')}`]: commentPlain } }); // audit trail
     }

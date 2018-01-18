@@ -10,7 +10,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Koa       from 'koa';          // Koa framework
-import jwt       from 'jsonwebtoken'; // JSON Web Token implementation
 import xmlify    from 'xmlify';       // JS object to XML
 import yaml      from 'js-yaml';      // JS object to YAML
 import MongoDB   from 'mongodb';      // MongoDB driver for Node.js
@@ -104,7 +103,9 @@ app.use(async function handleErrors(ctx, next) {
 app.use(async function(ctx, next) {
     if (!global.db['test-grn']) {
         try {
-            global.db['test-grn'] = await MongoClient.connect(process.env.DB_TEST_GRN);
+            const connectionString = process.env.DB_TEST_GRN;
+            const client = await MongoClient.connect(connectionString);
+            global.db['test-grn'] = client.db(client.s.options.dbName);
         } catch (e) {
             console.error('Mongo connection error', e.toString());
             process.exit(1);

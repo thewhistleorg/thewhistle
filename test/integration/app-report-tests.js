@@ -96,7 +96,7 @@ describe('Report app'+' ('+app.env+')', function() {
             const responseGet = await request.get('/test-grn/sexual-assault/1');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([...document.querySelectorAll('table.progress td')].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect( [ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[0].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(2);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
@@ -126,7 +126,7 @@ describe('Report app'+' ('+app.env+')', function() {
             const responseGet = await request.get('/test-grn/sexual-assault/2');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([...document.querySelectorAll('table.progress td')].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[1].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(11);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
@@ -147,7 +147,7 @@ describe('Report app'+' ('+app.env+')', function() {
             const responseGet = await request.get('/test-grn/sexual-assault/3');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([...document.querySelectorAll('table.progress td')].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[2].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(1);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
@@ -165,7 +165,7 @@ describe('Report app'+' ('+app.env+')', function() {
             const responseGet = await request.get('/test-grn/sexual-assault/4');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([...document.querySelectorAll('table.progress td')].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[3].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(4);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
@@ -182,7 +182,7 @@ describe('Report app'+' ('+app.env+')', function() {
             const responseGet = await request.get('/test-grn/sexual-assault/3');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([...document.querySelectorAll('table.progress td')].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[2].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
             expect(document.querySelectorAll('input')).to.have.lengthOf(1);
@@ -209,7 +209,7 @@ describe('Report app'+' ('+app.env+')', function() {
             const responseGet = await request.get('/test-grn/sexual-assault/4');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([...document.querySelectorAll('table.progress td')].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[3].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(4);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
@@ -228,7 +228,7 @@ describe('Report app'+' ('+app.env+')', function() {
             const responseGet = await request.get('/test-grn/sexual-assault/5');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([...document.querySelectorAll('table.progress td')].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[4].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(3);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
@@ -248,7 +248,7 @@ describe('Report app'+' ('+app.env+')', function() {
             const responseGet = await request.get('/test-grn/sexual-assault/6');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([...document.querySelectorAll('table.progress td')].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(6);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
@@ -266,30 +266,30 @@ describe('Report app'+' ('+app.env+')', function() {
             const responseGet = await request.get('/test-grn/sexual-assault/7');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([...document.querySelectorAll('table.progress td')].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[6].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(4);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
 
             const values = {
-                'existing-name':  '',
-                'used-before':    'n',
-                'generated-name': 'testy terrain',
-                'nav-next':       'next',
+                'existing-alias':  '',
+                'used-before':     'n',
+                'generated-alias': 'testy terrain',
+                'nav-next':        'next',
             };
             const responsePost = await request.post('/test-grn/sexual-assault/7').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/submit');
         });
 
-        it('ajax: gets a new random name', async function() {
-            const response = await request.get('/ajax/test-grn/names/new');
+        it('ajax: gets a new random alias', async function() {
+            const response = await request.get('/ajax/test-grn/aliases/new');
             expect(response.status).to.equal(200);
-            expect(response.body.name.split(' ')).to.have.lengthOf(2);
+            expect(response.body.alias.split(' ')).to.have.lengthOf(2);
         });
 
         it('ajax: checks ‘testy terrain’ is not already used', async function() {
-            const response = await request.get('/ajax/test-grn/names/testy+terrain');
+            const response = await request.get('/ajax/test-grn/aliases/testy+terrain');
             expect(response.status).to.equal(404);
         });
 
@@ -317,7 +317,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(tds[5].textContent).to.equal('Not known: A death eater');
             expect(ths[6].textContent).to.equal('Action taken');
             expect(tds[6].textContent).to.equal('—');
-            expect(ths[7].textContent).to.equal('Generated name');
+            expect(ths[7].textContent).to.equal('Alias');
             expect(tds[7].textContent).to.equal('testy terrain');
         });
 
@@ -331,17 +331,35 @@ describe('Report app'+' ('+app.env+')', function() {
         });
 
         it('sees whatnext page', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/whatnext');
-            expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            const response = await request.get('/test-grn/sexual-assault/whatnext');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
             expect(document.querySelectorAll('tr')).to.have.lengthOf(0); // local resources
         });
 
+        it('ajax: fails to geocode bad address', async function() {
+            const response = await request.get('/ajax/geocode?address=this+address+doesnt+have+a+location');
+            expect(response.status).to.equal(404);
+        });
+
+        it('ajax: geocodes address', async function() {
+            const response = await request.get('/ajax/geocode?address=university+of+lagos,+nigeria');
+            expect(response.status).to.equal(200);
+            expect(response.body.formattedAddress).to.equal('University Road 101017 Akoka,, Yaba,, Lagos State., Nigeria');
+        });
+
+        it('ajax: geocodes address using CORS', async function() {
+            const response = await request.get('/ajax/geocode?address=university+of+lagos,+nigeria').set('Origin', 'http://rapeisacrime.org');
+            expect(response.status).to.equal(200);
+            expect(response.body.formattedAddress).to.equal('University Road 101017 Akoka,, Yaba,, Lagos State., Nigeria');
+            expect(response.headers['access-control-allow-origin']).to.equal('http://rapeisacrime.org');
+        });
+
         it('sees whatnext resources', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/whatnext?address=university+of+lagos');
-            expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            const response = await request.get('/test-grn/sexual-assault/whatnext?address=university+of+lagos,+nigeria');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
             expect(document.querySelectorAll('tr')).to.have.lengthOf(39); // local resources
         });
@@ -382,7 +400,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(ths[5].nextSibling.textContent).to.equal('Not known: A death eater');
             expect(ths[6].textContent).to.equal('Action taken');
             expect(ths[6].nextSibling.textContent).to.equal('—');
-            expect(ths[7].textContent).to.equal('Generated name');
+            expect(ths[7].textContent).to.equal('Alias');
             expect(ths[7].nextSibling.textContent).to.equal('testy terrain');
         });
 
@@ -450,9 +468,9 @@ describe('Report app'+' ('+app.env+')', function() {
                 'who':                        'n',
                 'who-description':            'A death eater',
                 'action-taken-other-details': '',
-                'existing-name':              '',
+                'existing-alias':             '',
                 'used-before':                'n',
-                'generated-name':             'testy terrain',
+                'generated-alias':            'testy terrain',
                 'nav-next':                   'next',
             };
             const response = await request.post(report).send(values);
@@ -484,7 +502,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(tds[5].textContent).to.equal('Not known: A death eater');
             expect(ths[6].textContent).to.equal('Action taken');
             expect(tds[6].textContent).to.equal('—');
-            expect(ths[7].textContent).to.equal('Generated name');
+            expect(ths[7].textContent).to.equal('Alias');
             expect(tds[7].textContent).to.equal('testy terrain');
         });
 
@@ -499,17 +517,17 @@ describe('Report app'+' ('+app.env+')', function() {
         });
 
         it('sees whatnext page', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/whatnext');
-            expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            const response = await request.get('/test-grn/sexual-assault/whatnext');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
             expect(document.querySelectorAll('tr')).to.have.lengthOf(0); // local resources
         });
 
         it('sees whatnext resources', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/whatnext?address=university+of+lagos');
-            expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            const response = await request.get('/test-grn/sexual-assault/whatnext?address=university+of+lagos');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
             expect(document.querySelectorAll('tr')).to.have.lengthOf(39); // local resources
         });
@@ -537,7 +555,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(ths[5].nextSibling.textContent).to.equal('Not known: A death eater');
             expect(ths[6].textContent).to.equal('Action taken');
             expect(ths[6].nextSibling.textContent).to.equal('—');
-            expect(ths[7].textContent).to.equal('Generated name');
+            expect(ths[7].textContent).to.equal('Alias');
             expect(ths[7].nextSibling.textContent).to.equal('testy terrain');
         });
 

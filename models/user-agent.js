@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Record browser user agent.                                                      C.Veness 2017  */
+/* Record browser user agent.                                                 C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import useragent from 'useragent'; // parse browser user agent string
@@ -45,7 +45,7 @@ class UserAgent {
             browser: Object.keys(browserCounts).map(key => ({ key, val: browserCounts[key] })).sort((a, b) => a.val < b.val ? 1 : -1),
             os:      Object.keys(osCounts).map(key => ({ key, val: osCounts[key] })).sort((a, b) => a.val < b.val ? 1 : -1),
             device:  Object.keys(deviceCounts).map(key => ({ key, val: deviceCounts[key] })).sort((a, b) => a.val < b.val ? 1 : -1),
-        }
+        };
 
         const first = Math.min(...uas.map(ua => ua._id.getTimestamp()));
 

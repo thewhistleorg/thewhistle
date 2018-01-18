@@ -35,7 +35,7 @@ app.use(handlebars({
     helpers:       { selected: HandlebarsHelpers.selected, checked: HandlebarsHelpers.checked },
 }));
 
-import routes from './routes.js'
+import routes from './routes.js';
 app.use(routes); // routes/handlers are specific to this database/project)
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

@@ -1,6 +1,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Incident Reporting handlers - manage submission of incident reports by NGO staff / paralegals. */
-/*                                                                                 C.Veness 2017  */
+/*                                                                            C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */
@@ -8,14 +8,12 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import Report   from '../models/report.js';
-import Resource from '../models/resource.js';
+import Report    from '../models/report.js';
+import UserAgent from '../models/user-agent.js';
 
 import autoIdentifier   from '../lib/auto-identifier.js';
 import jsObjectToHtml   from '../lib/js-object-to-html.js';
 import validationErrors from '../lib/validation-errors.js';
-import useragent        from '../lib/user-agent.js';
-import geocode          from '../lib/geocode.js';
 
 
 const validation = {
@@ -53,37 +51,20 @@ class IncidentReport {
         const prettyReport = prettifyReport(ctx.session.report);
 
         const context = {
-            reporter:            ctx.state.user.name,
-            reportHtml:          jsObjectToHtml.usingTable(prettyReport),
-            formattedAddress:    ctx.session.geocode ? ctx.session.geocode.formattedAddress : '[unrecognised address]',
-            formattedAddressUrl: encodeURIComponent(ctx.session.geocode ? ctx.session.geocode.formattedAddress : ''),
-            files:               ctx.session.files.map(f => f.name).join(', '),
+            reporter:   ctx.state.user.name,
+            reportHtml: jsObjectToHtml.usingTable(prettyReport),
+            files:      ctx.session.files.map(f => f.name).join(', '),
         };
 
         await ctx.render(ctx.state.user.db+'/'+ctx.params.project+'-submit', context);
     }
 
+
     /**
      * Render incident report confirm page.
      */
     static async getReportConfirm(ctx) {
-        const report = await Report.get(ctx.state.user.db, ctx.params.id);
-
-        report.lat = report.location.coordinates[1];
-        report.lon = report.location.coordinates[0];
-
-        const resources = await Resource.getNear(ctx.state.user.db, report.lat, report.lon, 10e3);
-        resources.forEach(resource => {
-            const lat1 = report.lat;
-            const lon1 = report.lon;
-            const lat2 = resource.location.coordinates[1];
-            const lon2 = resource.location.coordinates[0];
-            const φ1 = lat1*Math.PI/180, φ2 = lat2*Math.PI/180, Δλ = (lon2-lon1)*Math.PI/180, R = 6371e3;
-            const d = Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
-            resource.distance = (d/1000).toPrecision(2);
-        });
-
-        await ctx.render(ctx.state.user.db+'/'+ctx.params.project+'-confirm', { report, resources });
+        await ctx.render(ctx.state.user.db+'/'+ctx.params.project+'-confirm');
     }
 
 
@@ -109,17 +90,17 @@ class IncidentReport {
             delete body.files;
         }
 
-        if (body['existing-name'] != null) {
-            // verify existing name does exist
-            const reports = await Report.getBy(ctx.state.user.db, 'report.name', body['existing-name']);
-            if (reports.length == 0) { ctx.flash = 'Name not found'; ctx.redirect(ctx.url); }
-            delete body['generated-name'];
+        if (body['existing-alias'] != null) {
+            // verify existing alias does exist
+            const reports = await Report.getBy(ctx.state.user.db, 'report.alias', body['existing-alias']);
+            if (reports.length == 0) { ctx.flash = 'Alias not found'; ctx.redirect(ctx.url); }
+            delete body['generated-alias'];
         } else {
-            // verify generated name does not exist
-            if (body['generated-name'] == null) { ctx.flash = 'Name not given'; ctx.redirect(ctx.url); }
-            const reports = await Report.getBy(ctx.state.user.db, 'report.name', body['generated-name']);
-            if (reports.length > 0) { ctx.flash = 'Generated name not available'; ctx.redirect(ctx.url); }
-            delete body['existing-name'];
+            // verify generated alias does not exist
+            if (body['generated-alias'] == null) { ctx.flash = 'Alias not given'; ctx.redirect(ctx.url); }
+            const reports = await Report.getBy(ctx.state.user.db, 'report.alias', body['generated-alias']);
+            if (reports.length > 0) { ctx.flash = 'Generated alias not available'; ctx.redirect(ctx.url); }
+            delete body['existing-alias'];
         }
 
         body['perpetrator-gender'] = body['perpetrator-gender'] || null;
@@ -131,11 +112,6 @@ class IncidentReport {
         delete body['nav-next'];
 
         ctx.session.report = body;
-
-        // geocode location
-        ctx.session.geocode = body['location-address']
-            ? await geocode(body['location-address'])
-            : null;
 
         ctx.redirect(`/report/${ctx.params.project}/submit`);
     }
@@ -151,13 +127,15 @@ class IncidentReport {
         // record this report
 
         const by = ctx.state.user.id;
-        const name = ctx.session.report['existing-name'] || ctx.session.report['generated-name'];
+        const alias = ctx.session.report['existing-alias'] || ctx.session.report['generated-alias'];
+        const files = ctx.session.files;
+        delete ctx.session.files;
         const prettyReport = prettifyReport(ctx.session.report);
 
-        const id = await Report.insert(ctx.state.user.db, by, name, prettyReport, ctx.params.project, ctx.session.files, ctx.session.geocode, ctx.headers['user-agent']);
+        const id = await Report.insert(ctx.state.user.db, by, alias, prettyReport, ctx.params.project, files, ctx.headers['user-agent']);
 
         // record user-agent
-        await useragent.log(ctx.state.user.db, ctx.ip, ctx.headers);
+        await UserAgent.log(ctx.state.user.db, ctx.ip, ctx.headers);
 
         ctx.set('X-Insert-Id', id); // for integration tests
 
@@ -172,29 +150,29 @@ class IncidentReport {
 
 
     /**
-     * GET /ajax/report/:db/names/new - Generate a random adjective-noun name..
+     * GET /ajax/report/:db/aliases/new - Generate a random adjective-noun alias.
      *
-     * For efficiency, this doesn't check if the name is already in use (should be very small
+     * For efficiency, this doesn't check if the alias is already in use (should be very small
      * probability), but such check should be done when submitting report.
      */
-    static async getGenerateNewName(ctx) {
-        const name = await autoIdentifier(12);
+    static async getNewAlias(ctx) {
+        const alias = await autoIdentifier(12);
 
-        ctx.body = { name: name };
+        ctx.body = { alias: alias };
         ctx.body.root = 'generateName';
         ctx.status = 200; // Ok
     }
 
 
     /**
-     * GET /ajax/report/names/:name - Get list of reports reported by name; return 404 if name
+     * GET /ajax/report/aliases/:alias - Get list of reports reported by alias; return 404 if alias
      * not used.
      */
-    static async getName(ctx) {
-        const reports = await Report.getBy(ctx.state.user.db, 'name', ctx.params.name.replace('+', ' '));
+    static async getAlias(ctx) {
+        const reports = await Report.getBy(ctx.state.user.db, 'alias', ctx.params.alias.replace('+', ' '));
 
         ctx.body = reports.map(r => r._id.toString());
-        ctx.body.root = 'name';
+        ctx.body.root = 'alias';
         ctx.status = reports.length==0 && ctx.params.id!='' ? 404 : 200; // Not Found / Ok
     }
 
@@ -235,11 +213,7 @@ function prettifyReport(report) {
         'Assistance requested':          report['assistance-requested'],
     };
 
-    if (report['existing-name']) {
-        rpt['Existing name'] = report['existing-name'];
-    } else {
-        rpt['Generated name'] = report['generated-name'];
-    }
+    rpt['Alias'] = report['existing-alias'] ? report['existing-alias'] : report['generated-alias'];
 
     return rpt;
 }

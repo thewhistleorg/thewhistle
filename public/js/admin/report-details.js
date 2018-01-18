@@ -3,7 +3,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';
-/* eslint-env browser *//* eslint no-unused-vars: [ warn, { vars: local } ] *//* TODO: 'vars: local' ignored? */
+/* exported setupMetadataAutosubmitListeners, setupTagsListeners, setupCommentaryListeners, setupLocationListeners, initialiseMap, resizeElementHeight */
 
 
 /**
@@ -67,8 +67,11 @@ function setupTagsListeners(reportId) {
         const values = JSON.stringify({ tag: tag });
         const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
         const credentials = 'same-origin';
+
         const response = await fetch(`/ajax/reports/${reportId}/tags`, { method: 'POST', body: values, headers, credentials });
+
         const body = await response.json();
+
         if (response.ok) {
             // create new tag span
             const tagDelBtn = '<button title="remove tag" class="tag-del hide fa fa-trash red"></button>';
@@ -94,8 +97,11 @@ function setupTagsListeners(reportId) {
         const tag = encodeURIComponent(tagSpan.textContent.replace(/ $/, ''));
         const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
         const credentials = 'same-origin';
+
         const response = await fetch(`/ajax/reports/${reportId}/tags/${tag}`, { method: 'DELETE', headers, credentials });
+
         const body = await response.json();
+
         if (response.ok) {
             tagSpan.remove();
         } else {
@@ -119,7 +125,6 @@ function setupTagsListeners(reportId) {
  * @param {ObjectId} userid - id of user making changes.
  */
 function setupCommentaryListeners(reportId, username, userid) {
-    const credentials = 'same-origin';
 
     document.querySelector('#add-comment').onclick = postComment;
     document.querySelectorAll('div.by button.edit').forEach(btn => btn.onclick = editComment);
@@ -132,7 +137,10 @@ function setupCommentaryListeners(reportId, username, userid) {
         const values = JSON.stringify({ comment, username, userid });
 
         const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+        const credentials = 'same-origin';
+
         const response = await fetch(`/ajax/reports/${reportId}/comments`, { method: 'POST', body: values, headers, credentials });
+
         const body = await response.json();
 
         if (response.ok) {
@@ -172,18 +180,19 @@ function setupCommentaryListeners(reportId, username, userid) {
 
     async function editCommentUpdate() {
         const commentContainerDiv = this.closest('div.comment-container');
-        const editCommentDiv = document.querySelector('#div-edit-comment');
 
         const comment = document.querySelector('#comment-edit').value;
         const values = JSON.stringify({ comment });
 
         const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+        const credentials = 'same-origin';
         const url = `/ajax/reports/${reportId}/comments/${commentContainerDiv.id}`;
+
         const response = await fetch(url, { method: 'PUT', body: values, headers, credentials });
+
         const body = await response.json();
 
         if (response.ok) {
-            const commentContainerDiv = this.closest('div.comment-container');
             commentContainerDiv.querySelector('p').textContent = body.comment;
             commentContainerDiv.querySelectorAll('div').forEach(div => div.classList.remove('hide'));
             document.querySelector('#div-edit-comment').classList.add('hide');
@@ -198,6 +207,8 @@ function setupCommentaryListeners(reportId, username, userid) {
             const commentDiv = this.closest('.comment');
 
             const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+            const credentials = 'same-origin';
+
             const response = await fetch(`/ajax/reports/${reportId}/comments/${commentDiv.id}`, { method: 'DELETE', headers, credentials });
 
             if (response.ok) {
@@ -212,23 +223,96 @@ function setupCommentaryListeners(reportId, username, userid) {
 }
 
 
+function setupLocationListeners(reportId) {
+    document.querySelector('#location-edit').onclick = editLocation;
+    document.querySelector('#location-cancel').onclick = cancelLocation;
+    document.querySelector('#location-update').onclick = updateLocation;
+    document.querySelector('#address').oninput = checkGeocoding;
+
+    function editLocation() {
+        document.querySelector('#location-edit').classList.add('hide');
+        document.querySelector('#address').classList.remove('hide');
+        document.querySelector('#location-cancel').classList.remove('hide');
+        document.querySelector('#location-update').classList.remove('hide');
+        document.querySelector('#location-update').disabled = true;
+        document.querySelector('#location-update').style.color = '#999999';
+        document.querySelector('#address').select();
+    }
+
+    function cancelLocation() {
+        document.querySelector('#location-edit').classList.remove('hide');
+        document.querySelector('#address').classList.add('hide');
+        document.querySelector('#location-cancel').classList.add('hide');
+        document.querySelector('#location-update').classList.add('hide');
+        document.querySelector('#location-update').style.color = '#006600';
+    }
+
+    async function updateLocation() {
+        const input = document.querySelector('#address');
+        const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+        const credentials = 'same-origin';
+        const url = `/ajax/reports/${reportId}/location`;
+        const values = JSON.stringify({ address: input.value });
+
+        const response = await fetch(url, { method: 'PUT', body: values, headers, credentials });
+
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            // ???? - should never happen!
+        }
+    }
+
+    function checkGeocoding() {
+        delay(async function() {
+            const input = document.querySelector('#address');
+            const credentials = 'same-origin';
+            const url = '/ajax/geocode';
+            const addr = encodeURI(input.value).replace(/%20/g, '+');
+
+            const response = await fetch(`${url}?address=${addr}`, { credentials });
+
+            switch (response.status) {
+                case 200:
+                    const body = await response.json();
+                    document.querySelector('#location-update').disabled = false;
+                    document.querySelector('#location-update').style.color = '#006600';
+                    document.querySelector('#location-update').title = body.formattedAddress;
+                    break;
+                case 404:
+                    document.querySelector('#location-update').disabled = true;
+                    document.querySelector('#location-update').style.color = '#999999';
+                    break;
+            }
+        }, 330);
+    }
+
+    const delay = (function() {
+        let timer = null;
+        return function(callback, ms) {
+            clearTimeout (timer);
+            timer = setTimeout(callback, ms);
+        };
+    })();
+}
+
+
 /**
  * Initialise Google map, and set up listeners for zoom & pan, and add new report markers as map is
  * zoomed / panned.
  *
  * @param {Object}   google - Google Map object returned by maps.googleapis.com/maps/api/js
  * @param {ObjectId} reportId - id of report being shown.
- * @param {string}   reporter - anonymous identifier name of reporter
+ * @param {string}   alias - anonymous identifier name of reporter
  * @param {number}   lat - latitude of incident
  * @param {number}   lon - longitude of incident
  * @param {string}   reportedOnDay - TODO: is this used?
- * @param {string}   reportedOnFull - date of incident submission, for icon title
  * @param {number}   highlight - opacity of marker, to indicate how long ago incident was reported
  */
-function initialiseMap(google, reportId, reporter, lat, lon, reportedOnDay, reportedOnFull, highlight) {
+function initialiseMap(google, reportId, alias, lat, lon, reportedOnDay, highlight) {
     // initialise array of reports markers with 'this' report
     const reports = {
-        [reportId]: { lat: lat, lng: lon, date: reportedOnDay, highlight: highlight, name: reporter },
+        [reportId]: { lat: lat, lng: lon, date: reportedOnDay, highlight: highlight, name: alias },
     };
 
     const mapStyles = [
@@ -273,13 +357,24 @@ function initialiseMap(google, reportId, reporter, lat, lon, reportedOnDay, repo
 
     // add marker for 'this' report
     map.greatestExtent = new google.maps.LatLngBounds(map.getCenter(), map.getCenter());
-    new google.maps.Marker({
-        position: { lat: lat, lng: lon },
-        icon:     `/map-marker/red/${highlight}`,
-        label:    reporter,
-        title:    reportedOnFull, // TODO: use info window for status, etc
-        url:      `/reports/${reportId}`,
-        map:      map,
+    const markerThis = new google.maps.Marker({
+        position:  { lat: lat, lng: lon },
+        icon:      `/map-marker/red/${highlight}`,
+        zIndex:    google.maps.Marker.MAX_ZINDEX+1, // ensure this report on top on top if superposed
+        draggable: true,
+        map:       map,
+    });
+    // and allow marker to be repositioned
+    markerThis.addListener('dragend', async function(evt) {
+        const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+        const credentials = 'same-origin';
+        const url = `/ajax/reports/${reportId}/latlon`;
+        const values = JSON.stringify({ lat: evt.latLng.lat(), lon: evt.latLng.lng() });
+
+        const response = await fetch(url, { method: 'PUT', body: values, headers, credentials });
+        if (!response.ok) alert('Location update failed');
+
+        map.panTo(new google.maps.LatLng(evt.latLng.lat(), evt.latLng.lng()));
     });
 
     // after zoom/pan, check for any new reports not currently displayed on the map
@@ -298,7 +393,9 @@ function initialiseMap(google, reportId, reporter, lat, lon, reportedOnDay, repo
             const headers = { Accept: 'application/json' };
             const credentials = 'same-origin';
             const url = `/ajax/reports/within/${sw.lat()},${sw.lng()}:${ne.lat()},${ne.lng()}`;
+
             const response = await fetch(url, { method: 'GET', headers, credentials });
+
             const body = await response.json();
             if (response.ok) {
                 for (const report of body.reports) {
@@ -307,11 +404,21 @@ function initialiseMap(google, reportId, reporter, lat, lon, reportedOnDay, repo
                         const marker = new google.maps.Marker({
                             position: { lat: report.lat, lng: report.lng },
                             icon:     '/map-marker/blue/'+report.highlight,
-                            title:    report.reported + ' ' + report.name + ' ' + report.summary, // TODO: use info window for status, etc?
-                            url:      '/reports/'+report._id+'/location',
+                            label:    { text: `${report.alias} ${report.reported}`, color: '#004466' },
+                            url:      '/reports/'+report._id,
                             map:      map,
                         });
-                        google.maps.event.addListener(marker, 'click', function() {
+                        let info = report.assignedTo ? 'Assigned to: '+report.assignedToName : 'Not assigned';
+                        if (report.status) info += `<div>Status: ${report.status}</div>`;
+                        if (report.tags.length > 0) info += `<div>Tags: ${report.tags.join('; ')}</div>`;
+                        const infowindow = new google.maps.InfoWindow({ content: info });
+                        marker.addListener('mouseover', function() {
+                            infowindow.open(map, marker);
+                        });
+                        marker.addListener('mouseout', function() {
+                            infowindow.close(map, marker);
+                        });
+                        marker.addListener('click', function() {
                             window.location.href = marker.url;
                         });
                     }

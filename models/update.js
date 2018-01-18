@@ -15,11 +15,18 @@ import Report from './report.js';
 /*
  * An update record records all updates made to incident reports.
  */
-const validator = { $and: [
-    { reportId: { $type: 'objectId', $exists: true } }, // report updated
-    { userId:   { $type: 'objectId', $exists: true } }, // user making update
-    { update:   { $type: 'object',   $exists: true } }, // update details as per update() update object
-] };
+/* eslint-disable no-unused-vars, key-spacing */
+const schema = {
+    type: 'object',
+    required: [ 'reportId', 'userId', 'update' ],
+    properties: {
+        reportId: { bsonType: 'objectId' }, // report updated
+        userId:   { bsonType: 'objectId' }, // user making update
+        update:   { bsonType: 'objectId' }, // update details as per update() update object
+    },
+};
+/* eslint-enable no-unused-vars, key-spacing */
+/* once we have MongoDB 3.6, we can use db.runCommand({ 'collMod': 'reports' , validator: { $jsonSchema: schema } }); */
 
 class Update {
 
@@ -158,7 +165,7 @@ class Update {
             u.description = Update.updateDescription(u.update, names);
         }
 
-        return upd;
+        return upd.sort((a, b) => a._id < b._id ? -1 : 1);
     }
 
 
@@ -235,8 +242,10 @@ class Update {
         switch (op) {
             case 'set':
                 switch (fld) {
-                    case 'assignedTo': description = `Set ${fld} to ${val?'@'+names.get(val.toString()):'<none>'}`; break;
-                    default:           description = `Set ${fld} to ‘${val}’`; break;
+                    case 'assignedTo':       description = `Set ${fld} to ${val?'@'+names.get(val.toString()):'<none>'}`; break;
+                    case 'location':         description = `Set ${fld} to ‘${val.address}’`; break;
+                    case 'analysis.weather': description = `Set ${fld} to ‘${val.city}, ${val.country}’`; break;
+                    default:                 description = `Set ${fld} to ‘${val}’`; break;
                 }
                 break;
             case 'addToSet': description = `Add ${fld.slice(0,-1)} ‘${val}’`; break;

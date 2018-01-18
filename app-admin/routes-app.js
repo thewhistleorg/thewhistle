@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Routes for main app (reports, messages, user-agents, notes).                    C.Veness 2017  */
+/* Routes for main app (reports, messages, user-agents, notes).               C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Router from 'koa-router'; // router middleware for koa
@@ -23,16 +23,16 @@ const router = new Router();
 
 import report from './report.js';
 
-router.get( '/report/:project',             report.getReportEntry);      // render incident report entry page
-router.post('/report/:project',             report.processReportEntry);  // process incident report entry
-router.get( '/report/:project/submit',      report.getReportSubmit);     // render incident report review+submit page
-router.post('/report/:project/submit',      report.processReportSubmit); // process incident report review+submit
-router.get( '/report/:project/:id/confirm', report.getReportConfirm);    // render incident report confirm page
+router.get( '/report/:project',               report.getReportEntry);      // render incident report entry page
+router.post('/report/:project',               report.processReportEntry);  // process incident report entry
+router.get( '/report/:project/submit',        report.getReportSubmit);     // render incident report review+submit page
+router.post('/report/:project/submit',        report.processReportSubmit); // process incident report review+submit
+router.get( '/report/:project/:id/confirm',   report.getReportConfirm);    // render incident report confirm page
 
 // ---- ajax routes
 
-router.get('/ajax/report/:db/names/new',     report.getGenerateNewName); // get newly generated name
-router.get('/ajax/report/:db/names/:name',   report.getName);            // check previously used name does exist
+router.get('/ajax/report/:db/aliases/new',    report.getNewAlias);         // get newly generated alias
+router.get('/ajax/report/:db/aliases/:alias', report.getAlias);            // get alias details (to check previously used alias does exist)
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -60,7 +60,9 @@ router.delete('/ajax/reports/:id/tags/:tag',         reports.ajaxReportDeleteTag
 router.post(  '/ajax/reports/:id/comments',          reports.ajaxReportPostComment);
 router.put(   '/ajax/reports/:id/comments/:comment', reports.ajaxReportPutComment);
 router.delete('/ajax/reports/:id/comments/:comment', reports.ajaxReportDeleteComment);
-router.get   ('/ajax/reports/:id/updates',           reports.ajaxReportGetUpdates);
+router.get(   '/ajax/reports/:id/updates',           reports.ajaxReportGetUpdates);
+router.put(   '/ajax/reports/:id/location',          reports.ajaxReportPutLocation);
+router.put(   '/ajax/reports/:id/latlon',            reports.ajaxReportPutLatLon);
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -183,6 +185,39 @@ router.get('/uploaded/:project/:date/:id/:file', async function getUploadedFile(
         // TODO: Last-Modified?
     } catch (e) {
         ctx.throw(e.statusCode, e.message);
+    }
+});
+
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/*  Geocode address                                                                               */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+import Ip       from '../lib/ip';
+import Geocoder from '../lib/geocode';
+
+/**
+ * Get geocode details for given address. Results are weighted to country of originating request,
+ * determined from IP address.
+ *
+ * This only returns the formattedAddress field, as otherwise it could be used as a free
+ * authenticated proxy for Google's geolocation service.
+ *
+ * Mirrors similar function in report app.
+ */
+router.get('/ajax/geocode', async function getGeocode(ctx) {
+    const region = ctx.request.query.region ? ctx.request.query.region : await Ip.getCountry(ctx.ip);
+    const geocoded = await Geocoder.geocode(ctx.request.query.address, region);
+
+    if (geocoded) {
+        // if region is specified, treat it as a requirement not just as bias as Google does
+        if (ctx.request.query.region && ctx.request.query.region.toUpperCase()!=geocoded.countryCode) { ctx.status = 404; return; }
+
+        ctx.body = { formattedAddress: geocoded.formattedAddress };
+        ctx.body.root = 'geocode';
+        ctx.status = 200; // Ok
+    } else {
+        ctx.status = 404; // Not Found
     }
 });
 

@@ -12,53 +12,67 @@
 
 import Report         from '../models/report.js';
 import autoIdentifier from '../lib/auto-identifier.js';
-import geocode        from '../lib/geocode.js';
-import ip             from '../lib/ip.js';
+import Geocoder       from '../lib/geocode.js';
+import Ip             from '../lib/ip.js';
 
 const handler = {};
 
 
 /**
- * Generate a random anonymous name.
+ * Generate a random anonymous alias.
  *
- * For efficiency, this doesn't check if the name is already in use (should be very small
+ * For efficiency, this doesn't check if the alias is already in use (should be very small
  * probability), but such check should be done when submitting report.
  */
-handler.getGenerateNewName = async function(ctx) {
-    let name = null;
+handler.getNewAlias = async function(ctx) {
+    let alias = null;
     do {
-        name = await autoIdentifier(12);
-    } while (name.length > 12); // avoid excessively long names
-    ctx.body = { name: name };
-    ctx.body.root = 'generateName';
+        alias = await autoIdentifier(12);
+    } while (alias.length > 12); // avoid excessively long aliases
+    ctx.body = { alias: alias };
+    ctx.body.root = 'generateAlias';
     ctx.status = 200; // Ok
-    ctx.set('Cache-Control', 'no-cache'); // stop IE caching generated names.
+    ctx.set('Cache-Control', 'no-cache'); // stop IE caching generated aliases.
 };
 
 
 /**
- * Get details of name - currently just used to check if name is available.
+ * Get details of alias - currently just used to check if alias is available.
  */
-handler.getName = async function(ctx) {
+handler.getAlias = async function(ctx) {
     const db = ctx.params.db;
-    const id = ctx.params.id.replace('+', ' ');
-    const reports = await Report.getBy(db, 'name', id);
+    const id = ctx.params.alias.replace('+', ' ');
+    const reports = await Report.getBy(db, 'alias', id);
     ctx.body = {};
-    ctx.body.root = 'name';
+    ctx.body.root = 'alias';
     ctx.status = reports.length==0 && ctx.params.id!='' ? 404 : 200; // Not Found / Ok
 };
 
 
 /**
- * Get geocode details for given address.
+ * Get geocode details for given address. Results are weighted to country of originating request,
+ * determined from IP address.
+ *
+ * This only returns the formattedAddress field, as otherwise it could be used as a free
+ * authenticated proxy for Google's geolocation service.
+ *
+ * Mirrors similar function in admin app.
  */
 handler.geocode = async function(ctx) {
-    const region = await ip.getCountry(ctx.ip);
-    const geocoded = await geocode(ctx.query.address, region);
+    const corsAllow = [ 'http://rapeisacrime.org', 'http://www.rapeisacrime.org', 'http://www.movable-type.co.uk' ];
+    const region = ctx.query.region ? ctx.query.region : await Ip.getCountry(ctx.ip);
+    const geocoded = await Geocoder.geocode(ctx.query.address, region);
 
     if (geocoded) {
-        ctx.body = geocoded;
+        ctx.body = { formattedAddress: geocoded.formattedAddress };
         ctx.body.root = 'geocode';
+        // if this is a CORS request, check it comes from acceptable source
+        if (corsAllow.includes(ctx.request.get('Origin'))) {
+            ctx.response.set('Vary', 'Origin');
+            ctx.response.set('Access-Control-Allow-Origin', ctx.request.get('Origin'));
+        }
+        // if region is specified, treat it as a requirement not just as bias as Google does (after CORS check!)
+        if (ctx.query.region && ctx.query.region.toUpperCase()!=geocoded.countryCode) { ctx.status = 404; return; }
         ctx.status = 200; // Ok
     } else {
         ctx.status = 404; // Not Found

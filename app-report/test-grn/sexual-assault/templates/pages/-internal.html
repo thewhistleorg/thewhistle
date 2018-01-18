@@ -1,7 +1,7 @@
 <form method="post" enctype="multipart/form-data" class="pure-form pure-form-aligned">
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
-    <div >
+    <div>
         <h1>Are you reporting on behalf of yourself or someone else?</h1>
         <ul>
             <li>
@@ -17,7 +17,7 @@
 
     <hr>
 
-    <div >
+    <div>
 
         <p class="special-intro">We understand that this can be difficult.<br>
             So please take your time and tell us what happened.</p>
@@ -100,7 +100,7 @@
 
     <hr>
 
-    <div >
+    <div>
         <script>
             'use strict';
             document.addEventListener('DOMContentLoaded', function () {
@@ -109,7 +109,7 @@
                     const fileInputs = document.querySelectorAll('input[type=file]');
                     const el = event.target;
                     // if we already have a 'no file chosen' input, don't clone another
-                    for (var i of fileInputs) if (i.files.length == 0) return;
+                    for (const i of fileInputs) if (i.files.length == 0) return;
                     // if same file has already been chosen, clear the filename & don't clone
                     const inputsWithThisName = [...fileInputs].filter(f => f.files[0].name == el.files[0].name)
                     if (inputsWithThisName.length > 1) { el.value = ''; return; }
@@ -152,7 +152,7 @@
 
     <hr>
 
-    <div >
+    <div>
         <h1>Where did it happen?</h1>
         <p class="hint-text">Please be as precise as you are able</p>
         <ul>
@@ -175,7 +175,7 @@
 
     <hr>
 
-    <div >
+    <div>
         <h1>Do you know who did it?</h1>
         <p class="hint-text">This could be one person or multiple people or a company or organisation.</p>
         <ul>
@@ -200,7 +200,7 @@
 
     <hr>
 
-    <div >
+    <div>
 
         <h1>Have you spoken to anybody about it?</h1>
 
@@ -235,7 +235,7 @@
 
     <hr>
 
-    <div >
+    <div>
         <h1>Have you used this anonymous reporting service before?</h1>
         <ul>
             {{#checked used-before}}
@@ -243,21 +243,21 @@
                 <input type="radio" name="used-before" id="used-before-y" value="y">
                 <label for="used-before-y" class="pure-radio greyed-out-unless-checked">Yes</label>
                 <br>
-                <label for="existing-name">Enter your anonymous name</label>
-                <input type="text" name="existing-name" id="existing-name" value="{{existing-name}}">
-                <span id="name-ok" title="name available" class="name-available hide">✓</span>
-                <span id="name-nok" title="name not available" class="name-available hide">✗</span>
+                <label for="existing-alias">Enter your anonymous alias</label>
+                <input type="text" name="existing-alias" id="existing-alias" value="{{existing-alias}}">
+                <span id="alias-ok" title="alias available" class="alias-available hide">✓</span>
+                <span id="alias-nok" title="alias not available" class="alias-available hide">✗</span>
             </li>
             <li>
                 <input type="radio" name="used-before" id="used-before-n" value="n" checked>
                 <label for="used-before-n" class="pure-radio greyed-out-unless-checked">No</label>
                 <br>
-                <p>We make sure that your report is anonymous by creating a random identification name.</p>
-                <p>If you want to follow up, use the anonymous name below so we can access any relevant information.</p>
+                <p>We make sure that your report is anonymous by creating a random identification alias.</p>
+                <p>If you want to follow up, use the anonymous alias below so we can access any relevant information.</p>
                 <div id="usegenerated">
-                    <p>This report will use <b><output name="generated-name">{{generated-name}}</output></b>
-                        <input type="hidden" name="generated-name" value="{{generated-name}}"></p>
-                    <button type="button" id="get-alt-name" class="inline-link">Generate another random name</button>
+                    <p>This report will use <b><output name="generated-alias">{{generated-alias}}</output></b>
+                        <input type="hidden" name="generated-alias" value="{{generated-alias}}"></p>
+                    <button type="button" id="get-alt-alias" class="inline-link">Generate another random alias</button>
                 </div>
             </li>
             {{/checked}}

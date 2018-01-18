@@ -82,7 +82,9 @@ global.db = {}; // initialise global.db to empty object on app startup
 app.use(async function(ctx, next) {
     if (!global.db.users) {
         try {
-            global.db.users = await MongoClient.connect(process.env.DB_USERS);
+            const connectionString = process.env.DB_USERS;
+            const client = await MongoClient.connect(connectionString);
+            global.db.users = client.db(client.s.options.dbName);
         } catch (e) {
             console.error('Mongo connection error', e.toString());
             process.exit(1);
@@ -120,7 +122,7 @@ app.use(async function composeSubapp(ctx) { // note no 'next' after composed sub
             if (process.env.SUBAPP) {
                 // eg for Heroku review apps where subdomain cannot be supplied, take subapp from env
                 const subapp = await import(`./app-${process.env.SUBAPP}/app-${process.env.SUBAPP}.js`);
-                await compose(subapp.middleware)(ctx); break;
+                await compose(subapp.default.middleware)(ctx); break;
             }
             if (ctx.state.subapp == 'localhost') { ctx.status = 403; break; } // avoid redirect loop
             // otherwise redirect to www static site (which should not be this app)

@@ -111,7 +111,7 @@ class UsersHandlers {
 
         if (!user) {
             // try getting user by username instead of id
-            [user] = await User.getBy('username', ctx.params.id);
+            [ user ] = await User.getBy('username', ctx.params.id);
         }
 
         if (!user) ctx.throw(404, 'User not found');

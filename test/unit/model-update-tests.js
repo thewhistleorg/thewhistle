@@ -36,7 +36,7 @@ describe('Update model', function() {
     it('creates dummy report', async function() {
         const submitted = { Date: new Date(), Description: 'a test report' };
         const ua = 'node-superagent/x.x.x';
-        reportId = await Report.insert(db, undefined, 'update test', submitted, 'test-project', undefined, undefined, ua);
+        reportId = await Report.insert(db, undefined, 'update test', submitted, 'test-project', undefined, ua);
         console.info('report id', reportId);
     });
 

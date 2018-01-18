@@ -17,17 +17,20 @@ class ReportMiddleware {
      * e.g. for report.thewhistle.org/test-cam/my-project, the env var will be DB_TEST_CAM.
      *
      * If no matching environment variable is found, this will throw a 404.
+     *
+     * qv lib/middleware.js.
      */
     static mongoConnect() {
         return async function(ctx, next) {
-            if (!global.db[ctx.params.database]) {
+            const db = ctx.params.database;
+            if (!global.db[db]) {
                 try {
-                    const dbEnvironmentVariable = 'DB_'+ctx.params.database.toUpperCase().replace('-', '_');
-                    const connectionString = process.env[dbEnvironmentVariable];
+                    const connectionString = process.env['DB_'+ctx.params.database.toUpperCase().replace('-', '_')];
                     if (connectionString == undefined) ctx.throw(404, `No configuration available for organisation ‘${ctx.params.database}’`);
-                    global.db[ctx.params.database] = await MongoClient.connect(connectionString);
+                    const client = await MongoClient.connect(connectionString);
+                    global.db[db] = client.db(client.s.options.dbName);
                 } catch (e) {
-                    ctx.throw(e);
+                    ctx.throw(e); // TODO: or redirect? (qv lib/middleware.js)
                 }
             }
             await next();

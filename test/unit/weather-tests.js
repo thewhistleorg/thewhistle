@@ -8,12 +8,11 @@ const expect = chai.expect;
 import weather from '../../lib/weather.js';
 
 describe('Weather data extraction tests', function() {
+    /* eslint no-unreachable: off */
     return; // TODO investigate why wunderground is returning 400 Bad Request
     this.timeout(4e3); // 4 sec
 
     const abuja = { lat: 9.06, lon: 7.49 };
-    const country = 'Nigeria';
-    const city = 'Abuja';
     const date = new Date(Date.UTC(2016, 3, 4));
 
     it('Check empty latitude', async function() {

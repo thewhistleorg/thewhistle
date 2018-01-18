@@ -1,8 +1,8 @@
 <form method="post" class="pure-form pure-form-aligned">
     {{> back}}
 
-    {{#if @koa.flash.name}}
-    <p class="error">{{@koa.flash.name}}</p>
+    {{#if @koa.flash.alias}}
+    <p class="error">{{@koa.flash.alias}}</p>
     {{/if}}
 
     <div class="pure-g pure-u">
@@ -15,9 +15,6 @@
         <h2>Files</h2>
         {{files}}
         {{/if}}
-
-        <h2>Geocoding</h2>
-        Formatted address: {{formattedAddress}}
 
         <hr>
 

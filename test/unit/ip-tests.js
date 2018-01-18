@@ -12,8 +12,17 @@ const test = it; // just an alias
 describe('IP caching', function() {
 
     describe('country', function() {
-        test('IP country cache starts empty', function() {
-            expect(global.ipsCountry.size).to.equal(0);
+
+        test('prep cache', async function() {
+            // if unit tests are run after integration tests, the app-report 'whatnext' tests will
+            // leave '::ffff:127.0.0.1' in the cache, so make the same call here in order that this
+            // unit test will return the same results whether or not integration tests have already
+            // been run
+            await ip.getCountry('::ffff:127.0.0.1');
+        });
+
+        test('IP country cache starts with just (ipv6) localhost', function() {
+            expect(global.ipsCountry.size).to.equal(1);
         });
         test('get IP country (from ipinfo.io)', async function() {
             const t0 = process.hrtime();
@@ -40,11 +49,11 @@ describe('IP caching', function() {
             expect(ipsCountry).to.be.null;
         });
         test('IP country cache has 3 entries', function() {
-            expect(global.ipsCountry.size).to.equal(3);
+            expect(global.ipsCountry.size).to.equal(4);
         });
     });
 
-    describe('domain', async function() {
+    describe('domain', function() {
         test('IP domain cache starts empty', function() {
             expect(global.ipsDomain.size).to.equal(0);
         });
@@ -72,7 +81,7 @@ describe('IP caching', function() {
             const ipsCountry = await ip.getDomain('not an ip address!');
             expect(ipsCountry).to.be.null;
         });
-        test('IP domain cache has 3 entries', async function() {
+        test('IP domain cache has 3 entries', function() {
             expect(global.ipsDomain.size).to.equal(3);
         });
     });

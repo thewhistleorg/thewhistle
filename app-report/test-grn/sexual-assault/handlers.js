@@ -97,7 +97,6 @@ class Handlers {
             if (isNaN(date.getTime())) {
                 ctx.flash = { validation: [ 'Invalid date' ] };
                 ctx.redirect(ctx.url); return;
-                console.log("THis is triggered")
             }
             if (date.getTime() > Date.now()) {
                 ctx.flash = { validation: [ 'Date is in the future' ] };

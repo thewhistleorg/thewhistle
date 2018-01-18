@@ -102,7 +102,6 @@ class ReportsHandlers {
                 location:         rpt.location,
                 name:             rpt.name,
                 comments:         rpt.comments,
-                _id:             rpt._id,
                 updatedOn:       lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
                 updatedOnPretty: lastUpdate.on ? prettyDate(lastUpdate.on.toDateString()) : '',
                 updatedAge:      lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
@@ -177,6 +176,7 @@ class ReportsHandlers {
         context.sort.asc = context.sort.asc=='-1' ? '+' : '-';
         await ctx.render('reports-list', context);
     }
+  }
 
     /**
      * GET /reports-map - Render reports search/map page.

@@ -91,7 +91,7 @@ class Handlers {
         // if date specified, verify it is valid (to back up client-side validation)
         if (body.when == 'date') {
             const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
-            const time = body.date.time ? body.date.time.split(':') : [ '00','00','00' ]
+            const time = body.date.time ? body.date.time.split(':') : [ '00','00','00' ];
             // const date = new Date(body.date.year, months.indexOf(body.date.month.toLowerCase()), body.date.day, body.date.hour, body.date.minute);
             const date = new Date(body.date.year, months.indexOf(body.date.month.toLowerCase()),body.date.day,time[0],time[1]);
             if (isNaN(date.getTime())) {
@@ -284,7 +284,7 @@ function prettifyReport(report) {
 
     // date gets allocated to either Date (if it's an actual date) or Happened for other options
     const d = report.date;
-    const time = d.time ? d.time.split(':') : [ '00','00','00' ]
+    const time = d.time ? d.time.split(':') : [ '00','00','00' ];
     switch (report.when) {
         case 'date':          rpt.Date = new Date(d.year, months.indexOf(d.month.toLowerCase()),d.day,time[0],time[1] ); break;
         case 'within':        rpt.Happened = report['within-options']; break;

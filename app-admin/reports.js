@@ -85,23 +85,7 @@ class ReportsHandlers {
                 const desc = rpt.submitted['Description'] || rpt.submitted['brief-description']; // TODO: transition code until all early test report are deleted
                 const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
                 const fields = {
-                    _id:              rpt._id,
-                    updatedOn:        lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
-                    updatedOnPretty:  lastUpdate.on ? prettyDate(lastUpdate.on.toDateString()) : '',
-                    updatedAge:       lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
-                    updatedAgo:       lastUpdate.on ? ago(lastUpdate.on) : '',
-                    updatedBy:        lastUpdate.by,
-                    assignedTo:       assignedTo ? assignedTo.username : '',
-                    status:           rpt.status || '', // ensure status is string
-                    summary:          rpt.summary || `<span title="submitted description">${desc}</span>`,
-                    submittedDesc:    truncate(desc,140)|| `<i title="submitted description" class="grey">No Description</i>`,
-                    tags:             rpt.tags,
-                    reportedOnPretty: prettyDate(rpt._id.getTimestamp()),
-                    reportedOnFull:   dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
-                    reportedBy:       rpt.by ? '@'+users.get(rpt.by.toString()).username : rpt.name,
-                    location:         rpt.location,
-                    name:             rpt.name,
-                    comments:         rpt.comments,
+                    _id:             rpt._id,
                     updatedOn:       lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
                     updatedOnPretty: lastUpdate.on ? prettyDate(lastUpdate.on.toDateString()) : '',
                     updatedAge:      lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
@@ -176,7 +160,7 @@ class ReportsHandlers {
             context.sort.asc = context.sort.asc=='-1' ? '+' : '-';
             await ctx.render('reports-list', context);
         }
-      }
+    }
 
     /**
      * GET /reports-map - Render reports search/map page.
@@ -825,7 +809,7 @@ class ReportsHandlers {
                 comment:  MarkdownIt().render(comment),
             };
         });
-        const referer = ctx.headers.referer? ctx.headers.referer : "/reports";
+        // const referer = ctx.headers.referer? ctx.headers.referer : "/reports";
         // audit trail
         const updates = await Update.getByReport(db, ctx.params.id);
 

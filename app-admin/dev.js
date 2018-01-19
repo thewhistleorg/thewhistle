@@ -332,13 +332,18 @@ class Dev {
             const month = dateFormat(submissions[s]._id.getTimestamp(), 'yyyy-mm');
             if (!counts[month]) counts[month] = {};
             const project = submissions[s].project;
-            if (!counts[month][project]) counts[month][project] = { pages: { index: { count: 0 } }, completionTimes: [] };
+            if (!counts[month][project]) counts[month][project] = { pages: { index: { count: 0 } }, completionTimes: [], completedReports: [] };
             counts[month][project].pages.index.count++;
             for (const p in submissions[s].progress) {
                 const page = p=='complete' ? p : 'p'+p; // use string to force insertion order for keys
                 if (!counts[month][project].pages[page]) counts[month][project].pages[page] = { count: 0 };
                 counts[month][project].pages[page].count++;
-                if (p=='complete') counts[month][project].completionTimes.push(submissions[s].progress[p] - submissions[s]._id.getTimestamp());
+                if (p=='complete') {
+                    // record time to complete report
+                    counts[month][project].completionTimes.push(submissions[s].progress[p] - submissions[s]._id.getTimestamp());
+                    // and report id (purely for testing)
+                    counts[month][project].completedReports.push(submissions[s].reportId.toString());
+                }
             }
         }
 

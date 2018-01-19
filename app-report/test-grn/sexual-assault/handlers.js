@@ -34,7 +34,9 @@ class Handlers {
         ctx.session.completed = 0; // number of pages completed; used to prevent users jumping ahead
 
         // record new submission has been started
-        ctx.session.submissionId = await Submission.insert(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
+        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0,15)=='node-superagent') {
+            ctx.session.submissionId = await Submission.insert(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
+        }
 
         await ctx.render('index');
     }
@@ -115,7 +117,9 @@ class Handlers {
         }
 
         // record submission progress
-        await Submission.progress(ctx.params.database, ctx.session.submissionId, page);
+        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0,15)=='node-superagent') {
+            await Submission.progress(ctx.params.database, ctx.session.submissionId, page);
+        }
 
         ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/`+(go<=nPages ? go : 'submit'));
     }
@@ -184,7 +188,9 @@ class Handlers {
         await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
 
         // record submission complete
-        await Submission.complete(ctx.params.database, ctx.session.submissionId, id);
+        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0,15)=='node-superagent') {
+            await Submission.complete(ctx.params.database, ctx.session.submissionId, id);
+        }
 
         // remove all session data (to prevent duplicate submission)
         ctx.session = {};

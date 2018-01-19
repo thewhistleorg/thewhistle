@@ -49,15 +49,18 @@
         {{#each this}}
         <td>
             <table>
-            {{#each this.pages}}
-            <tr>
-                <td>{{@key}}</td>
-                <td class="align-right"><div class="count-bar" style="width: {{width}}em">{{count}}</td>
-            </tr>
-            {{/each}}
-            <tr><td><i>min</i></td><td>{{this.times.min}}</td></tr>
-            <tr><td><i>max</i></td><td>{{this.times.max}}</td></tr>
-            <tr><td><i>avg</i></td><td>{{this.times.avg}}</td></tr>
+                {{#each this.pages}}
+                <tr>
+                    <td>{{@key}}</td>
+                    <td class="align-right"><div class="count-bar" style="width: {{width}}em">{{count}}</td>
+                </tr>
+                {{/each}}
+                <tr><td><i>min</i></td><td>{{this.times.min}}</td></tr>
+                <tr><td><i>max</i></td><td>{{this.times.max}}</td></tr>
+                <tr><td><i>avg</i></td><td>{{this.times.avg}}</td></tr>
+                <tr class="hide" id="completed-reports">
+                    <td colspan="2">{{#this.completedReports}}<span id="{{this}}">{{this}}</span>{{/this.completedReports}}</td>
+                </tr>
             </table>
         </td>
         {{/each}}

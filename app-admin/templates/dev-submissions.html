@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/admin.css">
     <style>
-        td, th { padding: 0.4em; }
+        p { max-width: 48em; }
+        td, th { padding: 2px; }
+        .count-bar { background: #cccccc; margin-left: auto; margin-right: 0; }
     </style>
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
     <script src="/js/admin/ga.js" async></script>
@@ -26,30 +28,43 @@
 
 <h1>Submissions</h1>
 
-<p>Currently this page simply lists submissions to illustrate what information is available.</p>
-<p>We need to decide what analytical reporting we want on incomplete submissions.</p>
+<p>During the reporting process, timestamps are recorded for opening the index page and for each
+    page submitted (also the browser ‘user agent’ is recorded).</p>
+<p>This page groups monthly totals for each <i>project</i>, with a funnel of counts of submissions
+    made for each page, and shows minimum, maximum, and average times from opening the index page to
+    submitting the completed report.</p>
+<p>In future, we may want to filter by date and/or by project, but this illustrates a possible
+    presentation.</p>
 
 <table>
+    {{#each months}}
     <tr>
-        <th></th>
-        {{#uasList}}
-        <th class="align-right">{{{this}}}</th>
-        {{/uasList}}
-    </tr>
-    {{#submissions}}
-    <tr id="{{id}}">
-        <td>{{date}} {{project}} {{ua}}</td>
+        <td>{{@key}}</td>
+        {{#each this}}
+        <td>{{@key}}</td>
+        {{/each}}
     </tr>
     <tr>
-        <td style="padding-left: 2em">
-            {{#each progress}}<b>{{@key}}</b>:&nbsp;{{this}} {{/each}}
-            {{#if reportId}}
-            <a href="/reports/{{reportId}}" class="fa fa-external-link"></a>
-            {{/if}}
+        <td></td>
+        {{#each this}}
+        <td>
+            <table>
+            {{#each this.pages}}
+            <tr>
+                <td>{{@key}}</td>
+                <td class="align-right"><div class="count-bar" style="width: {{width}}em">{{count}}</td>
+            </tr>
+            {{/each}}
+            <tr><td><i>min</i></td><td>{{this.times.min}}</td></tr>
+            <tr><td><i>max</i></td><td>{{this.times.max}}</td></tr>
+            <tr><td><i>avg</i></td><td>{{this.times.avg}}</td></tr>
+            </table>
         </td>
+        {{/each}}
     </tr>
-    {{/submissions}}
+    {{/each}}
 </table>
+
 </main>
 
 </body>

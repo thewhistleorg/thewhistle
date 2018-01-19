@@ -410,12 +410,13 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(ths[7].nextSibling.textContent).to.equal('testy terrain');
         });
 
-        it('sees report in submissions page', async function() {
-            const response = await request.get('/dev/submissions');
-            expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.querySelector(`a[href="/reports/${reportId}"]`)).to.not.be.null;
-        });
+        // TODO: need to consider how to implement this test
+        // it('sees report in submissions page', async function() {
+        //     const response = await request.get('/dev/submissions');
+        //     expect(response.status).to.equal(200);
+        //     const document = new jsdom.JSDOM(response.text).window.document;
+        //     expect(document.querySelector(`a[href="/reports/${reportId}"]`)).to.not.be.null;
+        // });
 
         it('deletes submitted incident report', async function() {
             const response = await request.host('admin.localhost').post(`/reports/${reportId}/delete`).send();

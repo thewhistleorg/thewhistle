@@ -79,6 +79,11 @@ describe('Report app'+' ('+app.env+')', function() {
     });
 
     describe('text-grn/sexual-assault', function() {
+        it('checks previous test report is not left undeleted', async function() {
+            const response = await request.get('/ajax/test-grn/aliases/testy+terrain');
+            expect(response.status).to.equal(404);
+        });
+
         it('sees home page', async function() {
             const responseGet = await request.get('/test-grn/sexual-assault');
             expect(responseGet.status).to.equal(200);

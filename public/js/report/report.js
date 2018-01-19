@@ -34,17 +34,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     case 'date':
                         document.querySelector('select[name="date.day"]').focus();
                         // document.querySelector('select[name="date.day"]').select();
+                        this.parentElement.parentElement.querySelector('.when-form').style.display = document.querySelector('#when-date').checked ? 'block' : 'none';
                         break;
                     case 'within':
                         document.querySelector('select[name="within-options"]').focus();
+                        this.parentElement.parentElement.querySelector('.when-form').style.display='none';
+                        break;
+                    case 'dont-remember':
+                        this.parentElement.parentElement.querySelector('.when-form').style.display='none';
                         break;
                 }
             });
         });
 
-        document.querySelector('#when-date').addEventListener('change', function() {
-         this.parentElement.querySelector(".when-form").style.display="block";
-        });
+        if (document.querySelector('#when-date').checked == true) {
+            document.querySelector('input[name=when]').parentElement.querySelector('.when-form').style.display='block';
+        }
 
         // check when-today if any today fields receive focus
         document.querySelectorAll('input[name^=today]').forEach(function(input) {
@@ -177,12 +182,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Show who-y-form when selected
         document.querySelector('#who-y').addEventListener('change', function() {
-         this.parentElement.querySelector("#who-y-form").style.display="block";
+            this.parentElement.querySelector('#who-y-form').style.display='block';
         });
 
         // Show who-n-form when selected
         document.querySelector('#who-n').addEventListener('change', function() {
-         this.parentElement.querySelector("#who-n-form").style.display="block";
+            this.parentElement.querySelector('#who-n-form').style.display='block';
         });
 
 

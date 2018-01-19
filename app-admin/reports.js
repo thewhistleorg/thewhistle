@@ -69,114 +69,114 @@ class ReportsHandlers {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
             if (Object.keys(rpt.geocode).length > 0) {
                 rpt.location = findBestLocnBelow(lowestCommonLevel, rpt);
-            const lastViewed = rpt.views[ctx.state.user.id];
+                const lastViewed = rpt.views[ctx.state.user.id];
 
-            if (rpt.location.geocode && Object.keys(rpt.location.geocode).length > 0) {
-                rpt.locn = findBestLocnBelow(lowestCommonLevel, rpt);
-            } else {
-                rpt.locn = '—';
+                if (rpt.location.geocode && Object.keys(rpt.location.geocode).length > 0) {
+                    rpt.locn = findBestLocnBelow(lowestCommonLevel, rpt);
+                } else {
+                    rpt.locn = '—';
+                }
+                for (let t=0; t<rpt.tags.length; t++) { // style tags in cartouches
+                    rpt.tags.splice(t, 1, `<span class="tag" title="filter by tag=‘${rpt.tags[t]}’">${rpt.tags[t]}</span>`);
+                }
+                if (rpt.tags.length > 2) { // limit displayed tags to 2
+                    rpt.tags.splice(2, rpt.tags.length, `<span class="nowrap">+${rpt.tags.length-2} more...</span>`);
+                }
+                const desc = rpt.submitted['Description'] || rpt.submitted['brief-description']; // TODO: transition code until all early test report are deleted
+                const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
+                const fields = {
+                    _id:              rpt._id,
+                    updatedOn:        lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
+                    updatedOnPretty:  lastUpdate.on ? prettyDate(lastUpdate.on.toDateString()) : '',
+                    updatedAge:       lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
+                    updatedAgo:       lastUpdate.on ? ago(lastUpdate.on) : '',
+                    updatedBy:        lastUpdate.by,
+                    assignedTo:       assignedTo ? assignedTo.username : '',
+                    status:           rpt.status || '', // ensure status is string
+                    summary:          rpt.summary || `<span title="submitted description">${desc}</span>`,
+                    submittedDesc:    truncate(desc,140)|| `<i title="submitted description" class="grey">No Description</i>`,
+                    tags:             rpt.tags,
+                    reportedOnPretty: prettyDate(rpt._id.getTimestamp()),
+                    reportedOnFull:   dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
+                    reportedBy:       rpt.by ? '@'+users.get(rpt.by.toString()).username : rpt.name,
+                    location:         rpt.location,
+                    name:             rpt.name,
+                    comments:         rpt.comments,
+                    updatedOn:       lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
+                    updatedOnPretty: lastUpdate.on ? prettyDate(lastUpdate.on.toDateString()) : '',
+                    updatedAge:      lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
+                    updatedAgo:      lastUpdate.on ? 'Updated ' + ago(lastUpdate.on) : '',
+                    viewed:          !!lastViewed,
+                    updatedBy:       lastUpdate.by,
+                    assignedTo:      assignedTo ? '@'+assignedTo.username : `<i class="pale-grey">Not assigned</i>`, // eslint-disable-line quotes
+                    status:          rpt.status ||  `<i class="pale-grey">None</i>`,                                 // eslint-disable-line quotes
+                    summary:         rpt.summary || `<span title="submitted description">${desc}</span>`,
+                    submittedDesc:   truncate(desc,140)|| `<i title="submitted description" class="pale-grey">No Description</i>`, // eslint-disable-line quotes
+                    tags:            rpt.tags,
+                    reportedOnDay:   prettyDate(rpt._id.getTimestamp()),
+                    reportedOnFull:  dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
+                    reportedBy:      rpt.by ? 'by @'+users.get(rpt.by.toString()).username : '',
+                    locn:            rpt.locn,
+                    alias:           rpt.alias,
+                    comments:        rpt.comments,
+                };
+                reports.push(fields);
             }
-            for (let t=0; t<rpt.tags.length; t++) { // style tags in cartouches
-                rpt.tags.splice(t, 1, `<span class="tag" title="filter by tag=‘${rpt.tags[t]}’">${rpt.tags[t]}</span>`);
-            }
-            if (rpt.tags.length > 2) { // limit displayed tags to 2
-                rpt.tags.splice(2, rpt.tags.length, `<span class="nowrap">+${rpt.tags.length-2} more...</span>`);
-            }
-            const desc = rpt.submitted['Description'] || rpt.submitted['brief-description']; // TODO: transition code until all early test report are deleted
-            const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
-            const fields = {
-                _id:              rpt._id,
-                updatedOn:        lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
-                updatedOnPretty:  lastUpdate.on ? prettyDate(lastUpdate.on.toDateString()) : '',
-                updatedAge:       lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
-                updatedAgo:       lastUpdate.on ? ago(lastUpdate.on) : '',
-                updatedBy:        lastUpdate.by,
-                assignedTo:       assignedTo ? assignedTo.username : '',
-                status:           rpt.status || '', // ensure status is string
-                summary:          rpt.summary || `<span title="submitted description">${desc}</span>`,
-                submittedDesc:    truncate(desc,140)|| `<i title="submitted description" class="grey">No Description</i>`,
-                tags:             rpt.tags,
-                reportedOnPretty: prettyDate(rpt._id.getTimestamp()),
-                reportedOnFull:   dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
-                reportedBy:       rpt.by ? '@'+users.get(rpt.by.toString()).username : rpt.name,
-                location:         rpt.location,
-                name:             rpt.name,
-                comments:         rpt.comments,
-                updatedOn:       lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
-                updatedOnPretty: lastUpdate.on ? prettyDate(lastUpdate.on.toDateString()) : '',
-                updatedAge:      lastUpdate.on ? new Date() - new Date(lastUpdate.on).valueOf() : 0, // for sorting
-                updatedAgo:      lastUpdate.on ? 'Updated ' + ago(lastUpdate.on) : '',
-                viewed:          !!lastViewed,
-                updatedBy:       lastUpdate.by,
-                assignedTo:      assignedTo ? '@'+assignedTo.username : `<i class="pale-grey">Not assigned</i>`, // eslint-disable-line quotes
-                status:          rpt.status ||  `<i class="pale-grey">None</i>`,                                 // eslint-disable-line quotes
-                summary:         rpt.summary || `<span title="submitted description">${desc}</span>`,
-                submittedDesc:   truncate(desc,140)|| `<i title="submitted description" class="pale-grey">No Description</i>`, // eslint-disable-line quotes
-                tags:            rpt.tags,
-                reportedOnDay:   prettyDate(rpt._id.getTimestamp()),
-                reportedOnFull:  dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
-                reportedBy:      rpt.by ? 'by @'+users.get(rpt.by.toString()).username : '',
-                locn:            rpt.locn,
-                alias:           rpt.alias,
-                comments:        rpt.comments,
+
+            // set sort field & order; if field is appended with '-', normal order is reversed
+            const sort = {
+                column: ctx.request.query.sort ? ctx.request.query.sort.replace('-', '') : '',
+                field:  '',
+                asc:    null,
             };
-            reports.push(fields);
+            switch (sort.column) {
+                case 'updated':   sort.field = 'updatedAge'; sort.asc = -1; break;
+                case 'assigned':  sort.field = 'assignedTo'; sort.asc = -1; break;
+                case 'status':    sort.field = 'status';     sort.asc = -1; break;
+                case 'summary':   sort.field = 'summary';    sort.asc = -1; break;
+                case 'submitted': sort.field = '_id';        sort.asc =  1; break;
+                case 'from':      sort.field = 'alias';       sort.asc = -1; break;
+                default:          sort.field = 'updatedAge'; sort.asc = -1; sort.column = 'updated'; break;
+            }
+            sort.asc = ctx.request.query.sort && ctx.request.query.sort.slice(-1)=='-' ? -sort.asc : sort.asc;
+            reports.sort((a, b) => {
+                // if field to be sorted on is string, use lower case to sort
+                const aVal = typeof a[sort.field] == 'string' ? a[sort.field].toLowerCase() : a[sort.field];
+                const bVal = typeof b[sort.field] == 'string' ? b[sort.field].toLowerCase() : b[sort.field];
+                // if sort fields are distinct, return ±1 as appropriate
+                if (aVal < bVal) return sort.asc;
+                if (aVal > bVal) return -sort.asc;
+                // if sort fields are equal, sort by id (ie temporally, most recent first)
+                return a._id < b._id ? 1 : -1;
+            });
+
+            // ---- filter lists
+
+            const filterLists = await ReportsHandlers.buildFilterLists(db, ctx);
+
+            // show number of reports in results
+            const count = reports.length == 0
+                ? 'No reports matching specified search'
+                : reports.length == 1 ? '1 report' : reports.length+' reports';
+
+            const context = {
+                reports:     reports,
+                filterLists: filterLists,
+                oldest:      oldest,            // to check for change
+                latest:      latest,            // to check for change
+                title:       title,             // page title indicating filtering
+                exportCsv:   ctx.request.href.replace('/reports', '/reports/export-csv'),
+                exportPdf:   ctx.request.href.replace('/reports', '/reports/export-pdf'),
+                current:     ctx.request.query, // current filter
+                sort:        sort,
+                count:       count,
+            };
+            context.current.from = context.current.from || oldest;
+            context.current.to = context.current.to || latest;
+            context.sort.asc = context.sort.asc=='-1' ? '+' : '-';
+            await ctx.render('reports-list', context);
         }
-
-        // set sort field & order; if field is appended with '-', normal order is reversed
-        const sort = {
-            column: ctx.request.query.sort ? ctx.request.query.sort.replace('-', '') : '',
-            field:  '',
-            asc:    null,
-        };
-        switch (sort.column) {
-            case 'updated':   sort.field = 'updatedAge'; sort.asc = -1; break;
-            case 'assigned':  sort.field = 'assignedTo'; sort.asc = -1; break;
-            case 'status':    sort.field = 'status';     sort.asc = -1; break;
-            case 'summary':   sort.field = 'summary';    sort.asc = -1; break;
-            case 'submitted': sort.field = '_id';        sort.asc =  1; break;
-            case 'from':      sort.field = 'alias';       sort.asc = -1; break;
-            default:          sort.field = 'updatedAge'; sort.asc = -1; sort.column = 'updated'; break;
-        }
-        sort.asc = ctx.request.query.sort && ctx.request.query.sort.slice(-1)=='-' ? -sort.asc : sort.asc;
-        reports.sort((a, b) => {
-            // if field to be sorted on is string, use lower case to sort
-            const aVal = typeof a[sort.field] == 'string' ? a[sort.field].toLowerCase() : a[sort.field];
-            const bVal = typeof b[sort.field] == 'string' ? b[sort.field].toLowerCase() : b[sort.field];
-            // if sort fields are distinct, return ±1 as appropriate
-            if (aVal < bVal) return sort.asc;
-            if (aVal > bVal) return -sort.asc;
-            // if sort fields are equal, sort by id (ie temporally, most recent first)
-            return a._id < b._id ? 1 : -1;
-        });
-
-        // ---- filter lists
-
-        const filterLists = await ReportsHandlers.buildFilterLists(db, ctx);
-
-        // show number of reports in results
-        const count = reports.length == 0
-            ? 'No reports matching specified search'
-            : reports.length == 1 ? '1 report' : reports.length+' reports';
-
-        const context = {
-            reports:     reports,
-            filterLists: filterLists,
-            oldest:      oldest,            // to check for change
-            latest:      latest,            // to check for change
-            title:       title,             // page title indicating filtering
-            exportCsv:   ctx.request.href.replace('/reports', '/reports/export-csv'),
-            exportPdf:   ctx.request.href.replace('/reports', '/reports/export-pdf'),
-            current:     ctx.request.query, // current filter
-            sort:        sort,
-            count:       count,
-        };
-        context.current.from = context.current.from || oldest;
-        context.current.to = context.current.to || latest;
-        context.sort.asc = context.sort.asc=='-1' ? '+' : '-';
-        await ctx.render('reports-list', context);
-    }
-  }
+      }
 
     /**
      * GET /reports-map - Render reports search/map page.

@@ -10,7 +10,7 @@
     <!-- <h2>To begin with, when did it happen?</h2> -->
 
     <ul>
-      {{#checked when-x}}
+      {{#checked when}}
       <li>
         <input type="radio" name="when" id="when-date" value="date">
         <label for="when-date" class="pure-radio">I remember exactly when it happened</label>
@@ -22,15 +22,12 @@
               <td>MMM</td>
               <td>YYYY</td>
             </tr>
-            <!-- <tr>
-              <td><input type="number" name="date.day" id="date.day" value="{{date.day}}" list="days" class="w4" min="1" max="31"></td>
-              <td><input type="text" name="date.month" id="date.month" value="{{date.month}}" list="months" class="w5" maxlength="3"></td>
-              <td><input type="number" name="date.year" id="date.year" value="{{date.year}}" list="years" class="w5" min="{{lastyear}}" max="{{thisyear}}"></td>
-            </tr> -->
 
             <tr>
               <td>
+
                 <select name="date.day" id="date.day" value="{{date.day}}" list="days" class="w4" min="1" max="31">
+                  {{#selected date.day}}
                    <option value="1">01</option>
                    <option value="2">02</option>
                    <option value="3">03</option>
@@ -62,10 +59,12 @@
                    <option value="29">29</option>
                    <option value="30">30</option>
                    <option value="31">31</option>
+                   {{/selected}}
                 <select>
               </td>
               <td>
                 <select name="date.month" id="date.month" value="{{date.month}}" list="months" class="w5" maxlength="3">
+                {{#selected date.month}}
                  <option value="Jan">Jan</option>
                  <option value="Feb">Feb</option>
                  <option value="Mar">Mar</option>
@@ -78,14 +77,17 @@
                  <option value="Oct">Oct</option>
                  <option value="Nov">Nov</option>
                  <option value="Dec">Dec</option>
+                {{/selected}}
                 </select>
               </td>
               <td>
                 <select name="date.year" id="date.year" value="{{date.year}}" list="years" class="w5" min="{{lastyear}}" max="{{thisyear}}">
+                  {{#selected date.year}}
                   <option value="2009">2009</option><option value="2010">2010</option><option value="2011">2011</option>
                   <option value="2012">2012</option><option value="2013">2013</option><option value="2014">2014</option>
                   <option value="2015">2015</option><option value="2016">2016</option><option value="2017">2017</option>
                   <option value="2018">2018</option>
+                  {{/selected}}
                 </select>
               </td>
             </tr>

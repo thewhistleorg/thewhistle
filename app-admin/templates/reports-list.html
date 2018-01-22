@@ -51,11 +51,12 @@
                 div.style.display = 'block';
             }
             const sortIndicator = document.querySelector('th[data-sort={{sort.column}}] .fa');
-            sortIndicator.style.color = '#000000';
-            sortIndicator.parentElement.style.backgroundColor = '#e8f2f7';
-            sortIndicator.classList.remove('fa-sort');
-            sortIndicator.classList.add('{{sort.asc}}'=='+' ? 'fa-sort-asc' : 'fa-sort-desc');
-
+            if (!document.querySelector('th[data-sort={{sort.column}}] .fa')) {
+                sortIndicator.style.color = '#000000';
+                sortIndicator.parentElement.style.backgroundColor = '#e8f2f7';
+                sortIndicator.classList.remove('fa-sort');
+                sortIndicator.classList.add('{{sort.asc}}'=='+' ? 'fa-sort-asc' : 'fa-sort-desc');
+            }
             // keep updated-ago current every 10 secs
             function updateAgo() {
                 document.querySelectorAll('td[data-ago]').forEach(td => {

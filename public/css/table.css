@@ -9,8 +9,8 @@
 }
 
 table.custom-table {
-    border-color: #f0f3f4;
-    background: #ffffff;
+  border-color: #f0f3f4;
+  background: #ffffff;
 }
 
 table.custom-table td, table.custom-table th {
@@ -53,22 +53,22 @@ td.action {
 }
 
 td.action a {
-    font-size: 1.4em;
-    padding: 5px;
+  font-size: 1.4em;
+  padding: 5px;
 }
 
 th[data-sort] {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 th[data-sort]:hover {
-    background: #f6f7f9;
+  background: #f6f7f9;
 }
 
 /* tweak margin */
 
 .custom-table.margin-tweak {
-    margin-top: 3px;
+  margin-top: 3px;
 }
 
 /* New reports row */

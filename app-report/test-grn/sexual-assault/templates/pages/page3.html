@@ -2,7 +2,7 @@
     {{> back}}{{> step}}
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
-    <div>
+    <div  class="margin-top-3">
         <script>
             'use strict';
             document.addEventListener('DOMContentLoaded', function () {
@@ -45,10 +45,9 @@
                         if you wish to submit them</span>
                     {{/if}}
                 </label>
-            </li>
-            <li>
                 <input type="file" name="documents" value="0" id="document0" class="upload-file">
             </li>
+
         </ul>
         {{> continue}}
     </div>

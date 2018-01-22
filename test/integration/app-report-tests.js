@@ -128,7 +128,8 @@ describe('Report app'+' ('+app.env+')', function() {
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[1].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(11);
+            expect(document.querySelectorAll('input')).to.have.lengthOf(5);
+            expect(document.querySelectorAll('select')).to.have.lengthOf(5);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
 
             const values = {
@@ -167,7 +168,7 @@ describe('Report app'+' ('+app.env+')', function() {
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[3].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(4);
+            expect(document.querySelectorAll('input')).to.have.lengthOf(3);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
 
             const values = {
@@ -211,7 +212,7 @@ describe('Report app'+' ('+app.env+')', function() {
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[3].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(4);
+            expect(document.querySelectorAll('input')).to.have.lengthOf(3);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
 
             const values = {

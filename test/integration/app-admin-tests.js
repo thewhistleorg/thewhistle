@@ -18,7 +18,7 @@ import fs         from 'fs';         // nodejs.org/api/fs.html
 const expect   = chai.expect;
 const ObjectId = MongoDB.ObjectId;
 
-import app from '../../app.js';
+import app      from '../../app.js';
 
 const testuser = process.env.TESTUSER; // note testuser must have access to test-grn only
 const testpass = process.env.TESTPASS; // (for successful login & sexual-assault report submission)
@@ -190,6 +190,59 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(document.querySelectorAll('header nav > ul > li').length).to.equal(8);
             // 'Submit' menu should have 'test-grn/sexual-assault (internal)' entry
             expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('test-grn/sexual-assault (internal)');
+        });
+    });
+
+    describe('report self/other questions', function() {
+        let questionId = null;
+
+        it('adds question', async function() {
+            const values = {
+                question: '1a',
+                self:     'A question I’m answering for myself',
+                other:    'A question I’m answering for someone else',
+            };
+            const response = await request.post('/ajax/questions/sexual-assault').send(values);
+            expect(response.status).to.equal(201);
+            questionId = response.headers['x-insert-id'];
+        });
+
+        it('sees question in questions page', async function() {
+            const response = await request.get('/questions/sexual-assault');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.getElementById(questionId)).to.not.be.null;
+            expect(document.getElementById(questionId).querySelector('td').textContent).to.equal('1a');
+        });
+
+        it('updates question', async function() {
+            const values = {
+                question: '2b',
+                self:     'A question I’m answering for myself',
+                other:    'A question I’m answering for someone else',
+            };
+            const response = await request.put(`/ajax/questions/${questionId}`).send(values);
+            expect(response.status).to.equal(200);
+        });
+
+        it('sees updated question', async function() {
+            const response = await request.get('/questions/sexual-assault');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.getElementById(questionId)).to.not.be.null;
+            expect(document.getElementById(questionId).querySelector('td').textContent).to.equal('2b');
+        });
+
+        it('deletes question', async function() {
+            const response = await request.delete(`/ajax/questions/${questionId}`);
+            expect(response.status).to.equal(200);
+        });
+
+        it('no longer sees question in questions page', async function() {
+            const response = await request.get('/questions/sexual-assault');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.getElementById(questionId)).to.be.null;
         });
     });
 

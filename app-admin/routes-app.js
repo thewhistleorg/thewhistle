@@ -164,6 +164,18 @@ router.post('/resources/:id/delete', resources.processDelete); // process delete
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/*  Questions routes (for parameterised report questions)                                         */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+import questions from './questions.js';
+
+router.get(   '/questions/:project',      questions.list);       // render questions for given project
+router.post(  '/ajax/questions/:project', questions.ajaxPost);   // add new question
+router.put(   '/ajax/questions/:id',      questions.ajaxPut);    // update question
+router.delete('/ajax/questions/:id',      questions.ajaxDelete); // delete question
+
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /*  Uploaded files routes                                                                         */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 

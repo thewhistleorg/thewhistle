@@ -9,6 +9,7 @@ import geodesy    from 'geodesy';    // library of geodesy functions
 const LatLon = geodesy.LatLonSpherical;
 
 import Report    from '../../../models/report.js';
+import Question  from '../../../models/question.js';
 import Resource  from '../../../models/resource.js';
 import UserAgent from '../../../models/user-agent.js';
 
@@ -44,12 +45,17 @@ class Handlers {
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num); // note '+' is allowed on windows, '*' is not
         if (page > ctx.session.completed+1) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); return; }
 
+        // supply any required self/other parameterised questions
+        const questions = await Question.get(ctx.params.database, ctx.params.project);
+        const q = {};
+        questions.forEach(qn => q[qn.questionNo] = ctx.session.report['on-behalf-of']=='someone-else' ? qn.other : qn.self );
+
         // progress indicator
         const pages = Array(nPages).fill(null).map((p, i) => ({ page: i+1 }));
         pages[page-1].class = 'current'; // to highlight current page
 
         const validYears = { thisyear: dateFormat('yyyy'), lastyear: dateFormat('yyyy')-1 }; // limit report to current or last year
-        const context = Object.assign({ pages: pages }, ctx.session.report, validYears);
+        const context = Object.assign({ pages: pages }, ctx.session.report, validYears, { q: q });
 
         await ctx.render('page'+page, context);
     }

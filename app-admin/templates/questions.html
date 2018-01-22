@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Report Questions | The Whistle</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        td[contenteditable] { background-color: #e2e7e9; }
+        table { border-collapse: separate; border-spacing: 0.4em; padding: 0.2em; }
+        td.q { min-width: 2em; }
+        td.self, td.other { min-width: 12em; }
+        td[contenteditable].edit { background-color: #d3dbde; }
+        p { max-width: 48em; }
+    </style>
+    <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
+    <script src="/js/admin/ga.js" async></script>
+    <script>
+        'use strict';
+
+        const project = '{{project}}';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            let oldContent = null;
+            console.log('DOMContentLoaded');
+
+            // focus to empty question number
+            [...document.querySelectorAll('td[contenteditable].q')].filter(el => el.textContent=='')[0].focus();
+
+            // record current value on moving to new field
+            document.querySelectorAll('td[contenteditable').forEach(el => el.onfocus = async function() {
+                oldContent = this.textContent;
+            });
+
+            // add new question
+            document.querySelectorAll('tr:not([id]) td[contenteditable]').forEach(el => el.onblur = async function() {
+                if (this.textContent == oldContent) return; // just passing through!
+
+                // clear success indicator
+                document.querySelectorAll('.saved').forEach(td => td.classList.add('hide'));
+
+                const tr = this.parentElement;
+                const question = tr.querySelector('.q').textContent.trim();
+                const self = tr.querySelector('.self').textContent.trim();
+                const other = tr.querySelector('.other').textContent.trim();
+                console.log('add', question, self, other)
+
+                // once question, self, & other fields completed, save it
+                if (question.length>0 && self.length>0 && other.length>0) {
+                    const url = `/ajax/questions/${project}`;
+                    const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+                    const credentials = 'same-origin';
+                    const values = JSON.stringify({ question, self, other });
+
+                    const response = await fetch(url, { method: 'POST', body: values, headers, credentials });
+
+                    if (response.ok) {
+                        window.location.reload(true); // simplest way to refresh & start new question
+                    } else {
+                        alert((await response.json()).message);
+                    }
+                }
+            });
+
+            // update/delete existing question
+            document.querySelectorAll('tr[id] td[contenteditable]').forEach(el => el.onblur = async function() {
+                if (this.textContent == oldContent) return; // just passing through!
+
+                // clear success indicator
+                document.querySelectorAll('.saved').forEach(td => td.classList.add('hide'));
+
+                const tr = this.parentElement;
+                const id = tr.id;
+                const question = tr.querySelector('.q').textContent.trim();
+                const self = tr.querySelector('.self').textContent.trim();
+                const other = tr.querySelector('.other').textContent.trim();
+                const url = `/ajax/questions/${id}`;
+                const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+                const credentials = 'same-origin';
+
+                // if we have question, self, & other, update the question
+                if (question.length>0 && self.length>0 && other.length>0) {
+                    tr.querySelectorAll('td[contenteditable]').forEach(td => td.classList.remove('edit')); // indicate edit complete
+
+                    const values = JSON.stringify({ question, self, other });
+                    console.log('update', id, values)
+
+                    const response = await fetch(url, { method: 'PUT', body: values, headers, credentials });
+
+                    if (response.ok) {
+                        tr.querySelector('.saved').classList.remove('hide'); // indicate success
+                    } else {
+                        alert((await response.json()).message);
+                    }
+                }
+
+                // if all of question, self, & other are cleared, delete the questions
+                if (question.length==0 && self.length==0 && other.length==0) {
+                    console.log('delete', id)
+
+                    const response = await fetch(url, { method: 'DELETE', headers, credentials });
+
+                    if (response.ok) {
+                        window.location.reload(true); // simplest way to refresh & start new question
+                    } else {
+                        alert((await response.json()).message);
+                    }
+                }
+            });
+
+            document.querySelectorAll('td[contenteditable').forEach(el => el.oninput = async function() {
+                console.log('oninput')
+                // clear success indicator on any input received
+                document.querySelectorAll('.saved').forEach(td => td.classList.add('hide'));
+                // indicate current question being edited
+                console.log(this.parentElement.querySelectorAll('td[contenteditable]'))
+                this.parentElement.querySelectorAll('td[contenteditable]').forEach(td => td.classList.add('edit'));
+            });
+        });
+    </script>
+</head>
+<body>
+
+<header>
+
+{{>navpartial}}
+
+</header>
+
+<main>
+
+<h1>Report Questions</h1>
+
+{{>errpartial}}
+
+<table>
+    <tr>
+        <th>Question</th>
+        <th>Self</th>
+        <th>Other</th>
+        <th></th>
+    </tr>
+    {{#questions}}
+    <tr id="{{_id}}">
+        <td contenteditable="true" class="q">{{questionNo}}</td>
+        <td contenteditable="true" class="self">{{self}}</td>
+        <td contenteditable="true" class="other">{{other}}</td>
+        <td class="saved hide green" title="saved">✔</td>
+    </tr>
+    {{/questions}}
+    <tr>
+        <td contenteditable="true" class="q"></td>
+        <td contenteditable="true" class="self"></td>
+        <td contenteditable="true" class="other"></td>
+        <td class="saved hide green" title="saved">✔</td>
+    </tr>
+</table>
+
+<p class="small grey">To add questions, enter the question number &amp; texts into the blank row.<br>
+    To edit questions, select the text and re-type.<br>
+    To delete a question, clear the question number, self, and other texts.</p>
+<p class="small grey">Note if the question number is a number (e.g. ‘5’ or ‘5.1’, then the template
+    will require <a href="http://handlebarsjs.com/expressions.html">‘segment-literal notation’</a>,
+    e.g. ‘\{{q.[5]}}’; if the question number is a string, the template can be simply e.g. ‘\{{q.5a}}’.</p>
+
+<div tabindex="0"><!-- can take focus after adding question to keep focus within page --></div>
+
+</main>
+
+</body>
+</html>

@@ -194,6 +194,8 @@ describe('Admin app'+' ('+app.env+')', function() {
     });
 
     describe('incident report', function() {
+        return; /* eslint-disable no-unreachable *//* TODO: remove single page submission code & tests? replace with staff equiv of report tests? */
+
         let reportId = null;
         let commentId = null;
         let testUserDetails = null;

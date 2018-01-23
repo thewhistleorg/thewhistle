@@ -814,6 +814,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             address:  'University of Lagos',
             phone:    '01 280 2439, 01 733 9832',
             email:    'informationunit@unilag.edu.ng, dsa@unilag.edu.ng',
+            website:  'https://unilag.edu.ng',
             services: 'testing',
         };
 
@@ -821,7 +822,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             const response = await request.get('/resources/add');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(8);
+            expect(document.querySelectorAll('input')).to.have.lengthOf(9);
         });
 
         it('adds new resource', async function() {
@@ -836,7 +837,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(resourceId).querySelectorAll('td')[0].textContent).to.equal('Test');
-            expect(document.getElementById(resourceId).querySelectorAll('td')[4].textContent).to.equal('testing');
+            expect(document.getElementById(resourceId).querySelectorAll('td')[5].textContent).to.equal('testing');
         });
 
         it('edits test resource', async function() {
@@ -855,7 +856,7 @@ describe('Admin app'+' ('+app.env+')', function() {
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(resourceId).querySelectorAll('td')[0].textContent).to.equal('Test');
-            expect(document.getElementById(resourceId).querySelectorAll('td')[4].textContent).to.equal('testing; validation');
+            expect(document.getElementById(resourceId).querySelectorAll('td')[5].textContent).to.equal('testing; validation');
         });
 
         it('deletes test resource', async function() {

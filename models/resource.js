@@ -15,13 +15,14 @@ const schema = {
     type: 'object',
     required: [ '_id', 'name' ],
     properties: {
-        name:     { type: 'string' },                          // name of organisation
-        address:  { type: 'string' },                          // full address (geocodable)
-        phone:    { type: 'array', items: { type: 'text' }  }, // list of phone numbers
-        email:    { type: 'array', items: { type: 'text' }  }, // list of e-mail addresses
-        services: { type: 'array', items: { type: 'text' }  }, // list of services offered
+        name:     { type: 'string' },                                             // name of organisation
+        address:  { type: 'string' },                                             // full address (geocodable)
+        phone:    { type: 'array', items: { type: 'string' }  },                  // list of phone numbers
+        email:    { type: 'array', items: { type: 'string', format: 'email' }  }, // list of e-mail addresses
+        website:  { type: 'string', format: 'uri' },                              // web site
+        services: { type: 'array', items: { type: 'string' }  },                  // list of services offered
         category: { type: 'string', enum: [ 'Legal aid', 'Medical help', 'Mental health counselling' ] },
-        location: { type: 'object' },                          // GeoJSON (with spatial index)
+        location: { type: 'object' },                                             // GeoJSON (with spatial index)
     },
 };
 /* eslint-enable no-unused-vars, key-spacing */

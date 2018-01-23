@@ -50,6 +50,7 @@ class Handlers {
         resources.forEach(r => {
             r.phone = formatPhoneNumbers(r.phone, 'NG'); // TODO: derive country code from database
             r.email = formatEmails(r.email);
+            r.website = formatUrl(r.website);
             r.services = r.services.join('; ');
         });
 
@@ -218,9 +219,9 @@ class Handlers {
  *
  * Each number is wrapped in a nowrap div, with a class indicating validity.
  *
- * @param   {string[]} phoneNumbers - array of numbers as stored in database
- * @param   {string}   country - ISO 3166-1 country code
- * @returns {string}   HTML-formatted list of numbers
+ * @param   {string[]} phoneNumbers - array of numbers as stored in database.
+ * @param   {string}   country - ISO 3166-1 country code.
+ * @returns {string}   HTML-formatted list of numbers.
  */
 function formatPhoneNumbers(phoneNumbers, country) {
     const numbers = phoneNumbers.map(phone => {
@@ -241,8 +242,8 @@ function formatPhoneNumbers(phoneNumbers, country) {
  *
  * Each number is wrapped in a span, with a class indicating validity.
  *
- * @param   {string[]} emails - array of e-mails as stored in database
- * @returns {string}   HTML-formatted list of e-mails
+ * @param   {string[]} emails - array of e-mails as stored in database.
+ * @returns {string}   HTML-formatted list of e-mails.
  */
 function formatEmails(emails) {
     const emailList = emails.map(email => {
@@ -251,6 +252,19 @@ function formatEmails(emails) {
             : `<span class="email-invalid" title="invalid email?">${email}</span>`;
     });
     return emailList.join(', ');
+}
+
+/**
+ * Format url to be HTML <a> element, with protocol (if any) stripped from displayed text.
+ *
+ * @param   {string} url - Website URL.
+ * @returns {string} HTML <a> element.
+ */
+function formatUrl(url) {
+    if (!url) return '';
+    const href = url.slice(0, 4)=='http' ? url : 'http://'+url;
+    url = url.replace(/^https?:\/\//, '');
+    return `<a href="${href}">${url}</a>`;
 }
 
 

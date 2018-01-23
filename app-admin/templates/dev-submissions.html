@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Submissions</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        p { max-width: 48em; }
+        td, th { padding: 2px; }
+        .count-bar { background: #cccccc; margin-left: auto; margin-right: 0; }
+    </style>
+    <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
+    <script src="/js/admin/ga.js" async></script>
+</head>
+<body>
+
+<header>
+
+{{>navpartial}}
+
+</header>
+
+<main>
+
+<h1>Submissions</h1>
+
+<p>During the reporting process, timestamps are recorded for opening the index page and for each
+    page submitted (also the browser ‘user agent’ is recorded).</p>
+<p>This page groups monthly totals for each <i>project</i>, with a funnel of counts of submissions
+    made for each page, and shows minimum, maximum, and average times from opening the index page to
+    submitting the completed report.</p>
+<p>In future, we may want to filter by date and/or by project, but this illustrates a possible
+    presentation.</p>
+
+<table>
+    {{#each months}}
+    <tr>
+        <td>{{@key}}</td>
+        {{#each this}}
+        <td>{{@key}}</td>
+        {{/each}}
+    </tr>
+    <tr>
+        <td></td>
+        {{#each this}}
+        <td>
+            <table>
+                {{#each this.pages}}
+                <tr>
+                    <td>{{@key}}</td>
+                    <td class="align-right"><div class="count-bar" style="width: {{width}}em">{{count}}</td>
+                </tr>
+                {{/each}}
+                <tr><td><i>min</i></td><td>{{this.times.min}}</td></tr>
+                <tr><td><i>max</i></td><td>{{this.times.max}}</td></tr>
+                <tr><td><i>avg</i></td><td>{{this.times.avg}}</td></tr>
+                <tr class="hide" id="completed-reports">
+                    <td colspan="2">{{#this.completedReports}}<span id="{{this}}">{{this}}</span>{{/this.completedReports}}</td>
+                </tr>
+            </table>
+        </td>
+        {{/each}}
+    </tr>
+    {{/each}}
+</table>
+
+</main>
+
+</body>
+</html>

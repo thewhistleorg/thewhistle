@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Report app integration/acceptance tests.                                        C.Veness 2017  */
+/* Report app integration/acceptance tests.                                   C.Veness 2017-2018  */
 /*                                                                                                */
 /* These tests require report.localhost to be set in /etc/hosts.                                  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -408,6 +408,13 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(ths[6].nextSibling.textContent).to.equal('—');
             expect(ths[7].textContent).to.equal('Alias');
             expect(ths[7].nextSibling.textContent).to.equal('testy terrain');
+        });
+
+        it('sees report in submissions page', async function() {
+            const response = await request.get('/dev/submissions');
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.getElementById(reportId).textContent).to.equal(reportId);
         });
 
         it('deletes submitted incident report', async function() {

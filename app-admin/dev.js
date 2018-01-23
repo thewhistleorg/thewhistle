@@ -14,8 +14,9 @@ const md = markdown();
 md.use(mda);
 md.use(mdi, 'dev/form-wizard');
 
-import UserAgent from '../models/user-agent.js';
-import Report    from '../models/report.js';
+import UserAgent  from '../models/user-agent.js';
+import Report     from '../models/report.js';
+import Submission from '../models/submission.js';
 
 import Ip from '../lib/ip.js';
 
@@ -313,6 +314,68 @@ class Dev {
         const context = { uasList, monthsList, counts, app: db+' submitted reports' };
 
         await ctx.render('dev-ua', context);
+    }
+
+
+    /**
+     * Submission progress page.
+     */
+    static async submissions(ctx) {
+        const db = ctx.state.user.db;
+        const submissions = await Submission.getAll(db);
+
+        // TODO: implement filtering by date and/or by project?
+
+        // get page counts in array indexed by month, project
+        const counts = {};
+        for (const s in submissions) {
+            const month = dateFormat(submissions[s]._id.getTimestamp(), 'yyyy-mm');
+            if (!counts[month]) counts[month] = {};
+            const project = submissions[s].project;
+            if (!counts[month][project]) counts[month][project] = { pages: { index: { count: 0 } }, completionTimes: [], completedReports: [] };
+            counts[month][project].pages.index.count++;
+            for (const p in submissions[s].progress) {
+                const page = p=='complete' ? p : 'p'+p; // use string to force insertion order for keys
+                if (!counts[month][project].pages[page]) counts[month][project].pages[page] = { count: 0 };
+                counts[month][project].pages[page].count++;
+                if (p=='complete') {
+                    // record time to complete report
+                    counts[month][project].completionTimes.push(submissions[s].progress[p] - submissions[s]._id.getTimestamp());
+                    // and report id (purely for testing)
+                    counts[month][project].completedReports.push(submissions[s].reportId.toString());
+                }
+            }
+        }
+
+        // get min/max/avg completion times per month/project, and overall total max counts for count bar widths
+        let maxCounts = 0;
+        for (const month in counts) {
+            for (const project in counts[month]) {
+                const completionTimes = counts[month][project].completionTimes;
+                const times = {
+                    min: dateFormat(completionTimes.reduce((prev, curr) => Math.min(prev, curr)), 'HH:MM:ss'),
+                    max: dateFormat(completionTimes.reduce((prev, curr) => Math.max(prev, curr)), 'HH:MM:ss'),
+                    avg: dateFormat(completionTimes.reduce((prev, curr) => prev + curr) / completionTimes.length, 'HH:MM:ss'),
+                };
+                counts[month][project].times = times;
+                delete counts[month][project].completionTimes;
+                maxCounts = Math.max(maxCounts, counts[month][project].pages.index.count);
+            }
+        }
+
+        // convert page counts to widths with maximum 8em
+        const width = 8;
+        for (const month in counts) {
+            for (const project in counts[month]) {
+                for (const page in counts[month][project].pages) {
+                    counts[month][project].pages[page].width = counts[month][project].pages[page].count / maxCounts * width;
+                }
+            }
+        }
+
+        const context = { months: counts };
+
+        await ctx.render('dev-submissions', context);
     }
 
 

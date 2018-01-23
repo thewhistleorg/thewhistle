@@ -9,6 +9,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Question from '../models/question.js';
+import log      from '../lib/log';
 
 
 class QuestionsHandlers {
@@ -45,6 +46,7 @@ class QuestionsHandlers {
             ctx.body = {};
             ctx.set('X-Insert-Id', id); // for integration tests
         } catch (e) {
+            await log(ctx, 'error', null, null, e);
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
@@ -65,6 +67,7 @@ class QuestionsHandlers {
             ctx.status = 200; // Ok
             ctx.body = {};
         } catch (e) {
+            await log(ctx, 'error', null, null, e);
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
@@ -84,7 +87,8 @@ class QuestionsHandlers {
             ctx.status = 200;
             ctx.body = {};
         } catch (e) {
-            ctx.status = 500;
+            await log(ctx, 'error', null, null, e);
+            ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
         ctx.body.root = 'questions';

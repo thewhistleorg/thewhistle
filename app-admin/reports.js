@@ -28,6 +28,7 @@ import Update from '../models/update.js';
 import jsObjectToHtml from '../lib/js-object-to-html';
 import Geocoder       from '../lib/geocode';
 import Weather        from '../lib/weather';
+import log            from '../lib/log';
 
 
 class ReportsHandlers {
@@ -957,7 +958,8 @@ class ReportsHandlers {
             ctx.status = 200;
             ctx.body = { latest: { timestamp: latest } };
         } catch (e) {
-            ctx.status = 500;
+            await log(ctx, 'error', null, null, e);
+            ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
         ctx.body.root = 'reports';
@@ -988,7 +990,8 @@ class ReportsHandlers {
             ctx.status = 200;
             ctx.body = { reports };
         } catch (e) {
-            ctx.status = 500;
+            await log(ctx, 'error', null, null, e);
+            ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
         ctx.body.root = 'reports';
@@ -1014,7 +1017,8 @@ class ReportsHandlers {
             ctx.status = 201;
             ctx.body = {};
         } catch (e) {
-            ctx.status = 500;
+            await log(ctx, 'error', null, null, e);
+            ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
         ctx.body.root = 'reports';
@@ -1032,7 +1036,8 @@ class ReportsHandlers {
             ctx.status = 200;
             ctx.body = {};
         } catch (e) {
-            ctx.status = 500;
+            await log(ctx, 'error', null, null, e);
+            ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
         ctx.body.root = 'reports';
@@ -1125,7 +1130,8 @@ class ReportsHandlers {
             ctx.status = 200;
             ctx.body = { updates: updates };
         } catch (e) {
-            ctx.status = 500;
+            await log(ctx, 'error', null, null, e);
+            ctx.status = 500; // Internal Server Error
             ctx.body = { message: e.message };
         }
         ctx.body.root = 'reports';
@@ -1206,7 +1212,8 @@ class ReportsHandlers {
             ctx.body = { lat, lon };
             ctx.body.root = 'reports';
         } catch (e) {
-            ctx.status = 500;
+            await log(ctx, 'error', null, null, e);
+            ctx.status = 500; // Internal Server Error
             ctx.body = { message: e.message };
         }
     }

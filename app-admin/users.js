@@ -1,6 +1,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Users handlers - manage adding, editing, deleting users who have access to the app.            */
-/*                                                                                 C.Veness 2017  */
+/*                                                                            C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */
@@ -12,6 +12,7 @@ import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 
 import User   from '../models/user.js';
 import Report from '../models/report.js';
+import log    from '../lib/log';
 
 /*
  * Note on roles:
@@ -269,7 +270,8 @@ class UsersHandlers {
             ctx.status = 200;
             ctx.body = { users: usrsNoPw };
         } catch (e) {
-            ctx.status = 500;
+            await log(ctx, 'error', null, null, e);
+            ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
         ctx.body.root = 'reports';

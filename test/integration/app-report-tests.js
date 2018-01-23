@@ -92,7 +92,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/1');
         });
 
-        it('sees/submits page 1', async function() {
+        it('sees/submits page 1 (on-behalf-of)', async function() {
             const responseGet = await request.get('/test-grn/sexual-assault/1');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
@@ -122,7 +122,7 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(response.headers.location).to.equal('/test-grn/sexual-assault/2');
         });
 
-        it('sees/submits page 2', async function() {
+        it('sees/submits page 2 (when)', async function() {
             const responseGet = await request.get('/test-grn/sexual-assault/2');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
@@ -144,25 +144,26 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/3');
         });
 
-        it('sees/submits page 3', async function() {
+        it('sees/submits page 3 (where)', async function() {
             const responseGet = await request.get('/test-grn/sexual-assault/3');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[2].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(1);
+            expect(document.querySelectorAll('input')).to.have.lengthOf(3);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
 
             const values = {
-                'description': 'erroneous description',
-                'nav-next':    'next',
+                where:        'at',
+                'at-address': 'University of Lagos',
+                'nav-next':   'next',
             };
             const responsePost = await request.post('/test-grn/sexual-assault/3').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/4');
         });
 
-        it('sees page 4 & goes back to page 3', async function() {
+        it('sees/submits page 4 (who)', async function() {
             const responseGet = await request.get('/test-grn/sexual-assault/4');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
@@ -172,19 +173,75 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
 
             const values = {
-                'nav-prev': 'prev',
+                'who-relationship': '',
+                'who':              'n',
+                'who-description':  'A death eater',
+                'nav-next':         'next',
             };
             const responsePost = await request.post('/test-grn/sexual-assault/4').send(values);
             expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/3');
+            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/5');
         });
 
-        it('sees page 3 & submits corrected description with file', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/3');
+        it('sees/submits page 5 (action-taken)', async function() {
+            const responseGet = await request.get('/test-grn/sexual-assault/5');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
-            expect(document.querySelectorAll('table.progress td')[2].classList.contains('current')).to.be.true;
+            expect(document.querySelectorAll('table.progress td')[4].classList.contains('current')).to.be.true;
+            expect(document.querySelectorAll('input')).to.have.lengthOf(5);
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
+
+            const values = {
+                'action-taken-other-details': '',
+                'nav-next':                   'next',
+            };
+            const responsePost = await request.post('/test-grn/sexual-assault/5').send(values);
+            expect(responsePost.status).to.equal(302);
+            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/6');
+        });
+
+        it('sees/submits page 6 (description)', async function() {
+            const responseGet = await request.get('/test-grn/sexual-assault/6');
+            expect(responseGet.status).to.equal(200);
+            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
+            expect(document.querySelectorAll('input')).to.have.lengthOf(1);
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
+
+            const values = {
+                'description': 'erroneous description',
+                'nav-next':    'next',
+            };
+            const responsePost = await request.post('/test-grn/sexual-assault/6').send(values);
+            expect(responsePost.status).to.equal(302);
+            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/7');
+        });
+
+        it('sees page 7 & goes back to page 6', async function() {
+            const responseGet = await request.get('/test-grn/sexual-assault/7');
+            expect(responseGet.status).to.equal(200);
+            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect(document.querySelectorAll('table.progress td')[6].classList.contains('current')).to.be.true;
+            expect(document.querySelectorAll('input')).to.have.lengthOf(4);
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
+
+            const values = {
+                'nav-prev': 'prev',
+            };
+            const responsePost = await request.post('/test-grn/sexual-assault/7').send(values);
+            expect(responsePost.status).to.equal(302);
+            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/6');
+        });
+
+        it('sees page 6 & submits corrected description with file', async function() {
+            const responseGet = await request.get('/test-grn/sexual-assault/6');
+            expect(responseGet.status).to.equal(200);
+            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
             expect(document.querySelectorAll('input')).to.have.lengthOf(1);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
@@ -198,67 +255,10 @@ describe('Report app'+' ('+app.env+')', function() {
             const imgFldr = 'test/img/';
             const imgFile = 's_gps.jpg';
             // superagent doesn't allow request.attach() to be used with request.send(), so instead use request.field()
-            const responsePost = await request.post('/test-grn/sexual-assault/3')
+            const responsePost = await request.post('/test-grn/sexual-assault/6')
                 .field('description', values['description'])
                 .field('nav-next', values['nav-next'])
                 .attach('documents', imgFldr+imgFile);
-            expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/4');
-        });
-
-        it('sees/submits page 4', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/4');
-            expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
-            expect(document.querySelectorAll('table.progress td')[3].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(3);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
-
-            const values = {
-                where:        'at',
-                'at-address': 'University of Lagos',
-                'nav-next':   'next',
-            };
-            const responsePost = await request.post('/test-grn/sexual-assault/4').send(values);
-            expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/5');
-        });
-
-        it('sees/submits page 5', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/5');
-            expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
-            expect(document.querySelectorAll('table.progress td')[4].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(3);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
-
-            const values = {
-                'who-relationship': '',
-                'who':              'n',
-                'who-description':  'A death eater',
-                'nav-next':         'next',
-            };
-            const responsePost = await request.post('/test-grn/sexual-assault/5').send(values);
-            expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/6');
-        });
-
-        it('sees/submits page 6', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/6');
-            expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
-            expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(6);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
-
-            const values = {
-                'action-taken-other-details': '',
-                'nav-next':                   'next',
-            };
-            const responsePost = await request.post('/test-grn/sexual-assault/6').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/7');
         });

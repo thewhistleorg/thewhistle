@@ -2,11 +2,13 @@
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
     <div>
+
         <h1>Are you reporting on behalf of yourself or someone else?</h1>
+
         <ul>
             <li>
                 <input type="radio" name="on-behalf-of" id="myself" value="myself">
-                <label for="myself">Me</label>
+                <label for="myself">Myself</label>
             </li>
             <li>
                 <input type="radio" name="on-behalf-of" id="someone-else" value="someone-else">
@@ -19,79 +21,159 @@
 
     <div>
 
-        <p class="special-intro">We understand that this can be difficult.<br>
-            So please take your time and tell us what happened.</p>
+        <p class="special-intro">We understand this can be difficult. Please take your time and tell
+            us as much as you can.</p>
 
-        <h1>To begin with, when did it happen?</h1>
+        <h2>{{q.2a}}</h2>
 
         <ul>
             {{#checked when}}
             <li>
                 <input type="radio" name="when" id="when-date" value="date">
-                <label for="when-date" class="pure-radio">On</label>
-                <table class="inline">
-                    <tr class="field-label">
-                        <td>DD</td>
-                        <td>MMM</td>
-                        <td>YYYY</td>
-                    </tr>
-                    <tr>
-                        <td><input type="number" name="date.day" id="date.day" value="{{date.day}}"
-                                   class="w4" min="1" max="31"></td>
-                        <td><input type="text" name="date.month" id="date.month" value="{{date.month}}" list="months"
-                                   class="w5" maxlength="3"></td>
-                        <td><input type="number" name="date.year" id="date.year" value="{{date.year}}"
-                                   class="w5" min="{{lastyear}}" max="{{thisyear}}"></td>
-                    </tr>
-                </table>
-                <datalist id="months">
-                    <option value="Jan"><option value="Feb"><option value="Mar">
-                    <option value="Apr"><option value="May"><option value="Jun">
-                    <option value="Jul"><option value="Aug"><option value="Sep">
-                    <option value="Oct"><option value="Nov"><option value="Dec">
-                </datalist>
-                at
-                <table class="inline">
-                    <tr class="field-label">
-                        <td>HH</td>
-                        <td>MM</td>
-                    </tr>
-                    <tr>
-                        <td><input type="number" name="date.hour" id="date.hour" value="{{date.hour}}"
-                                   class="w4" min="0" max="23" title="24h"></td>
-                        <td><input type="number" name="date.minute" id="date.minute" value="{{date.minute}}"
-                                   class="w4" min="0" max="59"></td>
-                    </tr>
-                </table>
+                <label for="when-date" class="pure-radio">Yes, exactly when it happened</label>
+                <div class="when-form" style="display:none;">
+                    <p class="grey">Please select the date and approximate time</p>
+                    <table class="inline">
+                        <tr class="field-label">
+                            <td>DD</td>
+                            <td>MMM</td>
+                            <td>YYYY</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <select name="date.day" id="date.day" value="{{date.day}}" list="days" class="w4" min="1" max="31">
+                                    {{#selected date.day}}
+                                    <option value="1">01</option>
+                                    <option value="2">02</option>
+                                    <option value="3">03</option>
+                                    <option value="4">04</option>
+                                    <option value="5">05</option>
+                                    <option value="6">06</option>
+                                    <option value="7">07</option>
+                                    <option value="8">08</option>
+                                    <option value="9">09</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25">25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                    <option value="29">29</option>
+                                    <option value="30">30</option>
+                                    <option value="31">31</option>
+                                    {{/selected}}
+                                </select>
+                            </td>
+                            <td>
+                                <select name="date.month" id="date.month" value="{{date.month}}" list="months" class="w5" maxlength="3">
+                                    {{#selected date.month}}
+                                    <option value="Jan">Jan</option>
+                                    <option value="Feb">Feb</option>
+                                    <option value="Mar">Mar</option>
+                                    <option value="Apr">Apr</option>
+                                    <option value="May">May</option>
+                                    <option value="Jun">Jun</option>
+                                    <option value="Jul">Jul</option>
+                                    <option value="Aug">Aug</option>
+                                    <option value="Sep">Sep</option>
+                                    <option value="Oct">Oct</option>
+                                    <option value="Nov">Nov</option>
+                                    <option value="Dec">Dec</option>
+                                    {{/selected}}
+                                </select>
+                            </td>
+                            <td>
+                                <select name="date.year" id="date.year" value="{{date.year}}" list="years" class="w5" min="{{lastyear}}" max="{{thisyear}}">
+                                    {{#selected date.year}}
+                                    <option value="2009">2009</option>
+                                    <option value="2010">2010</option>
+                                    <option value="2011">2011</option>
+                                    <option value="2012">2012</option>
+                                    <option value="2013">2013</option>
+                                    <option value="2014">2014</option>
+                                    <option value="2015">2015</option>
+                                    <option value="2016">2016</option>
+                                    <option value="2017">2017</option>
+                                    <option value="2018">2018</option>
+                                    {{/selected}}
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="inline">
+                        <br>at
+                        <select name="date.time" id="date.time">
+                            <option value="">&nbsp;</option>
+                            <option value="00:00:00">12:00 am</option>
+                            <option value="01:00:00">01:00 am</option>
+                            <option value="02:00:00">02:00 am</option>
+                            <option value="03:00:00">03:00 am</option>
+                            <option value="04:00:00">04:00 am</option>
+                            <option value="05:00:00">05:00 am</option>
+                            <option value="06:00:00">06:00 am</option>
+                            <option value="07:00:00">07:00 am</option>
+                            <option value="08:00:00">08:00 am</option>
+                            <option value="09:00:00">09:00 am</option>
+                            <option value="10:00:00">10:00 am</option>
+                            <option value="11:00:00">11:00 am</option>
+                            <option value="12:00:00">12:00 pm</option>
+                            <option value="13:00:00">01:00 pm</option>
+                            <option value="14:00:00">02:00 pm</option>
+                            <option value="15:00:00">03:00 pm</option>
+                            <option value="16:00:00">04:00 pm</option>
+                            <option value="17:00:00">05:00 pm</option>
+                            <option value="18:00:00">06:00 pm</option>
+                            <option value="19:00:00">07:00 pm</option>
+                            <option value="20:00:00">08:00 pm</option>
+                            <option value="21:00:00">09:00 pm</option>
+                            <option value="22:00:00">10:00 pm</option>
+                            <option value="23:00:00">11:00 pm</option>
+                        </select>
+                    </div>
+                </div>
             </li>
             <li>
                 <input type="radio" name="when" id="when-within" value="within">
                 <label for="when-within">It was within</label>
                 <select name="within-options" id="within-options">
                     <option value="">&nbsp;</option>
-                    <option value="within last month">Last month</option>
-                    <option value="within last 6 months">Last six months</option>
-                    <option value="within last year">Last year</option>
-                    <option value="more than a year ago">More than a year ago</option>
+                    <option value="within last week">last week</option>
+                    <option value="within last month">last month</option>
+                    <option value="within last year">last year</option>
+                    <option value="more than a year ago">more than a year ago</option>
                 </select>
             </li>
             <li>
                 <input type="radio" name="when" id="when-dont-remember" value="dont-remember">
-                <label for="when-dont-remember">I don't exactly remember</label>
-            </li>
-            <li>
-                <input type="radio" name="when" id="when-dont-know" value="dont-know">
-                <label for="when-dont-know">I don't know when it happened</label>
+                <label for="when-dont-remember">I do not remember</label>
             </li>
             {{/checked}}
         </ul>
+
         <h1>Is it still happening?</h1>
         <ul>
             {{#checked still-happening}}
             <li>
                 <input type="radio" name="still-happening" id="still-y" value="y">
                 <label for="still-y">Yes</label>
-                <input type="radio" name="still-happening" id="still-n" value="n" class="radio-margin">
+            </li>
+            <li>
+                <input type="radio" name="still-happening" id="still-n" value="n"
+                       class="radio-margin">
                 <label for="still-n">No</label>
             </li>
             {{/checked}}
@@ -101,6 +183,94 @@
     <hr>
 
     <div>
+
+        <h1>Where did this happen?</h1>
+
+        <p class="hint-text"></p>
+        <ul>
+            {{#checked where}}
+            <li>
+                <input type="radio" name="where" id="where-at" value="at"> <label for="where-at">Location.
+                Please provide as much detail as you are able – this could be an address, restaurant
+                name, or neighborhood.</label>
+                <input type="text" name="at-address" id="at-address" value="{{at-address}}" class="w36">
+            </li>
+            <li>
+                <input type="radio" name="where" id="where-dont-know" value="dont-know">
+                <label for="where-dont-know">I don’t know where it happened</label>
+            </li>
+            {{/checked}}
+        </ul>
+
+    </div>
+
+    <hr>
+
+    <div>
+
+        <h1>Do you know who did it?</h1>
+
+        <p class="hint-text">This could be one person or multiple people or a company or organisation.</p>
+        <ul>
+            {{#checked who-x}}
+            <li>
+                <input type="radio" name="who" id="who-y" value="y">
+                <label for="who-y" class="pure-radio greyed-out-unless-checked">Yes</label>
+                <div id="who-y-form" style="display:none">
+                    <label for="who-relationship">Please give us as much description as you are able; for
+                        example, it could be a relative, colleague, or acquaintance</label>
+                    <input type="text" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="">
+                </div>
+            </li>
+            <li>
+                <input type="radio" name="who" id="who-n" value="n">
+                <label for="who-n" class="pure-radio greyed-out-unless-checked">No</label>
+                <div id="who-n-form" style="display:none">
+                    <p>Please give us any description of the person/people you are able:</p>
+                    <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
+                </div>
+            </li>
+            {{/checked}}
+        </ul>
+
+    </div>
+
+    <hr>
+
+    <div>
+
+        <h1>{{q.5a}}</h1>
+
+        <p class="hint-text">Pick all options that apply.</p>
+
+        <ul>
+            {{#checked action-taken}}
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-police" value="police">
+                <label for="action-taken-police">Police or government officials</label>
+            </li>
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-teacher" value="organisation">
+                <label for="action-taken-teacher">Teacher/tutor/lecturer</label>
+            </li>
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-friends" value="friends">
+                <label for="action-taken-friends">Friends, family</label>
+            </li>
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-other" value="other">
+                <label for="action-taken-other">Somebody within another organisation</label>
+                <input type="text" name="action-taken-other-details" id="action-taken-other-details" class="">
+            </li>
+            {{/checked}}
+        </ul>
+
+    </div>
+
+    <hr>
+
+    <div>
+
         <script>
             'use strict';
             document.addEventListener('DOMContentLoaded', function () {
@@ -122,16 +292,15 @@
             });
         </script>
 
-        <h1>Describe what happened</h1>
-        <p class="hint-text">You may wish to include what led up to the event, if there were any
-            witnesses, and if anyone was told about it afterwards.</p>
+        <h1>This is an anonymous service. Any information you provide will be seen only by staff and
+            volunteers of Global Rights Nigeria.</h1>
+
+        <p class="hint-text">{{q.6a}}</p>
 
         <ul>
             <li>
-                <label for="description">
-                    Description:
-                </label>
-                <textarea class="pure-input-1" name="description" id="description" rows="4" required>{{description}}</textarea>
+                <label for="description">Description:</label>
+                <textarea class="pure-input-1" name="description" id="description" rows="4" autofocus required>{{description}}</textarea>
             </li>
             <li>
                 <label for="document0">
@@ -143,94 +312,11 @@
                         if you wish to submit them</span>
                     {{/if}}
                 </label>
-            </li>
-            <li>
                 <input type="file" name="documents" value="0" id="document0" class="upload-file">
             </li>
+
         </ul>
-    </div>
 
-    <hr>
-
-    <div>
-        <h1>Where did it happen?</h1>
-        <p class="hint-text">Please be as precise as you are able</p>
-        <ul>
-            {{#checked where}}
-            <li>
-                <input type="radio" name="where" id="where-at" value="at"> <label for="where-at">At</label>
-                <input type="text" name="at-address" id="at-address" value="{{at-address}}" class="w36">
-            </li>
-            <li>
-                <input type="radio" name="where" id="where-dont-remember" value="dont-remember">
-                <label for="where-dont-remember">I don’t exactly remember</label>
-            </li>
-            <li>
-                <input type="radio" name="where" id="where-dont-know" value="dont-know">
-                <label for="where-dont-know">I don’t know where it happened</label>
-            </li>
-            {{/checked}}
-        </ul>
-    </div>
-
-    <hr>
-
-    <div>
-        <h1>Do you know who did it?</h1>
-        <p class="hint-text">This could be one person or multiple people or a company or organisation.</p>
-        <ul>
-            {{#checked who}}
-            <li>
-                <input type="radio" name="who" id="who-y" value="y">
-                <label for="who-y" class="pure-radio greyed-out-unless-checked">Yes</label>
-                <br>
-                <label for="who-relationship">How do you know them?</label>
-                <p class="hint-text">For example, it could be a relative, colleague, or acquaintance.</p>
-                <input type="text" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="w36">
-            </li>
-            <li>
-                <input type="radio" name="who" id="who-n" value="n">
-                <label for="who-n" class="pure-radio greyed-out-unless-checked">No</label>
-                <p>Please give us a description of the person/people:</p>
-                <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
-            </li>
-            {{/checked}}
-        </ul>
-    </div>
-
-    <hr>
-
-    <div>
-
-        <h1>Have you spoken to anybody about it?</h1>
-
-        <p class="hint-text">Pick all options that apply.</p>
-
-        <ul>
-            {{#checked action-taken}}
-            <li>
-                <input type="checkbox" name="action-taken" id="action-taken-police" value="police">
-                <label for="action-taken-police">I have told the police</label>
-            </li>
-            <li>
-                <input type="checkbox" name="action-taken" id="action-taken-organisation" value="organisation">
-                <label for="action-taken-organisation">I have told somebody within an organisation</label>
-            </li>
-            <li>
-                <input type="checkbox" name="action-taken" id="action-taken-friends" value="friends">
-                <label for="action-taken-friends">I spoke to friends or other people I know</label>
-            </li>
-            <li>
-                <input type="checkbox" name="action-taken" id="action-taken-teacher" value="teacher">
-                <label for="action-taken-teacher">I spoke to a teacher</label>
-            </li>
-            <li>
-                <input type="checkbox" name="action-taken" id="action-taken-other" value="other">
-                <label for="action-taken-other">Other</label>
-                <input type="text" name="action-taken-other-details" id="action-taken-other-details" class="w24">
-            </li>
-            {{/checked}}
-        </ul>
     </div>
 
     <hr>

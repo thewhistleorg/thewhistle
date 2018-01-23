@@ -1,53 +1,25 @@
-<form method="post" enctype="multipart/form-data" class="pure-form">
+<form method="post">
     {{> back}}{{> step}}
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
     <div  class="margin-top-3">
-        <script>
-            'use strict';
-            document.addEventListener('DOMContentLoaded', function () {
-                document.querySelector('input[type=file]').onchange = cloneFileInput; // change handler for initial file input
-                function cloneFileInput(event) {
-                    const fileInputs = document.querySelectorAll('input[type=file]');
-                    const el = event.target;
-                    // if we already have a 'no file chosen' input, don't clone another
-                    for (const i of fileInputs) if (i.files.length == 0) return;
-                    // if same file has already been chosen, clear the filename & don't clone
-                    const inputsWithThisName = [...fileInputs].filter(f => f.files[0].name == el.files[0].name)
-                    if (inputsWithThisName.length > 1) { el.value = ''; return; }
-                    const copy = el.cloneNode(true);
-                    copy.onchange = cloneFileInput;
-                    copy.value = '';
-                    copy.id = 'document' + (fileInputs.length);
-                    el.insertAdjacentElement('afterend', copy)
-                }
-            });
-        </script>
 
-        <h1>Describe what happened</h1>
-        <p class="hint-text">You may wish to include what led up to the event, if there were any
-            witnesses, and if anyone was told about it afterwards.</p>
+        <h1>Where did this happen?</h1>
 
+        <p class="hint-text"></p>
         <ul>
+            {{#checked where}}
             <li>
-                <label for="description">
-                    Description:
-                </label>
-                <textarea class="pure-input-1" name="description" id="description" rows="4" autofocus required>{{description}}</textarea>
+                <input type="radio" name="where" id="where-at" value="at"> <label for="where-at">Location.
+                Please provide as much detail as you are able – this could be an address, restaurant
+                name, or neighborhood.</label>
+                <input type="text" name="at-address" id="at-address" value="{{at-address}}" class="w36">
             </li>
             <li>
-                <label for="document0">
-                    <strong>Please upload any evidence that could help.</strong>
-                    This can be photos, videos or any other documents.
-                    {{#if files}}
-                    <span class="note">note: please reselect
-                        {{#each files}}{{this.name}}{{#unless @last}}, {{/unless}}{{/each}}
-                        if you wish to submit them</span>
-                    {{/if}}
-                </label>
-                <input type="file" name="documents" value="0" id="document0" class="upload-file">
+                <input type="radio" name="where" id="where-dont-know" value="dont-know">
+                <label for="where-dont-know">I don’t know where it happened</label>
             </li>
-
+            {{/checked}}
         </ul>
         {{> continue}}
     </div>

@@ -1,28 +1,31 @@
-<form method="post" class="pure-form pure-form-aligned">
+<form method="post">
     {{> back}}{{> step}}
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
     <div  class="margin-top-3">
-        <h1>Do you know who did it?</h1>
-        <p class="hint-text">This could be one person or multiple people or a company or organisation.</p>
+
+        <h1>{{q.5a}}</h1>
+
+        <p class="hint-text">Pick all options that apply.</p>
+
         <ul>
-            {{#checked who-x}}
+            {{#checked action-taken}}
             <li>
-                <input type="radio" name="who" id="who-y" value="y">
-                <label for="who-y" class="pure-radio greyed-out-unless-checked">Yes</label>
-                <div id="who-y-form" style="display:none">
-                  <label for="who-relationship">How do you know them?</label>
-                  <p class="hint-text">For example, it could be a relative, colleague, or acquaintance.</p>
-                  <input type="text" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="">
-                </div>
+                <input type="checkbox" name="action-taken" id="action-taken-police" value="police">
+                <label for="action-taken-police">Police or government officials</label>
             </li>
             <li>
-                <input type="radio" name="who" id="who-n" value="n">
-                <label for="who-n" class="pure-radio greyed-out-unless-checked">No</label>
-                <div id="who-n-form" style="display:none">
-                  <p>Please give us any description of the person/people you are able:</p>
-                  <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
-                </div>
+                <input type="checkbox" name="action-taken" id="action-taken-teacher" value="organisation">
+                <label for="action-taken-teacher">Teacher/tutor/lecturer</label>
+            </li>
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-friends" value="friends">
+                <label for="action-taken-friends">Friends, family</label>
+            </li>
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-other" value="other">
+                <label for="action-taken-other">Somebody within another organisation</label>
+                <input type="text" name="action-taken-other-details" id="action-taken-other-details" class="">
             </li>
             {{/checked}}
         </ul>

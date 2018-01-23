@@ -1,23 +1,30 @@
-<form method="post" class="">
+<form method="post" class="pure-form pure-form-aligned">
     {{> back}}{{> step}}
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
     <div  class="margin-top-3">
-        <h1>Where did it happen?</h1>
-        <p class="hint-text">Please be as precise as you are able</p>
+
+        <h1>Do you know who did it?</h1>
+
+        <p class="hint-text">This could be one person or multiple people or a company or organisation.</p>
         <ul>
-            {{#checked where}}
+            {{#checked who-x}}
             <li>
-                <input type="radio" name="where" id="where-at" value="at"> <label for="where-at" style="width: 35px;">At</label>
-                <input type="text" name="at-address" id="at-address" value="{{at-address}}" class="" >
+                <input type="radio" name="who" id="who-y" value="y">
+                <label for="who-y" class="pure-radio greyed-out-unless-checked">Yes</label>
+                <div id="who-y-form" style="display:none">
+                  <label for="who-relationship">Please give us as much description as you are able; for
+                      example, it could be a relative, colleague, or acquaintance</label>
+                  <input type="text" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="">
+                </div>
             </li>
-            <!-- <li>
-                <input type="radio" name="where" id="where-dont-remember" value="dont-remember">
-                <label for="where-dont-remember">I don’t exactly remember</label>
-            </li> -->
             <li>
-                <input type="radio" name="where" id="where-dont-know" value="dont-know">
-                <label for="where-dont-know">I don’t know where it happened</label>
+                <input type="radio" name="who" id="who-n" value="n">
+                <label for="who-n" class="pure-radio greyed-out-unless-checked">No</label>
+                <div id="who-n-form" style="display:none">
+                  <p>Please give us any description of the person/people you are able:</p>
+                  <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
+                </div>
             </li>
             {{/checked}}
         </ul>

@@ -257,6 +257,8 @@ function formatEmails(emails) {
 /**
  * Format url to be HTML <a> element, with protocol (if any) stripped from displayed text.
  *
+ * Duplicated in app-report/<org>/<project>/handlers.js.
+ *
  * @param   {string} url - Website URL.
  * @returns {string} HTML <a> element.
  */

@@ -210,6 +210,7 @@ class Handlers {
                 resource.distKm = (resource.dist/1000).toPrecision(2); // used for display
                 resource.phone = resource.phone.map(p => `<span class="nowrap">${p}</span>`).join(', ');
                 resource.email = resource.email.join(' ');
+                resource.website = formatUrl(resource.website);
                 resource.services = resource.services.join('; ');
             }
 
@@ -344,6 +345,22 @@ function prettifyReport(report) {
     rpt['Alias'] = report['used-before']=='y' ? report['existing-alias'] : report['generated-alias'];
 
     return rpt;
+}
+
+
+/**
+ * Format url to be HTML <a> element, with protocol (if any) stripped from displayed text.
+ *
+ * Duplicated in app-admin/resources.js.
+ *
+ * @param   {string} url - Website URL.
+ * @returns {string} HTML <a> element.
+ */
+function formatUrl(url) {
+    if (!url) return '';
+    const href = url.slice(0, 4)=='http' ? url : 'http://'+url;
+    url = url.replace(/^https?:\/\//, '');
+    return `<a href="${href}">${url}</a>`;
 }
 
 

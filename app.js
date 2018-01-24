@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* The Whistle technology trial app.                                               C.Veness 2017  */
+/* The Whistle technology trial app.                                          C.Veness 2017-2018  */
 /*                                                                                                */
 /* App comprises three (composed) sub-apps:                                                       */
 /*  - report. (public incident reporting pages)                                                   */
@@ -81,8 +81,12 @@ app.use(async function(ctx, next) {
 global.db = {}; // initialise global.db to empty object on app startup
 app.use(async function(ctx, next) {
     if (!global.db.users) {
+        const connectionString = process.env.DB_USERS;
+        if (connectionString == undefined) {
+            console.error(`No configuration available for ‘users’ db`);
+            process.exit(1);
+        }
         try {
-            const connectionString = process.env.DB_USERS;
             const client = await MongoClient.connect(connectionString);
             global.db.users = client.db(client.s.options.dbName);
         } catch (e) {

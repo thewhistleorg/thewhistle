@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Twilio app - RESTful API for handling Twilio SMS messages.                      C.Veness 2017  */
+/* Twilio app - RESTful API for handling Twilio SMS messages.                 C.Veness 2017-2018  */
 /*                                                                                                */
 /* The API provides GET / POST / PATCH / DELETE methods on a variety of resources.                */
 /*                                                                                                */
@@ -102,8 +102,9 @@ app.use(async function handleErrors(ctx, next) {
 // something... for now we'll just hardwire the test-grn organisation
 app.use(async function(ctx, next) {
     if (!global.db['test-grn']) {
+        const connectionString = process.env.DB_TEST_GRN;
+        if (connectionString == undefined) ctx.throw(404, `No configuration available for organisation ‘test-grn’`);
         try {
-            const connectionString = process.env.DB_TEST_GRN;
             const client = await MongoClient.connect(connectionString);
             global.db['test-grn'] = client.db(client.s.options.dbName);
         } catch (e) {

@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Login handlers (invoked by router to render templates).                         C.Veness 2017  */
+/* Login handlers (invoked by router to render templates).                    C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -113,6 +113,7 @@ class LoginHandlers {
         // (these will remain in global for entire app, this doesn't happen per request)
         if (!global.db[db]) {
             const connectionString = process.env[`DB_${db.toUpperCase().replace('-', '_')}`];
+            if (connectionString == undefined) ctx.throw(404, `No configuration available for organisation ‘${db}’`);
             try {
                 const client = await MongoClient.connect(connectionString);
                 global.db[db] = client.db(client.s.options.dbName);

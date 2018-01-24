@@ -12,6 +12,7 @@
     "test": "mocha --exit -r @std/esm test/*/*.js",
     "test-unit": "mocha --exit -r @std/esm test/unit/*.js",
     "test-intgn": "mocha --exit -r @std/esm test/integration/*.js",
+    "test-smoke": "mocha --exit -r @std/esm test/staging-smoke-tests.js",
     "lint": "npm run lint-node && npm run lint-browser",
     "lint-node": "eslint --env node --ignore-pattern public --ignore-pattern app-api/apidoc .",
     "lint-browser": "eslint --env browser public/",

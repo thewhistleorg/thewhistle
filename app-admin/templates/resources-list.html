@@ -119,19 +119,17 @@
         <th>Services</th>
         <th>Category</th>
         <th></th>
-        <th></th>
         <th><a href="/resources/add" title="Add new resource" class="fa fa-plus primary-blue"></a></th>
     </tr>
     {{#resources}}
     <tr id="{{_id}}" class="resource">
         <td>{{name}}</td>
-        <td>{{address}}</td>
+        <td>{{#if location}}<a href="https://maps.google.com/maps/search/{{address}}" target="_blank">{{address}}</a>{{else}}{{address}}{{/if}}</td>
         <td>{{{phone}}}</td>
         <td>{{{email}}}</td>
         <td>{{{website}}}</td>
         <td>{{services}}</td>
         <td>{{category}}</td>
-        <td>{{#if location}}<a href="https://maps.google.com/maps/search/{{address}}" class="fa fa-globe"></a>{{/if}}</td>
         <td><a href="/resources/{{_id}}/edit" title="Edit resource" class="fa fa-pencil grey hide"></a></td>
         <td><form action="/resources/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" title="Delete resource" class="fa fa-trash hide"></button></form></td>
     </tr>

@@ -981,11 +981,12 @@ class ReportsHandlers {
             // get list of users (indexed by id) for use in translating assigned-to id's to usernames
             const users = await User.details(); // note users is a Map
             for (const report of reports) {
+                const assignedTo = users.get(report.assignedTo.toString());
                 report.lat = report.location.geojson.coordinates[1];
                 report.lng = report.location.geojson.coordinates[0];
                 report.reported = reported(report._id.getTimestamp());
                 report.highlight = Math.round(100 * (report._id.getTimestamp() - new Date() + y) / y);
-                report.assignedToName = report.assignedTo ? users.get(report.assignedTo.toString()).username : '';
+                report.assignedToName = assignedTo ? assignedTo.username : '??';
             }
             ctx.status = 200;
             ctx.body = { reports };

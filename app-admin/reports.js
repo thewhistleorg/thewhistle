@@ -769,7 +769,6 @@ class ReportsHandlers {
 
         // other reports from same reporter
         const otherReports = await Report.find(db, { $and: [ { alias: report.alias }, { _id: { $ne: ObjectId(ctx.params.id) } } ] });
-        console.log('otherReports', otherReports, ctx.params.id, report.alias)
         for (const rpt of otherReports) {
             rpt.reported = dateFormat(rpt._id.getTimestamp(), 'd mmm yyyy HH:MM');
             rpt.desc = truncate(rpt.submitted.Description, 24)

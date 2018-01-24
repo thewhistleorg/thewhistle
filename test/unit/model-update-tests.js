@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Update model unit tests.                                                        C.Veness 2017  */
+/* Update model unit tests.                                                   C.Veness 2017-2018  */
 /*                                                                                                */
 /* Note these tests do not mock out database components, but operate on the live 'test-cam' db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -18,9 +18,9 @@ const testuser = process.env.TESTUSER;
 
 const db = 'test-cam';
 
-import './before.js'; // set up database connections
+import './before.js';
 
-describe('Update model', function() {
+describe(`Update model (${db})`, function() {
     this.timeout(5e3); // 5 sec
 
     let updateId = null;

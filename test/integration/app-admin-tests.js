@@ -29,7 +29,7 @@ const request = supertest.agent(app.listen()).host('admin.localhost');
 // note that document.querySelector() works with CSS ids which are more restrictive than HTML5 ids,
 // so getElementById() has to be used to find ObjectId ids instead of querySelector()
 
-describe('Admin app'+' ('+app.env+')', function() {
+describe(`Admin app (test-grn/${app.env})`, function() {
     this.timeout(10e3); // 10 sec
 
     describe('password reset', function() {

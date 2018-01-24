@@ -18,7 +18,7 @@ const testpass = process.env.TESTPASS; // (for successful login & sexual-assault
 
 const request = supertest.agent(app.listen()).host('report.localhost');
 
-describe('Report app'+' ('+app.env+')', function() {
+describe(`Report app (test-grn/${app.env})`, function() {
     this.timeout(10e3); // 10 sec
 
     let reportId = null;
@@ -64,7 +64,7 @@ describe('Report app'+' ('+app.env+')', function() {
         });
     });
 
-    describe('text-grn/sexual-assault inaccessible pages', function() {
+    describe('test-grn/sexual-assault inaccessible pages', function() {
         it('request for page 2 gets redirected to home page', async function() {
             const response = await request.get('/test-grn/sexual-assault/2');
             expect(response.status).to.equal(302);
@@ -78,7 +78,7 @@ describe('Report app'+' ('+app.env+')', function() {
         });
     });
 
-    describe('text-grn/sexual-assault', function() {
+    describe('test-grn/sexual-assault', function() {
         it('checks previous test report is not left undeleted', async function() {
             const response = await request.get('/ajax/test-grn/aliases/testy+terrain');
             expect(response.status).to.equal(404);

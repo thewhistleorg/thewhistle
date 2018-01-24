@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* IP caching unit tests.                                                          C.Veness 2017  */
+/* IP caching unit tests.                                                     C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import chai from 'chai'; // BDD/TDD assertion library
@@ -10,6 +10,7 @@ import ip from '../../lib/ip.js';
 const test = it; // just an alias
 
 describe('IP caching', function() {
+    this.timeout(4e3); // 4 sec
 
     describe('country', function() {
 

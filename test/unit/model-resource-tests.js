@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Resource model unit tests.                                                      C.Veness 2017  */
+/* Resource model unit tests.                                                 C.Veness 2017-2018  */
 /*                                                                                                */
 /* Note these tests do not mock out database components, but operate on the live 'test-cam' db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -12,9 +12,11 @@ dotenv.config();
 
 import Resource from '../../models/resource.js';
 
+const db = 'test-cam';
+
 import './before.js'; // set up database connections
 
-describe('Resource model', function() {
+describe(`Resource model (${db})`, function() {
     this.timeout(5e3); // 5 sec
 
     let resourceId = null;
@@ -41,7 +43,7 @@ describe('Resource model', function() {
 
     describe('init', function() {
         it('initialises existing db (ie noop)', async function() {
-            expect(await Resource.init('test-cam')).to.be.undefined;
+            expect(await Resource.init(db)).to.be.undefined;
         });
     });
 
@@ -59,9 +61,9 @@ describe('Resource model', function() {
                 latitude:  52.2107262,
                 longitude: 0.1138847,
             };
-            resourceId = await Resource.insert('test-cam', values, geocode);
+            resourceId = await Resource.insert(db, values, geocode);
             expect(resourceId.constructor.name).to.equal('ObjectID');
-            const resource = await Resource.get('test-cam', resourceId);
+            const resource = await Resource.get(db, resourceId);
             expect(resource).to.be.an('object');
             expect(resource).to.have.property('name');
         });
@@ -71,7 +73,7 @@ describe('Resource model', function() {
 
         it('finds resource', async function() {
             const query = { name: 'Maudlin Rehab' };
-            const resources = await Resource.find('test-cam', query);
+            const resources = await Resource.find(db, query);
             expect(resources).to.be.an('array');
             expect(resources.length).to.equal(1); // wouldn't want more than one!
             expect(resources[0].name).to.equal('Maudlin Rehab');
@@ -79,47 +81,47 @@ describe('Resource model', function() {
         });
 
         it('gets resource', async function() {
-            const resource = await Resource.get('test-cam', resourceId);
+            const resource = await Resource.get(db, resourceId);
             expect(resource).to.be.an('object');
             expect(resource.name).to.equal('Maudlin Rehab');
         });
         it('gets newly created resource with string id', async function() {
-            const resource = await Resource.get('test-cam', resourceId.toString());
+            const resource = await Resource.get(db, resourceId.toString());
             expect(resource).to.be.an('object');
             expect(resource.name).to.equal('Maudlin Rehab');
         });
         it('gets all active resources', async function() {
-            const resources = await Resource.getAll('test-cam');
+            const resources = await Resource.getAll(db);
             expect(resources).to.be.an('array');
             expect(resources.length).to.be.at.least(1);
             // TODO: any way to test resources includes resourceId?
         });
         it('gets resources with field matching value', async function() {
-            const resources = await Resource.getBy('test-cam', 'name', 'Maudlin Rehab');
+            const resources = await Resource.getBy(db, 'name', 'Maudlin Rehab');
             expect(resources).to.be.an('array');
             expect(resources.length).to.be.equal(1);
         });
         it('gets local resources', async function() {
-            const resources = await Resource.getNear('test-cam', 52.2107, 0.1139, 100);
+            const resources = await Resource.getNear(db, 52.2107, 0.1139, 100);
             expect(resources).to.be.an('array');
             expect(resources.length).to.be.equal(1);
         });
         it('gets no local resources when dist too small', async function() {
-            const resources = await Resource.getNear('test-cam', 52.2107, 0.1139, 1);
+            const resources = await Resource.getNear(db, 52.2107, 0.1139, 1);
             expect(resources).to.be.an('array');
             expect(resources.length).to.be.equal(0);
         });
         it('updates resource', async function() {
-            await Resource.update('test-cam', resourceId.toString(), { services: [ 'rehab', 'comfort' ] });
-            const resource = await Resource.get('test-cam', resourceId);
+            await Resource.update(db, resourceId.toString(), { services: [ 'rehab', 'comfort' ] });
+            const resource = await Resource.get(db, resourceId);
             expect(resource.services).to.be.an('array');
         });
     });
 
     describe('delete', function() {
         it('deletes resource', async function() {
-            await Resource.delete('test-cam', resourceId.toString());
-            expect(await Resource.get('test-cam', resourceId)).to.be.null;
+            await Resource.delete(db, resourceId.toString());
+            expect(await Resource.get(db, resourceId)).to.be.null;
         });
     });
 

@@ -16,7 +16,7 @@ const db = 'test-cam';
 
 import './before.js'; // set up database connections
 
-describe('Submission model', function() {
+describe(`Submission model (${db})`, function() {
     this.timeout(2e3); // 2 sec
 
     let submissionId = null;

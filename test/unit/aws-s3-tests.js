@@ -1,13 +1,11 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* AWS S3 unit tests.                                                              C.Veness 2017  */
+/* AWS S3 unit tests.                                                         C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import chai       from 'chai';       // BDD/TDD assertion library
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-import dotenv from 'dotenv';         // load environment variables from a .env file into process.env
 const expect   = chai.expect;
 
-dotenv.config();
 
 import AwsS3 from'../../lib/aws-s3.js';
 

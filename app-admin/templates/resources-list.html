@@ -42,7 +42,7 @@
 
             // filter
             document.querySelector('select').onchange = function submitFilter() {
-                if (this.form.service.value == '') { // remove query string entirely
+                if (this.form.category.value == '') { // remove query string entirely
                     window.location = window.location.href.replace(location.search, '');
                     return;
                 }
@@ -98,13 +98,13 @@
 
 {{>errpartial}}
 
-<form>Filter service:
-    <select name="service">
-        {{#selected filter.service}}
+<form>Filter category:
+    <select name="category">
+        {{#selected filter.category}}
         <option value="">&nbsp;</option>
-        {{#services}}
+        {{#categories}}
         <option value="{{this}}">{{this}}</option>
-        {{/services}}
+        {{/categories}}
         {{/selected}}
     </select>
 </form>

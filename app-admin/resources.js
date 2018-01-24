@@ -41,7 +41,7 @@ class Handlers {
         const db = ctx.state.user.db;
 
         // get resources matching querystring filter
-        const query = ctx.query.service ? { services: ctx.query.service } : {};
+        const query = ctx.query.category ? { category: ctx.query.category } : {};
         const resources = await Resource.find(db, query);
 
         resources.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1);
@@ -54,10 +54,10 @@ class Handlers {
             r.services = r.services.join('; ');
         });
 
-        // list of services for filter <select>
-        let allServices = [];
-        (await Resource.getAll(db)).forEach(r => { allServices = allServices.concat(r.services); });
-        const services = [ ...new Set(allServices) ].sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
+        // list of categories for filter <select>
+        let allCategories = [];
+        (await Resource.getAll(db)).forEach(r => { allCategories = allCategories.concat(r.category); });
+        const categories = [ ...new Set(allCategories) ].sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
 
         // need separate list of resources with locations for map
         const resourceLocns = resources.filter(r => r.location != null).map(r => ({
@@ -67,8 +67,8 @@ class Handlers {
             name: r.name,
         }));
 
-        const filter = { service: ctx.query.service }; // current filter criteria
-        const context = { resources, resourceLocns, services, filter };
+        const filter = { category: ctx.query.category }; // current filter criteria
+        const context = { resources, resourceLocns, categories, filter };
         await ctx.render('resources-list', context);
     }
 

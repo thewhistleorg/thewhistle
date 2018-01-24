@@ -115,6 +115,15 @@ describe('Report app'+' ('+app.env+')', function() {
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/2');
         });
 
+        it('returns to index page on back button', async function() {
+            const values = {
+                'nav-prev': 'prev',
+            };
+            const responsePost = await request.post('/test-grn/sexual-assault/1').send(values);
+            expect(responsePost.status).to.equal(302);
+            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/');
+        });
+
         it('doesn’t allow access beyond next page', async function() {
             const response = await request.get('/test-grn/sexual-assault/3');
             expect(response.status).to.equal(302);

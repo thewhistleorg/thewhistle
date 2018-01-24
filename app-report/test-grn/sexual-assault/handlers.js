@@ -93,7 +93,8 @@ class Handlers {
         }
 
         // remember if we're going forward or back, then delete nav from body
-        const go = body['nav-next'] ? page + 1 : page - 1;
+        const goNum = body['nav-next'] ? page + 1 : page - 1;
+        const go = goNum==0 ? '' : goNum>nPages ? 'submit' : goNum;
         delete body['nav-prev'];
         delete body['nav-next'];
 
@@ -121,7 +122,7 @@ class Handlers {
             await Submission.progress(ctx.params.database, ctx.session.submissionId, page);
         }
 
-        ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/`+(go<=nPages ? go : 'submit'));
+        ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${go}`);
     }
 
 

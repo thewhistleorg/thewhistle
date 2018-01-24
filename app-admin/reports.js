@@ -92,7 +92,7 @@ class ReportsHandlers {
                 assignedTo:      assignedTo ? '@'+assignedTo.username : `<i class="pale-grey">Not assigned</i>`, // eslint-disable-line quotes
                 status:          rpt.status ||  `<i class="pale-grey">None</i>`,                                 // eslint-disable-line quotes
                 summary:         rpt.summary || `<span title="submitted description">${desc}</span>`,
-                submittedDesc:   truncate(desc,140)|| `<i title="submitted description" class="pale-grey">No Description</i>`, // eslint-disable-line quotes
+                submittedDesc:   truncate(desc, 140)|| `<i title="submitted description" class="pale-grey">No Description</i>`, // eslint-disable-line quotes
                 tags:            rpt.tags,
                 reportedOnDay:   prettyDate(rpt._id.getTimestamp()),
                 reportedOnFull:  dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
@@ -373,9 +373,9 @@ class ReportsHandlers {
         for (const q in ctx.request.query) {
             if (Array.isArray(ctx.request.query[q])) {
                 // if filter given multiple times eg tag=a&tag=b;
-                for (const f of ctx.request.query[q]) filters.push(q.slice(0,6)=='field:' ? `field <i>${q.slice(6)}</i>: ${f}` : `${q}: ${f}`);
+                for (const f of ctx.request.query[q]) filters.push(q.slice(0, 6)=='field:' ? `field <i>${q.slice(6)}</i>: ${f}` : `${q}: ${f}`);
             } else {
-                filters.push(q.slice(0,6)=='field:' ? `field <i>${q.slice(6)}</i>: ${ctx.request.query[q]}` : `${q}: ${ctx.request.query[q]}`);
+                filters.push(q.slice(0, 6)=='field:' ? `field <i>${q.slice(6)}</i>: ${ctx.request.query[q]}` : `${q}: ${ctx.request.query[q]}`);
             }
         }
 
@@ -771,7 +771,7 @@ class ReportsHandlers {
         const otherReports = await Report.find(db, { $and: [ { alias: report.alias }, { _id: { $ne: ObjectId(ctx.params.id) } } ] });
         for (const rpt of otherReports) {
             rpt.reported = dateFormat(rpt._id.getTimestamp(), 'd mmm yyyy HH:MM');
-            rpt.desc = truncate(rpt.submitted.Description, 24)
+            rpt.desc = truncate(rpt.submitted.Description, 24);
         }
 
         // list of all available tags (for autocomplete input)
@@ -817,7 +817,7 @@ class ReportsHandlers {
             reportedOnDay:    dateFormat(report.reported, 'd mmm yyyy'),
             reportedOnTz:     dateFormat(report.reported, 'Z'),
             reportedBy:       report.by ? `${report.alias} / @${reportedBy.username}` : report.alias,
-            reportHtml:       jsObjectToHtml.usingTable(report.submitted, [ 'Anonymous id','files' ], 'h3'),
+            reportHtml:       jsObjectToHtml.usingTable(report.submitted, [ 'Anonymous id', 'files' ], 'h3'),
             geocodeHtml:      jsObjectToHtml.usingTable(report.location.geocode),
             formattedAddress: report.location.geocode ? encodeURIComponent(report.location.geocode.formattedAddress) : 'report.location.address',
             lat:              report.location.geojson ? report.location.geojson.coordinates[1]  : 0,
@@ -832,7 +832,7 @@ class ReportsHandlers {
             files:            report.submitted.files, // for tabs
             updates:          updates,
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
-            submittedDesc:    truncate(desc,70) || `<i title="submitted description" class="grey">No Description</i>`, // eslint-disable-line quotes
+            submittedDesc:    truncate(desc, 70) || `<i title="submitted description" class="grey">No Description</i>`, // eslint-disable-line quotes
             showDeleteButton: ctx.app.env != 'production',
             referer:          ctx.headers.referer || '/reports',
         };
@@ -1274,7 +1274,7 @@ function ago(date, short=false) {
     for (const period in duration) {
         if (interval > duration[period]) {
             const n = Math.floor(interval / (duration[period]));
-            return short ? n + period.slice(0,1) : n + ' ' + period + (n>1 ? 's' : '') + ' ago';
+            return short ? n + period.slice(0, 1) : n + ' ' + period + (n>1 ? 's' : '') + ' ago';
         }
     }
 

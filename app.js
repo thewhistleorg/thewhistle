@@ -51,7 +51,7 @@ app.use(compress({}));
 // only search-index report subdomain
 app.use(async function robots(ctx, next) {
     await next();
-    if (ctx.hostname.slice(0,3) != 'report') ctx.response.set('X-Robots-Tag', 'noindex, nofollow');
+    if (ctx.hostname.slice(0, 3) != 'report') ctx.response.set('X-Robots-Tag', 'noindex, nofollow');
 });
 
 

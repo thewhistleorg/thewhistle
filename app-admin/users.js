@@ -291,7 +291,7 @@ class UsersHandlers {
  * @returns {string[]} List of defined organisation databases.
  */
 function availableDatabases() {
-    const dbEnvVars = Object.keys(process.env).filter(envvar => envvar.slice(0,3)=='DB_');
+    const dbEnvVars = Object.keys(process.env).filter(envvar => envvar.slice(0, 3)=='DB_');
     const databases = dbEnvVars.map(db => db.slice(3).toLowerCase().replace('_', '-'));
     return databases.filter(db => db!='users').sort();
 }

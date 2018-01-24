@@ -34,7 +34,7 @@ class Handlers {
         ctx.session.completed = 0; // number of pages completed; used to prevent users jumping ahead
 
         // record new submission has been started
-        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0,15)=='node-superagent') {
+        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
             ctx.session.submissionId = await Submission.insert(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
         }
 
@@ -104,9 +104,9 @@ class Handlers {
         // if date specified, verify it is valid (to back up client-side validation)
         if (body.when == 'date') {
             const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
-            const time = body.date.time ? body.date.time.split(':') : [ '00','00','00' ];
+            const time = body.date.time ? body.date.time.split(':') : [ '00', '00', '00' ];
             // const date = new Date(body.date.year, months.indexOf(body.date.month.toLowerCase()), body.date.day, body.date.hour, body.date.minute);
-            const date = new Date(body.date.year, months.indexOf(body.date.month.toLowerCase()),body.date.day,time[0],time[1]);
+            const date = new Date(body.date.year, months.indexOf(body.date.month.toLowerCase()), body.date.day, time[0], time[1]);
             if (isNaN(date.getTime())) {
                 ctx.flash = { validation: [ 'Invalid date' ] };
                 ctx.redirect(ctx.url); return;
@@ -118,7 +118,7 @@ class Handlers {
         }
 
         // record submission progress
-        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0,15)=='node-superagent') {
+        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
             await Submission.progress(ctx.params.database, ctx.session.submissionId, page);
         }
 
@@ -143,7 +143,7 @@ class Handlers {
         const files = ctx.session.report.files ? ctx.session.report.files.map(f => f.name).join(', ') : null;
         const context = {
             reportHtml: jsObjectToHtml.usingTable(prettyReport),
-            files:      files ,
+            files:      files,
         };
 
         await ctx.render('submit', context);
@@ -189,7 +189,7 @@ class Handlers {
         await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
 
         // record submission complete
-        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0,15)=='node-superagent') {
+        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
             await Submission.complete(ctx.params.database, ctx.session.submissionId, id);
         }
 
@@ -308,9 +308,9 @@ function prettifyReport(report) {
 
     // date gets allocated to either Date (if it's an actual date) or Happened for other options
     const d = report.date;
-    const time = d.time ? d.time.split(':') : [ '00','00','00' ];
+    const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
     switch (report.when) {
-        case 'date':          rpt.Date = new Date(d.year, months.indexOf(d.month.toLowerCase()),d.day,time[0],time[1] ); break;
+        case 'date':          rpt.Date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1] ); break;
         case 'within':        rpt.Happened = report['within-options']; break;
         case 'dont-remember': rpt.Happened = 'Don’t remember'; break;
         case 'dont-know':     rpt.Happened = 'Don’t know'; break;

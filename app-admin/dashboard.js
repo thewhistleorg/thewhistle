@@ -223,7 +223,7 @@ function ago(date, short=false) {
     for (const period in duration) {
         if (interval > duration[period]) {
             const n = Math.floor(interval / (duration[period]));
-            return short ? n + period.slice(0,1) : n + ' ' + period + (n>1 ? 's' : '') + ' ago';
+            return short ? n + period.slice(0, 1) : n + ' ' + period + (n>1 ? 's' : '') + ' ago';
         }
     }
 

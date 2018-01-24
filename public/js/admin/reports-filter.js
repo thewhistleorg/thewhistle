@@ -112,12 +112,12 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
         if (key == 'sort') { document.querySelector('#search').dataset.sort = value; return; }
         if (key == 'active') { document.querySelector('#search').dataset.active = value; return; }
 
-        if ([ 'assigned', 'status', 'submitted' ].includes(key) || key.slice(0,6)=='field:') {
+        if ([ 'assigned', 'status', 'submitted' ].includes(key) || key.slice(0, 6)=='field:') {
             // only makes sense to have one assigned / status / submitted filter, so remove current one
             const current = document.querySelector(`#search-display span[data-key="${key}"]`);
             if (current) current.remove();
         }
-        const displayText = key.slice(0,6)=='field:' ? `field <i>${key.slice(6)}</i>: ${value}` : `${key}: ${value}`;
+        const displayText = key.slice(0, 6)=='field:' ? `field <i>${key.slice(6)}</i>: ${value}` : `${key}: ${value}`;
         const removeLink = '<a href="#" class="remove-filter">×</a>';
         const filterSpan = `<span data-key="${key}" data-value="${value}"  class="selected-filter">${displayText} ${removeLink}</span>`;
         document.querySelector('#filter-container').insertAdjacentHTML('beforeend', filterSpan);

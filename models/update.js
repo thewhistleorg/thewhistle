@@ -248,9 +248,9 @@ class Update {
                     default:                 description = `Set ${fld} to ‘${val}’`; break;
                 }
                 break;
-            case 'addToSet': description = `Add ${fld.slice(0,-1)} ‘${val}’`; break;
-            case 'push':     description = `Add ${fld.slice(0,-1)} ‘${val}’`; break;
-            case 'pull':     description = `Delete ${fld.slice(0,-1)} ‘${val}’`; break;
+            case 'addToSet': description = `Add ${fld.slice(0, -1)} ‘${val}’`; break;
+            case 'push':     description = `Add ${fld.slice(0, -1)} ‘${val}’`; break;
+            case 'pull':     description = `Delete ${fld.slice(0, -1)} ‘${val}’`; break;
         }
 
         return description;

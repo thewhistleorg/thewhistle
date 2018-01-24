@@ -134,11 +134,11 @@ class LoginHandlers {
         // submitted credentials validate: create JWT & record it in a cookie to 'log in' user
 
         const payload = {
-            id:       user._id,                                                 // to get user details
-            name:     user.username,                                            // make username available without db query
-            roles:    user.roles.map(r => r.slice(0,1).toLowerCase()).join(''), // make roles available without db query (slightly obfuscated)
-            db:       db,                                                       // currently selected database
-            remember: body['remember-me'] ? true : false,                       // whether token can be renewed
+            id:       user._id,                                                  // to get user details
+            name:     user.username,                                             // make username available without db query
+            roles:    user.roles.map(r => r.slice(0, 1).toLowerCase()).join(''), // make roles available without db query (slightly obfuscated)
+            db:       db,                                                        // currently selected database
+            remember: body['remember-me'] ? true : false,                        // whether token can be renewed
         };
         const token = jwt.sign(payload, 'the-whistle-jwt-signature-key', { expiresIn: '24h' });
 

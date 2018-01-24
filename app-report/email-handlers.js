@@ -37,7 +37,7 @@ class Email {
         const now = Math.floor(Date.now()/1000).toString(36);
         // 1st 8 chars of hash in base36 gives 42 bits of entropy
         const hash = crypto.createHash('sha256').update(ctx.request.body.email);
-        const emailHash = parseInt(hash.digest('hex'), 16).toString(36).slice(0,8);
+        const emailHash = parseInt(hash.digest('hex'), 16).toString(36).slice(0, 8);
         const token = now+'-'+emailHash; // note use timestamp first so it is easier to identify old tokens in db
 
         // record email hash in db

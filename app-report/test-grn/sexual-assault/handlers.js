@@ -58,12 +58,12 @@ class Handlers {
 
         // progress indicator
         const pages = Array(nPages).fill(null).map((p, i) => ({ page: i+1 }));
-        if (Number(page) > 1) pages[page-1].class = 'current'; // to highlight current page
+        pages[page-1].class = 'current'; // to highlight current page
 
         const validYears = { thisyear: dateFormat('yyyy'), lastyear: dateFormat('yyyy')-1 }; // limit report to current or last year
         const context = Object.assign({ pages: pages }, ctx.session.report, validYears, { q: q });
 
-        await ctx.render(page==0 ? 'index' : 'page'+page, context);
+        await ctx.render('page'+page, context);
     }
 
 

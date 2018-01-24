@@ -330,14 +330,13 @@
                     {{/if}}
 
                     {{#if otherReports}}
-                    <p>Other reports by {{by}}:</p>
+                    <p>Other reports by {{alias}}:</p>
                     <table>
                         {{#otherReports}}
                         <tr>
                             <td></td>
                             <td><a href="/reports/{{_id}}">{{reported}}</a></td>
-                            <td>{{alias}}</td>
-                            <td>{{summary}}</td>
+                            <td>{{desc}}</td>
                         </tr>
                         {{/otherReports}}
                     </table>

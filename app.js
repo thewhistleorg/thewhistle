@@ -83,7 +83,7 @@ app.use(async function(ctx, next) {
     if (!global.db.users) {
         const connectionString = process.env.DB_USERS;
         if (connectionString == undefined) {
-            console.error(`No configuration available for ‘users’ db`);
+            console.error('No configuration available for ‘users’ db');
             process.exit(1);
         }
         try {

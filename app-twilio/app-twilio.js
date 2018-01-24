@@ -103,7 +103,7 @@ app.use(async function handleErrors(ctx, next) {
 app.use(async function(ctx, next) {
     if (!global.db['test-grn']) {
         const connectionString = process.env.DB_TEST_GRN;
-        if (connectionString == undefined) ctx.throw(404, `No configuration available for organisation ‘test-grn’`);
+        if (connectionString == undefined) ctx.throw(404, 'No configuration available for organisation ‘test-grn’');
         try {
             const client = await MongoClient.connect(connectionString);
             global.db['test-grn'] = client.db(client.s.options.dbName);

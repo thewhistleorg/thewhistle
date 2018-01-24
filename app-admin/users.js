@@ -63,6 +63,11 @@ class UsersHandlers {
 
         const users = (await User.getAll()).filter(usr => isSuUser=='show' || usr.databases.includes(ctx.state.user.db));
 
+        for (const user of users) {
+            user.roles = user.roles.join(', ');
+            user.databases = user.databases.join(', ');
+        }
+
         users.sort((a, b) => { a = (a.firstname+a.lastname).toLowerCase(); b = (b.firstname+b.lastname).toLowerCase(); return a < b ? -1 : 1; });
         await ctx.render('users-list', { users, isSuUser: isSuUser });
     }

@@ -30,7 +30,7 @@ app.use(handlebars({
 // koa-static will throw 400 Malicious Path (from resolve-path) on URL starting with '//', so trap that
 // case before using serve() middleware and return 404 instead (as with '//' anywhere else in url)
 app.use(async function trapMaliciousPath(ctx, next) {
-    if (ctx.url.slice(0,2) == '//') { await ctx.render('404-not-found'); return; }
+    if (ctx.url.slice(0, 2) == '//') { await ctx.render('404-not-found'); return; }
     await next();
 });
 

@@ -408,7 +408,7 @@ function initialiseMap(google, reportId, alias, lat, lon, reportedOnDay, highlig
                             url:      '/reports/'+report._id,
                             map:      map,
                         });
-                        let info = report.assignedTo ? 'Assigned to: '+report.assignedToName : 'Not assigned';
+                        let info = report.assignedToText;
                         if (report.status) info += `<div>Status: ${report.status}</div>`;
                         if (report.tags.length > 0) info += `<div>Tags: ${report.tags.join('; ')}</div>`;
                         const infowindow = new google.maps.InfoWindow({ content: info });

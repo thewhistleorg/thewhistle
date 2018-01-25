@@ -81,6 +81,9 @@ class ReportsHandlers {
 
             const desc = rpt.submitted['Description'] || rpt.submitted['brief-description']; // TODO: transition code until all early test report are deleted
             const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
+            const notAssigned = '<i class="pale-grey">Not assigned</i>';
+            const assignedMissing = '<span title="assignee no longer available">??</span>';
+            const assignedToText = rpt.assignedTo==null ? notAssigned : assignedTo==undefined ? assignedMissing : '@'+assignedTo.username;
             const fields = {
                 _id:             rpt._id,
                 updatedOn:       lastUpdate.on ? lastUpdate.on.toISOString().replace('T', ' ').replace('.000Z', '') : '',
@@ -89,8 +92,8 @@ class ReportsHandlers {
                 updatedAgo:      lastUpdate.on ? 'Updated ' + ago(lastUpdate.on) : '',
                 viewed:          !!lastViewed,
                 updatedBy:       lastUpdate.by,
-                assignedTo:      assignedTo ? '@'+assignedTo.username : `<i class="pale-grey">Not assigned</i>`, // eslint-disable-line quotes
-                status:          rpt.status ||  `<i class="pale-grey">None</i>`,                                 // eslint-disable-line quotes
+                assignedTo:      assignedToText, // note equivalent logic in ajaxReportsWithin()
+                status:          rpt.status ||  '<i class="pale-grey">None</i>',
                 summary:         rpt.summary || `<span title="submitted description">${desc}</span>`,
                 submittedDesc:   truncate(desc, 140)|| `<i title="submitted description" class="pale-grey">No Description</i>`, // eslint-disable-line quotes
                 tags:            rpt.tags,
@@ -982,12 +985,15 @@ class ReportsHandlers {
             // get list of users (indexed by id) for use in translating assigned-to id's to usernames
             const users = await User.details(); // note users is a Map
             for (const report of reports) {
-                const assignedTo = users.get(report.assignedTo.toString());
+                const assignedTo = report.assignedTo ? users.get(report.assignedTo.toString()) : null;
+                const notAssigned = 'Not assigned';
+                const assignedMissing = 'Assigned to: ??';
+                const assignedToText = report.assignedTo==null ? notAssigned : assignedTo==undefined ? assignedMissing : 'Assigned to: '+assignedTo.username;
                 report.lat = report.location.geojson.coordinates[1];
                 report.lng = report.location.geojson.coordinates[0];
                 report.reported = reported(report._id.getTimestamp());
                 report.highlight = Math.round(100 * (report._id.getTimestamp() - new Date() + y) / y);
-                report.assignedToName = assignedTo ? assignedTo.username : '??';
+                report.assignedToText = assignedToText; // note equivalent logic in list()
             }
             ctx.status = 200;
             ctx.body = { reports };

@@ -96,7 +96,8 @@ import fs   from 'fs-extra'; // fs with extra functions & promise interface
  */
 router.get('/map-marker/:colour/:percentage', async function getMapMarker(ctx) {
     const colour = ctx.params.colour;
-    const percentage = Math.round(ctx.params.percentage); // 0 = transparent/monochrome, 100 = full color
+    const percentageInt = Math.round(ctx.params.percentage); // 0 = transparent/monochrome, 100 = full color
+    const percentage = Math.max(Math.min(percentageInt, 100), 0); // constrain to 0..100
     const path = 'static/map/marker-'+colour+'-'+percentage+'.png';
 
     const maxage = ctx.app.env=='production' ? 1000*60*60*24 : 1000;

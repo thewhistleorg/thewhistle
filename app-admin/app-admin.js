@@ -18,6 +18,23 @@ import Middleware        from '../lib/middleware.js';
 const app = new Koa(); // admin app
 
 
+// handlebars templating
+app.use(handlebars({
+    extension:   [ 'html' ],
+    viewsDir:    'app-admin/templates',
+    partialsDir: 'app-admin/templates/partials',
+    helpers:     { selected: HandlebarsHelpers.selected, checked: HandlebarsHelpers.checked, contains: HandlebarsHelpers.contains },
+}));
+
+
+// koa-static will throw 400 Malicious Path (from resolve-path) on URL starting with '//', so trap that
+// case before using serve() middleware and return 404 instead (as with '//' anywhere else in url)
+app.use(async function trapMaliciousPath(ctx, next) {
+    if (ctx.url.slice(0,2) == '//') { await ctx.render('404-not-found'); return; }
+    await next();
+});
+
+
 // serve static files (html, css, js); allow browser to cache for 1 day (note css/js req'd before login)
 // note that these files held in /public are included in the repository and served without constraint,
 // as opposed to files in /static which are outside the repository and may be large and/or sensitive
@@ -33,15 +50,6 @@ app.use(async function logAccess(ctx, next) {
 
     await log(ctx, 'access', t1, t2);
 });
-
-
-// handlebars templating
-app.use(handlebars({
-    extension:   [ 'html' ],
-    viewsDir:    'app-admin/templates',
-    partialsDir: 'app-admin/templates/partials',
-    helpers:     { selected: HandlebarsHelpers.selected, checked: HandlebarsHelpers.checked, contains: HandlebarsHelpers.contains },
-}));
 
 
 // handle thrown or uncaught exceptions anywhere down the line

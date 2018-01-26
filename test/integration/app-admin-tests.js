@@ -189,7 +189,7 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             // nav should be /, Reports, Users, Resources, Submit, user-name, Logout
             expect(document.querySelectorAll('header nav > ul > li').length).to.equal(8);
             // 'Submit' menu should have 'test-grn/sexual-assault (internal)' entry
-            expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('test-grn/sexual-assault (internal)');
+            expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('sexual-assault (internal)');
         });
     });
 

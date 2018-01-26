@@ -300,8 +300,8 @@ function prettifyReport(report) {
 
     // on-behalf-of
     const onbehalfof = {
-        myself:         'myself',
-        'someone-else': 'someone else',
+        myself:         'Myself',
+        'someone-else': 'Someone else',
         undefined:      null,
     };
     rpt['On behalf of'] = onbehalfof[report['on-behalf-of']];
@@ -324,9 +324,6 @@ function prettifyReport(report) {
     };
     rpt['Still happening?'] = stillHappening[report['still-happening']];
 
-    // description
-    rpt.Description = report.description;
-
     //where
     const where = {
         at:              report['at-address'],
@@ -346,16 +343,18 @@ function prettifyReport(report) {
 
     // action-taken: create array of responses matching form labels
     const action = {
-        police:       'I have told the police',
-        organisation: 'I have told somebody within an organisation',
-        friends:      'I spoke to friends or other people I know',
-        teacher:      'I spoke to a teacher',
+        police:       'Police or government officials',
+        teacher:      'Teacher/tutor/lecturer',
+        friends:      'Friends, family',
         other:        report['action-taken-other-details'],
         unset:        null, // no checkboxes ticked
     };
     if (report['action-taken'] == undefined) report['action-taken'] = 'unset';
     if (typeof report['action-taken'] == 'string') report['action-taken'] = [ report['action-taken'] ];
-    rpt['Action taken'] = report['action-taken'].map(a => action[a]);
+    rpt['Spoken to anybody?'] = report['action-taken'].map(a => action[a]);
+
+    // description
+    rpt.Description = report.description;
 
     // used-before: set Alias from generated-alias or existing-alias (don't record distinction in
     // order to ensure homogeneous reports)

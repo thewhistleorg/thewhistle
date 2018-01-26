@@ -322,7 +322,7 @@ function prettifyReport(report) {
         n:         'no',
         undefined: null,
     };
-    rpt['Still happening'] = stillHappening[report['still-happening']];
+    rpt['Still happening?'] = stillHappening[report['still-happening']];
 
     // description
     rpt.Description = report.description;

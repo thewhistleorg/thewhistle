@@ -24,7 +24,6 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             let oldContent = null;
-            console.log('DOMContentLoaded');
 
             // focus to empty question number
             [...document.querySelectorAll('td[contenteditable].q')].filter(el => el.textContent=='')[0].focus();
@@ -45,7 +44,6 @@
                 const question = tr.querySelector('.q').textContent.trim();
                 const self = tr.querySelector('.self').textContent.trim();
                 const other = tr.querySelector('.other').textContent.trim();
-                console.log('add', question, self, other)
 
                 // once question, self, & other fields completed, save it
                 if (question.length>0 && self.length>0 && other.length>0) {
@@ -85,7 +83,6 @@
                     tr.querySelectorAll('td[contenteditable]').forEach(td => td.classList.remove('edit')); // indicate edit complete
 
                     const values = JSON.stringify({ question, self, other });
-                    console.log('update', id, values)
 
                     const response = await fetch(url, { method: 'PUT', body: values, headers, credentials });
 
@@ -98,8 +95,6 @@
 
                 // if all of question, self, & other are cleared, delete the questions
                 if (question.length==0 && self.length==0 && other.length==0) {
-                    console.log('delete', id)
-
                     const response = await fetch(url, { method: 'DELETE', headers, credentials });
 
                     if (response.ok) {
@@ -111,11 +106,9 @@
             });
 
             document.querySelectorAll('td[contenteditable').forEach(el => el.oninput = async function() {
-                console.log('oninput')
                 // clear success indicator on any input received
                 document.querySelectorAll('.saved').forEach(td => td.classList.add('hide'));
                 // indicate current question being edited
-                console.log(this.parentElement.querySelectorAll('td[contenteditable]'))
                 this.parentElement.querySelectorAll('td[contenteditable]').forEach(td => td.classList.add('edit'));
             });
         });

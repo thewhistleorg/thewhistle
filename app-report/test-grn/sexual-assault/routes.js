@@ -19,6 +19,12 @@ router.post('/:database/:project/whatnext',   handlers.postWhatnext);
 router.get( '/:database/:project/reset', function(ctx) { ctx.session.report = {}; ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return;  }); // TODO; for testing only
 
 
+// JUST FOR TESTING: supertest doesn't appear to manage to pass koa:jwt cookie between apps on
+// different ports, so provide a way for the test suite to explicitly log in to the report app
+import adminLogin from '../../../app-admin/login.js';
+router.post('/:database/:project/login', adminLogin.postLogin);
+
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 export default router.middleware();

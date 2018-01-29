@@ -25,6 +25,7 @@ const testpass = process.env.TESTPASS; // (for successful login & sexual-assault
 
 
 const request = supertest.agent(app.listen()).host('admin.localhost');
+const requestReport = supertest.agent(app.listen()).host('report.localhost');
 
 // note that document.querySelector() works with CSS ids which are more restrictive than HTML5 ids,
 // so getElementById() has to be used to find ObjectId ids instead of querySelector()
@@ -161,7 +162,7 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             expect(document.querySelector('button').nextElementSibling.textContent).to.equal('E-mail / password not recognised');
         });
 
-        it('redirects to / on login', async function() {
+        it('logs in, and redirects to /', async function() {
             const values = { username: testuser, password: testpass, 'remember-me': 'on' };
             const response = await request.post('/login').send(values);
             expect(response.status).to.equal(302);
@@ -246,9 +247,7 @@ describe(`Admin app (test-grn/${app.env})`, function() {
         });
     });
 
-    describe('incident report', function() {
-        return; /* eslint-disable no-unreachable *//* TODO: remove single page submission code & tests? replace with staff equiv of report tests? */
-
+    describe('submit (internal single-page) incident report', function() {
         let reportId = null;
         let commentId = null;
         let testUserDetails = null;
@@ -263,76 +262,87 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             testUserDetails = response.body.users[0];
         });
 
+        // supertest doesn't appear to be able to pass koa:jwt cookie between apps running on
+        // different ports, so log in explicitly to emulate browser behaviour
+        it('logs in to report app (supertest doesn’t share login)', async function() {
+            const values = { username: testuser, password: testpass, 'remember-me': 'on' };
+            const response = await requestReport.post('/test-grn/sexual-assault/login').send(values);
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/test-grn/sexual-assault');
+        });
+
         it('sees new case intake page', async function() {
-            const response = await request.get('/report/sexual-assault');
+            const response = await requestReport.get('/test-grn/sexual-assault/internal');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.querySelector('h1').textContent).to.equal('New Case Intake');
+            expect(document.querySelector('h1').textContent).to.equal('Are you reporting on behalf of yourself or someone else?');
         });
 
         it('reports new case intake invalid project', async function() {
-            const response = await request.get('/report/no-such-project');
+            const response = await requestReport.get('/test-grn/no-such-project/internal');
             expect(response.status).to.equal(404);
             const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.querySelector('p').textContent).to.equal('Project ‘no-such-project’ not found.');
-        });
-
-        it('reports submit without entering details', async function() {
-            const response = await request.post('/report/sexual-assault/submit');
-            expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/report/sexual-assault');
+            expect(document.querySelector('p').textContent).to.equal('Couldn’t find that one!...');
         });
 
         it('enters incident report', async function() {
+            const d = new Date(Date.now() - 1000*60*60*24); // yesterday in case of early-morning run
             const values = { // eslint-disable-line no-unused-vars
-                'generated-alias':   'testy terrain',
-                date:                dateFormat(new Date(Date.now() - 1000*60*60*24), 'yyyy-mm-dd'), // yesterday in case of early-morning run
-                time:                dateFormat('HH:MM'),
-                'brief-description': 'test',
-                'location-address':  'University of Lagos',
+                'on-behalf-of':    'myself',
+                'when':            'date',
+                'date':            { day: dateFormat(d, 'dd'),  month: dateFormat(d, 'mmm'), year: dateFormat(d, 'yyyy'), time: '' },
+                'still-happening': 'n',
+                'where':           'at',
+                'at-address':      'University of Lagos',
+                'who':             'n',
+                'who-description': 'A death eater',
+                'action-taken':    'teacher',
+                'description':     'Test',
+                'used-before':     'n',
+                'generated-alias': 'testy terrain',
             };
             // sadly, it seems that superagent doesn't allow request.attach() to be used with
             // request.send(), so instead we need to use request.field()
-            const response = await request.post('/report/sexual-assault')
+            const response = await requestReport.post('/test-grn/sexual-assault/internal')
+                .field('on-behalf-of', values['on-behalf-of'])
+                .field('when', values['when'])
+                .field('date', JSON.stringify(values['date']))
+                .field('still-happening', values['still-happening'])
+                .field('where', values['where'])
+                .field('at-address', values['at-address'])
+                .field('who', values['who'])
+                .field('who-description', values['who-description'])
+                .field('action-taken', values['action-taken'])
+                .field('description', values['description'])
+                .field('used-before', values['used-before'])
                 .field('generated-alias', values['generated-alias'])
-                .field('date', values['date'])
-                .field('time', values['time'])
-                .field('brief-description', values['brief-description'])
-                .field('location-address', values['location-address'])
                 .attach('documents', imgFldr+imgFile);
             expect(response.status).to.equal(302);
             const koaSession = base64.decode(response.headers['set-cookie'][0].match(/^koa:sess=([a-zA-Z0-9=.]+);.+/)[1]);
-            expect(response.headers.location).to.equal('/report/sexual-assault/submit', koaSession); // koaSession['koa-flash'] fails??
+            expect(response.headers.location).to.equal('/test-grn/sexual-assault/submit', koaSession); // koaSession['koa-flash'] fails??
         });
 
         it('gets new autogenerated alias (ajax)', async function() {
-            const response = await request.get('/ajax/report/test-grn/aliases/new');
+            const response = await requestReport.get('/ajax/test-grn/aliases/new');
             expect(response.status).to.equal(200);
             expect(response.body.alias.split(' ')).to.have.lengthOf(2);
         });
 
         it('sees review & submit page', async function() {
-            const response = await request.get('/report/sexual-assault/submit');
+            const response = await requestReport.get('/test-grn/sexual-assault/submit');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.querySelector('h1').textContent).to.equal('Review & Submit');
+            expect(document.querySelector('h1').textContent).to.equal('Check before you send the report');
         });
 
         it('submits incident report', async function() {
-            const response = await request.post('/report/sexual-assault/submit').send();
+            const response = await requestReport.post('/test-grn/sexual-assault/submit').send();
             expect(response.status).to.equal(302);
             reportId = response.headers['x-insert-id'];
-            expect(response.headers.location).to.equal(`/report/sexual-assault/${reportId}/confirm`);
+            expect(response.headers.location).to.equal('/test-grn/sexual-assault/whatnext');
             expect(reportId.length).to.equal(24);
             // note no test junk will be left in user-agents recording as long as test host
             // IP address (localhost or CI host) is excluded from user-agents recording
-        });
-
-        it('sees confirm page', async function() {
-            const response = await request.get(`/report/sexual-assault/${reportId}/confirm`);
-            expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.querySelector('h1').textContent).to.equal('Report Submitted');
         });
 
         it('has new report in list of reports', async function() {
@@ -340,6 +350,30 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(reportId)).to.not.be.null;
+        });
+
+        it('sees new report with nicely formatted information', async function() {
+            const response = await request.get(`/reports/${reportId}`);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const reportInfo = document.querySelector('table.js-obj-to-html');
+            const ths = reportInfo.querySelectorAll('th');
+            expect(ths[0].textContent).to.equal('On behalf of');
+            expect(ths[0].nextSibling.textContent).to.equal('Myself');
+            expect(ths[1].textContent).to.equal('Date');
+            expect(ths[1].nextSibling.textContent).to.equal(dateFormat(Date.now()-1000*60*60*24, 'd mmm yyyy'));
+            expect(ths[2].textContent).to.equal('Still happening?');
+            expect(ths[2].nextSibling.textContent).to.equal('no');
+            expect(ths[3].textContent).to.equal('Where');
+            expect(ths[3].nextSibling.textContent).to.equal('University of Lagos');
+            expect(ths[4].textContent).to.equal('Who');
+            expect(ths[4].nextSibling.textContent).to.equal('Not known: A death eater');
+            expect(ths[5].textContent).to.equal('Spoken to anybody?');
+            expect(ths[5].nextSibling.textContent).to.equal('Teacher/tutor/lecturer');
+            expect(ths[6].textContent).to.equal('Description');
+            expect(ths[6].nextSibling.textContent).to.equal('Test');
+            expect(ths[7].textContent).to.equal('Alias');
+            expect(ths[7].nextSibling.textContent).to.equal('testy terrain');
         });
 
         it('sets location by geocoding address (ajax)', async function() {

@@ -144,7 +144,8 @@ class LoginHandlers {
         const token = jwt.sign(payload, 'the-whistle-jwt-signature-key', { expiresIn: '24h' });
 
         // record token in signed cookie, in top-level domain to be available to both admin. and report. subdomains
-        const domain = ctx.request.hostname.replace('admin.', '');
+        // note in test suite, this is invoked also from report app
+        const domain = ctx.request.hostname.replace(/admin\.|report\./, '');
         const options = { signed: true, domain: domain };
         // if 'remember-me', set cookie for 1 week, otherwise set session only
         if (body['remember-me']) options.expires = new Date(Date.now() + 1000*60*60*24*7);

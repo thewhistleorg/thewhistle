@@ -307,7 +307,8 @@ function prettifyReport(report) {
     rpt['On behalf of'] = onbehalfof[report['on-behalf-of']];
 
     // date gets allocated to either Date (if it's an actual date) or Happened for other options
-    const d = report.date;
+    // (for some reason, test suite leaves date as a string)
+    const d = typeof report.date=='object' ? report.date : JSON.parse(report.date);
     const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
     switch (report.when) {
         case 'date':          rpt.Date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1] ); break;
@@ -343,11 +344,11 @@ function prettifyReport(report) {
 
     // action-taken: create array of responses matching form labels
     const action = {
-        police:       'Police or government officials',
-        teacher:      'Teacher/tutor/lecturer',
-        friends:      'Friends, family',
-        other:        report['action-taken-other-details'],
-        unset:        null, // no checkboxes ticked
+        police:  'Police or government officials',
+        teacher: 'Teacher/tutor/lecturer',
+        friends: 'Friends, family',
+        other:   report['action-taken-other-details'],
+        unset:   null, // no checkboxes ticked
     };
     if (report['action-taken'] == undefined) report['action-taken'] = 'unset';
     if (typeof report['action-taken'] == 'string') report['action-taken'] = [ report['action-taken'] ];

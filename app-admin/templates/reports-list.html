@@ -51,7 +51,7 @@
                 div.style.display = 'block';
             }
             const sortIndicator = document.querySelector('th[data-sort={{sort.column}}] .fa');
-            if (!document.querySelector('th[data-sort={{sort.column}}] .fa')) {
+            if (document.querySelector('th[data-sort={{sort.column}}] .fa')) {
                 sortIndicator.style.color = '#000000';
                 sortIndicator.parentElement.style.backgroundColor = '#e8f2f7';
                 sortIndicator.classList.remove('fa-sort');

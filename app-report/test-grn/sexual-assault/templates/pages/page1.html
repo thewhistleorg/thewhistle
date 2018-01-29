@@ -1,21 +1,41 @@
 <form method="post">
-    {{> back}}{{> step}}
-    <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+  {{> back}}{{> step}}
+  <ul class="validation-errors">{{#@koa.flash.validation}}
+    <li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+  <div class="margin-top-3">
+    <h1>Are you reporting on behalf of yourself or someone else?</h1>
 
-    <div class="margin-top-3">
+    <ul>
+      <li>
+        <input type="radio" name="on-behalf-of" id="myself" value="myself">
+        <label for="myself">Myself</label>
+      </li>
+      <li>
+        <input type="radio" name="on-behalf-of" id="someone-else" value="someone-else">
+        <label for="someone-else">Someone else</label>
+      </li>
+    </ul>
 
-        <h1>Are you reporting on behalf of yourself or someone else?</h1>
+    <!-- Following age and gender form placement should be discussed, hence commented out -->
+    <!-- <h1>Gender</h1>
+    <ul>
+      {{#checked survivor-gender}}
+      <li>
+        <input type="radio" name="survivor-gender" id="survivor-gender-m" value="m"> <label for="survivor-gender-m">Male</label>
+      </li>
+      <li>
+        <input type="radio" name="survivor-gender" id="survivor-gender-f" value="f"> <label for="survivor-gender-f">Female</label>
+      </li>
+      {{/checked}}
+    </ul>
 
-        <ul>
-            <li>
-                <input type="radio" name="on-behalf-of" id="myself" value="myself">
-                <label for="myself">Myself</label>
-            </li>
-            <li>
-                <input type="radio" name="on-behalf-of" id="someone-else" value="someone-else">
-                <label for="someone-else">Someone else</label>
-            </li>
-        </ul>
-        {{> continue}}
-    </div>
+    <h1>Age</h1>
+    <ul>
+      <li>
+        <label for="survivor-age"></label>
+        <input type="number" name="survivor-age" id="survivor-age" value="{{survivor-age}}" autofocus>
+      </li>
+    </ul> -->
+    {{> continue}}
+  </div>
 </form>

@@ -295,21 +295,7 @@
                         </form>
                     </div>
                 </li> -->
-                <li class="accordion-item">
-                    <input type="checkbox" class="accordion-toggle" id="toggle-updates" />
-                    <label class="accordion-trigger" for="toggle-updates"><span class="bold">Audit trail</span></label>
-                    <div class="accordion-target">
-                        <table id="updates">
-                            {{#updates}}
-                            <tr id="{{_id}}">
-                                <td><span class="nowrap">{{onDate}}</span> {{onTime}}</td>
-                                <td>@{{by}}</td>
-                                <td>{{description}}</td>
-                            </tr>
-                            {{/updates}}
-                        </table>
-                    </div>
-                </li>
+
                 <li>
                     <span class="card-header">Archive</span>
 
@@ -326,7 +312,7 @@
 
                     {{#if showDeleteButton}}
                     <form action="/reports/{{_id}}/delete" method="post" class="pure-form pure-form-aligned delete">
-                        <button name="delete" value="{{_id}}" class="fa fa-trash red"></button>
+                        <button name="delete" value="{{_id}}" class="fa fa-trash red"></button><small>Delete report</small>
                     </form>
                     {{/if}}
 
@@ -342,6 +328,21 @@
                         {{/otherReports}}
                     </table>
                     {{/if}}
+                </li>
+                <li class="accordion-item">
+                    <input type="checkbox" class="accordion-toggle" id="toggle-updates" />
+                    <label class="accordion-trigger" for="toggle-updates"><span class="bold">Audit trail</span></label>
+                    <div class="accordion-target">
+                        <table id="updates">
+                            {{#updates}}
+                            <tr id="{{_id}}">
+                                <td><span class="nowrap">{{onDate}}</span> {{onTime}}</td>
+                                <td>@{{by}}</td>
+                                <td>{{description}}</td>
+                            </tr>
+                            {{/updates}}
+                        </table>
+                    </div>
                 </li>
             </ul>
         </div>

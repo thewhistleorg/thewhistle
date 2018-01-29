@@ -1,32 +1,52 @@
-<form method="post" class="pure-form pure-form-aligned">
+<form method="post" enctype="multipart/form-data" class="pure-form">
     {{> back}}{{> step}}
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
     <div  class="margin-top-3">
+        <script>
+            'use strict';
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelector('input[type=file]').onchange = cloneFileInput; // change handler for initial file input
+                function cloneFileInput(event) {
+                    const fileInputs = document.querySelectorAll('input[type=file]');
+                    const el = event.target;
+                    // if we already have a 'no file chosen' input, don't clone another
+                    for (const i of fileInputs) if (i.files.length == 0) return;
+                    // if same file has already been chosen, clear the filename & don't clone
+                    const inputsWithThisName = [...fileInputs].filter(f => f.files[0].name == el.files[0].name)
+                    if (inputsWithThisName.length > 1) { el.value = ''; return; }
+                    const copy = el.cloneNode(true);
+                    copy.onchange = cloneFileInput;
+                    copy.value = '';
+                    copy.id = 'document' + (fileInputs.length);
+                    el.insertAdjacentElement('afterend', copy)
+                }
+            });
+        </script>
 
-        <h1>Do you know who did it?</h1>
+        <h1>This is an anonymous service. Any information you provide will be seen only by staff and
+            volunteers of Global Rights Nigeria.</h1>
 
-        <p class="hint-text">This could be one person or multiple people or a company or organisation.</p>
+        <p class="hint-text">{{q.6a}}</p>
+
         <ul>
-            {{#checked who-x}}
             <li>
-                <input type="radio" name="who" id="who-y" value="y">
-                <label for="who-y" class="pure-radio greyed-out-unless-checked">Yes</label>
-                <div id="who-y-form" style="display:none">
-                  <label for="who-relationship">Please give us as much description as you are able; for
-                      example, it could be a relative, colleague, or acquaintance</label>
-                  <input type="text" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="">
-                </div>
+                <label for="description">Description:</label>
+                <textarea class="pure-input-1" name="description" id="description" rows="4" autofocus>{{description}}</textarea>
             </li>
             <li>
-                <input type="radio" name="who" id="who-n" value="n">
-                <label for="who-n" class="pure-radio greyed-out-unless-checked">No</label>
-                <div id="who-n-form" style="display:none">
-                  <p>Please give us any description of the person/people you are able:</p>
-                  <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
-                </div>
+                <label for="document0">
+                    <strong>Please upload any evidence that could help.</strong>
+                    This can be photos, videos or any other documents.
+                    {{#if files}}
+                    <span class="note">note: please reselect
+                        {{#each files}}{{this.name}}{{#unless @last}}, {{/unless}}{{/each}}
+                        if you wish to submit them</span>
+                    {{/if}}
+                </label>
+                <input type="file" name="documents" value="0" id="document0" class="upload-file">
             </li>
-            {{/checked}}
+
         </ul>
         {{> continue}}
     </div>

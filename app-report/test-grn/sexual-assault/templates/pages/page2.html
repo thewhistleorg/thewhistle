@@ -7,10 +7,9 @@
 
     <div class="margin-top-3">
 
-        <p class="special-intro">We understand this can be difficult. Please take your time and tell
-            us as much as you can.</p>
+        <p class="special-intro">We understand this can be difficult. Please take your time and tell us as much as you are able.</p>
 
-        <h2>{{q.2a}}</h2>
+        <h1>{{q.2a}}</h1>
 
         <ul>
             {{#checked when}}
@@ -18,7 +17,7 @@
                 <input type="radio" name="when" id="when-date" value="date">
                 <label for="when-date" class="pure-radio">Yes, exactly when it happened</label>
                 <div class="when-form" style="display:none;">
-                    <p class="grey">Please select the date and approximate time</p>
+                    <p class="hint-text">Please select the date and approximate time</p>
                     <table class="inline">
                         <tr class="field-label">
                             <td>DD</td>
@@ -134,7 +133,8 @@
             </li>
             <li>
                 <input type="radio" name="when" id="when-within" value="within">
-                <label for="when-within">It was within</label>
+                <label for="when-within">Yes, about when it happened</label>
+                <p class="hint-text">For example, last month, a couple of years ago, …</p>
                 <select name="within-options" id="within-options">
                     <option value="">&nbsp;</option>
                     <option value="within last week">last week</option>

@@ -260,9 +260,8 @@ class ReportsHandlers {
         // get list of users (indexed by id) for use in translating id's to usernames
         const users = await User.details(); // note users is a Map
 
-        // if we have homogeneous submitted details (eg for single project), include them in the CSV
-        const submittedFields = rpts.map(rpt => Object.keys(rpt.submitted).join(':'));
-        const submittedFieldsDistinct = submittedFields.filter((val, idx, me) => me.indexOf(val) == idx);
+        // if list is for single project with homogeneous submitted details, include them in the CSV
+        const singleProject = isListSingleProject(rpts);
 
         const reports = [];
         for (const rpt of rpts) {
@@ -283,7 +282,7 @@ class ReportsHandlers {
                 'active?':       rpt.archived ? 'archived' : 'active',
                 'url':           ctx.origin + '/reports/'+rpt._id,
             };
-            if (submittedFieldsDistinct.length == 1) {
+            if (singleProject) {
                 // we have homogeneous submitted fields, append them to the CSV
                 fields['submitted details'] = '';
                 Object.assign(fields, rpt.submitted);
@@ -299,6 +298,14 @@ class ReportsHandlers {
         ctx.status = 200;
         ctx.body = csv;
         ctx.attachment(filename);
+
+        // check whether current list of reports is for a single project, with homogeneous submitted details
+        function isListSingleProject(rpts) {
+            const submittedFields = rpts.map(rpt => Object.keys(rpt.submitted).join(':'));
+            const submittedFieldsDistinct = submittedFields.filter((val, idx, me) => me.indexOf(val) == idx);
+
+            return submittedFieldsDistinct.length == 1;
+        }
     }
 
 

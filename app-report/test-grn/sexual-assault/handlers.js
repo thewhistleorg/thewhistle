@@ -306,15 +306,14 @@ function prettifyReport(report) {
     };
     rpt['On behalf of'] = onbehalfof[report['on-behalf-of']];
 
-    // date gets allocated to either Date (if it's an actual date) or Happened for other options
-    // (for some reason, test suite leaves date as a string)
+    // date (either date object or string)
+    // (note for some reason test suite leaves date as a string)
     const d = typeof report.date=='object' ? report.date : JSON.parse(report.date);
     const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
     switch (report.when) {
-        case 'date':          rpt.Date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1] ); break;
+        case 'date':          rpt.Happened = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1] ); break;
         case 'within':        rpt.Happened = report['within-options']; break;
         case 'dont-remember': rpt.Happened = 'Don’t remember'; break;
-        case 'dont-know':     rpt.Happened = 'Don’t know'; break;
     }
 
     // still-happening

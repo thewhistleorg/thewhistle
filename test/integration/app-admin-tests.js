@@ -360,7 +360,7 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             const ths = reportInfo.querySelectorAll('th');
             expect(ths[0].textContent).to.equal('On behalf of');
             expect(ths[0].nextSibling.textContent).to.equal('Myself');
-            expect(ths[1].textContent).to.equal('Date');
+            expect(ths[1].textContent).to.equal('Happened');
             expect(ths[1].nextSibling.textContent).to.equal(dateFormat(Date.now()-1000*60*60*24, 'd mmm yyyy'));
             expect(ths[2].textContent).to.equal('Still happening?');
             expect(ths[2].nextSibling.textContent).to.equal('no');

@@ -180,15 +180,15 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     if (document.querySelector('input[name=who]')) {
 
-        // Show who-y-form when selected
-        document.querySelector('#who-y').addEventListener('change', function() {
-            this.parentElement.querySelector('#who-y-form').style.display='block';
-        });
-
-        // Show who-n-form when selected
-        document.querySelector('#who-n').addEventListener('change', function() {
-            this.parentElement.querySelector('#who-n-form').style.display='block';
-        });
+        // // Show who-y-form when selected
+        // document.querySelector('#who-y').addEventListener('change', function() {
+        //     this.parentElement.querySelector('#who-y-form').style.display='block';
+        // });
+        //
+        // // Show who-n-form when selected
+        // document.querySelector('#who-n').addEventListener('change', function() {
+        //     this.parentElement.querySelector('#who-n-form').style.display='block';
+        // });
 
 
         // check #who-y if who-relationship receives focus
@@ -206,6 +206,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (input.value == 'y') {
                     document.querySelector('input[name="who-relationship"]').focus();
                     document.querySelector('input[name="who-relationship"]').select();
+                    this.parentElement.querySelector('#who-y-form').style.display='block';
+                    this.parentElement.parentElement.querySelector('#who-n-form').style.display='none';
                 }
             });
         });
@@ -215,6 +217,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (input.value == 'n') {
                     document.querySelector('textarea[name="who-description"]').focus();
                     document.querySelector('textarea[name="who-description"]').select();
+                    this.parentElement.querySelector('#who-n-form').style.display='block';
+                    this.parentElement.parentElement.querySelector('#who-y-form').style.display='none';
                 }
             });
         });

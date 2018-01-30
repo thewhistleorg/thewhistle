@@ -77,26 +77,27 @@ ul.accordion input:checked + label::after {
 }
 
 .accordion-trigger::after {
-    content: '';
-    margin-right: 0;
-    position: absolute;
-    font-weight: bold;
-    font-size: 1.5em;
-    right: 0;
-    top: 0;
-    display: block;
-    color: #333333;
-    width: 3em;
-    height: 3em;
-    line-height: 2.5;
-    text-align: center;
-    transition: all 0.35s;
-    font-family: 'fontawesome';
+  content: 'expand';
+  margin-right: 0;
+  position: absolute;
+  font-weight: bold;
+  font-size: 0.8em;
+  right: 10px;
+  top: 10px;
+  display: block;
+  text-decoration: underline;
+  color: #75afe9;
+  /* width: 3em; */
+  /* height: 3em; */
+  line-height: 2.5;
+  text-align: center;
+  transition: all 0.35s;
 }
 
 .accordion-toggle:checked + .accordion-trigger::after {
     /* transform: rotateX(180deg); */
-    transform: rotate(90deg);
+    /*transform: rotate(90deg);*/
+    content: 'close';
 }
 
 /**

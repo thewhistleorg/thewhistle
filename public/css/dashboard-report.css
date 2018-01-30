@@ -5,15 +5,15 @@
 }
 
 .report-container {
-    border-left: 1px solid #f0f3f4;
+    border: 1px solid #d0dbdf;
     background: #dee9ed;
 }
 
 .report-header-container {
     color: #033549;
     background: #ffffff;
-    position: relative;
-    z-index: 1;
+    /*position: relative;
+    z-index: 1;*/
 }
 
 .report-header-content {

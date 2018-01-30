@@ -104,7 +104,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect( [ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[0].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(2);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
                 'on-behalf-of': 'myself',
@@ -144,7 +144,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect(document.querySelectorAll('table.progress td')[1].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(5);
             expect(document.querySelectorAll('select')).to.have.lengthOf(5);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
                 'when':            'date',
@@ -165,7 +165,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[2].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(3);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
                 where:        'at',
@@ -177,14 +177,32 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/4');
         });
 
-        it('sees/submits page 4 (who)', async function() {
+        it('sees/submits page 4 (description)', async function() {
             const responseGet = await request.get('/test-grn/sexual-assault/4');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[3].classList.contains('current')).to.be.true;
+            expect(document.querySelectorAll('input')).to.have.lengthOf(1);
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
+
+            const values = {
+                'description': 'erroneous description',
+                'nav-next':    'next',
+            };
+            const responsePost = await request.post('/test-grn/sexual-assault/4').send(values);
+            expect(responsePost.status).to.equal(302);
+            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/5');
+        });
+
+        it('sees/submits page 5 (who)', async function() {
+            const responseGet = await request.get('/test-grn/sexual-assault/5');
+            expect(responseGet.status).to.equal(200);
+            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
+            expect(document.querySelectorAll('table.progress td')[4].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(3);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
                 'who-relationship': '',
@@ -192,41 +210,23 @@ describe(`Report app (test-grn/${app.env})`, function() {
                 'who-description':  'A death eater',
                 'nav-next':         'next',
             };
-            const responsePost = await request.post('/test-grn/sexual-assault/4').send(values);
-            expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/5');
-        });
-
-        it('sees/submits page 5 (action-taken)', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/5');
-            expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
-            expect(document.querySelectorAll('table.progress td')[4].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(5);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
-
-            const values = {
-                'action-taken-other-details': '',
-                'nav-next':                   'next',
-            };
             const responsePost = await request.post('/test-grn/sexual-assault/5').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/6');
         });
 
-        it('sees/submits page 6 (description)', async function() {
+        it('sees/submits page 6 (action-taken)', async function() {
             const responseGet = await request.get('/test-grn/sexual-assault/6');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(1);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
+            expect(document.querySelectorAll('input')).to.have.lengthOf(5);
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
-                'description': 'erroneous description',
-                'nav-next':    'next',
+                'action-taken-other-details': '',
+                'nav-next':                   'next',
             };
             const responsePost = await request.post('/test-grn/sexual-assault/6').send(values);
             expect(responsePost.status).to.equal(302);
@@ -240,7 +240,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[6].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(4);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
                 'nav-prev': 'prev',
@@ -250,15 +250,15 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/6');
         });
 
-        it('sees page 6 & submits corrected description with file', async function() {
-            const responseGet = await request.get('/test-grn/sexual-assault/6');
+        it('sees page 4 & submits corrected description with file', async function() {
+            const responseGet = await request.get('/test-grn/sexual-assault/4');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
-            expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
+            expect(document.querySelectorAll('table.progress td')[3].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
             expect(document.querySelectorAll('input')).to.have.lengthOf(1);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             expect(document.querySelector('textarea').textContent).to.equal('erroneous description');
 
@@ -284,7 +284,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7');
             expect(document.querySelectorAll('table.progress td')[6].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(4);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue');
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
                 'existing-alias':  '',

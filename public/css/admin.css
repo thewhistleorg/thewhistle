@@ -217,8 +217,14 @@ span.tag, a.tag {
 }
 
 /*
- *  Purecss overrides
+ *  Pure.css overrides
  */
+
+/* pure-css bizarrely 'normalises' select height to 2.25em; this stuffs the datalist-polyfill for
+ * setting status in safari browsers, so cancel it */
+.pure-form select {
+    height: auto;
+}
 
 /* override pure form checkbox labels */
 .pure-form-aligned .pure-control-group input + label {

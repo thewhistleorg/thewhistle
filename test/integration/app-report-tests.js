@@ -23,6 +23,12 @@ describe(`Report app (test-grn/${app.env})`, function() {
 
     let reportId = null;
 
+    before(async function checkPreviousTestReportDeleted() {
+        await request.get('/test-grn/sexual-assault'); // force db connection to test-grn (ajax calls don't)
+        const response = await request.get('/ajax/test-grn/aliases/testy+terrain');
+        if (response.status != 404) throw new Error('Previous test report was not deleted');
+    });
+
     describe('report app home page', function() {
         it('sees home page', async function() {
             const response = await request.get('/');
@@ -36,20 +42,33 @@ describe(`Report app (test-grn/${app.env})`, function() {
         it('fails on bad org’n', async function() {
             const response = await request.get('/no-such-organisation');
             expect(response.status).to.equal(404);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal(':(');
         });
 
         it('fails on bad org’n/project', async function() {
             const response = await request.get('/no-such-organisation/no-such-project');
             expect(response.status).to.equal(404);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal(':(');
         });
 
         it('fails on bad org’n/project/page', async function() {
             const response = await request.get('/no-such-organisation/no-such-project/1');
             expect(response.status).to.equal(404);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal(':(');
         });
 
         it('fails on bad project', async function() {
             const response = await request.get('/test-grn/no-such-project');
+            expect(response.status).to.equal(404);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal(':(');
+        });
+
+        it('fails on bad page', async function() {
+            const response = await request.get('/test-grn/sexual-assault/no-such-page');
             expect(response.status).to.equal(404);
         });
 
@@ -65,26 +84,15 @@ describe(`Report app (test-grn/${app.env})`, function() {
     });
 
     describe('test-grn/sexual-assault inaccessible pages', function() {
-        it('request for page 2 gets redirected to home page', async function() {
+        it('request for page 2 gets redirected to page 1', async function() {
             const response = await request.get('/test-grn/sexual-assault/2');
             expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/test-grn/sexual-assault');
-        });
-
-        it('submit with no session gets redirected to home page', async function() {
-            const response = await request.post('/test-grn/sexual-assault/submit').send({});
-            expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/test-grn/sexual-assault');
+            expect(response.headers.location).to.equal('/test-grn/sexual-assault/1');
         });
     });
 
     describe('test-grn/sexual-assault', function() {
-        it('checks previous test report is not left undeleted', async function() {
-            const response = await request.get('/ajax/test-grn/aliases/testy+terrain');
-            expect(response.status).to.equal(404);
-        });
-
-        it('sees home page', async function() {
+        it('sees home page & starts submission', async function() {
             const responseGet = await request.get('/test-grn/sexual-assault');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
@@ -95,6 +103,8 @@ describe(`Report app (test-grn/${app.env})`, function() {
             const responsePost = await request.post('/test-grn/sexual-assault').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/1');
+            reportId = responsePost.headers['x-insert-id'];
+            console.info('\treport id', reportId);
         });
 
         it('sees/submits page 1 (on-behalf-of)', async function() {
@@ -117,7 +127,8 @@ describe(`Report app (test-grn/${app.env})`, function() {
 
         it('returns to index page on back button', async function() {
             const values = {
-                'nav-prev': 'prev',
+                'on-behalf-of': 'myself', // will have been remembered from session
+                'nav-prev':     'prev',
             };
             const responsePost = await request.post('/test-grn/sexual-assault/1').send(values);
             expect(responsePost.status).to.equal(302);
@@ -207,7 +218,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             const values = {
                 'who-relationship': '',
                 'who':              'n',
-                'who-description':  'A death eater',
+                'who-description':  'Big fat guy',
                 'nav-next':         'next',
             };
             const responsePost = await request.post('/test-grn/sexual-assault/5').send(values);
@@ -277,6 +288,17 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/7');
         });
 
+        it('ajax: gets a new random alias', async function() {
+            const response = await request.get('/ajax/test-grn/aliases/new');
+            expect(response.status).to.equal(200);
+            expect(response.body.alias.split(' ')).to.have.lengthOf(2);
+        });
+
+        it('ajax: checks ‘testy terrain’ is not already used', async function() {
+            const response = await request.get('/ajax/test-grn/aliases/testy+terrain');
+            expect(response.status).to.equal(404);
+        });
+
         it('sees/submits page 7', async function() {
             const responseGet = await request.get('/test-grn/sexual-assault/7');
             expect(responseGet.status).to.equal(200);
@@ -294,26 +316,15 @@ describe(`Report app (test-grn/${app.env})`, function() {
             };
             const responsePost = await request.post('/test-grn/sexual-assault/7').send(values);
             expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/submit');
+            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/review');
         });
 
-        it('ajax: gets a new random alias', async function() {
-            const response = await request.get('/ajax/test-grn/aliases/new');
-            expect(response.status).to.equal(200);
-            expect(response.body.alias.split(' ')).to.have.lengthOf(2);
-        });
-
-        it('ajax: checks ‘testy terrain’ is not already used', async function() {
-            const response = await request.get('/ajax/test-grn/aliases/testy+terrain');
-            expect(response.status).to.equal(404);
-        });
-
-        it('sees review/submit page', async function() {
-            const response = await request.get('/test-grn/sexual-assault/submit');
+        it('sees review & confirm page', async function() {
+            const response = await request.get('/test-grn/sexual-assault/review');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.querySelector('h1').textContent).to.equal('Check before you send the report');
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Send the report');
+            expect(document.querySelector('h1').textContent).to.equal('Please review & confirm details');
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue to Resources');
 
             const reportInfo = document.querySelector('table.js-obj-to-html');
             const ths = reportInfo.querySelectorAll('th');
@@ -326,23 +337,21 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect(tds[2].textContent).to.equal('no');
             expect(ths[3].textContent).to.equal('Where');
             expect(tds[3].textContent).to.equal('University of Lagos');
-            expect(ths[4].textContent).to.equal('Who');
-            expect(tds[4].textContent).to.equal('Not known: A death eater');
-            expect(ths[5].textContent).to.equal('Spoken to anybody?');
-            expect(tds[5].textContent).to.equal('—');
-            expect(ths[6].textContent).to.equal('Description');
-            expect(tds[6].textContent).to.equal('Test');
+            expect(ths[4].textContent).to.equal('Description');
+            expect(tds[4].textContent).to.equal('Test');
+            expect(ths[5].textContent).to.equal('Who');
+            expect(tds[5].textContent).to.equal('Not known: Big fat guy');
+            expect(ths[6].textContent).to.equal('Spoken to anybody?');
+            expect(tds[6].textContent).to.equal('—');
             expect(ths[7].textContent).to.equal('Alias');
             expect(tds[7].textContent).to.equal('testy terrain');
         });
 
-        it('submits report', async function() {
+        it('continues to Resources page', async function() {
             const values = { 'submit': 'submit' };
-            const response = await request.post('/test-grn/sexual-assault/submit').send(values);
+            const response = await request.post('/test-grn/sexual-assault/review').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/test-grn/sexual-assault/whatnext');
-            reportId = response.headers['x-insert-id'];
-            console.info('report id', reportId);
         });
 
         it('sees whatnext page', async function() {
@@ -381,7 +390,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
 
         it('submits whatnext "back to start"', async function() {
             const values = { 'submit': 'end' };
-            const response = await request.post('/test-grn/sexual-assault/submit').send(values);
+            const response = await request.post('/test-grn/sexual-assault/whatnext').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/test-grn/sexual-assault');
         });
@@ -409,12 +418,12 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect(ths[2].nextSibling.textContent).to.equal('no');
             expect(ths[3].textContent).to.equal('Where');
             expect(ths[3].nextSibling.textContent).to.equal('University of Lagos');
-            expect(ths[4].textContent).to.equal('Who');
-            expect(ths[4].nextSibling.textContent).to.equal('Not known: A death eater');
-            expect(ths[5].textContent).to.equal('Spoken to anybody?');
-            expect(ths[5].nextSibling.textContent).to.equal('—');
-            expect(ths[6].textContent).to.equal('Description');
-            expect(ths[6].nextSibling.textContent).to.equal('Test');
+            expect(ths[4].textContent).to.equal('Description');
+            expect(ths[4].nextSibling.textContent).to.equal('Test');
+            expect(ths[5].textContent).to.equal('Who');
+            expect(ths[5].nextSibling.textContent).to.equal('Not known: Big fat guy');
+            expect(ths[6].textContent).to.equal('Spoken to anybody?');
+            expect(ths[6].nextSibling.textContent).to.equal('—');
             expect(ths[7].textContent).to.equal('Alias');
             expect(ths[7].nextSibling.textContent).to.equal('testy terrain');
         });
@@ -439,14 +448,8 @@ describe(`Report app (test-grn/${app.env})`, function() {
         });
     });
 
-    describe('single page report submission', function() {
-        const report = '/test-grn/sexual-assault/internal';
-        it('redirects to login page when not logged-in', async function() {
-            const response = await request.get(report);
-            expect(response.status).to.equal(302);
-            // note redirect has full url as it is changing subdomains
-            expect(response.headers.location.slice(-report.length-8)).to.equal('/login/-'+report);
-        });
+    describe('single page report submission', function() { // TODO: check overlap with admin tests
+        const report = '/test-grn/sexual-assault/*';
 
         it('logs in', async function() {
             request.host('admin.localhost');
@@ -488,7 +491,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
                 'at-address':                 'University of Lagos',
                 'who-relationship':           '',
                 'who':                        'n',
-                'who-description':            'A death eater',
+                'who-description':            'Big fat guy',
                 'action-taken-other-details': '',
                 'existing-alias':             '',
                 'used-before':                'n',
@@ -497,15 +500,17 @@ describe(`Report app (test-grn/${app.env})`, function() {
             };
             const response = await request.post(report).send(values);
             expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/test-grn/sexual-assault/submit');
+            expect(response.headers.location).to.equal('/test-grn/sexual-assault/review');
+            reportId = response.headers['x-insert-id'];
+            console.info('\treport id', reportId);
         });
 
         it('sees report confirmation page', async function() {
-            const response = await request.get('/test-grn/sexual-assault/submit'); // note no 'internal'
+            const response = await request.get('/test-grn/sexual-assault/review'); // note no 'internal'
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.querySelector('h1').textContent).to.equal('Check before you send the report');
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Send the report');
+            expect(document.querySelector('h1').textContent).to.equal('Please review & confirm details');
+            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Continue to Resources');
 
             const reportInfo = document.querySelector('table.js-obj-to-html');
             const ths = reportInfo.querySelectorAll('th');
@@ -518,24 +523,22 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect(tds[2].textContent).to.equal('no');
             expect(ths[3].textContent).to.equal('Where');
             expect(tds[3].textContent).to.equal('University of Lagos');
-            expect(ths[4].textContent).to.equal('Who');
-            expect(tds[4].textContent).to.equal('Not known: A death eater');
-            expect(ths[5].textContent).to.equal('Spoken to anybody?');
-            expect(tds[5].textContent).to.equal('—');
-            expect(ths[6].textContent).to.equal('Description');
-            expect(tds[6].textContent).to.equal('Single-page submission test');
+            expect(ths[4].textContent).to.equal('Description');
+            expect(tds[4].textContent).to.equal('Single-page submission test');
+            expect(ths[5].textContent).to.equal('Who');
+            expect(tds[5].textContent).to.equal('Not known: Big fat guy');
+            expect(ths[6].textContent).to.equal('Spoken to anybody?');
+            expect(tds[6].textContent).to.equal('—');
             expect(ths[7].textContent).to.equal('Alias');
             expect(tds[7].textContent).to.equal('testy terrain');
         });
 
 
-        it('submits report', async function() {
+        it('confirms report', async function() {
             const values = { 'submit': 'submit' };
-            const response = await request.post('/test-grn/sexual-assault/submit').send(values);
+            const response = await request.post('/test-grn/sexual-assault/review').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/test-grn/sexual-assault/whatnext');
-            reportId = response.headers['x-insert-id'];
-            console.info('report id', reportId);
         });
 
         it('sees whatnext page', async function() {
@@ -571,12 +574,12 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect(ths[2].nextSibling.textContent).to.equal('no');
             expect(ths[3].textContent).to.equal('Where');
             expect(ths[3].nextSibling.textContent).to.equal('University of Lagos');
-            expect(ths[4].textContent).to.equal('Who');
-            expect(ths[4].nextSibling.textContent).to.equal('Not known: A death eater');
-            expect(ths[5].textContent).to.equal('Spoken to anybody?');
-            expect(ths[5].nextSibling.textContent).to.equal('—');
-            expect(ths[6].textContent).to.equal('Description');
-            expect(ths[6].nextSibling.textContent).to.equal('Single-page submission test');
+            expect(ths[4].textContent).to.equal('Description');
+            expect(ths[4].nextSibling.textContent).to.equal('Single-page submission test');
+            expect(ths[5].textContent).to.equal('Who');
+            expect(ths[5].nextSibling.textContent).to.equal('Not known: Big fat guy');
+            expect(ths[6].textContent).to.equal('Spoken to anybody?');
+            expect(ths[6].nextSibling.textContent).to.equal('—');
             expect(ths[7].textContent).to.equal('Alias');
             expect(ths[7].nextSibling.textContent).to.equal('testy terrain');
         });

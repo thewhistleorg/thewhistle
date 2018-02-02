@@ -145,9 +145,9 @@
                 <li id="files">
                     <span class="card-header">FILES</span>
                     <div class="image-ctx">
-                        {{#if analysis.files}}
+                        {{#if files}}
                         <table>
-                            {{#analysis.files}}
+                            {{#files}}
                             <tr id="{{name}}" class="align-top">
                                 <td><a href="{{url}}">{{#if isImage}}<img src="{{url}}" alt="{{name}}">{{else}}{{name}}{{/if}}</a></td>
                                 <td class="exif">
@@ -155,7 +155,7 @@
                                     {{#if time}}<div title="{{time}}">{{timeDesc}}</div>{{/if}}
                                 </td>
                             </tr>
-                            {{/analysis.files}}
+                            {{/files}}
                         </table>
                         {{else}}
                         <div class="padding-15">No files uploaded by the reporter</div>

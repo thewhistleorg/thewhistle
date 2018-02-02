@@ -300,11 +300,25 @@ class ReportsHandlers {
         ctx.attachment(filename);
 
         // check whether current list of reports is for a single project, with homogeneous submitted details
+        // incomplete submissions are considered homogeneous: hence [ { a: 'x' }, {  a: 'x', b: 'y' } ] is ok,
+        // but [ { a: 'x' }, {  c: 'z' } ] is not
         function isListSingleProject(rpts) {
-            const submittedFields = rpts.map(rpt => Object.keys(rpt.submitted).join(':'));
-            const submittedFieldsDistinct = submittedFields.filter((val, idx, me) => me.indexOf(val) == idx);
+            const fields = [];
 
-            return submittedFieldsDistinct.length == 1;
+            for (const rpt of rpts) {
+                const flds = Object.keys(rpt.submitted);
+                for (let f=0; f<flds.length; f++) {
+                    if (fields[f] == undefined) fields[f] = {};
+                    const fld = flds[f];
+                    fields[f][fld] = true;
+                }
+            }
+
+            for (let f=0; f<fields.length; f++) {
+                if (Object.keys(fields[f]).length > 1) return false; // differently named fields at same position in report
+            }
+
+            return true;
         }
     }
 
@@ -835,11 +849,10 @@ class ReportsHandlers {
             highlight:        Math.max(Math.round(100 * (report._id.getTimestamp() - new Date() + y) / y), 0),
             comments:         comments,
             location:         report.location,
-            users:            users,                  // for select
-            statuses:         statuses,               // for datalist
+            users:            users,           // for select
+            statuses:         statuses,        // for datalist
             otherReports:     otherReports,
-            tagList:          tagList,                // for autocomplete datalist
-            files:            report.submitted.files, // for tabs
+            tagList:          tagList,         // for autocomplete datalist
             updates:          updates,
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
             submittedDesc:    truncate(desc, 70) || `<i title="submitted description" class="grey">No Description</i>`, // eslint-disable-line quotes
@@ -851,16 +864,16 @@ class ReportsHandlers {
             : `Report by ${extra.reportedBy}, ${extra.reportedOnDay}`;
 
         // uploaded files
-        if (report.analysis.files) {
+        if (report.files) {
             const incidentLocn = report.location.geocode ? new LatLon(report.location.geocode.latitude, report.location.geocode.longitude) : null;
             const incidentTime = new Date(report.submitted.Date);
             const submissionTime = report._id.getTimestamp();
-            for (const file of report.analysis.files) {
-                if (!incidentLocn) continue;
+            for (const file of report.files) {
                 // proxy url
                 file.url = `/uploaded/${report.project}/${dateFormat(report._id.getTimestamp(), 'yyyy-mm')}/${report._id}/${file.name}`;
-                // exif location
                 file.isImage = file.type.slice(0, 5) == 'image';
+                if (!incidentLocn) continue;
+                // exif location
                 if (file.exif && incidentLocn.lat && incidentLocn.lon) {
                     const d = incidentLocn.distanceTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
                     file.distance = d > 1e3 ? Number(d.toPrecision(2)) / 1e3 + ' km' : Number(d.toPrecision(2)) + ' metres';

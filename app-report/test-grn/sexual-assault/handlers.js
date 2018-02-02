@@ -86,8 +86,13 @@ class Handlers {
         const pages = Array(nPages).fill(null).map((p, i) => ({ page: i+1 }));
         if (page != '+') pages[page-1].class = 'current'; // to highlight current page
 
-        const validYears = { thisyear: dateFormat('yyyy'), lastyear: dateFormat('yyyy')-1 }; // limit report to current or last year
-        const context = Object.assign({ pages: pages }, ctx.session.report, validYears, { q: q });
+        const incidentDate = {
+            days:   Array(31).fill(null).map((day, i) => i + 1),
+            months: [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ],
+            years:  Array(60).fill(null).map((year, i) => new Date().getFullYear() - i),
+            hours:  Array(24).fill(null).map((d, i) => i.toString().padStart(2, '0')+':00'),
+        };
+        const context = Object.assign({ pages: pages }, ctx.session.report, { incidentDate }, { q: q });
 
         await ctx.render('page'+page, context);
     }

@@ -26,73 +26,29 @@
                         </tr>
                         <tr>
                             <td>
-                                <select name="date.day" id="date.day" value="{{date.day}}" list="days" class="w4" min="1" max="31">
+                                <select name="date.day" id="date.day" class="w4">
                                     {{#selected date.day}}
-                                    <option value="1">01</option>
-                                    <option value="2">02</option>
-                                    <option value="3">03</option>
-                                    <option value="4">04</option>
-                                    <option value="5">05</option>
-                                    <option value="6">06</option>
-                                    <option value="7">07</option>
-                                    <option value="8">08</option>
-                                    <option value="9">09</option>
-                                    <option value="10">10</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
-                                    <option value="13">13</option>
-                                    <option value="14">14</option>
-                                    <option value="15">15</option>
-                                    <option value="16">16</option>
-                                    <option value="17">17</option>
-                                    <option value="18">18</option>
-                                    <option value="19">19</option>
-                                    <option value="20">20</option>
-                                    <option value="21">21</option>
-                                    <option value="22">22</option>
-                                    <option value="23">23</option>
-                                    <option value="24">24</option>
-                                    <option value="25">25</option>
-                                    <option value="26">26</option>
-                                    <option value="27">27</option>
-                                    <option value="28">28</option>
-                                    <option value="29">29</option>
-                                    <option value="30">30</option>
-                                    <option value="31">31</option>
+                                    {{#incidentDate.days}}
+                                    <option value="{{this}}">{{this}}</option>
+                                    {{/incidentDate.days}}
                                     {{/selected}}
                                 </select>
                             </td>
                             <td>
-                                <select name="date.month" id="date.month" value="{{date.month}}" list="months" class="w5" maxlength="3">
+                                <select name="date.month" id="date.month" class="w5">
                                     {{#selected date.month}}
-                                    <option value="Jan">Jan</option>
-                                    <option value="Feb">Feb</option>
-                                    <option value="Mar">Mar</option>
-                                    <option value="Apr">Apr</option>
-                                    <option value="May">May</option>
-                                    <option value="Jun">Jun</option>
-                                    <option value="Jul">Jul</option>
-                                    <option value="Aug">Aug</option>
-                                    <option value="Sep">Sep</option>
-                                    <option value="Oct">Oct</option>
-                                    <option value="Nov">Nov</option>
-                                    <option value="Dec">Dec</option>
+                                    {{#incidentDate.months}}
+                                    <option value="{{this}}">{{this}}</option>
+                                    {{/incidentDate.months}}
                                     {{/selected}}
                                 </select>
                             </td>
                             <td>
-                                <select name="date.year" id="date.year" value="{{date.year}}" list="years" class="w5" min="{{lastyear}}" max="{{thisyear}}">
+                                <select name="date.year" id="date.year" class="w5">
                                     {{#selected date.year}}
-                                    <option value="2009">2009</option>
-                                    <option value="2010">2010</option>
-                                    <option value="2011">2011</option>
-                                    <option value="2012">2012</option>
-                                    <option value="2013">2013</option>
-                                    <option value="2014">2014</option>
-                                    <option value="2015">2015</option>
-                                    <option value="2016">2016</option>
-                                    <option value="2017">2017</option>
-                                    <option value="2018">2018</option>
+                                    {{#incidentDate.years}}
+                                    <option value="{{this}}">{{this}}</option>
+                                    {{/incidentDate.years}}
                                     {{/selected}}
                                 </select>
                             </td>
@@ -103,30 +59,11 @@
                         <br>at
                         <select name="date.time" id="date.time">
                             <option value="">&nbsp;</option>
-                            <option value="00:00:00">12:00 am</option>
-                            <option value="01:00:00">01:00 am</option>
-                            <option value="02:00:00">02:00 am</option>
-                            <option value="03:00:00">03:00 am</option>
-                            <option value="04:00:00">04:00 am</option>
-                            <option value="05:00:00">05:00 am</option>
-                            <option value="06:00:00">06:00 am</option>
-                            <option value="07:00:00">07:00 am</option>
-                            <option value="08:00:00">08:00 am</option>
-                            <option value="09:00:00">09:00 am</option>
-                            <option value="10:00:00">10:00 am</option>
-                            <option value="11:00:00">11:00 am</option>
-                            <option value="12:00:00">12:00 pm</option>
-                            <option value="13:00:00">01:00 pm</option>
-                            <option value="14:00:00">02:00 pm</option>
-                            <option value="15:00:00">03:00 pm</option>
-                            <option value="16:00:00">04:00 pm</option>
-                            <option value="17:00:00">05:00 pm</option>
-                            <option value="18:00:00">06:00 pm</option>
-                            <option value="19:00:00">07:00 pm</option>
-                            <option value="20:00:00">08:00 pm</option>
-                            <option value="21:00:00">09:00 pm</option>
-                            <option value="22:00:00">10:00 pm</option>
-                            <option value="23:00:00">11:00 pm</option>
+                            {{#selected date.time}}
+                            {{#incidentDate.hours}}
+                            <option value="{{this}}">{{this}}</option>
+                            {{/incidentDate.hours}}
+                            {{/selected}}
                         </select>
                     </div>
                 </div>

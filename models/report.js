@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Report model.                                                                   C.Veness 2017  */
+/* Report model.                                                              C.Veness 2017-2018  */
 /*                                                                                                */
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -29,11 +29,11 @@ import Update  from './update.js';
 /* eslint-disable no-unused-vars, key-spacing */
 const schema = {
     type: 'object',
-    required: [ '_id', 'project', 'alias', 'submitted', 'location', 'assignedTo', 'status', 'tags', 'comments', 'archived' ],
+    required: [ '_id', 'project', 'alias', 'submitted', 'location', 'analysis', 'assignedTo', 'status', 'tags', 'comments', 'archived', 'views' ],
     properties: {
         project:    { type:     'string' },               // name of project report belongs to
         by:         { bsonType: [ 'objectId', 'null' ] }, // user entering incident report
-        alias:      { type:     'string' },               // auto-generated alias of victim/survivor
+        alias:      { type:     [ 'string', 'null' ] },   // auto-generated alias of victim/survivor
         submitted:  { type:     'object' },               // originally submitted report (flexible format following incident reporting format)
         files:      { type:     'array',                  // uploaded files
             items: { type: 'object' },                    // ... 'formidable' File objects
@@ -265,6 +265,110 @@ class Report {
         const oldestTimestamp = oldestReport._id.getTimestamp().toISOString();
 
         return oldestTimestamp;
+    }
+
+
+    /**
+     * Creates new skeleton Incident Report record.
+     *
+     * @param   {string}   db - Database to use.
+     * @param   {string}   project - Project report is part of.
+     * @param   {string}   userAgent - User agent from http request header.
+     * @returns {ObjectId} New report id.
+     */
+    static async submissionStart(db, project, userAgent) {
+        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+
+        const reports = global.db[db].collection('reports');
+
+        const values = {
+            project:    project,
+            submitted:  {},
+            alias:      null,
+            location:   { address: '', geocode: null, geojson: null },
+            analysis:   {},
+            // summary: null,
+            assignedTo: null,
+            status:     null,
+            tags:       [],
+            comments:   [],
+            views:      {},
+            archived:   false,
+        };
+
+        // record user agent for potential later analyses
+        const ua = useragent.parse(userAgent);
+        values.ua = Object.assign({}, ua, { os: ua.os }); // trigger on-demand parsing of os
+
+        const { insertedId } = await reports.insertOne(values);
+
+        return insertedId; // TODO: toString()?
+    }
+
+
+    static async submissionAlias(db, id, alias) {
+        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+
+        id = objectId(id);  // allow id as string
+
+        const reports = global.db[db].collection('reports');
+
+        await reports.updateOne({ _id: id }, { $set: { alias: alias } });
+    }
+
+
+    static async submissionDetails(db, id, details) {
+        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+
+        id = objectId(id);  // allow id as string
+
+        const reports = global.db[db].collection('reports');
+
+        for (const field in details) {
+            await reports.updateOne({ _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
+        }
+
+    }
+
+
+    static async submissionFile(db, id, file) {
+        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+
+        id = objectId(id); // allow id as string
+
+        const reports = global.db[db].collection('reports');
+
+        if (file.size == 0) return;
+
+        const rpt = await Report.get(db, id);
+        const project = rpt.project;
+
+        // store uploaded files in AWS S3
+        const date = dateFormat(id.getTimestamp(), 'yyyy-mm');
+        const fldr = `${project}/${date}/${id}/`;
+        const src = file.path;
+        const dst = slug(file.name, { lower: true, remove: null });
+
+        // upload /tmp file to S3
+        await AwsS3.put(db, project, date, id, dst, src);
+
+        // augment files object with EXIF metadata
+
+        file.path = fldr; // S3 folder
+        file.name = dst;  // slugified name
+
+        // extract EXIF metadata from files
+        const exif = await exiftool.exiftool.read(src);
+        file.exif = {
+            GPSLatitude:  exif.GPSLatitude,
+            GPSLongitude: exif.GPSLongitude,
+            CreateDate:   exif.CreateDate, // TODO: JS Date object?
+        };
+
+        await reports.updateOne({ _id: id }, { $push: { files: file } });
+
+        // delete uploaded file from /tmp
+        await fs.remove(src);
     }
 
 

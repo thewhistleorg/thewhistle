@@ -43,12 +43,38 @@ class Handlers {
 
 
     /**
+     * Process index page submission - creates a partially submitted report in the database.
+     */
+    static async postIndex(ctx) {
+        if (!ctx.session.report) { ctx.flash = { expire: 'Your session has expired' }; ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
+
+        // create skeleton report
+        const id = await Report.submissionStart(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
+
+        // record id for subsequent updates
+        ctx.session.id = id;
+
+        ctx.set('X-Insert-Id', id); // for integration tests
+
+        // record user-agent
+        await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
+
+        // redirect to page 1 of the submission
+        ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/1`);
+    }
+
+
+    /**
      * Render report page.
+     *
+     * TODO: uploaded files requires more work: when returning to page, already uploaded files should
+     *   be displayed (thumbnails), and when using the 'back' button, the 'choose file' should be
+     *   reset, not left with the previous uploaded file.
      */
     static async getPage(ctx) {
         if (!ctx.session.report) { ctx.flash = { expire: 'Your session has expired' }; ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
 
-        const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num); // note '+' is allowed on windows, '*' is not
+        const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num); // note '+' is allowed in windows filenames, '*' is not
         if (page > ctx.session.completed+1) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); return; }
 
         // supply any required self/other parameterised questions
@@ -58,7 +84,7 @@ class Handlers {
 
         // progress indicator
         const pages = Array(nPages).fill(null).map((p, i) => ({ page: i+1 }));
-        pages[page-1].class = 'current'; // to highlight current page
+        if (page != '+') pages[page-1].class = 'current'; // to highlight current page
 
         const validYears = { thisyear: dateFormat('yyyy'), lastyear: dateFormat('yyyy')-1 }; // limit report to current or last year
         const context = Object.assign({ pages: pages }, ctx.session.report, validYears, { q: q });
@@ -66,17 +92,54 @@ class Handlers {
         await ctx.render('page'+page, context);
     }
 
+    static async getPageSingle(ctx) {
+        const today = { day: dateFormat('d'), month: dateFormat('mmm'), year: dateFormat('yyyy') };
+        ctx.session.report = { when: 'date', date: today };
+
+        ctx.params.num = '*';
+
+        await Handlers.getPage(ctx);
+    }
+
 
     /**
-     * Process 'next' / 'previous' page submissions.
+     * Process page submissions.
+     *
+     * For single-page submissions, ctx.params.num is '*', which gets  translated to page '+'.
      */
     static async postPage(ctx) {
-        // getIndex initialises ctx.session.report with date, so for this project ctx.session.report is never empty
-        if (!ctx.session.report) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
-        const page = ctx.params.num==undefined ? 0 : Number(ctx.params.num);
-        ctx.session.completed = Number(page);
+        if (!ctx.session.report) { ctx.flash = { expire: 'Your session has expired' }; ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
+
+        const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num);
+        if (page > ctx.session.completed+1) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); return; }
+
+        if (page == '+') {
+            // create skeleton report (we had no index page submission)
+            ctx.session.id = await Report.submissionStart(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
+            ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
+        } else {
+            ctx.session.completed = page;
+        }
 
         const body = ctx.request.body; // shorthand
+
+
+        if (body['used-before']) {
+            // check generated alias not already used, or existing alias does exist
+            switch (ctx.session.report['used-before']) {
+                case 'y':
+                    // verify existing alias does exist
+                    const reportsY = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['existing-alias']);
+                    if (reportsY.length == 0) { ctx.flash = { alias: 'Anonymous alias not found' }; ctx.redirect(ctx.url); return; }
+                    break;
+                case 'n':
+                    // verify generated alias does not exist
+                    if (ctx.session.report['generated-alias'] == null) { ctx.flash = 'Alias not given'; ctx.redirect(ctx.url); }
+                    const reportsN = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['generated-alias']);
+                    if (reportsN.length > 0) { ctx.flash = { alias: 'Generated alias not available: please select another' }; ctx.redirect(ctx.url); return; }
+                    break;
+            }
+        }
 
         if (body.fields) {
             // multipart/form-data: move body.fields.* to body.* to match
@@ -94,19 +157,21 @@ class Handlers {
 
         // remember if we're going forward or back, then delete nav from body
         const goNum = body['nav-next'] ? page + 1 : page - 1;
-        const go = goNum==0 ? '' : goNum>nPages ? 'submit' : goNum;
+        const go = goNum==0 ? '' : goNum>nPages || page=='+' ? 'review' : goNum;
         delete body['nav-prev'];
         delete body['nav-next'];
 
-        // record current body in session before validation
+        // record current body in session (before validation!), in order to show previously entered info
         ctx.session.report = Object.assign(ctx.session.report, body);
 
         // if date specified, verify it is valid (to back up client-side validation)
         if (body.when == 'date') {
+            // (note for some reason test suite leaves date as a string)
+            const d = typeof body.date=='object' ? body.date : JSON.parse(body.date);
+            const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
             const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
-            const time = body.date.time ? body.date.time.split(':') : [ '00', '00', '00' ];
-            // const date = new Date(body.date.year, months.indexOf(body.date.month.toLowerCase()), body.date.day, body.date.hour, body.date.minute);
-            const date = new Date(body.date.year, months.indexOf(body.date.month.toLowerCase()), body.date.day, time[0], time[1]);
+            // const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, d.hour, d.minute);
+            const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
             if (isNaN(date.getTime())) {
                 ctx.flash = { validation: [ 'Invalid date' ] };
                 ctx.redirect(ctx.url); return;
@@ -117,80 +182,70 @@ class Handlers {
             }
         }
 
+        const prettyReport = prettifyReport(page, body);
+
+        await Report.submissionDetails(ctx.params.database, ctx.session.id, prettyReport);
+
+        if (prettyReport.Alias) {
+            Report.submissionAlias(ctx.params.database, ctx.session.id, prettyReport.Alias);
+        }
+
+        if (body.files) {
+            for (const file of body.files) Report.submissionFile(ctx.params.database, ctx.session.id, file);
+        }
+
+        // record user-agent
+        await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
+
+        ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${go}`);
+
         // record submission progress
         if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
             await Submission.progress(ctx.params.database, ctx.session.submissionId, page);
         }
 
+        if (page == '+') ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
+
         ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${go}`);
     }
 
+    static async postPageSingle(ctx) {
+        ctx.params.num = '*';
+        await Handlers.postPage(ctx);
+    }
 
-    /* submit  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+    /* review  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
     /**
-     * Render 'review & submit' page.
+     * Render 'review & confirm' page.
      */
-    static async getSubmit(ctx) {
+    static async getReview(ctx) {
         if (!ctx.session.report) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
 
-        // make sure only one of generated-alias and existing-alias are recorded, and make it 1st property of report
-        if (ctx.session.report['existing-alias']) { delete ctx.session.report['generated-alias']; ctx.session.report = Object.assign({ 'existing-alias': null }, ctx.session.report); }
-        if (ctx.session.report['generated-alias']) { delete ctx.session.report['existing-alias']; ctx.session.report = Object.assign({ 'generated-alias': null }, ctx.session.report); }
-
-        const prettyReport = prettifyReport(ctx.session.report);
+        const prettyReport = prettifyReport('+', ctx.session.report);
         const files = ctx.session.report.files ? ctx.session.report.files.map(f => f.name).join(', ') : null;
         const context = {
             reportHtml: jsObjectToHtml.usingTable(prettyReport),
             files:      files,
         };
 
-        await ctx.render('submit', context);
+        await ctx.render('review', context);
     }
 
 
     /**
-     * Process 'review & submit' submission.
+     * Process 'review & confirm' submission.
      */
-    static async postSubmit(ctx) {
+    static async postReview(ctx) {
         if (!ctx.session.report) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
-        if (ctx.request.body['nav-prev'] == 'prev') { ctx.redirect(ctx.session.completed); return; }
+        if (ctx.request.body['nav-prev'] == 'prev') { ctx.redirect('*'); return; }
 
-        // record this report
-        delete ctx.request.body['submit'];
-
-        // check generated alias not already used, or existing alias does exist
-        switch (ctx.session.report['used-before']) {
-            case 'y':
-                // verify existing alias does exist
-                const reportsY = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['existing-alias']);
-                if (reportsY.length == 0) { ctx.flash = { alias: 'Anonymous alias not found' }; ctx.redirect(ctx.url); return; }
-                break;
-            case 'n':
-                // verify generated alias does not exist
-                if (ctx.session.report['generated-alias'] == null) { ctx.flash = 'Alias not given'; ctx.redirect(ctx.url); }
-                const reportsN = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['generated-alias']);
-                if (reportsN.length > 0) { ctx.flash = { alias: 'Generated alias not available: please select another' }; ctx.redirect(ctx.url); return; }
-                break;
-        }
-
-        const alias = ctx.session.report['existing-alias'] || ctx.session.report['generated-alias'];
-        const files = ctx.session.report.files;
-        delete ctx.session.report.files;
-
-        const prettyReport = prettifyReport(ctx.session.report);
-
-        const by = ctx.state.user ? ctx.state.user.id : null;
-        const id = await Report.insert(ctx.params.database, by, alias, prettyReport, 'sexual-assault', files, ctx.headers['user-agent']);
-        ctx.set('X-Insert-Id', id); // for integration tests
-
-        // record user-agent
-        await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
 
         // record submission complete
         if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
-            await Submission.complete(ctx.params.database, ctx.session.submissionId, id);
+            await Submission.complete(ctx.params.database, ctx.session.submissionId, ctx.session.id);
         }
 
         // remove all session data (to prevent duplicate submission)
@@ -290,75 +345,113 @@ class Handlers {
  *
  * Note that the admin app expects a field named 'Description'.
  *
- * @param   {Object} report - Report as submitted
- * @returns {Object} Transformed report
+ * @param   {Object} page - Page number to be converted, or '+' for single-page submission.
+ * @param   {Object} report - Report as submitted.
+ * @returns {Object} Transformed report.
  */
-function prettifyReport(report) {
-    const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ];
+function prettifyReport(page, report) {
 
     const rpt = {};
 
-    // on-behalf-of
-    const onbehalfof = {
-        myself:         'Myself',
-        'someone-else': 'Someone else',
-        undefined:      null,
+    // if no selection is made for checkboxes / radio-buttons (which are not preselected) they will
+    // not appear in the post body, so set initial values here (retaining correct sequence) - this
+    // is probably not the best way to do this, but since this is all still in flux, this is the
+    // easiest for now...
+    const nulls = {
+        '1a': 'on-behalf-of',
+        '2a': 'when',
+        '2b': 'date',
+        '2c': 'still-happening',
+        '3a': 'where',
+        '4a': 'description', // TODO: what about files?
+        '5a': 'who',
+        '6a': 'action-taken',
+        '7a': 'used-before',
     };
-    rpt['On behalf of'] = onbehalfof[report['on-behalf-of']];
-
-    // date (either date object or string)
-    // (note for some reason test suite leaves date as a string)
-    const d = typeof report.date=='object' ? report.date : JSON.parse(report.date);
-    const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
-    switch (report.when) {
-        case 'date':          rpt.Happened = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1] ); break;
-        case 'within':        rpt.Happened = report['within-options']; break;
-        case 'dont-remember': rpt.Happened = 'Don’t remember'; break;
+    // if (nulls[page] && report[nulls[page]]==undefined) report[nulls[page]] = null; // kludgy or what!
+    if (page == '+') {
+        const defaults = Object.values(nulls).reduce(function(prev, curr) {
+            prev[curr] = null;
+            return prev;
+        }, {});
+        report = Object.assign(defaults, report);
+    } else {
+        const defaults = Object.entries(nulls).reduce(function(prev, curr) {
+            const [ key, val ] = curr;
+            if (parseInt(key)==page) prev[val] = null;
+            return prev; }, {});
+        report = Object.assign(defaults, report);
     }
 
-    // still-happening
-    const stillHappening = {
-        y:         'yes',
-        n:         'no',
-        undefined: null,
-    };
-    rpt['Still happening?'] = stillHappening[report['still-happening']];
-
-    //where
-    const where = {
-        at:              report['at-address'],
-        'dont-remember': 'Don’t remember',
-        'dont-know':     'Don’t know',
-        undefined:       null,
-    };
-    rpt['Where'] = where[report['where']];
-
-    // who
-    const who = {
-        y:         'Known: ' + report['who-relationship'],
-        n:         'Not known: ' + report['who-description'],
-        undefined: null,
-    };
-    rpt['Who'] = who[report['who']];
-
-    // action-taken: create array of responses matching form labels
-    const action = {
-        police:  'Police or government officials',
-        teacher: 'Teacher/tutor/lecturer',
-        friends: 'Friends, family',
-        other:   report['action-taken-other-details'],
-        unset:   null, // no checkboxes ticked
-    };
-    if (report['action-taken'] == undefined) report['action-taken'] = 'unset';
-    if (typeof report['action-taken'] == 'string') report['action-taken'] = [ report['action-taken'] ];
-    rpt['Spoken to anybody?'] = report['action-taken'].map(a => action[a]);
-
-    // description
-    rpt.Description = report.description;
-
-    // used-before: set Alias from generated-alias or existing-alias (don't record distinction in
-    // order to ensure homogeneous reports)
-    rpt['Alias'] = report['used-before']=='y' ? report['existing-alias'] : report['generated-alias'];
+    for (const field in report) {
+        switch (field) {
+            case 'on-behalf-of':
+                const onbehalfof = {
+                    'myself':       'Myself',
+                    'someone-else': 'Someone else',
+                    null:           null,
+                };
+                rpt['On behalf of'] = onbehalfof[report['on-behalf-of']];
+                break;
+            case 'date': // may be date object or string
+                // (note for some reason test suite leaves date as a string)
+                const d = typeof report.date=='object' ? report.date : JSON.parse(report.date);
+                const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
+                const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ];
+                switch (report.when) {
+                    case 'date':          rpt.Happened = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1] ); break;
+                    case 'within':        rpt.Happened = report['within-options']; break;
+                    case 'dont-remember': rpt.Happened = 'Don’t remember'; break;
+                }
+                break;
+            case 'still-happening':
+                const stillHappening = {
+                    y:    'yes',
+                    n:    'no',
+                    null: null,
+                };
+                rpt['Still happening?'] = stillHappening[report['still-happening']];
+                break;
+            case 'where':
+                const where = {
+                    'at':            report['at-address'],
+                    'dont-remember': 'Don’t remember',
+                    'dont-know':     'Don’t know',
+                    null:            null,
+                };
+                rpt['Where'] = where[report['where']];
+                break;
+            case 'who':
+                const who = {
+                    y:    'Known: ' + (report['who-relationship'] || '–'),
+                    n:    'Not known: ' + (report['who-description'] || '–'),
+                    null: null,
+                };
+                rpt['Who'] = who[report['who']];
+                break;
+            case 'action-taken':
+                // create array of responses matching form labels
+                const action = {
+                    police:  'Police or government officials',
+                    teacher: 'Teacher/tutor/lecturer',
+                    friends: 'Friends, family',
+                    other:   report['action-taken-other-details'],
+                    unset:   null, // no checkboxes ticked
+                };
+                if (report['action-taken'] == null) report['action-taken'] = 'unset';
+                if (typeof report['action-taken'] == 'string') report['action-taken'] = [ report['action-taken'] ];
+                rpt['Spoken to anybody?'] = report['action-taken'].map(a => action[a]);
+                break;
+            case 'description':
+                rpt.Description = report.description;
+                break;
+            case 'used-before':
+                // set Alias from generated-alias or existing-alias (don't record distinction in
+                // order to ensure homogeneous reports)
+                rpt['Alias'] = report['used-before']=='y' ? report['existing-alias'] : report['generated-alias'];
+                break;
+        }
+    }
 
     return rpt;
 }

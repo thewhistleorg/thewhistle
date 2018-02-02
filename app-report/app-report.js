@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* 'Report' app - (publicly available) witness reporting parts of the site.        C.Veness 2017  */
+/* 'Report' app - (publicly available) witness reporting parts of the site.   C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Koa        from 'koa';            // koa framework
@@ -54,7 +54,8 @@ app.use(async function handleErrors(ctx, next) {
         switch (ctx.status) {
             case 404: // Not Found
                 const context404 = { msg: e.message=='Not Found'?null:e.message };
-                await ctx.render('404-not-found', context404);
+                // TODO: fix!
+                try { await ctx.render('404-not-found', context404); } catch (e) { }
                 break;
             default:
             case 500: // Internal Server Error TODO: 500-internal-server-error gets looked for within individual project
@@ -208,7 +209,7 @@ router.get('/logout', function logout(ctx) {
 
 
 // TODO: why doesn't router.all('/:database/:project', '/:database/:project/:page', ...) work?
-router.all('/:database/:project', async function composeDatabaseProject(ctx) {
+router.all('/:database/:project', async function composeDbProject(ctx) {
     try {
         const appReport = await import(`./${ctx.params.database}/${ctx.params.project}/app.js`);
         await compose(appReport.default.middleware)(ctx);
@@ -217,7 +218,7 @@ router.all('/:database/:project', async function composeDatabaseProject(ctx) {
         throw e;
     }
 });
-router.all('/:database/:project/:page', async function composeDatabaseProject(ctx) {
+router.all('/:database/:project/:page', async function composeDbProjectPage(ctx) {
     try {
         const appReport = await import(`./${ctx.params.database}/${ctx.params.project}/app.js`);
         await compose(appReport.default.middleware)(ctx);

@@ -430,6 +430,17 @@ function prettifyReport(page, report) {
             case 'description':
                 rpt.Description = report.description;
                 break;
+            case 'survivor-gender':
+                const gender = {
+                    m:    'male',
+                    f:    'female',
+                    null: null,
+                };
+                rpt['Survivor gender'] = gender[report['survivor-gender']];
+                break;
+            case 'survivor-age':
+                rpt['Survivor age'] = report['survivor-age'];
+                break;
             case 'used-before':
                 // set Alias from generated-alias or existing-alias (don't record distinction in
                 // order to ensure homogeneous reports)

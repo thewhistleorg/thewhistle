@@ -1,33 +1,52 @@
-<form method="post">
+<form method="post" enctype="multipart/form-data" class="pure-form">
     {{> back}}{{> step}}
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
 
     <div  class="margin-top-3">
+        <script>
+            'use strict';
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelector('input[type=file]').onchange = cloneFileInput; // change handler for initial file input
+                function cloneFileInput(event) {
+                    const fileInputs = document.querySelectorAll('input[type=file]');
+                    const el = event.target;
+                    // if we already have a 'no file chosen' input, don't clone another
+                    for (const i of fileInputs) if (i.files.length == 0) return;
+                    // if same file has already been chosen, clear the filename & don't clone
+                    const inputsWithThisName = [...fileInputs].filter(f => f.files[0].name == el.files[0].name)
+                    if (inputsWithThisName.length > 1) { el.value = ''; return; }
+                    const copy = el.cloneNode(true);
+                    copy.onchange = cloneFileInput;
+                    copy.value = '';
+                    copy.id = 'document' + (fileInputs.length);
+                    el.insertAdjacentElement('afterend', copy)
+                }
+            });
+        </script>
 
-        <h1>{{q.5a}}</h1>
+        <h1>This is an anonymous service. Any information you provide will be seen only by staff and
+            volunteers of Global Rights Nigeria.</h1>
 
-        <p class="hint-text">Pick all options that apply.</p>
+        <p class="hint-text">{{q.6a}}</p>
 
         <ul>
-            {{#checked action-taken}}
             <li>
-                <input type="checkbox" name="action-taken" id="action-taken-police" value="police">
-                <label for="action-taken-police">Police or government officials</label>
+                <label for="description">Description:</label>
+                <textarea class="pure-input-1" name="description" id="description" rows="4" autofocus>{{description}}</textarea>
             </li>
             <li>
-                <input type="checkbox" name="action-taken" id="action-taken-other" value="other">
-                <label for="action-taken-other">Somebody within an organisation</label>
-                <input type="text" name="action-taken-other-details" id="action-taken-other-details" class="">
+                <label for="document0">
+                    <strong>Please upload any evidence that could help.</strong>
+                    This can be photos, videos or any other documents.
+                    {{#if files}}
+                    <span class="note">note: please reselect
+                        {{#each files}}{{this.name}}{{#unless @last}}, {{/unless}}{{/each}}
+                        if you wish to submit them</span>
+                    {{/if}}
+                </label>
+                <input type="file" name="documents" value="0" id="document0" class="upload-file">
             </li>
-            <li>
-                <input type="checkbox" name="action-taken" id="action-taken-teacher" value="teacher">
-                <label for="action-taken-teacher">Teacher/tutor/lecturer</label>
-            </li>
-            <li>
-                <input type="checkbox" name="action-taken" id="action-taken-friends" value="friends">
-                <label for="action-taken-friends">Friends, family</label>
-            </li>
-            {{/checked}}
+
         </ul>
         {{> continue}}
     </div>

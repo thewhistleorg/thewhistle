@@ -14,10 +14,9 @@ import Resource  from '../../../models/resource.js';
 import Submission from '../../../models/submission.js';
 import UserAgent from '../../../models/user-agent.js';
 
-import jsObjectToHtml from '../../../lib/js-object-to-html.js';
 import Geocoder       from '../../../lib/geocode.js';
 
-const nPages = 7;
+const nPages = 8;
 
 class Handlers {
 
@@ -25,6 +24,14 @@ class Handlers {
      * Render incident report index page.
      */
     static async getIndex(ctx) {
+        // set up values for date select elements
+        ctx.session.incidentDate = {
+            days:   Array(31).fill(null).map((day, i) => i + 1),
+            months: [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ],
+            years:  Array(60).fill(null).map((year, i) => new Date().getFullYear() - i),
+            hours:  Array(24).fill(null).map((d, i) => i.toString().padStart(2, '0')+':00'),
+        };
+
         // default the incident report date to today: this is a natural default, is quite easy to
         // change to yesterday, or to any other day; it also maximises the chances of getting an
         // actual date, rather than leaving the option blank or selecting a 'within' option
@@ -32,6 +39,8 @@ class Handlers {
         ctx.session.report = { when: 'date', date: today };
 
         ctx.session.completed = 0; // number of pages completed; used to prevent users jumping ahead
+
+        ctx.session.saved = false;
 
         // record new submission has been started
         if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
@@ -43,19 +52,9 @@ class Handlers {
 
 
     /**
-     * Process index page submission - creates a partially submitted report in the database.
+     * Process index page submission - just goes to page 1.
      */
     static async postIndex(ctx) {
-        if (!ctx.session.report) { ctx.flash = { expire: 'Your session has expired' }; ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
-
-        // create skeleton report
-        const id = await Report.submissionStart(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
-
-        // record id for subsequent updates
-        ctx.session.id = id;
-
-        ctx.set('X-Insert-Id', id); // for integration tests
-
         // record user-agent
         await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
 
@@ -85,18 +84,15 @@ class Handlers {
         // progress indicator
         const pages = Array(nPages).fill(null).map((p, i) => ({ page: i+1 }));
         if (page != '+') pages[page-1].class = 'current'; // to highlight current page
-
-        const incidentDate = {
-            days:   Array(31).fill(null).map((day, i) => i + 1),
-            months: [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ],
-            years:  Array(60).fill(null).map((year, i) => new Date().getFullYear() - i),
-            hours:  Array(24).fill(null).map((d, i) => i.toString().padStart(2, '0')+':00'),
-        };
-        const context = Object.assign({ pages: pages }, ctx.session.report, { incidentDate }, { q: q });
+        const context = Object.assign({ pages: pages }, ctx.session.report, { incidentDate: ctx.session.incidentDate }, { q: q });
 
         await ctx.render('page'+page, context);
     }
 
+
+    /**
+     *
+     */
     static async getPageSingle(ctx) {
         const today = { day: dateFormat('d'), month: dateFormat('mmm'), year: dateFormat('yyyy') };
         ctx.session.report = { when: 'date', date: today };
@@ -115,36 +111,13 @@ class Handlers {
     static async postPage(ctx) {
         if (!ctx.session.report) { ctx.flash = { expire: 'Your session has expired' }; ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
 
+        // page number, or '+' for single-page submission
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num);
+
+        // don't allow jumping further forward than 'next' page
         if (page > ctx.session.completed+1) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); return; }
 
-        if (page == '+') {
-            // create skeleton report (we had no index page submission)
-            ctx.session.id = await Report.submissionStart(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
-            ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
-        } else {
-            ctx.session.completed = page;
-        }
-
-        const body = ctx.request.body; // shorthand
-
-
-        if (body['used-before']) {
-            // check generated alias not already used, or existing alias does exist
-            switch (ctx.session.report['used-before']) {
-                case 'y':
-                    // verify existing alias does exist
-                    const reportsY = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['existing-alias']);
-                    if (reportsY.length == 0) { ctx.flash = { alias: 'Anonymous alias not found' }; ctx.redirect(ctx.url); return; }
-                    break;
-                case 'n':
-                    // verify generated alias does not exist
-                    if (ctx.session.report['generated-alias'] == null) { ctx.flash = 'Alias not given'; ctx.redirect(ctx.url); }
-                    const reportsN = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['generated-alias']);
-                    if (reportsN.length > 0) { ctx.flash = { alias: 'Generated alias not available: please select another' }; ctx.redirect(ctx.url); return; }
-                    break;
-            }
-        }
+        const body = ctx.request.body;
 
         if (body.fields) {
             // multipart/form-data: move body.fields.* to body.* to match
@@ -160,9 +133,44 @@ class Handlers {
             for (let f=0; f<body.files.length; f++) if (body.files[f].size == 0) body.files.splice(f, 1);
         }
 
+        // if this is page 2 (with report not already saved), or single page submission, create skeleton report in the database
+        if ((!ctx.session.saved && page==2) || page=='+') {
+            ctx.session.id = await Report.submissionStart(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
+            await Report.insertTag(ctx.params.database, ctx.session.id, 'incomplete', null);
+            ctx.session.saved = false;
+            ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
+        }
+
+        // if this is page 2 (with report not already saved), or page 1 with report already saved, or
+        // single page submission, check generated alias not already used, or existing alias does exist
+        if ((!ctx.session.saved && page==2) || (ctx.session.saved && page==1) || page=='+') { // record alias
+            switch (ctx.session.report['used-before']) {
+                case 'y':
+                    // verify existing alias does exist
+                    const reportsY = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['existing-alias']);
+                    const reportsYexclCurr = reportsY.filter(r => r._d != ctx.session.id); // exclude current report
+                    if (reportsYexclCurr.length == 0) { ctx.flash = { alias: 'Anonymous alias not found' }; ctx.redirect(ctx.url); return; }
+                    break;
+                case 'n':
+                    // verify generated alias does not exist
+                    if (ctx.session.report['generated-alias'] == null) { ctx.flash = 'Alias not given'; ctx.redirect(ctx.url); }
+                    const reportsN = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['generated-alias']);
+                    const reportsNexclCurr = reportsN.filter(r => r._d != ctx.session.id); // exclude current report
+                    if (reportsNexclCurr.length > 0) { ctx.flash = { alias: 'Generated alias not available: please select another' }; ctx.redirect(ctx.url); return; }
+                    break;
+            }
+
+            // set/update alias
+            const alias = page=='+'
+                ? body['generated-alias'] || body['existing-alias']
+                : ctx.session.report['generated-alias'] || ctx.session.report['existing-alias'];
+            await Report.submissionDetails(ctx.params.database, ctx.session.id, { Alias: alias });
+            await Report.submissionAlias(ctx.params.database, ctx.session.id, alias);
+        }
+
         // remember if we're going forward or back, then delete nav from body
         const goNum = body['nav-next'] ? page + 1 : page - 1;
-        const go = goNum==0 ? '' : goNum>nPages || page=='+' ? 'review' : goNum;
+        const go = goNum==0 ? '' : goNum>nPages || page=='+' ? 'whatnext' : goNum;
         delete body['nav-prev'];
         delete body['nav-next'];
 
@@ -189,11 +197,7 @@ class Handlers {
 
         const prettyReport = prettifyReport(page, body);
 
-        await Report.submissionDetails(ctx.params.database, ctx.session.id, prettyReport);
-
-        if (prettyReport.Alias) {
-            Report.submissionAlias(ctx.params.database, ctx.session.id, prettyReport.Alias);
-        }
+        if (page>1 || page=='+') await Report.submissionDetails(ctx.params.database, ctx.session.id, prettyReport);
 
         if (body.files) {
             for (const file of body.files) Report.submissionFile(ctx.params.database, ctx.session.id, file);
@@ -202,65 +206,27 @@ class Handlers {
         // record user-agent
         await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
 
-        ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${go}`);
+        if (page != '+') ctx.session.completed = page;
 
         // record submission progress
         if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
             await Submission.progress(ctx.params.database, ctx.session.submissionId, page);
         }
 
-        if (page == '+') ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
-
         ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${go}`);
     }
 
+
+    /**
+     *
+     */
     static async postPageSingle(ctx) {
         ctx.params.num = '*';
         await Handlers.postPage(ctx);
     }
 
 
-    /* review  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-
-    /**
-     * Render 'review & confirm' page.
-     */
-    static async getReview(ctx) {
-        if (!ctx.session.report) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
-
-        const prettyReport = prettifyReport('+', ctx.session.report);
-        const files = ctx.session.report.files ? ctx.session.report.files.map(f => f.name).join(', ') : null;
-        const context = {
-            reportHtml: jsObjectToHtml.usingTable(prettyReport),
-            files:      files,
-        };
-
-        await ctx.render('review', context);
-    }
-
-
-    /**
-     * Process 'review & confirm' submission.
-     */
-    static async postReview(ctx) {
-        if (!ctx.session.report) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
-        if (ctx.request.body['nav-prev'] == 'prev') { ctx.redirect('*'); return; }
-
-
-        // record submission complete
-        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
-            await Submission.complete(ctx.params.database, ctx.session.submissionId, ctx.session.id);
-        }
-
-        // remove all session data (to prevent duplicate submission)
-        ctx.session = {};
-
-        ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/whatnext`);
-    }
-
-
-    /* what's next - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+    /* whatnext - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
     /**
@@ -269,6 +235,20 @@ class Handlers {
      * Shows local resources grouped by services they offer.
      */
     static async getWhatnext(ctx) {
+        if (ctx.session.report) {
+            // tag report as complete
+            await Report.deleteTag(ctx.params.database, ctx.session.id, 'incomplete', null);
+            await Report.insertTag(ctx.params.database, ctx.session.id, 'complete', null);
+
+            // record submission complete
+            if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
+                await Submission.complete(ctx.params.database, ctx.session.submissionId, ctx.session.id);
+            }
+
+            // remove all session data (to prevent duplicate submission)
+            ctx.session = {};
+
+        }
         const context = { address: ctx.query.address };
 
         // if we have a geocode result on the incident location, list local resources
@@ -363,15 +343,15 @@ function prettifyReport(page, report) {
     // is probably not the best way to do this, but since this is all still in flux, this is the
     // easiest for now...
     const nulls = {
-        '1a': 'on-behalf-of',
-        '2a': 'when',
-        '2b': 'date',
-        '2c': 'still-happening',
-        '3a': 'where',
-        '4a': 'description', // TODO: what about files?
+        '1a': 'used-before',
+        '2a': 'on-behalf-of',
+        '3a': 'when',
+        '3b': 'date',
+        '3c': 'still-happening',
+        '4a': 'where',
         '5a': 'who',
-        '6a': 'action-taken',
-        '7a': 'used-before',
+        '6a': 'description', // TODO: what about files?
+        '7a': 'action-taken',
     };
     // if (nulls[page] && report[nulls[page]]==undefined) report[nulls[page]] = null; // kludgy or what!
     if (page == '+') {

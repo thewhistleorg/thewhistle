@@ -18,18 +18,17 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
+
     /*
      * 'when' page
      */
-
-
 
     if (document.querySelector('input[name=when]')) {
         const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
 
         // set focus to hour/day field if any 'when' radio button clicked
         document.querySelectorAll('input[name=when]').forEach(function(input) {
-            input.addEventListener('change', function() {
+            input.onchange = function() {
                 switch (this.value) {
                     case 'date':
                         document.querySelector('select[name="date.day"]').focus();
@@ -44,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         this.parentElement.parentElement.querySelector('.when-form').style.display='none';
                         break;
                 }
-            });
+            };
         });
 
         if (document.querySelector('#when-date').checked == true) {
@@ -53,63 +52,63 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // check when-today if any today fields receive focus
         document.querySelectorAll('input[name^=today]').forEach(function(input) {
-            input.addEventListener('focus', function() {
+            input.onfocus = function() {
                 document.querySelector('#when-today').checked = true;
-            });
+            };
         });
 
         // check when-yesterday if any yesterday fields receive focus
         document.querySelectorAll('input[name^=yesterday]').forEach(function(input) {
-            input.addEventListener('focus', function() {
+            input.onfocus = function() {
                 document.querySelector('#when-yesterday').checked = true;
-            });
+            };
         });
 
 
         // check when-date if any date fields receive focus
         document.querySelectorAll('input[name^=date], select[name^=date]').forEach(function(input) {
-            input.addEventListener('focus', function() {
+            input.onfocus = function() {
                 document.querySelector('#when-date').checked = true;
-            });
+            };
         });
 
         // check when-within if within-options is changed, clear it if no value set
         // (note not on focus, as tabbing to it from date would auto-select it)
-        document.querySelector('#within-options').addEventListener('change', function() {
+        document.querySelector('#within-options').onchange = function() {
             document.querySelector('#when-within').checked = this.value!='';
-        });
+        };
 
         // auto-advance day field when completed
-        document.querySelector('select[name="date.day"]').addEventListener('keypress', function(event) {
+        document.querySelector('select[name="date.day"]').onkeypress = function(event) {
             if (!event.key.match(/\d/)) { event.preventDefault(); return; }
             const newValue = this.value + event.key;
             if (newValue.length==2 || newValue>3) {
                 document.querySelector('select[name="date.month"]').focus();
                 document.querySelector('select[name="date.month"]').select();
             }
-        });
+        };
 
         // auto-advance month field when completed
-        document.querySelector('select[name="date.month"]').addEventListener('keypress', function(event) {
+        document.querySelector('select[name="date.month"]').onkeypress = function(event) {
             //if (this.value.length == 3) { event.preventDefault(); return; }
             const newValue = this.value + event.key;
             if (months.indexOf(newValue.toLowerCase()) >= 0) {
                 document.querySelector('select[name="date.year"]').focus();
                 document.querySelector('select[name="date.year"]').select();
             }
-        });
+        };
 
         // month field validation
-        document.querySelector('select[name="date.month"]').addEventListener('change', function() {
+        document.querySelector('select[name="date.month"]').onchange = function() {
             if (this.setCustomValidity == undefined) return;
             const err = 'Please enter a valid three-letter abbreviation of a month';
             const ok = months.indexOf(this.value.toLowerCase()) >= 0;
             this.setCustomValidity(ok ? '' : err);
-        });
+        };
 
         // on/within validation
         document.querySelectorAll('input[name=when]').forEach(function(input) {
-            input.addEventListener('change', function() {
+            input.onchange = function() {
                 if (this.setCustomValidity == undefined) return;
                 document.querySelector('#within-options').required = false;
                 document.querySelectorAll('input[name^=date]').forEach(function(el) { el.required = false; });
@@ -126,11 +125,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         document.querySelector('select[name="within-options"]').focus();
                         break;
                 }
-            });
+            };
         });
 
         // auto-advance hour field when completed (date)
-        // document.querySelector('input[name="date.hour"]').addEventListener('keypress', function(event) {
+        // document.querySelector('input[name="date.hour"]').onkeypress = function(event) {
         //     var newValue = this.value + event.key;
         //     if (newValue.length==2 || newValue>2) {
         //         document.querySelector('input[name="date.minute"]').focus();
@@ -139,45 +138,56 @@ document.addEventListener('DOMContentLoaded', function() {
         // });
 
         // don't tab out of empty date field (in case tab typed after auto-advance)
-        document.querySelectorAll('input[name^=date]').forEach(function(elem) {
-            // if (elem.name=='date.hour' || elem.name=='date.minute') return; // hour/min can be left blank
-            if (elem.name=='date.time') return; // hour/min can be left blank
+        document.querySelectorAll('input[name^=date]').forEach(function(input) {
+            // if (input.name=='date.hour' || input.name=='date.minute') return; // hour/min can be left blank
+            if (input.name=='date.time') return; // hour/min can be left blank
 
-            elem.addEventListener('keydown', function (event) {
+            input.onkeydown = function (event) {
                 if (event.key == 'Tab' && this.value == '') event.preventDefault();
-            });
+            };
         });
     }
+
 
     /*
      * 'where' page
      */
-    if (document.querySelector('input[name=where]')) {
 
-        // Show where-at form when this option selected
-        // document.querySelector('#where-at').addEventListener('change', function() {
-        //  this.parentElement.querySelector("#at-address").style.display="block";
-        // });
+    if (document.querySelector('#where')) {
+        const where = document.querySelector('#where');
+
+        // show/hide at-address according to selected option
+        document.querySelectorAll('input[name=where]').forEach(function(input) {
+            input.onclick = function() {
+                if (input.value == 'at') {
+                    where.querySelector('p').classList.remove('hide');
+                    where.querySelector('input[name="at-address"]').classList.remove('hide');
+                    where.querySelector('input[name="at-address"]').focus();
+                    where.querySelector('input[name="at-address"]').select();
+                }
+                if (input.value == 'dont-know') {
+                    where.querySelector('p').classList.add('hide');
+                    where.querySelector('input[name="at-address"]').classList.add('hide');
+                }
+            };
+        });
+
+        // defaults for previously answered questions
+        document.querySelectorAll('input[name=where]').forEach(function(input) {
+            if (input.checked) input.onclick();
+        });
 
         // check #where-at if at-address receives focus
-        document.querySelector('#at-address').addEventListener('focus', function() {
+        document.querySelector('#at-address').onfocus = function() {
             document.querySelector('#where-at').checked = true;
-        });
-
-        // set focus to at-address if where-at selected
-        document.querySelectorAll('input[name=where]').forEach(function(input) {
-            input.addEventListener('change', function() {
-                if (input.value == 'at') {
-                    document.querySelector('input[name="at-address"]').focus();
-                    document.querySelector('input[name="at-address"]').select();
-                }
-            });
-        });
+        };
     }
+
 
     /*
      * 'who' page
      */
+
     if (document.querySelector('input[name=who]')) {
 
         // // Show who-y-form when selected
@@ -202,51 +212,62 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // set focus to who-relationship if who-y selected
         document.querySelectorAll('input[name=who]').forEach(function(input) {
-            input.addEventListener('change', function() {
+            input.onchange = function() {
                 if (input.value == 'y') {
                     document.querySelector('input[name="who-relationship"]').focus();
                     document.querySelector('input[name="who-relationship"]').select();
                     this.parentElement.querySelector('#who-y-form').style.display='block';
                     this.parentElement.parentElement.querySelector('#who-n-form').style.display='none';
                 }
-            });
-        });
-        // set focus to who-description if who-n selected
-        document.querySelectorAll('input[name=who]').forEach(function(input) {
-            input.addEventListener('change', function() {
                 if (input.value == 'n') {
                     document.querySelector('textarea[name="who-description"]').focus();
                     document.querySelector('textarea[name="who-description"]').select();
                     this.parentElement.querySelector('#who-n-form').style.display='block';
                     this.parentElement.parentElement.querySelector('#who-y-form').style.display='none';
                 }
-            });
+            }
         });
-    }
-
-    /*
-     * 'action-taken' page
-     */
-    if (document.querySelector('input[name="action-taken"]')) {
-        // check #action-taken-other if action-taken-other-details entered
-        document.querySelector('input[name="action-taken-other-details"]').addEventListener('change', function() {
-            document.querySelector('#action-taken-other').checked = this.value != '';
-        });
-
-        // set focus to action-taken-other-details if action-taken-other selected
-        document.querySelector('#action-taken-other').addEventListener('click', function() {
-            if (this.checked) {
-                document.querySelector('input[name="action-taken-other-details"]').focus();
-                document.querySelector('input[name="action-taken-other-details"]').select();
-            } else {
-                document.querySelector('input[name="action-taken-other-details"]').value = '';
+        // set focus to who-description if who-n selected
+        document.querySelectorAll('input[name=who]').forEach(function(input) {
+            input.onchange = function() {
             }
         });
     }
 
+
+    /*
+     * 'action-taken' page
+     */
+
+    if (document.querySelector('input[name="action-taken"]')) {
+        // defaults for previously answered questions
+        document.querySelectorAll('input[name=action-taken]').forEach(function(el) {
+            if (el.checked) {
+                const extra = el.parentElement.querySelector('input[type=text]');
+                extra.classList.remove('hide');
+            }
+        });
+
+        document.querySelectorAll('input[name=action-taken]').forEach(function(el) {
+            el.onclick = function() {
+                const extra = this.parentElement.querySelector('input[type=text]');
+                if (this.checked) {
+                    extra.classList.remove('hide');
+                    extra.focus();
+                    extra.select();
+                } else {
+                    extra.value = '';
+                    extra.classList.add('hide');
+                }
+            }
+        });
+    }
+
+
     /*
      * 'used-before' page
      */
+
     if (document.querySelector('input[name="used-before"]')) {
         // if we have no alias on opening page (ie we're not coming back to page with filled alias),
         // fetch a random one (use ajax to initialise alias so that no special treatment is required
@@ -259,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // listener to set focus to existing-alias if used-before-y selected
-        document.querySelector('#used-before-y').addEventListener('click', function() {
+        document.querySelector('#used-before-y').onclick = function() {
             if (this.checked) {
                 document.querySelector('#usegenerated').classList.add('hide');
                 document.querySelector('input[name="existing-alias"]').focus();
@@ -268,10 +289,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('#usegenerated').classList.remove('hide');
                 document.querySelector('input[name="existing-alias"]').value = '';
             }
-        });
+        };
 
         // listener to display usegenerated and clear existing-alias if used-before-n clicked
-        document.querySelector('#used-before-n').addEventListener('click', function() {
+        document.querySelector('#used-before-n').onclick = function() {
             if (this.checked) {
                 document.querySelector('#usegenerated').classList.remove('hide');
                 document.querySelector('input[name="existing-alias"]').value = '';
@@ -283,18 +304,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('input[name="existing-alias"]').focus();
                 document.querySelector('input[name="existing-alias"]').select();
             }
-        });
+        };
 
         // listener to get alternative generated alias
-        document.querySelector('#get-alt-alias').addEventListener('click', function() {
+        document.querySelector('#get-alt-alias').onclick = function() {
             generateAlias();
-        });
+        };
 
         // listener to check #used-before-y if existing-alias entered
-        document.querySelector('input[name="existing-alias"]').addEventListener('change', function() {
+        document.querySelector('input[name="existing-alias"]').onchange = function() {
             document.querySelector('#used-before-y').checked = this.value != '';
             document.querySelector('#usegenerated').classList.add('hide');
-        });
+        };
 
         // check entered existing alias letter-by-letter
         document.querySelector('input[name="existing-alias"]').oninput = function() {
@@ -357,8 +378,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     /**
-     * Resources ('what next') page
+     * whatnext (resources) page
      */
+
     if (document.querySelector('input[name=address]')) {
         document.querySelector('input[name="address"]').oninput = function() {
             const input = this;

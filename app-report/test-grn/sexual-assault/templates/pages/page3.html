@@ -1,23 +1,101 @@
 <form method="post">
     {{> back}}{{> step}}
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+    <div class="margin-top-3">
 
-    <div  class="margin-top-3">
+        <h1>{{q.2a}}</h1>
 
-        <h1>Where did this happen?</h1>
+        <p class="hint-text">We understand this can be difficult. Please take your time and tell us
+            as much as you are able.</p>
 
-        <p class="hint-text"></p>
-        <ul>
-            {{#checked where}}
+        <ul id="when">
+            {{#checked when}}
             <li>
-                <input type="radio" name="where" id="where-at" value="at"> <label for="where-at">Location</label>
-                <p class="hint-text">Please provide as much detail as you are able – this could be
-                    an address, restaurant name, or neighborhood or sights and landmarks you recall.</p>
-                <input type="text" name="at-address" id="at-address" value="{{at-address}}" class="w36">
+                <input type="radio" name="when" id="when-date" value="date">
+                <label for="when-date" class="pure-radio">Yes, exactly when it happened</label>
+                <div class="when-form" style="display:none;">
+                    <p class="hint-text">Please select the date and approximate time</p>
+                    <table class="inline">
+                        <tr class="field-label">
+                            <td>DD</td>
+                            <td>MMM</td>
+                            <td>YYYY</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <select name="date.day" id="date.day" class="w4">
+                                    {{#selected date.day}}
+                                    {{#incidentDate.days}}
+                                    <option value="{{this}}">{{this}}</option>
+                                    {{/incidentDate.days}}
+                                    {{/selected}}
+                                </select>
+                            </td>
+                            <td>
+                                <select name="date.month" id="date.month" class="w5">
+                                    {{#selected date.month}}
+                                    {{#incidentDate.months}}
+                                    <option value="{{this}}">{{this}}</option>
+                                    {{/incidentDate.months}}
+                                    {{/selected}}
+                                </select>
+                            </td>
+                            <td>
+                                <select name="date.year" id="date.year" class="w6">
+                                    {{#selected date.year}}
+                                    {{#incidentDate.years}}
+                                    <option value="{{this}}">{{this}}</option>
+                                    {{/incidentDate.years}}
+                                    {{/selected}}
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="inline">
+                        <br>at
+                        <select name="date.time" id="date.time">
+                            <option value="">&nbsp;</option>
+                            {{#selected date.time}}
+                            {{#incidentDate.hours}}
+                            <option value="{{this}}">{{this}}</option>
+                            {{/incidentDate.hours}}
+                            {{/selected}}
+                        </select>
+                    </div>
+                </div>
             </li>
             <li>
-                <input type="radio" name="where" id="where-dont-know" value="dont-know">
-                <label for="where-dont-know">I don’t know</label>
+                <input type="radio" name="when" id="when-within" value="within">
+                <label for="when-within">Yes, about when it happened</label>
+                <p class="hint-text">For example, last month, a couple of years ago, …</p>
+                <select name="within-options" id="within-options">
+                    <option value="">&nbsp;</option>
+                    <option value="within last week">last week</option>
+                    <option value="within last month">last month</option>
+                    <option value="within last year">last year</option>
+                    <option value="more than a year ago">more than a year ago</option>
+                </select>
+            </li>
+            <li>
+                <input type="radio" name="when" id="when-dont-remember" value="dont-remember">
+                <label for="when-dont-remember">I do not remember</label>
+            </li>
+            {{/checked}}
+        </ul>
+
+        <h1>Is it still happening?</h1>
+
+        <ul id="still-happening">
+            {{#checked still-happening}}
+            <li>
+                <input type="radio" name="still-happening" id="still-y" value="y">
+                <label for="still-y">Yes</label>
+            </li>
+            <li>
+                <input type="radio" name="still-happening" id="still-n" value="n"
+                       class="radio-margin">
+                <label for="still-n">No</label>
             </li>
             {{/checked}}
         </ul>

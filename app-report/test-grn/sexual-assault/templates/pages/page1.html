@@ -1,41 +1,34 @@
-<form method="post">
-  {{> back}}{{> step}}
-  <ul class="validation-errors">{{#@koa.flash.validation}}
-    <li>{{this}}</li>{{/@koa.flash.validation}}</ul>
-  <div class="margin-top-3">
-    <h1>Are you reporting on behalf of yourself or someone else?</h1>
+<form method="post" class="pure-form pure-form-aligned">
+    {{> step}}
+    <ul class="validation-errors">{{#@koa.flash.alias}}<li>{{this}}</li>{{/@koa.flash.alias}}</ul>
 
-    <ul>
-      <li>
-        <input type="radio" name="on-behalf-of" id="myself" value="myself">
-        <label for="myself">Myself</label>
-      </li>
-      <li>
-        <input type="radio" name="on-behalf-of" id="someone-else" value="someone-else">
-        <label for="someone-else">Someone else</label>
-      </li>
-    </ul>
-
-    <!-- Following age and gender form placement should be discussed, hence commented out -->
-    <!-- <h1>Gender</h1>
-    <ul>
-      {{#checked survivor-gender}}
-      <li>
-        <input type="radio" name="survivor-gender" id="survivor-gender-m" value="m"> <label for="survivor-gender-m">Male</label>
-      </li>
-      <li>
-        <input type="radio" name="survivor-gender" id="survivor-gender-f" value="f"> <label for="survivor-gender-f">Female</label>
-      </li>
-      {{/checked}}
-    </ul>
-
-    <h1>Age</h1>
-    <ul>
-      <li>
-        <label for="survivor-age"></label>
-        <input type="number" name="survivor-age" id="survivor-age" value="{{survivor-age}}" autofocus>
-      </li>
-    </ul> -->
-    {{> continue}}
-  </div>
+    <div  class="margin-top-3">
+        <h1>Have you used this anonymous reporting service before?</h1>
+        <ul>
+            {{#checked used-before}}
+            <li>
+                <input type="radio" name="used-before" id="used-before-y" value="y">
+                <label for="used-before-y" class="pure-radio greyed-out-unless-checked">Yes</label>
+                <br>
+                <label for="existing-alias">Enter your anonymous alias</label>
+                <input type="text" name="existing-alias" id="existing-alias" value="{{existing-alias}}">
+                <span id="alias-ok" title="alias available" class="alias-available hide">✓</span>
+                <span id="alias-nok" title="alias not available" class="alias-available hide">✗</span>
+            </li>
+            <li>
+                <input type="radio" name="used-before" id="used-before-n" value="n" checked>
+                <label for="used-before-n" class="pure-radio greyed-out-unless-checked">No</label>
+                <br>
+                <p>We make sure that your report is anonymous by creating a random identification alias.</p>
+                <p>If you want to follow up, use the anonymous alias below so we can access any relevant information.</p>
+                <div id="usegenerated">
+                <p>This report will use <b><output name="generated-alias">{{generated-alias}}</output></b>
+                <input type="hidden" name="generated-alias" value="{{generated-alias}}"></p>
+                <button type="button" id="get-alt-alias" class="inline-link">Generate another random alias</button>
+                </div>
+            </li>
+            {{/checked}}
+        </ul>
+        {{> continue}}
+    </div>
 </form>

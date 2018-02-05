@@ -1,106 +1,41 @@
 <form method="post">
     {{> back}}{{> step}}
-    <ul class="validation-errors">{{#@koa.flash.validation}}
-        <li>{{this}}</li>
-        {{/@koa.flash.validation}}
-    </ul>
-
+    <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
     <div class="margin-top-3">
 
-        <p class="special-intro">We understand this can be difficult. Please take your time and tell us as much as you are able.</p>
+        <h1>Are you reporting on behalf of yourself or someone else?</h1>
 
-        <h1>{{q.2a}}</h1>
-
-        <ul>
-            {{#checked when}}
+        <ul id="on-behalf-of">
             <li>
-                <input type="radio" name="when" id="when-date" value="date">
-                <label for="when-date" class="pure-radio">Yes, exactly when it happened</label>
-                <div class="when-form" style="display:none;">
-                    <p class="hint-text">Please select the date and approximate time</p>
-                    <table class="inline">
-                        <tr class="field-label">
-                            <td>DD</td>
-                            <td>MMM</td>
-                            <td>YYYY</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <select name="date.day" id="date.day" class="w4">
-                                    {{#selected date.day}}
-                                    {{#incidentDate.days}}
-                                    <option value="{{this}}">{{this}}</option>
-                                    {{/incidentDate.days}}
-                                    {{/selected}}
-                                </select>
-                            </td>
-                            <td>
-                                <select name="date.month" id="date.month" class="w5">
-                                    {{#selected date.month}}
-                                    {{#incidentDate.months}}
-                                    <option value="{{this}}">{{this}}</option>
-                                    {{/incidentDate.months}}
-                                    {{/selected}}
-                                </select>
-                            </td>
-                            <td>
-                                <select name="date.year" id="date.year" class="w5">
-                                    {{#selected date.year}}
-                                    {{#incidentDate.years}}
-                                    <option value="{{this}}">{{this}}</option>
-                                    {{/incidentDate.years}}
-                                    {{/selected}}
-                                </select>
-                            </td>
-                        </tr>
-                    </table>
-
-                    <div class="inline">
-                        <br>at
-                        <select name="date.time" id="date.time">
-                            <option value="">&nbsp;</option>
-                            {{#selected date.time}}
-                            {{#incidentDate.hours}}
-                            <option value="{{this}}">{{this}}</option>
-                            {{/incidentDate.hours}}
-                            {{/selected}}
-                        </select>
-                    </div>
-                </div>
+                <input type="radio" name="on-behalf-of" id="myself" value="myself">
+                <label for="myself">Myself</label>
             </li>
             <li>
-                <input type="radio" name="when" id="when-within" value="within">
-                <label for="when-within">Yes, about when it happened</label>
-                <p class="hint-text">For example, last month, a couple of years ago, …</p>
-                <select name="within-options" id="within-options">
-                    <option value="">&nbsp;</option>
-                    <option value="within last week">last week</option>
-                    <option value="within last month">last month</option>
-                    <option value="within last year">last year</option>
-                    <option value="more than a year ago">more than a year ago</option>
-                </select>
+                <input type="radio" name="on-behalf-of" id="someone-else" value="someone-else">
+                <label for="someone-else">Someone else</label>
             </li>
-            <li>
-                <input type="radio" name="when" id="when-dont-remember" value="dont-remember">
-                <label for="when-dont-remember">I do not remember</label>
-            </li>
-            {{/checked}}
         </ul>
 
-        <h1>Is it still happening?</h1>
+        <!-- Following age and gender form placement should be discussed, hence commented out -->
+        <!-- <h1>Gender</h1>
         <ul>
-            {{#checked still-happening}}
-            <li>
-                <input type="radio" name="still-happening" id="still-y" value="y">
-                <label for="still-y">Yes</label>
-            </li>
-            <li>
-                <input type="radio" name="still-happening" id="still-n" value="n"
-                       class="radio-margin">
-                <label for="still-n">No</label>
-            </li>
-            {{/checked}}
+          {{#checked survivor-gender}}
+          <li>
+            <input type="radio" name="survivor-gender" id="survivor-gender-m" value="m"> <label for="survivor-gender-m">Male</label>
+          </li>
+          <li>
+            <input type="radio" name="survivor-gender" id="survivor-gender-f" value="f"> <label for="survivor-gender-f">Female</label>
+          </li>
+          {{/checked}}
         </ul>
+
+        <h1>Age</h1>
+        <ul>
+          <li>
+            <label for="survivor-age"></label>
+            <input type="number" name="survivor-age" id="survivor-age" value="{{survivor-age}}" autofocus>
+          </li>
+        </ul> -->
         {{> continue}}
     </div>
 </form>

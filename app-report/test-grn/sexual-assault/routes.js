@@ -14,8 +14,6 @@ router.get( '/:database/:project/:num(\\d+)', handlers.getPage);
 router.post('/:database/:project/:num(\\d+)', handlers.postPage);
 router.get( '/:database/:project/\\*',        handlers.getPageSingle);
 router.post('/:database/:project/\\*',        handlers.postPageSingle);
-router.get( '/:database/:project/review',     handlers.getReview);
-router.post('/:database/:project/review',     handlers.postReview);
 router.get( '/:database/:project/whatnext',   handlers.getWhatnext);
 router.post('/:database/:project/whatnext',   handlers.postWhatnext);
 

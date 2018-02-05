@@ -10,6 +10,9 @@ import dateFormat from 'dateformat';        // Steven Levithan's dateFormat()
 import exiftool   from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
 import useragent  from 'useragent';         // parse browser user agent string
 import MongoDB    from 'mongodb';           // MongoDB driver for Node.js
+import Debug      from 'debug';             // small debugging utility
+
+const debug = Debug('app:db'); // db write ops
 const ObjectId = MongoDB.ObjectId;
 
 import User    from '../models/user.js';
@@ -277,6 +280,7 @@ class Report {
      * @returns {ObjectId} New report id.
      */
     static async submissionStart(db, project, userAgent) {
+        debug('submissionStart', db, project);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         const reports = global.db[db].collection('reports');
@@ -306,7 +310,15 @@ class Report {
     }
 
 
+    /**
+     * Sets (or updates) alias for submitted report.
+     *
+     * @param {string}   db - Database to use.
+     * @param {ObjectId} id - Report Id.
+     * @param {string}   alias - Alias to record for given report.
+     */
     static async submissionAlias(db, id, alias) {
+        debug('submissionAlias', db, id, alias);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);  // allow id as string
@@ -317,7 +329,15 @@ class Report {
     }
 
 
+    /**
+     * Sets (or updates) (prettified) report details.
+     *
+     * @param {string}   db - Database to use.
+     * @param {ObjectId} id - Report Id.
+     * @param {Object}   details TODO
+     */
     static async submissionDetails(db, id, details) {
+        debug('submissionDetails', db, id, details);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);  // allow id as string
@@ -331,7 +351,15 @@ class Report {
     }
 
 
+    /**
+     * Stores uploaded file.
+     *
+     * @param {string}   db - Database to use.
+     * @param {ObjectId} id - Report Id.
+     * @param {Object}   file TODO
+     */
     static async submissionFile(db, id, file) {
+        debug('submissionFile');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id); // allow id as string
@@ -390,6 +418,7 @@ class Report {
      * @throws  Error on validation or referential integrity errors.
      */
     static async insert(db, by, alias, submitted, project, files, userAgent) {
+        debug('insert');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         by = objectId(by); // allow id as string
@@ -476,6 +505,7 @@ class Report {
      * @throws Error on validation or referential integrity errors.
      */
     static async update(db, id, values, userId) {
+        debug('update');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -499,6 +529,7 @@ class Report {
      * @throws Error if MongoDB delete fails or remove directory fails.
      */
     static async delete(db, id) {
+        debug('delete');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id); // allow id as string
@@ -576,7 +607,7 @@ class Report {
 
 
     /**
-     * Add tag to report.
+     * Add tag to report. May be used as part of report submission, in which case userId will be null.
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report id.
@@ -584,6 +615,7 @@ class Report {
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async insertTag(db, id, tag, userId) {
+        debug('insertTag', db, id, tag, userId);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -592,12 +624,12 @@ class Report {
         const reports = global.db[db].collection('reports');
         await reports.updateOne({ _id: id }, { $addToSet: { tags: tag } });
 
-        await Update.insert(db, id, userId, { addToSet: { tags: tag } }); // audit trail
+        if (userId) await Update.insert(db, id, userId, { addToSet: { tags: tag } }); // audit trail
     }
 
 
     /**
-     * Delete tag from report.
+     * Delete tag from report. May be used as part of report submission, in which case userId will be null.
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report id.
@@ -605,6 +637,7 @@ class Report {
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async deleteTag(db, id, tag, userId) {
+        debug('deleteTag', db, id, tag, userId);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -613,7 +646,7 @@ class Report {
         const reports = global.db[db].collection('reports');
         await reports.updateOne({ _id: id }, { $pull: { tags: tag } });
 
-        await Update.insert(db, id, userId, { pull: { tags: tag } }); // audit trail
+        if (userId) await Update.insert(db, id, userId, { pull: { tags: tag } }); // audit trail
     }
 
 
@@ -631,6 +664,7 @@ class Report {
      * @returns {Object} Inserted comment, including byId, byName, on, comment.
      */
     static async insertComment(db, id, comment, userId) {
+        debug('insertComment');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -671,6 +705,7 @@ class Report {
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async updateComment(db, id, by, on, comment, userId) {
+        debug('updateComment');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);                            // allow id as string
@@ -708,6 +743,7 @@ class Report {
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async deleteComment(db, id, by, on, userId) {
+        debug('deleteComment');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);                            // allow id as string
@@ -731,6 +767,7 @@ class Report {
      * @param {ObjectId} userId - User id.
      */
     static async flagView(db, id, userId) {
+        debug('flagView');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -780,6 +817,7 @@ class Report {
  */
 function objectId(id) {
     if (id == undefined) return undefined;
+    if (id == null) return null;
     try {
         const objId = id instanceof ObjectId ? id : new ObjectId(id);
         return objId;

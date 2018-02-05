@@ -169,7 +169,9 @@ class IncidentReport {
      * not used.
      */
     static async getAlias(ctx) {
-        const reports = await Report.getBy(ctx.state.user.db, 'alias', ctx.params.alias.replace('+', ' '));
+        const db = ctx.params.db;
+        const id = ctx.params.alias.replace('+', ' ');
+        const reports = await Report.getBy(db, 'alias', id);
 
         ctx.body = reports.map(r => r._id.toString());
         ctx.body.root = 'alias';

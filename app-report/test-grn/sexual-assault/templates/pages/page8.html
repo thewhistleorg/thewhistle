@@ -1,0 +1,20 @@
+<form method="post" class="pure-form">
+    {{> back}}{{> step}}
+    <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+
+    <div  class="margin-top-3">
+
+        <h1>Is there anything else you would like to add?.</h1>
+
+        <ul>
+            <li>
+                <label for="extra-notes">Extra notes:</label>
+                <textarea class="pure-input-1" name="extra-notes" id="extra-notes" rows="4" autofocus>{{extra-notes}}</textarea>
+            </li>
+        </ul>
+        <div class="text-center">
+            <button type="submit" name="nav-next" value="next" accesskey="c" class="nav-action-button pure-button-primary pure-button">Submit and continue to Resources</button>
+            <button type="submit" name="nav-next" value="next" accesskey="c" class="nav-action-button pure-button">Skip</button>
+        </div>
+    </div>
+</form>

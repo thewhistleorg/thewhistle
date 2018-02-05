@@ -370,6 +370,11 @@ function prettifyReport(page, report) {
 
     for (const field in report) {
         switch (field) {
+            case 'used-before':
+                // set Alias from generated-alias or existing-alias (don't record distinction in
+                // order to ensure homogeneous reports)
+                rpt['Alias'] = report['used-before']=='y' ? report['existing-alias'] : report['generated-alias'];
+                break;
             case 'on-behalf-of':
                 const onbehalfof = {
                     'myself':       'Myself',
@@ -417,15 +422,15 @@ function prettifyReport(page, report) {
             case 'action-taken':
                 // create array of responses matching form labels
                 const action = {
-                    police:  'Police or government officials',
-                    teacher: 'Teacher/tutor/lecturer',
-                    friends: 'Friends, family',
-                    other:   report['action-taken-other-details'],
-                    unset:   null, // no checkboxes ticked
+                    police:       'Police or government officials',
+                    organisation: 'Somebody within an organisation',
+                    teacher:      'Teacher/tutor/lecturer',
+                    friends:      'Friends, family',
+                    unset:        null, // no checkboxes ticked
                 };
                 if (report['action-taken'] == null) report['action-taken'] = 'unset';
                 if (typeof report['action-taken'] == 'string') report['action-taken'] = [ report['action-taken'] ];
-                rpt['Spoken to anybody?'] = report['action-taken'].map(a => action[a]);
+                rpt['Spoken to anybody?'] = report['action-taken'].map(a => action[a] + (report[`action-taken-${a}-details`] ? ` (${report[`action-taken-${a}-details`]})` : ''));
                 break;
             case 'description':
                 rpt.Description = report.description;
@@ -441,10 +446,8 @@ function prettifyReport(page, report) {
             case 'survivor-age':
                 rpt['Survivor age'] = report['survivor-age'];
                 break;
-            case 'used-before':
-                // set Alias from generated-alias or existing-alias (don't record distinction in
-                // order to ensure homogeneous reports)
-                rpt['Alias'] = report['used-before']=='y' ? report['existing-alias'] : report['generated-alias'];
+            case 'extra-notes':
+                rpt['Extra notes'] = report['extra-notes'];
                 break;
         }
     }

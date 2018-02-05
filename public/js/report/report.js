@@ -189,48 +189,27 @@ document.addEventListener('DOMContentLoaded', function() {
      */
 
     if (document.querySelector('input[name=who]')) {
-
-        // // Show who-y-form when selected
-        // document.querySelector('#who-y').addEventListener('change', function() {
-        //     this.parentElement.querySelector('#who-y-form').style.display='block';
-        // });
-        //
-        // // Show who-n-form when selected
-        // document.querySelector('#who-n').addEventListener('change', function() {
-        //     this.parentElement.querySelector('#who-n-form').style.display='block';
-        // });
-
-
-        // check #who-y if who-relationship receives focus
-        document.querySelector('#who-relationship').addEventListener('focus', function() {
-            document.querySelector('#who-y').checked = true;
-        });
-        // check #who-n if who-description receives focus
-        document.querySelector('#who-description').addEventListener('focus', function() {
-            document.querySelector('#who-n').checked = true;
-        });
-
-        // set focus to who-relationship if who-y selected
+        // display/hide supplementary information fields on radio-box selection
         document.querySelectorAll('input[name=who]').forEach(function(input) {
-            input.onchange = function() {
-                if (input.value == 'y') {
+            input.onclick = function() {
+                if (this.value == 'y') {
+                    this.parentElement.querySelector('#who-y-form').classList.remove('hide');
+                    this.parentElement.parentElement.querySelector('#who-n-form').classList.add('hide');
                     document.querySelector('input[name="who-relationship"]').focus();
                     document.querySelector('input[name="who-relationship"]').select();
-                    this.parentElement.querySelector('#who-y-form').style.display='block';
-                    this.parentElement.parentElement.querySelector('#who-n-form').style.display='none';
                 }
-                if (input.value == 'n') {
+                if (this.value == 'n') {
+                    this.parentElement.querySelector('#who-n-form').classList.remove('hide');
+                    this.parentElement.parentElement.querySelector('#who-y-form').classList.add('hide');
                     document.querySelector('textarea[name="who-description"]').focus();
                     document.querySelector('textarea[name="who-description"]').select();
-                    this.parentElement.querySelector('#who-n-form').style.display='block';
-                    this.parentElement.parentElement.querySelector('#who-y-form').style.display='none';
                 }
             }
         });
-        // set focus to who-description if who-n selected
+
+        // defaults for previously answered questions
         document.querySelectorAll('input[name=who]').forEach(function(input) {
-            input.onchange = function() {
-            }
+            if (input.checked) input.onclick();
         });
     }
 

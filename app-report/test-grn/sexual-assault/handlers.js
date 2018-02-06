@@ -6,6 +6,10 @@
 
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 import geodesy    from 'geodesy';    // library of geodesy functions
+import Debug      from 'debug';      // small debugging utility
+
+const debug = Debug('app:report'); // submission process
+
 const LatLon = geodesy.LatLonSpherical;
 
 import Report    from '../../../models/report.js';
@@ -24,6 +28,9 @@ class Handlers {
      * Render incident report index page.
      */
     static async getIndex(ctx) {
+        // clear previous session
+        ctx.session = {};
+
         // set up values for date select elements
         ctx.session.incidentDate = {
             days:   Array(31).fill(null).map((day, i) => i + 1),
@@ -71,6 +78,7 @@ class Handlers {
      *   reset, not left with the previous uploaded file.
      */
     static async getPage(ctx) {
+        debug('getPage', 'p'+ctx.params.num, 'id:'+ctx.session.id);
         if (!ctx.session.report) { ctx.flash = { expire: 'Your session has expired' }; ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
 
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num); // note '+' is allowed in windows filenames, '*' is not
@@ -109,6 +117,7 @@ class Handlers {
      * For single-page submissions, ctx.params.num is '*', which gets  translated to page '+'.
      */
     static async postPage(ctx) {
+        debug('postPage', 'p'+ctx.params.num, 'id:'+ctx.session.id, Object.keys(ctx.request.body));
         if (!ctx.session.report) { ctx.flash = { expire: 'Your session has expired' }; ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
 
         // page number, or '+' for single-page submission
@@ -133,12 +142,15 @@ class Handlers {
             for (let f=0; f<body.files.length; f++) if (body.files[f].size == 0) body.files.splice(f, 1);
         }
 
+        let saved = ctx.session.saved; // TODO: this logic really needs cleaning up!
+
         // if this is page 2 (with report not already saved), or single page submission, create skeleton report in the database
-        if ((!ctx.session.saved && page==2) || page=='+') {
+        if ((!saved && page==2) || page=='+') {
             ctx.session.id = await Report.submissionStart(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
             await Report.insertTag(ctx.params.database, ctx.session.id, 'incomplete', null);
-            ctx.session.saved = false;
+            saved = true;
             ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
+            debug('submissionStart', ctx.session.id)
         }
 
         // if this is page 2 (with report not already saved), or page 1 with report already saved, or
@@ -147,16 +159,18 @@ class Handlers {
             switch (ctx.session.report['used-before']) {
                 case 'y':
                     // verify existing alias does exist
-                    const reportsY = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['existing-alias']);
+                    const aliasExisting = ctx.session.report['existing-alias'];
+                    const reportsY = await Report.getBy(ctx.params.database, 'alias', aliasExisting);
                     const reportsYexclCurr = reportsY.filter(r => r._d != ctx.session.id); // exclude current report
-                    if (reportsYexclCurr.length == 0) { ctx.flash = { alias: 'Anonymous alias not found' }; ctx.redirect(ctx.url); return; }
+                    if (reportsYexclCurr.length == 0) { ctx.flash.alias = `Anonymous alias ‘${aliasExisting}’ not found`; ctx.redirect(ctx.url); return; }
                     break;
                 case 'n':
                     // verify generated alias does not exist
                     if (ctx.session.report['generated-alias'] == null) { ctx.flash = 'Alias not given'; ctx.redirect(ctx.url); }
-                    const reportsN = await Report.getBy(ctx.params.database, 'alias', ctx.session.report['generated-alias']);
+                    const aliasGenerated = ctx.session.report['generated-alias']
+                    const reportsN = await Report.getBy(ctx.params.database, 'alias', aliasGenerated);
                     const reportsNexclCurr = reportsN.filter(r => r._d != ctx.session.id); // exclude current report
-                    if (reportsNexclCurr.length > 0) { ctx.flash = { alias: 'Generated alias not available: please select another' }; ctx.redirect(ctx.url); return; }
+                    if (reportsNexclCurr.length > 0) { ctx.flash.alias = `Generated alias ‘${aliasGenerated}’ not available: please select another`; ctx.redirect(ctx.url); return; }
                     break;
             }
 
@@ -167,6 +181,8 @@ class Handlers {
             await Report.submissionDetails(ctx.params.database, ctx.session.id, { Alias: alias });
             await Report.submissionAlias(ctx.params.database, ctx.session.id, alias);
         }
+
+        ctx.session.saved = saved; // TODO: this logic really needs cleaning up!
 
         // remember if we're going forward or back, then delete nav from body
         const goNum = body['nav-next'] ? page + 1 : page - 1;
@@ -351,7 +367,10 @@ function prettifyReport(page, report) {
         '4a': 'where',
         '5a': 'who',
         '6a': 'description', // TODO: what about files?
+        '6b': 'survivor-gender',
+        '6c': 'survivor-age',
         '7a': 'action-taken',
+        '8a': 'extra-notes',
     };
     // if (nulls[page] && report[nulls[page]]==undefined) report[nulls[page]] = null; // kludgy or what!
     if (page == '+') {
@@ -426,11 +445,12 @@ function prettifyReport(page, report) {
                     organisation: 'Somebody within an organisation',
                     teacher:      'Teacher/tutor/lecturer',
                     friends:      'Friends, family',
-                    unset:        null, // no checkboxes ticked
+                    null:         null, // no checkboxes ticked
                 };
-                if (report['action-taken'] == null) report['action-taken'] = 'unset';
-                if (typeof report['action-taken'] == 'string') report['action-taken'] = [ report['action-taken'] ];
+                if (report['action-taken'] == null) report['action-taken'] = [ null ]; // no value: convert to array
+                if (typeof report['action-taken'] == 'string') report['action-taken'] = [ report['action-taken'] ]; // single value: convert to array
                 rpt['Spoken to anybody?'] = report['action-taken'].map(a => action[a] + (report[`action-taken-${a}-details`] ? ` (${report[`action-taken-${a}-details`]})` : ''));
+                if (JSON.stringify(rpt['Spoken to anybody?']) == '["null"]') rpt['Spoken to anybody?'] = []; // kludge alert!
                 break;
             case 'description':
                 rpt.Description = report.description;

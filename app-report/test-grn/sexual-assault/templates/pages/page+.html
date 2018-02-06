@@ -1,19 +1,34 @@
 <form method="post" enctype="multipart/form-data" class="pure-form pure-form-aligned">
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+    <ul class="validation-errors">{{#@koa.flash.alias}}<li>{{this}}</li>{{/@koa.flash.alias}}</ul>
 
     <div>
-
-        <h1>Are you reporting on behalf of yourself or someone else?</h1>
+        <h1>Have you used this anonymous reporting service before?</h1>
 
         <ul>
+            {{#checked used-before}}
             <li>
-                <input type="radio" name="on-behalf-of" id="myself" value="myself" autofocus>
-                <label for="myself">Myself</label>
+                <input type="radio" name="used-before" id="used-before-y" value="y">
+                <label for="used-before-y" class="pure-radio greyed-out-unless-checked">Yes</label>
+                <br>
+                <label for="existing-alias">Enter your anonymous alias</label>
+                <input type="text" name="existing-alias" id="existing-alias" value="{{existing-alias}}">
+                <span id="alias-ok" title="alias available" class="alias-available hide">✓</span>
+                <span id="alias-nok" title="alias not available" class="alias-available hide">✗</span>
             </li>
             <li>
-                <input type="radio" name="on-behalf-of" id="someone-else" value="someone-else">
-                <label for="someone-else">Someone else</label>
+                <input type="radio" name="used-before" id="used-before-n" value="n" checked>
+                <label for="used-before-n" class="pure-radio greyed-out-unless-checked">No</label>
+                <br>
+                <p>We make sure that your report is anonymous by creating a random identification alias.</p>
+                <p>If you want to follow up, use the anonymous alias below so we can access any relevant information.</p>
+                <div id="usegenerated">
+                    <p>This report will use <b><output name="generated-alias">{{generated-alias}}</output></b>
+                        <input type="hidden" name="generated-alias" value="{{generated-alias}}"></p>
+                    <button type="button" id="get-alt-alias" class="inline-link">Generate another random alias</button>
+                </div>
             </li>
+            {{/checked}}
         </ul>
     </div>
 
@@ -21,12 +36,31 @@
 
     <div>
 
-        <p class="special-intro">We understand this can be difficult. Please take your time and tell
-            us as much as you are able.</p>
+        <h1>Are you reporting on behalf of yourself or someone else?</h1>
 
-        <h2>{{q.2a}}</h2>
+        <ul id="on-behalf-of">
+            {{#checked on-behalf-of}}
+            <li>
+                <input type="radio" name="on-behalf-of" id="myself" value="myself">
+                <label for="myself">Myself</label>
+            </li>
+            <li>
+                <input type="radio" name="on-behalf-of" id="someone-else" value="someone-else">
+                <label for="someone-else">Someone else</label>
+            </li>
+            {{/checked}}
+        </ul>
+    </div>
 
-        <ul>
+    <hr>
+
+    <div>
+        <h1>{{q.3a}}</h1>
+
+        <p class="hint-text">We understand this can be difficult. Please take your time and tell us
+            as much as you are able.</p>
+
+        <ul id="when">
             {{#checked when}}
             <li>
                 <input type="radio" name="when" id="when-date" value="date">
@@ -41,73 +75,29 @@
                         </tr>
                         <tr>
                             <td>
-                                <select name="date.day" id="date.day" value="{{date.day}}" list="days" class="w4" min="1" max="31">
+                                <select name="date.day" id="date.day" class="w4">
                                     {{#selected date.day}}
-                                    <option value="1">01</option>
-                                    <option value="2">02</option>
-                                    <option value="3">03</option>
-                                    <option value="4">04</option>
-                                    <option value="5">05</option>
-                                    <option value="6">06</option>
-                                    <option value="7">07</option>
-                                    <option value="8">08</option>
-                                    <option value="9">09</option>
-                                    <option value="10">10</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
-                                    <option value="13">13</option>
-                                    <option value="14">14</option>
-                                    <option value="15">15</option>
-                                    <option value="16">16</option>
-                                    <option value="17">17</option>
-                                    <option value="18">18</option>
-                                    <option value="19">19</option>
-                                    <option value="20">20</option>
-                                    <option value="21">21</option>
-                                    <option value="22">22</option>
-                                    <option value="23">23</option>
-                                    <option value="24">24</option>
-                                    <option value="25">25</option>
-                                    <option value="26">26</option>
-                                    <option value="27">27</option>
-                                    <option value="28">28</option>
-                                    <option value="29">29</option>
-                                    <option value="30">30</option>
-                                    <option value="31">31</option>
+                                    {{#incidentDate.days}}
+                                    <option value="{{this}}">{{this}}</option>
+                                    {{/incidentDate.days}}
                                     {{/selected}}
                                 </select>
                             </td>
                             <td>
-                                <select name="date.month" id="date.month" value="{{date.month}}" list="months" class="w5" maxlength="3">
+                                <select name="date.month" id="date.month" class="w5">
                                     {{#selected date.month}}
-                                    <option value="Jan">Jan</option>
-                                    <option value="Feb">Feb</option>
-                                    <option value="Mar">Mar</option>
-                                    <option value="Apr">Apr</option>
-                                    <option value="May">May</option>
-                                    <option value="Jun">Jun</option>
-                                    <option value="Jul">Jul</option>
-                                    <option value="Aug">Aug</option>
-                                    <option value="Sep">Sep</option>
-                                    <option value="Oct">Oct</option>
-                                    <option value="Nov">Nov</option>
-                                    <option value="Dec">Dec</option>
+                                    {{#incidentDate.months}}
+                                    <option value="{{this}}">{{this}}</option>
+                                    {{/incidentDate.months}}
                                     {{/selected}}
                                 </select>
                             </td>
                             <td>
-                                <select name="date.year" id="date.year" value="{{date.year}}" list="years" class="w5" min="{{lastyear}}" max="{{thisyear}}">
+                                <select name="date.year" id="date.year" class="w6">
                                     {{#selected date.year}}
-                                    <option value="2009">2009</option>
-                                    <option value="2010">2010</option>
-                                    <option value="2011">2011</option>
-                                    <option value="2012">2012</option>
-                                    <option value="2013">2013</option>
-                                    <option value="2014">2014</option>
-                                    <option value="2015">2015</option>
-                                    <option value="2016">2016</option>
-                                    <option value="2017">2017</option>
-                                    <option value="2018">2018</option>
+                                    {{#incidentDate.years}}
+                                    <option value="{{this}}">{{this}}</option>
+                                    {{/incidentDate.years}}
                                     {{/selected}}
                                 </select>
                             </td>
@@ -118,30 +108,11 @@
                         <br>at
                         <select name="date.time" id="date.time">
                             <option value="">&nbsp;</option>
-                            <option value="00:00:00">12:00 am</option>
-                            <option value="01:00:00">01:00 am</option>
-                            <option value="02:00:00">02:00 am</option>
-                            <option value="03:00:00">03:00 am</option>
-                            <option value="04:00:00">04:00 am</option>
-                            <option value="05:00:00">05:00 am</option>
-                            <option value="06:00:00">06:00 am</option>
-                            <option value="07:00:00">07:00 am</option>
-                            <option value="08:00:00">08:00 am</option>
-                            <option value="09:00:00">09:00 am</option>
-                            <option value="10:00:00">10:00 am</option>
-                            <option value="11:00:00">11:00 am</option>
-                            <option value="12:00:00">12:00 pm</option>
-                            <option value="13:00:00">01:00 pm</option>
-                            <option value="14:00:00">02:00 pm</option>
-                            <option value="15:00:00">03:00 pm</option>
-                            <option value="16:00:00">04:00 pm</option>
-                            <option value="17:00:00">05:00 pm</option>
-                            <option value="18:00:00">06:00 pm</option>
-                            <option value="19:00:00">07:00 pm</option>
-                            <option value="20:00:00">08:00 pm</option>
-                            <option value="21:00:00">09:00 pm</option>
-                            <option value="22:00:00">10:00 pm</option>
-                            <option value="23:00:00">11:00 pm</option>
+                            {{#selected date.time}}
+                            {{#incidentDate.hours}}
+                            <option value="{{this}}">{{this}}</option>
+                            {{/incidentDate.hours}}
+                            {{/selected}}
                         </select>
                     </div>
                 </div>
@@ -166,7 +137,8 @@
         </ul>
 
         <h1>Is it still happening?</h1>
-        <ul>
+
+        <ul id="still-happening">
             {{#checked still-happening}}
             <li>
                 <input type="radio" name="still-happening" id="still-y" value="y">
@@ -184,11 +156,10 @@
     <hr>
 
     <div>
-
         <h1>Where did this happen?</h1>
 
         <p class="hint-text"></p>
-        <ul>
+        <ul id="where">
             {{#checked where}}
             <li>
                 <input type="radio" name="where" id="where-at" value="at"> <label for="where-at">Location</label>
@@ -202,12 +173,43 @@
             </li>
             {{/checked}}
         </ul>
-
     </div>
 
     <hr>
-    <div>
 
+    <div>
+        <h1>Do you know who did it?</h1>
+
+        <p class="hint-text">This could be one person or multiple people or a company or organisation.</p>
+        <ul id="who">
+            {{#checked who}}
+            <li>
+                <input type="radio" name="who" id="who-y" value="y">
+                <label for="who-y" class="pure-radio greyed-out-unless-checked">Yes</label>
+                <div id="who-y-form" class="hide">
+                    <label for="who-relationship">
+                        <p class="hint-text">Please give us a description of the person/people. Please
+                            include how you know them (for example, it could be a relative, colleague,
+                            or acquaintance.</p>
+                    </label>
+                    <input type="text" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="w100pc">
+                </div>
+            </li>
+            <li>
+                <input type="radio" name="who" id="who-n" value="n">
+                <label for="who-n" class="pure-radio greyed-out-unless-checked">No</label>
+                <div id="who-n-form" class="hide">
+                    <p class="hint-text">Please give us as much description as you are able.</p>
+                    <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
+                </div>
+            </li>
+            {{/checked}}
+        </ul>
+    </div>
+
+    <hr>
+
+    <div>
         <script>
             'use strict';
             document.addEventListener('DOMContentLoaded', function () {
@@ -254,102 +256,88 @@
 
         </ul>
 
-    </div>
-
-    <hr>
-    <div>
-
-        <h1>Do you know who did it?</h1>
-
-        <p class="hint-text">This could be one person or multiple people or a company or organisation.</p>
+        <h1>Survivor gender</h1>
         <ul>
-            {{#checked who-x}}
+            {{#checked survivor-gender}}
             <li>
-                <input type="radio" name="who" id="who-y" value="y">
-                <label for="who-y" class="pure-radio greyed-out-unless-checked">Yes</label>
-                <div id="who-y-form" style="display:none">
-                    <label for="who-relationship">
-                      <p class="hint-text">Please give us a description of the person/people. Please include how you know them (for example, it could be a relative, colleague, or acquaintance.</p>
-                    </label>
-                    <input type="text" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="">
-                </div>
+                <input type="radio" name="survivor-gender" id="survivor-gender-m" value="m"> <label for="survivor-gender-m">Male</label>
             </li>
             <li>
-                <input type="radio" name="who" id="who-n" value="n">
-                <label for="who-n" class="pure-radio greyed-out-unless-checked">No</label>
-                <div id="who-n-form" style="display:none">
-                  <p class="hint-text">Please give us as much description as you are able.</p>
-                  <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
-                </div>
+                <input type="radio" name="survivor-gender" id="survivor-gender-f" value="f"> <label for="survivor-gender-f">Female</label>
             </li>
             {{/checked}}
         </ul>
 
+        <h1>Survivor age</h1>
+        <ul>
+            <li>
+                <label for="survivor-age"></label>
+                <select name="survivor-age" id="survivor-age">
+                    {{#selected survivor-age}}
+                    <option></option>
+                    <option>0–9</option>
+                    <option>10–19</option>
+                    <option>20–29</option>
+                    <option>30–39</option>
+                    <option>40–49</option>
+                    <option>50–59</option>
+                    <option>60–69</option>
+                    <option>70–79</option>
+                    <option>80–89</option>
+                    {{/selected}}
+                </select>
+            </li>
+        </ul>
     </div>
 
     <hr>
 
     <div>
-
-        <h1>{{q.5a}}</h1>
+        <h1>{{q.7a}}</h1>
 
         <p class="hint-text">Pick all options that apply.</p>
 
-        <ul>
+        <ul id="action-taken">
             {{#checked action-taken}}
             <li>
                 <input type="checkbox" name="action-taken" id="action-taken-police" value="police">
                 <label for="action-taken-police">Police or government officials</label>
+                <input type="text" name="action-taken-police-details" id="action-taken-police-details" value="{{action-taken-police-details}}" class="details hide w16">
+            </li>
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-organisation" value="organisation">
+                <label for="action-taken-organisation">Somebody within an organisation</label>
+                <input type="text" name="action-taken-organisation-details" id="action-taken-organisation-details" value="{{action-taken-organisation-details}}" class="details hide w16">
             </li>
             <li>
                 <input type="checkbox" name="action-taken" id="action-taken-teacher" value="teacher">
                 <label for="action-taken-teacher">Teacher/tutor/lecturer</label>
+                <input type="text" name="action-taken-teacher-details" id="action-taken-teacher-details" value="{{action-taken-teacher-details}}" class="details hide w16">
             </li>
             <li>
                 <input type="checkbox" name="action-taken" id="action-taken-friends" value="friends">
                 <label for="action-taken-friends">Friends, family</label>
-            </li>
-            <li>
-                <input type="checkbox" name="action-taken" id="action-taken-other" value="other">
-                <label for="action-taken-other">Somebody within another organisation</label>
-                <input type="text" name="action-taken-other-details" id="action-taken-other-details" class="">
+                <input type="text" name="action-taken-friends-details" id="action-taken-friends-details" value="{{action-taken-friends-details}}" class="details hide w16">
             </li>
             {{/checked}}
         </ul>
-
     </div>
 
     <hr>
 
     <div>
-        <h1>Have you used this anonymous reporting service before?</h1>
+        <h1>Is there anything else you would like to add?.</h1>
+
         <ul>
-            {{#checked used-before}}
             <li>
-                <input type="radio" name="used-before" id="used-before-y" value="y">
-                <label for="used-before-y" class="pure-radio greyed-out-unless-checked">Yes</label>
-                <br>
-                <label for="existing-alias">Enter your anonymous alias</label>
-                <input type="text" name="existing-alias" id="existing-alias" value="{{existing-alias}}">
-                <span id="alias-ok" title="alias available" class="alias-available hide">✓</span>
-                <span id="alias-nok" title="alias not available" class="alias-available hide">✗</span>
+                <label for="extra-notes">Extra notes:</label>
+                <textarea class="pure-input-1" name="extra-notes" id="extra-notes" rows="4">{{extra-notes}}</textarea>
             </li>
-            <li>
-                <input type="radio" name="used-before" id="used-before-n" value="n" checked>
-                <label for="used-before-n" class="pure-radio greyed-out-unless-checked">No</label>
-                <br>
-                <p>We make sure that your report is anonymous by creating a random identification alias.</p>
-                <p>If you want to follow up, use the anonymous alias below so we can access any relevant information.</p>
-                <div id="usegenerated">
-                    <p>This report will use <b><output name="generated-alias">{{generated-alias}}</output></b>
-                        <input type="hidden" name="generated-alias" value="{{generated-alias}}"></p>
-                    <button type="button" id="get-alt-alias" class="inline-link">Generate another random alias</button>
-                </div>
-            </li>
-            {{/checked}}
         </ul>
-        {{> continue}}
     </div>
 
+    <div class="text-center">
+        <button type="submit" name="nav-next" value="next" accesskey="c" class="nav-action-button pure-button-primary pure-button">Submit and continue to Resources</button>
+    </div>
 
 </form>

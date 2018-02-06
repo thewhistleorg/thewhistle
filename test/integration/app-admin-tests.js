@@ -275,7 +275,7 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             const response = await appReport.get('/test-grn/sexual-assault/*');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.querySelector('h1').textContent).to.equal('Are you reporting on behalf of yourself or someone else?');
+            expect(document.querySelector('h1').textContent).to.equal('Have you used this anonymous reporting service before?');
         });
 
         it('reports new case intake invalid project', async function() {
@@ -288,6 +288,8 @@ describe(`Admin app (test-grn/${app.env})`, function() {
         it('enters incident report', async function() {
             const d = new Date(Date.now() - 1000*60*60*24); // yesterday in case of early-morning run
             const values = { // eslint-disable-line no-unused-vars
+                'used-before':     'n',
+                'generated-alias': 'testy terrain',
                 'on-behalf-of':    'myself',
                 'when':            'date',
                 'date':            { day: dateFormat(d, 'dd'),  month: dateFormat(d, 'mmm'), year: dateFormat(d, 'yyyy'), time: '' },
@@ -296,26 +298,30 @@ describe(`Admin app (test-grn/${app.env})`, function() {
                 'at-address':      'University of Lagos',
                 'who':             'n',
                 'who-description': 'Big fat guy',
-                'action-taken':    'teacher',
                 'description':     'Test',
-                'used-before':     'n',
-                'generated-alias': 'testy terrain',
+                'action-taken':    'teacher',
+                'survivor-gender': 'f',
+                'survivor-age':    '10–19',
+                'extra-notes':     '',
             };
             // sadly, it seems that superagent doesn't allow request.attach() to be used with
             // request.send(), so instead we need to use request.field()
             const response = await appReport.post('/test-grn/sexual-assault/*')
+                .field('used-before', values['used-before'])
+                .field('generated-alias', values['generated-alias'])
                 .field('on-behalf-of', values['on-behalf-of'])
                 .field('when', values['when'])
                 .field('date', JSON.stringify(values['date']))
                 .field('still-happening', values['still-happening'])
                 .field('where', values['where'])
                 .field('at-address', values['at-address'])
-                .field('description', values['description'])
                 .field('who', values['who'])
                 .field('who-description', values['who-description'])
+                .field('description', values['description'])
                 .field('action-taken', values['action-taken'])
-                .field('used-before', values['used-before'])
-                .field('generated-alias', values['generated-alias'])
+                .field('survivor-gender', values['survivor-gender'])
+                .field('survivor-age', values['survivor-age'])
+                .field('extra-notes', values['extra-notes'])
                 .attach('documents', imgFldr+imgFile);
             expect(response.status).to.equal(302);
             const koaSession = base64.decode(response.headers['set-cookie'][0].match(/^koa:sess=([a-zA-Z0-9=.]+);.+/)[1]);
@@ -366,8 +372,14 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             expect(tds[5].textContent).to.equal('Not known: Big fat guy');
             expect(ths[6].textContent).to.equal('Description');
             expect(tds[6].textContent).to.equal('Test');
-            expect(ths[7].textContent).to.equal('Spoken to anybody?');
-            expect(tds[7].textContent).to.equal('Teacher/tutor/lecturer');
+            expect(ths[7].textContent).to.equal('Survivor gender');
+            expect(tds[7].textContent).to.equal('female');
+            expect(ths[8].textContent).to.equal('Survivor age');
+            expect(tds[8].textContent).to.equal('10–19');
+            expect(ths[9].textContent).to.equal('Spoken to anybody?');
+            expect(tds[9].textContent).to.equal('Teacher/tutor/lecturer');
+            expect(ths[10].textContent).to.equal('Extra notes');
+            expect(tds[10].textContent).to.equal('—');
         });
 
         it('sets location by geocoding address (ajax)', async function() {

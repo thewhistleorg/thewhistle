@@ -129,6 +129,11 @@ repository `master`, it will be automatically deployed to the staging app
 ([admin.staging.thewhistle.org](http://admin.staging.thewhistle.org) /
 [report.staging.thewhistle.org](http://report.staging.thewhistle.org)) for final testing.
 
+A final ‘smoke test’ can be performed on the staging app – to be sure e.g. there haven’t been 
+environment changes between dev & staging which catastrophically bring down the app – by running
+
+    $ npm run test-smoke
+    
 When final verification is complete, the staging app can be promoted to production.
 
 ### Don’t rewrite history

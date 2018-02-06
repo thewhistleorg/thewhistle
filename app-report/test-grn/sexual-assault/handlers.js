@@ -150,7 +150,7 @@ class Handlers {
             await Report.insertTag(ctx.params.database, ctx.session.id, 'incomplete', null);
             saved = true;
             ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
-            debug('submissionStart', ctx.session.id)
+            debug('submissionStart', ctx.session.id);
         }
 
         // if this is page 2 (with report not already saved), or page 1 with report already saved, or
@@ -167,7 +167,7 @@ class Handlers {
                 case 'n':
                     // verify generated alias does not exist
                     if (ctx.session.report['generated-alias'] == null) { ctx.flash = 'Alias not given'; ctx.redirect(ctx.url); }
-                    const aliasGenerated = ctx.session.report['generated-alias']
+                    const aliasGenerated = ctx.session.report['generated-alias'];
                     const reportsN = await Report.getBy(ctx.params.database, 'alias', aliasGenerated);
                     const reportsNexclCurr = reportsN.filter(r => r._d != ctx.session.id); // exclude current report
                     if (reportsNexclCurr.length > 0) { ctx.flash.alias = `Generated alias ‘${aliasGenerated}’ not available: please select another`; ctx.redirect(ctx.url); return; }

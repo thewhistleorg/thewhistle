@@ -380,10 +380,20 @@ class Dev {
 
 
     /**
+     * Development index page.
+     */
+    static async index(ctx) {
+        const index = await fs.readFile('dev/index.md', 'utf8');
+        const content = md.render(index);
+        await ctx.render('dev-notes', { content, title: 'The Whistle Dev Functions' });
+    }
+
+
+    /**
      * Development notes index page.
      */
     static async notesIndex(ctx) {
-        const index = await fs.readFile('dev/index.md', 'utf8');
+        const index = await fs.readFile('dev/notes.md', 'utf8');
         const content = md.render(index);
         await ctx.render('dev-notes', { content, title: 'The Whistle Development Notes' });
     }

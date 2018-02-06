@@ -10,6 +10,8 @@ const router = new Router();
 import Dev from './dev.js';
 
 
+router.get('/dev', Dev.index);
+
 router.get('/dev/nodeinfo', Dev.nodeinfo);
 
 router.get('/dev/user-agents',         Dev.userAgentsV1);      // original user agents reporting on report submission

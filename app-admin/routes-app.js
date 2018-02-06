@@ -170,6 +170,7 @@ router.post('/resources/:id/delete', resources.processDelete); // process delete
 
 import questions from './questions.js';
 
+router.get(   '/questions',               questions.projects);   // render list of projects
 router.get(   '/questions/:project',      questions.list);       // render questions for given project
 router.post(  '/ajax/questions/:project', questions.ajaxPost);   // add new question
 router.put(   '/ajax/questions/:id',      questions.ajaxPut);    // update question

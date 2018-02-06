@@ -8,11 +8,28 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+import glob from 'glob-promise'; // match files using the patterns the shell uses
+
 import Question from '../models/question.js';
 import log      from '../lib/log';
 
 
 class QuestionsHandlers {
+
+    /**
+     * GET /questions - list of projects to serve as links to individual questions pages.
+     */
+    static async projects(ctx) {
+        const projectFolders = await glob(`app-report/${ctx.state.user.db}/*`);
+
+        const proj = projectFolders.map(p => ({
+            project: p.replace(`app-report/${ctx.state.user.db}/`, ''),
+            url:     p.replace(`app-report/${ctx.state.user.db}/`, '/questions/'),
+        }));
+
+        await ctx.render('questions-projects', { projects: proj });
+    }
+
 
     /**
      * GET /questions/:project - Render report questions page for given project.

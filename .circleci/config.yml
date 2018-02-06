@@ -6,6 +6,6 @@ jobs:
       - image: circleci/node:latest
     steps:
       - checkout
-      - run: echo 127.0.0.1 admin.localhost report.localhost | sudo tee -a /etc/hosts
+      - run: echo 127.0.0.1 admin.localhost admin.thewhistle.local report.localhost report.thewhistle.local | sudo tee -a /etc/hosts
       - run: npm install
       - run: npm test

@@ -12,9 +12,10 @@
     "test": "mocha --exit -r @std/esm test/*/*.js",
     "test-unit": "mocha --exit -r @std/esm test/unit/*.js",
     "test-intgn": "mocha --exit -r @std/esm test/integration/*.js",
+    "test-frontend": "node -r @std/esm app.js & pid=$!; npx cypress run --browser chrome; kill -9 $pid",
     "test-smoke": "mocha --exit -r @std/esm test/staging-smoke-tests.js",
     "lint": "npm run lint-node && npm run lint-browser",
-    "lint-node": "eslint --env node --ignore-pattern public --ignore-pattern app-api/apidoc .",
+    "lint-node": "eslint --env node --ignore-pattern public --ignore-pattern /cypress .",
     "lint-browser": "eslint --env browser public/",
     "stylelint": "stylelint public/css/*.css",
     "cover": "istanbul cover node_modules/.bin/_mocha test/*/ -- --exit -r @std/esm",
@@ -82,15 +83,16 @@
     "babel-eslint": "^8.2.1",
     "base-64": "^0.1.0",
     "chai": "^4.1.2",
+    "cypress": "^1.4.2",
     "eslint": "^4.15.0",
     "istanbul": "^1.1.0-alpha.1",
-    "mocha": "^4.1.0",
+    "mocha": "^5.0.0",
     "nodemon": "^1.14.10",
     "npm-check": "^5.5.2",
     "npm-check-updates": "^2.14.0",
     "stylelint": "^8.4.0",
     "stylelint-config-standard": "^18.0.0",
-    "supertest": "https://github.com/mikec/supertest.git"
+    "supertest": "git+https://github.com/mikec/supertest.git"
   },
   "@std/esm": {
     "esm": "js"

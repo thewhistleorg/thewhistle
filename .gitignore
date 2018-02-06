@@ -8,5 +8,5 @@ static/map/*
 !static/map/marker-red-outline.png
 node_modules
 package-lock.json
-.esm-cache/
-coverage/
+/cypress/
+/coverage/

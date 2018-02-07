@@ -160,14 +160,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('input[name=where]').forEach(function(input) {
             input.onclick = function() {
                 if (input.value == 'at') {
-                    where.querySelector('p').classList.remove('hide');
-                    where.querySelector('input[name="at-address"]').classList.remove('hide');
-                    where.querySelector('input[name="at-address"]').focus();
-                    where.querySelector('input[name="at-address"]').select();
+                    // where.querySelector('p').classList.remove('hide');
+                    // where.querySelector('textarea[name="at-address"]').classList.remove('hide');
+                    where.querySelector('textarea[name="at-address"]').focus();
+                    where.querySelector('textarea[name="at-address"]').select();
                 }
                 if (input.value == 'dont-know') {
-                    where.querySelector('p').classList.add('hide');
-                    where.querySelector('input[name="at-address"]').classList.add('hide');
+                    // where.querySelector('p').classList.add('hide');
+                    // where.querySelector('textarea[name="at-address"]').classList.add('hide');
                 }
             };
         });
@@ -195,8 +195,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (this.value == 'y') {
                     this.parentElement.querySelector('#who-y-form').classList.remove('hide');
                     this.parentElement.parentElement.querySelector('#who-n-form').classList.add('hide');
-                    document.querySelector('input[name="who-relationship"]').focus();
-                    document.querySelector('input[name="who-relationship"]').select();
+                    document.querySelector('textarea[name="who-relationship"]').focus();
+                    document.querySelector('textarea[name="who-relationship"]').select();
                 }
                 if (this.value == 'n') {
                     this.parentElement.querySelector('#who-n-form').classList.remove('hide');
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.querySelector('textarea[name="who-description"]').focus();
                     document.querySelector('textarea[name="who-description"]').select();
                 }
-            }
+            };
         });
 
         // defaults for previously answered questions
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     extra.value = '';
                     extra.classList.add('hide');
                 }
-            }
+            };
         });
     }
 

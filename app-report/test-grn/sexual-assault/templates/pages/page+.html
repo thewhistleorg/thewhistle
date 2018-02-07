@@ -156,7 +156,8 @@
     <hr>
 
     <div>
-        <h1>Where did this happen?</h1>
+      <h1>Do you remember anything about where this happened?</h1>
+
 
         <p class="hint-text"></p>
         <ul id="where">
@@ -165,7 +166,7 @@
                 <input type="radio" name="where" id="where-at" value="at"> <label for="where-at">Location</label>
                 <p class="hint-text">Please provide as much detail as you are able – this could be
                     an address, restaurant name, or neighborhood or sights and landmarks you recall.</p>
-                <input type="text" name="at-address" id="at-address" value="{{at-address}}" class="w36">
+                <textarea rows="4" name="at-address" id="at-address" value="{{at-address}}" class="w100pc"></textarea>
             </li>
             <li>
                 <input type="radio" name="where" id="where-dont-know" value="dont-know">
@@ -192,7 +193,7 @@
                             include how you know them (for example, it could be a relative, colleague,
                             or acquaintance.</p>
                     </label>
-                    <input type="text" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="w100pc">
+                    <textarea type="text" rows="4" class="w100pc" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="w100pc"></textarea>
                 </div>
             </li>
             <li>
@@ -256,7 +257,8 @@
 
         </ul>
 
-        <h1>Survivor gender</h1>
+        <h1>{{q.6b}}</h1>
+        <h3>Gender</h3>
         <ul>
             {{#checked survivor-gender}}
             <li>
@@ -268,22 +270,18 @@
             {{/checked}}
         </ul>
 
-        <h1>Survivor age</h1>
+        <h3>Age</h3>
         <ul>
             <li>
                 <label for="survivor-age"></label>
-                <select name="survivor-age" id="survivor-age">
+                <select name="survivor-age" id="survivor-age" class="w16">
                     {{#selected survivor-age}}
                     <option></option>
-                    <option>0–9</option>
-                    <option>10–19</option>
-                    <option>20–29</option>
-                    <option>30–39</option>
-                    <option>40–49</option>
-                    <option>50–59</option>
-                    <option>60–69</option>
-                    <option>70–79</option>
-                    <option>80–89</option>
+                    <option>0–17</option>
+                    <option>18–22</option>
+                    <option>23–27</option>
+                    <option>28–32</option>
+                    <option>33+</option>
                     {{/selected}}
                 </select>
             </li>
@@ -318,6 +316,11 @@
                 <input type="checkbox" name="action-taken" id="action-taken-friends" value="friends">
                 <label for="action-taken-friends">Friends, family</label>
                 <input type="text" name="action-taken-friends-details" id="action-taken-friends-details" value="{{action-taken-friends-details}}" class="details hide w16">
+            </li>
+            <li>
+                <input type="checkbox" name="action-taken" id="action-taken-others" value="others">
+                <label for="action-taken-others">Others</label>
+                <input type="text" name="action-taken-others-details" id="action-taken-others-details" value="{{action-taken-others-details}}" class="details hide w16">
             </li>
             {{/checked}}
         </ul>

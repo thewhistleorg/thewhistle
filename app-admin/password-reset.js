@@ -35,9 +35,11 @@ class PasswordResetHandlers {
 
 
     /**
-     * POST /password/reset-request - process request password reset
+     * POST /password/reset-request - process request password reset.
      *
-     * Send e-mail with password reset link
+     * Send e-mail with password reset link.
+     *
+     * Note common code in users.js.
      */
     static async processRequest(ctx) {
         const email = ctx.request.body.email;

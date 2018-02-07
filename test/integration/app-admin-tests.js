@@ -749,6 +749,7 @@ describe(`Admin app (test-grn/${app.env})`, function() {
 
     describe('users', function() {
         let userId = null;
+        let pwResetToken = null;
 
         const values = {
             firstname: 'Test',
@@ -771,6 +772,14 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/users');
             userId = response.headers['x-insert-id'];
+            pwResetToken = response.headers['x-pw-reset-token'];
+        });
+
+        it('sees password reset page', async function() {
+            const response = await appAdmin.get('/password/reset/'+pwResetToken);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal('Password Reset');
         });
 
         it('lists users including test user', async function() {

@@ -51,6 +51,7 @@
 <h1>Users</h1>
 
 {{>errpartial}}
+{{#if @koa.flash.notification}}<p class="alert">{{@koa.flash.notification}}</p>{{/if}}
 
 <table>
     <tr>

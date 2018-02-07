@@ -62,7 +62,8 @@ class PasswordResetHandlers {
 
         // send e-mail with generated token
         try {
-            await Mail.send(email, 'password-reset.email', { firstname: user.firstname, host: ctx.host, token: token });
+            const context = { firstname: user.firstname, host: ctx.host, token: token };
+            if (ctx.app.env != 'development') await Mail.send(email, 'password-reset.email', context);
         } catch (e) {
             await log(ctx, 'error', null, null, e);
         }

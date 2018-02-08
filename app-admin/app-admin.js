@@ -14,6 +14,7 @@ const router      = koaRouter();
 import HandlebarsHelpers from '../lib/handlebars-helpers.js';
 import log               from '../lib/log.js';
 import Middleware        from '../lib/middleware.js';
+import ssl               from '../lib/ssl.js';
 
 const app = new Koa(); // admin app
 
@@ -136,6 +137,10 @@ app.use(async function ctxAddDomain(ctx, next) {
 
 
 // ------------ routing
+
+
+// force use of SSL (redirect http protocol to https)
+app.use(ssl({ trustProxy: true }));
 
 
 // check if user is signed in; leaves id in ctx.status.user.id if JWT verified

@@ -14,6 +14,7 @@ import convert    from 'koa-convert';    // tmp for koa-flash, koa-lusca
 const router = new Router();
 
 import log from '../lib/log.js';
+import ssl from '../lib/ssl.js';
 
 
 const app = new Koa(); // report app
@@ -159,6 +160,11 @@ app.use(async function ctxAddDomain(ctx, next) {
 
 
 // ------------ routing
+
+
+// force use of SSL (redirect http protocol to https)
+app.use(ssl({ trustProxy: true }));
+
 
 // compose appropriate sub-app for required database / project, in order to maximise modularity
 

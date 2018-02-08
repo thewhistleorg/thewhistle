@@ -24,10 +24,18 @@ describe(`Report app (test-grn/${app.env})`, function() {
 
     let reportId = null;
 
-    before(async function checkPreviousTestReportDeleted() {
-        await appReport.get('/test-grn/sexual-assault'); // force db connection to test-grn (ajax calls don't)
-        const response = await appReport.get('/ajax/test-grn/aliases/testy+terrain');
-        if (response.status != 404) throw new Error('Previous test report was not deleted');
+    before(async function() {
+        // check testuser 'tester' exists and has access to test-grn (only)
+        const responseUsr = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
+        if (responseUsr.body.databases.length != 1) throw new Error(`${testuser} must have access to test-grn (only)`);
+        if (responseUsr.body.databases[0] != 'test-grn') throw new Error(`${testuser} must have access to test-grn (only)`);
+
+        // force db connection to test-grn (ajax calls don't)
+        await appReport.get('/test-grn/sexual-assault');
+
+        // check previous test report deleted
+        const responseTestRpt = await appReport.get('/ajax/test-grn/aliases/testy+terrain');
+        if (responseTestRpt.status != 404) throw new Error('Previous test report was not deleted');
     });
 
     describe('report app home page', function() {
@@ -86,6 +94,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
 
     describe('test-grn/sexual-assault inaccessible pages', function() {
         it('request for page 2 gets redirected to page 1', async function() {
+            // (note before() has already opened index page, so we go back to p1 rather than index
             const response = await appReport.get('/test-grn/sexual-assault/2');
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/test-grn/sexual-assault/1');

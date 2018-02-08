@@ -20,7 +20,7 @@ const ObjectId = MongoDB.ObjectId;
 
 import app      from '../../app.js';
 
-const testuser = process.env.TESTUSER; // note testuser must have access to test-grn only
+const testuser = process.env.TESTUSER; // note testuser 'tester' must have access to test-grn only
 const testpass = process.env.TESTPASS; // (for successful login & sexual-assault report submission)
 
 
@@ -32,6 +32,27 @@ const appReport = supertest.agent(app.listen()).host('report.localhost');
 
 describe(`Admin app (test-grn/${app.env})`, function() {
     this.timeout(10e3); // 10 sec
+
+    before(async function() {
+        // check testuser 'tester' exists and has access to test-grn (only)
+        const responseUsr = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
+        if (responseUsr.body.databases.length != 1) throw new Error(`${testuser} must have access to test-grn (only)`);
+        if (responseUsr.body.databases[0] != 'test-grn') throw new Error(`${testuser} must have access to test-grn (only)`);
+
+        // check previous test user deleted
+        const responseTestUsr = await appAdmin.get('/ajax/login/databases?user=test@user.com');
+        if (responseTestUsr.body.databases.length != 0) throw new Error('Previous test user was not deleted');
+
+        // login to set up db connection to test-grn
+        const values = { username: testuser, password: testpass, 'remember-me': 'on' };
+        await appAdmin.post('/login').send(values);
+
+        // check previous test report deleted
+        const responseTestRpt = await appReport.get('/ajax/test-grn/aliases/testy+terrain');
+        if (responseTestRpt.status != 404) throw new Error('Previous test report was not deleted');
+
+        await appAdmin.get('/logout');
+    });
 
     describe('password reset', function() {
         let resetToken = null;

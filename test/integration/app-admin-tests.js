@@ -31,7 +31,7 @@ const appReport = supertest.agent(app.listen()).host('report.localhost');
 // so getElementById() has to be used to find ObjectId ids instead of querySelector()
 
 describe(`Admin app (test-grn/${app.env})`, function() {
-    this.timeout(10e3); // 10 sec
+    this.timeout(20e3); // 10 sec
 
     before(async function() {
         // check testuser 'tester' exists and has access to test-grn (only)

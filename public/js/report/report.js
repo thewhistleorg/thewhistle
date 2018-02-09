@@ -370,21 +370,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 button.classList.add('grey');
                 return;
             }
-            delay(async function() {
-                var response = await fetch(`/ajax/geocode?address=${encodeURI(input.value).replace(/%20/g, '+')}`);
-                switch (response.status) {
-                    case 200:
-                        var body = await response.json();
-                        button.disabled = false;
-                        button.classList.remove('grey');
-                        formatted.innerHTML = `(for <i>${body.formattedAddress}</i>)`;
-                        break;
-                    case 404:
-                        button.disabled = true;
-                        button.classList.add('grey');
-                        formatted.innerHTML = '';
-                        break;
-                }
+            delay(function() {
+                var request = new XMLHttpRequest();
+                request.responseType = 'json';
+                request.open('GET', '/ajax/geocode?address='+encodeURI(input.value).replace(/%20/g, '+'));
+                request.setRequestHeader('Accept', 'application/json');
+                request.onreadystatechange = function () {
+                    if (request.readyState == 4) {
+                        switch (request.status) {
+                            case 200:
+                                var body = request.response;
+                                button.disabled = false;
+                                button.classList.remove('grey');
+                                formatted.innerHTML = '(for <i>'+body.formattedAddress+'</i>)';
+                                break;
+                            case 404:
+                                button.disabled = true;
+                                button.classList.add('grey');
+                                formatted.innerHTML = '';
+                                break;
+                        }
+                    }
+                };
+                request.send();
             }, 330);
         };
 

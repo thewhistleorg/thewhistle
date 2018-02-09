@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* 'Admin' app - basic pages for reviewing reports & messages.                     C.Veness 2017  */
+/* 'Admin' app - basic pages for reviewing reports & messages.                C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Koa        from 'koa';            // koa framework
@@ -14,7 +14,6 @@ const router      = koaRouter();
 import HandlebarsHelpers from '../lib/handlebars-helpers.js';
 import log               from '../lib/log.js';
 import Middleware        from '../lib/middleware.js';
-import ssl               from '../lib/ssl.js';
 
 const app = new Koa(); // admin app
 
@@ -123,7 +122,7 @@ const luscaCspDefaultSrc = `'self' 'unsafe-inline' 'unsafe-eval' ${luscaCspTrust
 app.use(convert(lusca({ // note koa-lusca@2.2.0 is v1 middleware which generates deprecation notice
     csp:           { policy: { 'default-src': luscaCspDefaultSrc } }, // Content-Security-Policy
     cto:           'nosniff',                                         // X-Content-Type-Options
-    hsts:          { maxAge: 60*60, includeSubDomains: true }, // HTTP Strict-Transport-Security
+    hsts:          { maxAge: 60, includeSubDomains: true },   // HTTP Strict-Transport-Security
     xframe:        'SAMEORIGIN',                                      // X-Frame-Options
     xssProtection: true,                                              // X-XSS-Protection
 })));
@@ -140,7 +139,7 @@ app.use(async function ctxAddDomain(ctx, next) {
 
 
 // force use of SSL (redirect http protocol to https)
-app.use(ssl({ trustProxy: true }));
+// TODO: temporarily suspend app.use(Middleware.ssl({ trustProxy: true }));
 
 
 // check if user is signed in; leaves id in ctx.status.user.id if JWT verified

@@ -3,12 +3,12 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // add 'required' indicators for form labels
-    document.querySelectorAll('[required]').forEach(function(input) {
-        var req = '<sup class="required" title="required">*</sup>';
-        var prev = input.previousSibling;
-        while (prev && prev.localName != 'label' && prev.previousSibling != null) prev = prev.previousSibling;
-        if (prev && prev.localName=='label' && prev.textContent!='&nbsp;') prev.insertAdjacentHTML('beforeend', req);
-    });
+    // document.querySelectorAll('[required]').forEach(function(input) {
+    //     var req = '<sup class="required" title="required">*</sup>';
+    //     var prev = input.previousSibling;
+    //     while (prev && prev.localName != 'label' && prev.previousSibling != null) prev = prev.previousSibling;
+    //     if (prev && prev.localName=='label' && prev.textContent!='&nbsp;') prev.insertAdjacentHTML('beforeend', req);
+    // });
 
     // remove 'required' attributes if going back to prev page
     var prevButton = document.querySelector('button.prev');

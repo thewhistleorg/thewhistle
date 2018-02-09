@@ -29,6 +29,10 @@
                   <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
                 </div>
             </li>
+            <li>
+                <input type="radio" name="who" id="who-skip" value="skip">
+                <label for="who-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
+            </li>
             {{/checked}}
         </ul>
         {{> continue}}

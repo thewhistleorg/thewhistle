@@ -46,7 +46,10 @@
                 </label>
                 <input type="file" name="documents" value="0" id="document0" class="upload-file">
             </li>
-
+            <li>
+                <input type="radio" name="description" id="description-skip" value="skipped">
+                <label for="description-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
+            </li>
         </ul>
 
         <h1>{{q.6b}}</h1>
@@ -58,6 +61,9 @@
             </li>
             <li>
                 <input type="radio" name="survivor-gender" id="survivor-gender-f" value="f"> <label for="survivor-gender-f">Female</label>
+            </li>
+            <li>
+                <input type="radio" name="survivor-gender" id="survivor-gender-skip" value="skip"> <label for="survivor-gender-skip">Skip</label>
             </li>
             {{/checked}}
         </ul>
@@ -76,6 +82,10 @@
                     <option>33+</option>
                     {{/selected}}
                 </select>
+            </li>
+            <li>
+                <input type="radio" name="survivor-age" id="survivor-age-skip" value="skipped">
+                <label for="survivor-age-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
             </li>
         </ul>
 

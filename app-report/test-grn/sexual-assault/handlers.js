@@ -411,12 +411,14 @@ function prettifyReport(page, report) {
                     case 'date':          rpt.Happened = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1] ); break;
                     case 'within':        rpt.Happened = report['within-options']; break;
                     case 'dont-remember': rpt.Happened = 'Don’t remember'; break;
+                    case 'skip':          rpt.Happened = 'Skipped'; break;
                 }
                 break;
             case 'still-happening':
                 const stillHappening = {
                     y:    'yes',
                     n:    'no',
+                    skip: 'Skipped',
                     null: null,
                 };
                 rpt['Still happening?'] = stillHappening[report['still-happening']];
@@ -426,6 +428,7 @@ function prettifyReport(page, report) {
                     'at':            report['at-address'],
                     'dont-remember': 'Don’t remember',
                     'dont-know':     'Don’t know',
+                    'skip':          'Skipped',
                     null:            null,
                 };
                 rpt['Where'] = where[report['where']];
@@ -434,6 +437,7 @@ function prettifyReport(page, report) {
                 const who = {
                     y:    'Known: ' + (report['who-relationship'] || '–'),
                     n:    'Not known: ' + (report['who-description'] || '–'),
+                    skip: 'Skipped',
                     null: null,
                 };
                 rpt['Who'] = who[report['who']];
@@ -460,6 +464,7 @@ function prettifyReport(page, report) {
                 const gender = {
                     m:    'male',
                     f:    'female',
+                    skip: 'Skipped',
                     null: null,
                 };
                 rpt['Survivor gender'] = gender[report['survivor-gender']];

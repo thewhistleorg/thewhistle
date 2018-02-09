@@ -35,6 +35,10 @@
                 <label for="action-taken-others">Others</label>
                 <input type="text" name="action-taken-others-details" id="action-taken-others-details" value="{{action-taken-others-details}}" class="details hide w16">
             </li>
+            <li>
+                <input type="radio" name="action-taken" id="action-taken-skip" value="skip">
+                <label for="action-taken-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
+            </li>
             {{/checked}}
         </ul>
         {{> continue}}

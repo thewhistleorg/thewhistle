@@ -180,7 +180,10 @@ app.use(ajaxRoutes);
 
 // home page - list available reporting apps
 router.get('/', async function indexPage(ctx) {
-    const reportApps = {
+    // temporarily(?) redirect to /test-grn/sexual-assault
+    return ctx.redirect('/test-grn/sexual-assault');
+
+    const reportApps = { // eslint-disable-line no-unreachable
         GB: [
             { name: 'survivor-centred response', url: 'report.thewhistle.org/test-cam/scr' },
             { name: 'what-where-when-who',       url: 'report.thewhistle.org/test-cam/wwww' },

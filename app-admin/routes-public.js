@@ -18,7 +18,10 @@ router.get('/', async function getIndexPage(ctx) {
     if (ctx.state.user) return ctx.redirect('/reports');
 
     // otherwise render index page
-    await ctx.render('index');
+    // suspended 9 Feb 2018: await ctx.render('index');
+
+    // otherwise (temporarily?) redirect to login page (per decision 9 Feb 2018)
+    return ctx.redirect('/login');
 });
 
 

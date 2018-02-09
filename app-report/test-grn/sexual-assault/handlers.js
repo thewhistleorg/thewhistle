@@ -162,7 +162,7 @@ class Handlers {
                     const aliasExisting = ctx.session.report['existing-alias'];
                     const reportsY = await Report.getBy(ctx.params.database, 'alias', aliasExisting);
                     const reportsYexclCurr = reportsY.filter(r => r._d != ctx.session.id); // exclude current report
-                    if (reportsYexclCurr.length == 0) { ctx.flash.alias = `Anonymous alias ‘${aliasExisting}’ not found`; ctx.redirect(ctx.url); return; }
+                    if (reportsYexclCurr.length == 0) { ctx.flash.alias = `Anonymous alias not found`; ctx.redirect(ctx.url); return; }
                     break;
                 case 'n':
                     // verify generated alias does not exist
@@ -170,7 +170,7 @@ class Handlers {
                     const aliasGenerated = ctx.session.report['generated-alias'];
                     const reportsN = await Report.getBy(ctx.params.database, 'alias', aliasGenerated);
                     const reportsNexclCurr = reportsN.filter(r => r._d != ctx.session.id); // exclude current report
-                    if (reportsNexclCurr.length > 0) { ctx.flash.alias = `Generated alias ‘${aliasGenerated}’ not available: please select another`; ctx.redirect(ctx.url); return; }
+                    if (reportsNexclCurr.length > 0) { ctx.flash.alias = `Generated alias not available: please select another`; ctx.redirect(ctx.url); return; }
                     break;
             }
 

@@ -16,8 +16,6 @@ import compress        from 'koa-compress';   // HTTP compression
 import session         from 'koa-session';    // session for flash messages
 import dateFormat      from 'dateformat';     // Steven Levithan's dateFormat()
 import MongoDB         from 'mongodb';
-import Debug           from 'debug';          // small debugging utility
-const debug = Debug('app');
 const MongoClient = MongoDB.MongoClient;
 
 import dotenv from 'dotenv';
@@ -67,13 +65,6 @@ app.keys = [ 0, 1, 2 ].map(x => process.env.COOKIE_KEY + dateFormat(new Date(new
 
 // session for flash messages (uses signed session cookies, with no server storage)
 app.use(session(app));
-
-
-// sometimes useful to be able to track each request...
-app.use(async function(ctx, next) {
-    debug(ctx.method + ' ' + ctx.url);
-    await next();
-});
 
 
 // get database connection to 'users' database if not already available (only done on first request

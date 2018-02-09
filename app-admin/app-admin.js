@@ -9,7 +9,10 @@ import lusca      from 'koa-lusca';      // security header middleware
 import serve      from 'koa-static';     // static file serving middleware
 import convert    from 'koa-convert';    // tmp for koa-flash, koa-lusca
 import koaRouter  from 'koa-router';     // router middleware for koa
-const router      = koaRouter();
+import Debug      from 'debug';          // small debugging utility
+
+const debug  = Debug('app:req:a'); // debug each request
+const router = koaRouter();
 
 import HandlebarsHelpers from '../lib/handlebars-helpers.js';
 import log               from '../lib/log.js';
@@ -44,6 +47,7 @@ app.use(serve('public', { maxage: maxage }));
 
 // log requests (excluding static files, into capped collection)
 app.use(async function logAccess(ctx, next) {
+    debug(ctx.method.padEnd(4) + ' ' + ctx.url);
     const t1 = Date.now();
     await next();
     const t2 = Date.now();

@@ -11,6 +11,9 @@ import lusca      from 'koa-lusca';      // security header middleware
 import serve      from 'koa-static';     // static file serving middleware
 import fetch      from 'node-fetch';     // window.fetch in node.js
 import convert    from 'koa-convert';    // tmp for koa-flash, koa-lusca
+import Debug      from 'debug';          // small debugging utility
+
+const debug  = Debug('app:req:r'); // debug each request
 const router = new Router();
 
 import log        from '../lib/log.js';
@@ -27,6 +30,7 @@ app.use(serve('public', { maxage: maxage }));
 
 // log requests (excluding static files, into capped collection)
 app.use(async function logAccess(ctx, next) {
+    debug(ctx.method.padEnd(4) + ' ' + ctx.url);
     const t1 = Date.now();
     await next();
     const t2 = Date.now();

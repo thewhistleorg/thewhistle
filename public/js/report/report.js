@@ -33,7 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // set focus to hour/day field if any 'when' radio button clicked
         var fields = document.querySelectorAll('input[name=when]');
         for(var i = 0; i < fields.length; i++) {
-            fields[i].onchange = function() {
+            var input = fields[i];
+            input.addEventListener('change', function() {
                 switch (this.value) {
                     case 'date':
                         document.querySelector('select[name="date.day"]').focus();
@@ -47,8 +48,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     case 'dont-remember':
                         this.parentElement.parentElement.querySelector('.when-form').style.display='none';
                         break;
+                    case 'skip':
+                        this.parentElement.parentElement.querySelector('.when-form').style.display='none';
+                        break;
                 }
-            };
+            });
         }
 
         if (document.querySelector('#when-date').checked == true) {
@@ -119,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var nameWhen = document.querySelectorAll('input[name=when]');
         for ( var i = 0; i < nameWhen.length; i++) {
             var input = nameWhen[i];
-            input.onchange = function() {
+            input.addEventListener('change', function() {
                 if (this.setCustomValidity == undefined) return;
                 document.querySelector('#within-options').required = false;
                 var nameDate = document.querySelectorAll('input[name^=date]');
@@ -141,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         document.querySelector('select[name="within-options"]').focus();
                         break;
                 }
-            };
+            });
         }
 
 

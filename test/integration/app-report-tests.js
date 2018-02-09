@@ -316,7 +316,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
-            expect(document.querySelectorAll('input')).to.have.lengthOf(3); // file selector, age, gender
+            expect(document.querySelectorAll('input')).to.have.lengthOf(6); // file selector, age, gender
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             expect(document.querySelector('textarea').textContent).to.equal('erroneous description');

@@ -280,6 +280,23 @@ form li {
     transform: scale(1);
 }
 
+
+/*
+* Custom checkbox
+*/
+
+[type="checkbox"] + label{
+  position: relative;
+  cursor: pointer;
+  line-height: 20px;
+  display: inline-block;
+  color: #444;
+  padding-bottom: 10px;
+  font-size: 120%;
+  padding-top: 4px;
+  width: 90%;
+}
+
 /*
 * Header
 */

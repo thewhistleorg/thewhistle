@@ -218,7 +218,8 @@ describe(`Report app (test-grn/${app.env})`, function() {
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[3].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(3);
+            expect(document.querySelectorAll('input')).to.have.lengthOf(2);
+            expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
@@ -237,7 +238,8 @@ describe(`Report app (test-grn/${app.env})`, function() {
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[4].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(3);
+            expect(document.querySelectorAll('input')).to.have.lengthOf(2);
+            expect(document.querySelectorAll('textarea')).to.have.lengthOf(2);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
@@ -264,7 +266,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             const values = {
                 'description':     'erroneous description',
                 'survivor-gender': 'f',
-                'survivor-age':    '10–19',
+                'survivor-age':    '18–22',
                 'nav-next':        'next',
             };
             const responsePost = await appReport.post('/test-grn/sexual-assault/6').send(values);
@@ -278,7 +280,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[6].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(8);
+            expect(document.querySelectorAll('input')).to.have.lengthOf(10);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
@@ -322,7 +324,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             const values = {
                 'description':     'Test',
                 'survivor-gender': 'f',
-                'survivor-age':    '10–19',
+                'survivor-age':    '18–22',
                 'nav-next':        'next',
             };
             const imgFldr = 'test/img/';
@@ -412,7 +414,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect(ths[7].textContent).to.equal('Survivor gender');
             expect(tds[7].textContent).to.equal('female');
             expect(ths[8].textContent).to.equal('Survivor age');
-            expect(tds[8].textContent).to.equal('10–19');
+            expect(tds[8].textContent).to.equal('18–22');
             expect(ths[9].textContent).to.equal('Spoken to anybody?');
             expect(tds[9].textContent).to.equal('—');
             expect(ths[10].textContent).to.equal('Extra notes');
@@ -486,7 +488,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
                 'description':      'Single-page submission test',
                 'action-taken':     'teacher',
                 'survivor-gender':  'f',
-                'survivor-age':     '10–19',
+                'survivor-age':     '18–22',
                 'extra-notes':      '',
                 'nav-next':         'next',
             };
@@ -540,7 +542,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect(ths[7].textContent).to.equal('Survivor gender');
             expect(tds[7].textContent).to.equal('female');
             expect(ths[8].textContent).to.equal('Survivor age');
-            expect(tds[8].textContent).to.equal('10–19');
+            expect(tds[8].textContent).to.equal('18–22');
             expect(ths[9].textContent).to.equal('Spoken to anybody?');
             expect(tds[9].textContent).to.equal('Teacher/tutor/lecturer');
             expect(ths[10].textContent).to.equal('Extra notes');

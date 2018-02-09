@@ -445,6 +445,7 @@ function prettifyReport(page, report) {
                     organisation: 'Somebody within an organisation',
                     teacher:      'Teacher/tutor/lecturer',
                     friends:      'Friends, family',
+                    others:       'Others',
                     null:         null, // no checkboxes ticked
                 };
                 if (report['action-taken'] == null) report['action-taken'] = [ null ]; // no value: convert to array

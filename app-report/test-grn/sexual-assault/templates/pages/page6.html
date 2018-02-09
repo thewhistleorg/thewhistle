@@ -49,7 +49,8 @@
 
         </ul>
 
-        <h1>Survivor gender</h1>
+        <h1>{{q.6b}}</h1>
+        <h3>Gender</h3>
         <ul>
             {{#checked survivor-gender}}
             <li>
@@ -61,22 +62,18 @@
             {{/checked}}
         </ul>
 
-        <h1>Survivor age</h1>
+        <h3>Age</h3>
         <ul>
             <li>
                 <label for="survivor-age"></label>
-                <select name="survivor-age" id="survivor-age">
+                <select name="survivor-age" id="survivor-age" class="w16">
                     {{#selected survivor-age}}
                     <option></option>
-                    <option>0–9</option>
-                    <option>10–19</option>
-                    <option>20–29</option>
-                    <option>30–39</option>
-                    <option>40–49</option>
-                    <option>50–59</option>
-                    <option>60–69</option>
-                    <option>70–79</option>
-                    <option>80–89</option>
+                    <option>0–17</option>
+                    <option>18–22</option>
+                    <option>23–27</option>
+                    <option>28–32</option>
+                    <option>33+</option>
                     {{/selected}}
                 </select>
             </li>

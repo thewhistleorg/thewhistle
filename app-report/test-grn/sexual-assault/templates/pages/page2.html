@@ -1,5 +1,5 @@
 <form method="post">
-    {{> back}}{{> step}}
+    {{> step}}
     <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
     <ul class="validation-errors">{{#@koa.flash.alias}}<li>{{this}}</li>{{/@koa.flash.alias}}</ul>
     <div class="margin-top-3">

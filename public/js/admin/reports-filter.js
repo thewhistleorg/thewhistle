@@ -112,8 +112,8 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
         if (key == 'sort') { document.querySelector('#search').dataset.sort = value; return; }
         if (key == 'active') { document.querySelector('#search').dataset.active = value; return; }
 
-        if ([ 'assigned', 'status', 'submitted' ].includes(key) || key.slice(0, 6)=='field:') {
-            // only makes sense to have one assigned / status / submitted filter, so remove current one
+        if ([ 'project', 'assigned', 'status', 'submitted' ].includes(key) || key.slice(0, 6)=='field:') {
+            // only makes sense to have one project / assigned / status / submitted filter, so remove current one
             const current = document.querySelector(`#search-display span[data-key="${key}"]`);
             if (current) current.remove();
         }

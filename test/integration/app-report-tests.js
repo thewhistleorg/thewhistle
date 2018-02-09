@@ -16,6 +16,7 @@ const testuser = process.env.TESTUSER; // note testuser must have access to test
 const testpass = process.env.TESTPASS; // (for successful login & sexual-assault report submission)
 
 
+const appAdmin = supertest.agent(app.listen()).host('admin.localhost');
 const appReport = supertest.agent(app.listen()).host('report.localhost');
 
 describe(`Report app (test-grn/${app.env})`, function() {
@@ -23,10 +24,18 @@ describe(`Report app (test-grn/${app.env})`, function() {
 
     let reportId = null;
 
-    before(async function checkPreviousTestReportDeleted() {
-        await appReport.get('/test-grn/sexual-assault'); // force db connection to test-grn (ajax calls don't)
-        const response = await appReport.get('/ajax/test-grn/aliases/testy+terrain');
-        if (response.status != 404) throw new Error('Previous test report was not deleted');
+    before(async function() {
+        // check testuser 'tester' exists and has access to test-grn (only)
+        const responseUsr = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
+        if (responseUsr.body.databases.length != 1) throw new Error(`${testuser} must have access to test-grn (only)`);
+        if (responseUsr.body.databases[0] != 'test-grn') throw new Error(`${testuser} must have access to test-grn (only)`);
+
+        // force db connection to test-grn (ajax calls don't)
+        await appReport.get('/test-grn/sexual-assault');
+
+        // check previous test report deleted
+        const responseTestRpt = await appReport.get('/ajax/test-grn/aliases/testy+terrain');
+        if (responseTestRpt.status != 404) throw new Error('Previous test report was not deleted');
     });
 
     describe('report app home page', function() {
@@ -85,6 +94,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
 
     describe('test-grn/sexual-assault inaccessible pages', function() {
         it('request for page 2 gets redirected to page 1', async function() {
+            // (note before() has already opened index page, so we go back to p1 rather than index
             const response = await appReport.get('/test-grn/sexual-assault/2');
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/test-grn/sexual-assault/1');
@@ -373,13 +383,13 @@ describe(`Report app (test-grn/${app.env})`, function() {
     describe('submitted report in admin app', function() {
         it('redirects to /reports on login', async function() {
             const values = { username: testuser, password: testpass };
-            const response = await appReport.host('admin.localhost').post('/login/reports').send(values);
+            const response = await appAdmin.post('/login/reports').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
         });
 
         it('sees new report with nicely formatted information', async function() {
-            const response = await appReport.host('admin.localhost').get(`/reports/${reportId}`);
+            const response = await appAdmin.get(`/reports/${reportId}`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             const reportInfo = document.querySelector('table.js-obj-to-html');
@@ -410,14 +420,14 @@ describe(`Report app (test-grn/${app.env})`, function() {
         });
 
         it('sees report in submissions page', async function() {
-            const response = await appReport.get('/dev/submissions');
+            const response = await appAdmin.get('/dev/submissions');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(reportId).textContent).to.equal(reportId);
         });
 
         it('deletes submitted incident report', async function() {
-            const response = await appReport.host('admin.localhost').post(`/reports/${reportId}/delete`).send();
+            const response = await appAdmin.post(`/reports/${reportId}/delete`).send();
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
         });
@@ -433,15 +443,14 @@ describe(`Report app (test-grn/${app.env})`, function() {
         const report = '/test-grn/sexual-assault/*';
 
         it('logs in', async function() {
-            appReport.host('admin.localhost');
             const values = { username: testuser, password: testpass };
-            const response = await appReport.post('/login/-'+report).send(values);
+            const response = await appAdmin.post('/login/-'+report).send(values);
             expect(response.status).to.equal(302);
             // note redirect has full url as it is changing subdomains
             expect(response.headers.location.slice(-report.length)).to.equal(report);
         });
         it('shows logged in user on login page when logged-in', async function() {
-            const response = await appReport.get('/login');
+            const response = await appAdmin.get('/login');
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('#name').textContent).to.equal('tester');
@@ -449,7 +458,6 @@ describe(`Report app (test-grn/${app.env})`, function() {
         });
 
         it('sees report submission page', async function() {
-            appReport.host('report.localhost');
             const response = await appReport.get(report);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
@@ -509,7 +517,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
 
     describe('single page report in admin app', function() {
         it('sees new report with nicely formatted information', async function() {
-            const response = await appReport.host('admin.localhost').get(`/reports/${reportId}`);
+            const response = await appAdmin.get(`/reports/${reportId}`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             const reportInfo = document.querySelector('table.js-obj-to-html');
@@ -541,7 +549,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
 
 
         it('deletes submitted incident report', async function() {
-            const response = await appReport.host('admin.localhost').post(`/reports/${reportId}/delete`).send();
+            const response = await appAdmin.post(`/reports/${reportId}/delete`).send();
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
         });

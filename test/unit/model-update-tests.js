@@ -30,19 +30,19 @@ describe(`Update model (${db})`, function() {
     it('gets test user id', async function() {
         const [ user ] = await User.getBy('email', testuser);
         userId = user._id;
-        console.info('user id', userId);
+        console.info('\tuser id', userId);
     });
 
     it('creates dummy report', async function() {
         const submitted = { Date: new Date(), Description: 'a test report' };
         const ua = 'node-superagent/x.x.x';
         reportId = await Report.insert(db, undefined, 'update test', submitted, 'test-project', undefined, ua);
-        console.info('report id', reportId);
+        console.info('\treport id', reportId);
     });
 
     it('creates update record', async function() {
         updateId = await Update.insert(db, reportId, userId, { set: { status: 'update test' } });
-        console.info('update id', updateId);
+        console.info('\tupdate id', updateId);
     });
 
     it('gets update', async function() {

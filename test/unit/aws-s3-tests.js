@@ -22,7 +22,7 @@ describe('AWS S3', function() {
 
     const date = dateFormat('yyyy-mm');
     const id = ObjectId();
-    console.info('report id', id);
+    console.info('\treport id', id);
 
     test('upload file', async function() {
         const ok = await AwsS3.put('test-cam', 'sexual-assault', date, id, 's_gps.jpg', 'test/img/s_gps.jpg');

@@ -24,7 +24,7 @@ describe(`Submission model (${db})`, function() {
     it('creates submission', async function() {
         const uaChrome = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
         submissionId = await Submission.insert(db, 'test-project', uaChrome);
-        console.info(submissionId);
+        console.info('\tsubmission id', submissionId);
     });
 
     it('gets submission', async function() {

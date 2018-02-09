@@ -29,7 +29,7 @@ describe(`Report model (${db})`, function() {
         it ('sets up test user', async function() {
             const usr = { firstname: 'Test', lastname: 'User', email: 'test@user.com', username: 'test', roles: 'admin', databases: 'test' };
             userId = await User.insert(usr);
-            console.info('user id:', userId);
+            console.info('\tuser id:', userId);
         });
     });
 
@@ -87,7 +87,7 @@ describe(`Report model (${db})`, function() {
 
             const ua = 'node-superagent/x.x.x';
             reportId = await Report.insert(db, undefined, 'test test', submitted, 'test-project', files, ua);
-            console.info('report id:', reportId);
+            console.info('\treport id:', reportId);
             expect(reportId.constructor.name).to.equal('ObjectID');
             const report = await Report.get(db, reportId);
             expect(report).to.be.an('object');

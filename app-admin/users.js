@@ -9,10 +9,13 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+import isEmail    from 'isemail';    // email address validation library
+import crypto     from 'crypto';     // nodejs.org/api/crypto.html
 
 import User   from '../models/user.js';
 import Report from '../models/report.js';
 import log    from '../lib/log';
+import Mail   from '../lib/mail';
 
 /*
  * Note on roles:
@@ -29,10 +32,9 @@ class UsersHandlers {
      * GET /users/add - Render add user page.
      */
     static async add(ctx) {
-        const isAdminUser = ctx.state.user.roles.includes('admin');
-        if (!isAdminUser) {
+        if (!ctx.state.user.roles.includes('admin')) {
             ctx.flash = { _error: 'User management requires admin privileges' };
-            ctx.redirect('/login');
+            return ctx.redirect('/login'+ctx.url);
         }
 
         const isSuUser = ctx.state.user.roles.includes('su') ? 'show' : 'hide';
@@ -53,10 +55,9 @@ class UsersHandlers {
      * user's database.
      */
     static async list(ctx) {
-        const isAdminUser = ctx.state.user.roles.includes('admin');
-        if (!isAdminUser) {
+        if (!ctx.state.user.roles.includes('admin')) {
             ctx.flash = { _error: 'User management requires admin privileges' };
-            ctx.redirect('/login');
+            return ctx.redirect('/login'+ctx.url);
         }
 
         const isSuUser = ctx.state.user.roles.includes('su') ? 'show' : 'hide';
@@ -77,10 +78,9 @@ class UsersHandlers {
      * GET /users/:id/edit - Render edit user page.
      */
     static async edit(ctx) {
-        const isAdminUser = ctx.state.user.roles.includes('admin');
-        if (!isAdminUser) {
+        if (!ctx.state.user.roles.includes('admin')) {
             ctx.flash = { _error: 'User management requires admin privileges' };
-            ctx.redirect('/login');
+            return ctx.redirect('/login'+ctx.url);
         }
 
         if (!ctx.params.id.match(/^[0-9a-f]{24}$/i)) ctx.throw(404, 'User not found');
@@ -148,38 +148,76 @@ class UsersHandlers {
 
     /**
      * POST /users/add - Process add user.
+     *
+     * Note common code in password-reset.js.
      */
     static async processAdd(ctx) {
-        //if (ctx.state.user.Role != 'admin') return ctx.redirect('/login'+ctx.url);
+        if (!ctx.state.user.roles.includes('admin')) {
+            ctx.flash = { _error: 'User management requires admin privileges' };
+            return ctx.redirect('/login'+ctx.url);
+        }
+
+        const body = ctx.request.body;
 
         try {
 
             // username must be alphanumeric
-            if (!ctx.request.body.username.match(/[a-zA-Z-][a-zA-Z0-9-]*/)) throw new Error('Username must be alphanumeric');
+            if (!body.username.match(/[a-zA-Z-][a-zA-Z0-9-]*/)) throw new Error(`Username (‘${body.username}’) must be alphanumeric`);
+
+            // confirm valid e-mail (backing up browser input type validation)
+            if (!body.email) throw new Error('E-mail address is required');
+            if (!isEmail.validate(body.email)) throw new Error(`Invalid e-mail ‘${body.email}’`);
+
+            // firstname is required
+            if (!body.firstname) throw new Error('First name is required');
 
             // ensure roles is array (koa-body will return single selection as string not array)
-            if (!Array.isArray(ctx.request.body.roles)) {
-                ctx.request.body.roles = ctx.request.body.roles ? [ ctx.request.body.roles ] : [];
+            if (!Array.isArray(body.roles)) {
+                body.roles = body.roles ? [ body.roles ] : [];
             }
             // ensure databases is array (koa-body will return single selection as string not array)
-            if (!Array.isArray(ctx.request.body.databases)) {
-                ctx.request.body.databases = ctx.request.body.databases ? [ ctx.request.body.databases ] : [];
+            if (!Array.isArray(body.databases)) {
+                body.databases = body.databases ? [ body.databases ] : [];
             }
 
             // ensure su is also admin
-            if (ctx.request.body.roles.includes('su') && !ctx.request.body.roles.includes('admin')) {
-                ctx.request.body.roles.concat([ 'admin' ], ctx.request.body.roles); // put 'admin' at the front!
+            if (body.roles.includes('su') && !body.roles.includes('admin')) {
+                body.roles.concat([ 'admin' ], body.roles); // put 'admin' at the front!
             }
 
-            const id = await User.insert(ctx.request.body);
+            const id = await User.insert(body);
             ctx.set('X-Insert-Id', id); // for integration tests
+
+            // send notification e-mail to new user
+
+            // current timestamp for token expiry in base36
+            const now = Math.floor(Date.now()/1000).toString(36);
+
+            // random sha256 hash; 1st 8 chars of hash in base36 gives 42 bits of entropy
+            const hash = crypto.createHash('sha256').update(Math.random().toString());
+            const rndHash = parseInt(hash.digest('hex'), 16).toString(36).slice(0, 8);
+            const token = now+'-'+rndHash; // note use timestamp first so it is easier to identify old tokens in db
+            if (ctx.app.env != 'production') ctx.set('X-Pw-Reset-Token', token); // for integration tests
+
+            // record reset request in db
+            await User.update(id, { passwordResetRequest: token });
+
+            // send e-mail
+            try {
+                const context = { firstname: body.firstname, host: ctx.host, token: token };
+                if (ctx.app.env != 'development') await Mail.send(body.email, 'users-add.email', context);
+                ctx.flash = { notification: `Notification e-mail sent to ${body.email}` };
+            } catch (e) {
+                await log(ctx, 'error', null, null, e);
+                throw e;
+            }
 
             // return to list of users
             ctx.redirect('/users');
 
         } catch (e) {
             // stay on same page to report error (with current filled fields)
-            ctx.flash = { formdata: ctx.request.body, _error: e.message };
+            ctx.flash = { formdata: body, _error: e.message };
             ctx.redirect(ctx.url);
         }
 
@@ -193,28 +231,40 @@ class UsersHandlers {
      *       needs thought as to implementation
      */
     static async processEdit(ctx) {
-        if (!ctx.state.user.roles.includes('admin')) return ctx.redirect('/login'+ctx.url);
+        if (!ctx.state.user.roles.includes('admin')) {
+            ctx.flash = { _error: 'User management requires admin privileges' };
+            return ctx.redirect('/login'+ctx.url);
+        }
+
+        const body = ctx.request.body;
 
         try {
 
-            // username must be
-            if (!ctx.request.body.username.match(/[a-zA-Z-][a-zA-Z0-9-]*/)) throw new Error('Username must be alphanumeric');
+            // username must be alphanumeric
+            if (!body.username.match(/[a-zA-Z-][a-zA-Z0-9-]*/)) throw new Error(`Username (‘${body.username}’) must be alphanumeric`);
+
+            // confirm valid e-mail (backing up browser input type validation)
+            if (!body.email) throw new Error('E-mail address is required');
+            if (!isEmail.validate(body.email)) throw new Error(`Invalid e-mail ‘${body.email}’`);
+
+            // firstname is required
+            if (!body.firstname) throw new Error('First name is required');
 
             // ensure roles is array (koa-body will return single selection as string not array)
-            if (!Array.isArray(ctx.request.body.roles)) {
-                ctx.request.body.roles = ctx.request.body.roles ? [ ctx.request.body.roles ] : [];
+            if (!Array.isArray(body.roles)) {
+                body.roles = body.roles ? [ body.roles ] : [];
             }
             // ensure databases is array (koa-body will return single selection as string not array)
-            if (!Array.isArray(ctx.request.body.databases)) {
-                ctx.request.body.databases = ctx.request.body.databases ? [ ctx.request.body.databases ] : [];
+            if (!Array.isArray(body.databases)) {
+                body.databases = body.databases ? [ body.databases ] : [];
             }
 
             // ensure su is also admin
-            if (ctx.request.body.roles.includes('su') && !ctx.request.body.roles.includes('admin')) {
-                ctx.request.body.roles.concat([ 'admin' ], ctx.request.body.roles); // put 'admin' at the front!
+            if (body.roles.includes('su') && !body.roles.includes('admin')) {
+                body.roles.concat([ 'admin' ], body.roles); // put 'admin' at the front!
             }
 
-            await User.update(ctx.params.id, ctx.request.body);
+            await User.update(ctx.params.id, body);
 
             // TODO: if roles/organisations changed for current user, need to reset ctx.state
 
@@ -234,7 +284,10 @@ class UsersHandlers {
      * otherwise delete).
      */
     static async processDelete(ctx) {
-        if (!ctx.state.user.roles.includes('admin')) return ctx.redirect('/login'+ctx.url);
+        if (!ctx.state.user.roles.includes('admin')) {
+            ctx.flash = { _error: 'User management requires admin privileges' };
+            return ctx.redirect('/login'+ctx.url);
+        }
 
         try {
 

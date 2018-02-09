@@ -14,6 +14,7 @@ import convert    from 'koa-convert';    // tmp for koa-flash, koa-lusca
 const router = new Router();
 
 import log from '../lib/log.js';
+import ssl from '../lib/ssl.js';
 
 
 const app = new Koa(); // report app
@@ -145,7 +146,7 @@ const luscaCspDefaultSrc = `'self' 'unsafe-inline' ${luscaCspTrustedCdns}`; // '
 app.use(convert(lusca({ // note koa-lusca@2.2.0 is v1 middleware which generates deprecation notice
     csp:           { policy: { 'default-src': luscaCspDefaultSrc } }, // Content-Security-Policy
     cto:           'nosniff',                                         // X-Content-Type-Options
-    hsts:          { maxAge: 60*60*24*365, includeSubDomains: true }, // HTTP Strict-Transport-Security
+    hsts:          { maxAge: 60*60, includeSubDomains: true }, // HTTP Strict-Transport-Security
     xframe:        'SAMEORIGIN',                                      // X-Frame-Options
     xssProtection: true,                                              // X-XSS-Protection
 })));
@@ -159,6 +160,11 @@ app.use(async function ctxAddDomain(ctx, next) {
 
 
 // ------------ routing
+
+
+// force use of SSL (redirect http protocol to https)
+app.use(ssl({ trustProxy: true }));
+
 
 // compose appropriate sub-app for required database / project, in order to maximise modularity
 

@@ -4,14 +4,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // add 'required' indicators for form labels
     document.querySelectorAll('[required]').forEach(function(input) {
-        const req = '<sup class="required" title="required">*</sup>';
-        let prev = input.previousSibling;
+        var req = '<sup class="required" title="required">*</sup>';
+        var prev = input.previousSibling;
         while (prev && prev.localName != 'label' && prev.previousSibling != null) prev = prev.previousSibling;
         if (prev && prev.localName=='label' && prev.textContent!='&nbsp;') prev.insertAdjacentHTML('beforeend', req);
     });
 
     // remove 'required' attributes if going back to prev page
-    const prevButton = document.querySelector('button.prev');
+    var prevButton = document.querySelector('button.prev');
     if (prevButton) {
         prevButton.onclick = function () {
             document.querySelectorAll('input,textarea').forEach(function(i) { i.required = false; });
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
      */
 
     if (document.querySelector('input[name=when]')) {
-        const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
+        var months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
 
         // set focus to hour/day field if any 'when' radio button clicked
         document.querySelectorAll('input[name=when]').forEach(function(input) {
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // auto-advance day field when completed
         document.querySelector('select[name="date.day"]').onkeypress = function(event) {
             if (!event.key.match(/\d/)) { event.preventDefault(); return; }
-            const newValue = this.value + event.key;
+            var newValue = this.value + event.key;
             if (newValue.length==2 || newValue>3) {
                 document.querySelector('select[name="date.month"]').focus();
                 document.querySelector('select[name="date.month"]').select();
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // auto-advance month field when completed
         document.querySelector('select[name="date.month"]').onkeypress = function(event) {
             //if (this.value.length == 3) { event.preventDefault(); return; }
-            const newValue = this.value + event.key;
+            var newValue = this.value + event.key;
             if (months.indexOf(newValue.toLowerCase()) >= 0) {
                 document.querySelector('select[name="date.year"]').focus();
                 document.querySelector('select[name="date.year"]').select();
@@ -101,8 +101,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // month field validation
         document.querySelector('select[name="date.month"]').onchange = function() {
             if (this.setCustomValidity == undefined) return;
-            const err = 'Please enter a valid three-letter abbreviation of a month';
-            const ok = months.indexOf(this.value.toLowerCase()) >= 0;
+            var err = 'Please enter a valid three-letter abbreviation of a month';
+            var ok = months.indexOf(this.value.toLowerCase()) >= 0;
             this.setCustomValidity(ok ? '' : err);
         };
 
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
      */
 
     if (document.querySelector('#where')) {
-        const where = document.querySelector('#where');
+        var where = document.querySelector('#where');
 
         // show/hide at-address according to selected option
         document.querySelectorAll('input[name=where]').forEach(function(input) {
@@ -222,14 +222,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // defaults for previously answered questions
         document.querySelectorAll('input[name=action-taken]').forEach(function(el) {
             if (el.checked) {
-                const extra = el.parentElement.querySelector('input[type=text]');
+                var extra = el.parentElement.querySelector('input[type=text]');
                 extra.classList.remove('hide');
             }
         });
 
         document.querySelectorAll('input[name=action-taken]').forEach(function(el) {
             el.onclick = function() {
-                const extra = this.parentElement.querySelector('input[type=text]');
+                var extra = this.parentElement.querySelector('input[type=text]');
                 if (this.checked) {
                     extra.classList.remove('hide');
                     extra.focus();
@@ -303,13 +303,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function generateAlias() {
-        const db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path
-        const request = new XMLHttpRequest();
+        var db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path
+        var request = new XMLHttpRequest();
         request.open('GET', '/ajax/'+db+'/aliases/new');
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
                 if (request.status == 200) {
-                    const data = JSON.parse(request.responseText);
+                    var data = JSON.parse(request.responseText);
                     document.querySelector('output[name="generated-alias"]').textContent = data.alias;
                     document.querySelector('input[name="generated-alias"]').value = data.alias;
                 } // TODO: or?
@@ -326,8 +326,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('#generated-alias').classList.remove('hide');
             return;
         }
-        const db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path
-        const request = new XMLHttpRequest();
+        var db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path
+        var request = new XMLHttpRequest();
         request.open('GET', '/ajax/'+db+'/aliases/'+alias.replace(' ', '+'));
         request.setRequestHeader('Accept', 'application/json');
         request.onreadystatechange = function () {
@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (this.setCustomValidity) this.setCustomValidity('');
                         break;
                     case 404: // alias not found
-                        const err = 'Alias not found';
+                        var err = 'Alias not found';
                         if (this.setCustomValidity) document.querySelector('input[name="existing-alias"]').setCustomValidity(err);
                         document.querySelector('#alias-ok').classList.add('hide');
                         document.querySelector('#alias-nok').classList.remove('hide');
@@ -362,19 +362,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (document.querySelector('input[name=address]')) {
         document.querySelector('input[name="address"]').oninput = function() {
-            const input = this;
-            const button = document.querySelector('#get');
-            const formatted = document.querySelector('#formatted-address');
+            var input = this;
+            var button = document.querySelector('#get');
+            var formatted = document.querySelector('#formatted-address');
             if (input.value == '') {
                 button.disabled = true;
                 button.classList.add('grey');
                 return;
             }
             delay(async function() {
-                const response = await fetch(`/ajax/geocode?address=${encodeURI(input.value).replace(/%20/g, '+')}`);
+                var response = await fetch(`/ajax/geocode?address=${encodeURI(input.value).replace(/%20/g, '+')}`);
                 switch (response.status) {
                     case 200:
-                        const body = await response.json();
+                        var body = await response.json();
                         button.disabled = false;
                         button.classList.remove('grey');
                         formatted.innerHTML = `(for <i>${body.formattedAddress}</i>)`;
@@ -393,8 +393,8 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    const delay = (function() {
-        let timer = null;
+    var delay = (function() {
+        var timer = null;
         return function(callback, ms) {
             clearTimeout (timer);
             timer = setTimeout(callback, ms);

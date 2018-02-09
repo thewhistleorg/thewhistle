@@ -38,12 +38,11 @@ describe(`Report app (test-grn/${app.env})`, function() {
         if (responseTestRpt.status != 404) throw new Error('Previous test report was not deleted');
     });
 
-    describe('report app home page', function() {
+    describe('report app home page redirects to /test-grn/sexual-assault', function() {
         it('sees home page', async function() {
             const response = await appReport.get('/');
-            expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.querySelector('title').textContent).to.equal('The Whistle Eyewitness Report');
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/test-grn/sexual-assault');
         });
     });
 

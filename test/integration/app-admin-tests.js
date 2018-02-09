@@ -143,12 +143,10 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             expect(response.headers.location).to.equal('/login/reports');
         });
 
-        it('has home page with login link in nav when not logged-in', async function() {
+        it('redirects home page to login page when not logged in', async function() {
             const response = await appAdmin.get('/');
-            expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.querySelector('title').textContent.slice(0, 11)).to.equal('The Whistle');
-            expect(document.querySelectorAll('nav ul li').length).to.equal(2); // nav should be just '/', 'login'
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/login');
         });
 
         it('has login page with login fields when not logged-in', async function() {

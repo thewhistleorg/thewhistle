@@ -14,7 +14,11 @@ document.addEventListener('DOMContentLoaded', function() {
     var prevButton = document.querySelector('button.prev');
     if (prevButton) {
         prevButton.onclick = function () {
-            document.querySelectorAll('input,textarea').forEach(function(i) { i.required = false; });
+           var fields = document.querySelectorAll('input,textarea');
+           for(var i = 0; i < fields.length; i++) {
+              fields[i].required = false;
+           }
+            // document.querySelectorAll('input,textarea').forEach(function(i) { i.required = false; });
         };
     }
 
@@ -27,8 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
         var months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
 
         // set focus to hour/day field if any 'when' radio button clicked
-        document.querySelectorAll('input[name=when]').forEach(function(input) {
-            input.onchange = function() {
+        var fields = document.querySelectorAll('input[name=when]');
+        for(var i = 0; i < fields.length; i++) {
+            fields[i].onchange = function() {
                 switch (this.value) {
                     case 'date':
                         document.querySelector('select[name="date.day"]').focus();
@@ -44,33 +49,71 @@ document.addEventListener('DOMContentLoaded', function() {
                         break;
                 }
             };
-        });
+        }
+        // document.querySelectorAll('input[name=when]').forEach(function(input) {
+        //     input.onchange = function() {
+        //         switch (this.value) {
+        //             case 'date':
+        //                 document.querySelector('select[name="date.day"]').focus();
+        //                 // document.querySelector('select[name="date.day"]').select();
+        //                 this.parentElement.parentElement.querySelector('.when-form').style.display = document.querySelector('#when-date').checked ? 'block' : 'none';
+        //                 break;
+        //             case 'within':
+        //                 document.querySelector('select[name="within-options"]').focus();
+        //                 this.parentElement.parentElement.querySelector('.when-form').style.display='none';
+        //                 break;
+        //             case 'dont-remember':
+        //                 this.parentElement.parentElement.querySelector('.when-form').style.display='none';
+        //                 break;
+        //         }
+        //     };
+        // });
 
         if (document.querySelector('#when-date').checked == true) {
             document.querySelector('input[name=when]').parentElement.querySelector('.when-form').style.display='block';
         }
 
         // check when-today if any today fields receive focus
-        document.querySelectorAll('input[name^=today]').forEach(function(input) {
-            input.onfocus = function() {
+        var nameToday = document.querySelectorAll('input[name^=today]');
+        for ( var i = 0; i < nameToday.length; i++) {
+            nameToday[i].onfocus = function() {
                 document.querySelector('#when-today').checked = true;
             };
-        });
+        }
+
+        // document.querySelectorAll('input[name^=today]').forEach(function(input) {
+        //     input.onfocus = function() {
+        //         document.querySelector('#when-today').checked = true;
+        //     };
+        // });
 
         // check when-yesterday if any yesterday fields receive focus
-        document.querySelectorAll('input[name^=yesterday]').forEach(function(input) {
-            input.onfocus = function() {
+        var nameYesterday = document.querySelectorAll('input[name^=yesterday]');
+        for ( var i = 0; i < nameYesterday.length; i++) {
+            nameYesterday[i].onfocus = function() {
                 document.querySelector('#when-yesterday').checked = true;
             };
-        });
+        }
+
+        // document.querySelectorAll('input[name^=yesterday]').forEach(function(input) {
+        //     input.onfocus = function() {
+        //         document.querySelector('#when-yesterday').checked = true;
+        //     };
+        // });
 
 
         // check when-date if any date fields receive focus
-        document.querySelectorAll('input[name^=date], select[name^=date]').forEach(function(input) {
-            input.onfocus = function() {
+        var nameDate = document.querySelectorAll('input[name^=date], select[name^=date]');
+        for ( var i = 0; i < nameDate.length; i++) {
+            nameDate[i].onfocus = function() {
                 document.querySelector('#when-date').checked = true;
             };
-        });
+        }
+        // document.querySelectorAll('input[name^=date], select[name^=date]').forEach(function(input) {
+        //     input.onfocus = function() {
+        //         document.querySelector('#when-date').checked = true;
+        //     };
+        // });
 
         // check when-within if within-options is changed, clear it if no value set
         // (note not on focus, as tabbing to it from date would auto-select it)
@@ -107,11 +150,18 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         // on/within validation
-        document.querySelectorAll('input[name=when]').forEach(function(input) {
+        var nameWhen = document.querySelectorAll('input[name=when]');
+        for ( var i = 0; i < nameWhen.length; i++) {
+            var input = nameWhen[i];
             input.onchange = function() {
                 if (this.setCustomValidity == undefined) return;
                 document.querySelector('#within-options').required = false;
-                document.querySelectorAll('input[name^=date]').forEach(function(el) { el.required = false; });
+                var nameDate = document.querySelectorAll('input[name^=date]');
+                for ( var i = 0; i < nameDate.length; i++) {
+                    var el = nameDate[i];
+                    el.required = false;
+                }
+                // document.querySelectorAll('input[name^=date]').forEach(function(el) { el.required = false; });
                 switch (input.value) {
                     case 'date':
                         document.querySelector('select[name="date.day"]').required = true;
@@ -126,7 +176,27 @@ document.addEventListener('DOMContentLoaded', function() {
                         break;
                 }
             };
-        });
+        }
+        // document.querySelectorAll('input[name=when]').forEach(function(input) {
+        //     input.onchange = function() {
+        //         if (this.setCustomValidity == undefined) return;
+        //         document.querySelector('#within-options').required = false;
+        //         document.querySelectorAll('input[name^=date]').forEach(function(el) { el.required = false; });
+        //         switch (input.value) {
+        //             case 'date':
+        //                 document.querySelector('select[name="date.day"]').required = true;
+        //                 document.querySelector('select[name="date.month"]').required = true;
+        //                 document.querySelector('select[name="date.year"]').required = true;
+        //                 document.querySelector('select[name="date.day"]').focus();
+        //                 // document.querySelector('select[name="date.day"]').select();
+        //                 break;
+        //             case 'within':
+        //                 document.querySelector('select[name="within-options"]').required = true;
+        //                 document.querySelector('select[name="within-options"]').focus();
+        //                 break;
+        //         }
+        //     };
+        // });
 
         // auto-advance hour field when completed (date)
         // document.querySelector('input[name="date.hour"]').onkeypress = function(event) {
@@ -138,14 +208,25 @@ document.addEventListener('DOMContentLoaded', function() {
         // });
 
         // don't tab out of empty date field (in case tab typed after auto-advance)
-        document.querySelectorAll('input[name^=date]').forEach(function(input) {
-            // if (input.name=='date.hour' || input.name=='date.minute') return; // hour/min can be left blank
-            if (input.name=='date.time') return; // hour/min can be left blank
+        var nameDate = document.querySelectorAll('input[name^=date]');
+        for ( var i = 0; i < nameDate.length; i++) {
+          input = nameDate[i];
+          // if (input.name=='date.hour' || input.name=='date.minute') return; // hour/min can be left blank
+          if (input.name=='date.time') return; // hour/min can be left blank
 
-            input.onkeydown = function (event) {
-                if (event.key == 'Tab' && this.value == '') event.preventDefault();
-            };
-        });
+          input.onkeydown = function (event) {
+              if (event.key == 'Tab' && this.value == '') event.preventDefault();
+          };
+
+        }
+        // document.querySelectorAll('input[name^=date]').forEach(function(input) {
+        //     // if (input.name=='date.hour' || input.name=='date.minute') return; // hour/min can be left blank
+        //     if (input.name=='date.time') return; // hour/min can be left blank
+        //
+        //     input.onkeydown = function (event) {
+        //         if (event.key == 'Tab' && this.value == '') event.preventDefault();
+        //     };
+        // });
     }
 
 
@@ -157,25 +238,47 @@ document.addEventListener('DOMContentLoaded', function() {
         var where = document.querySelector('#where');
 
         // show/hide at-address according to selected option
-        document.querySelectorAll('input[name=where]').forEach(function(input) {
-            input.onclick = function() {
-                if (input.value == 'at') {
-                    // where.querySelector('p').classList.remove('hide');
-                    // where.querySelector('textarea[name="at-address"]').classList.remove('hide');
-                    where.querySelector('textarea[name="at-address"]').focus();
-                    where.querySelector('textarea[name="at-address"]').select();
-                }
-                if (input.value == 'dont-know') {
-                    // where.querySelector('p').classList.add('hide');
-                    // where.querySelector('textarea[name="at-address"]').classList.add('hide');
-                }
-            };
-        });
+        var nameWhere = document.querySelectorAll('input[name=where]');
+        for ( var i = 0; i < nameWhere.length; i++) {
+          var input = nameWhere[i];
+          input.onclick = function() {
+              if (input.value == 'at') {
+                  // where.querySelector('p').classList.remove('hide');
+                  // where.querySelector('textarea[name="at-address"]').classList.remove('hide');
+                  where.querySelector('textarea[name="at-address"]').focus();
+                  where.querySelector('textarea[name="at-address"]').select();
+              }
+              if (input.value == 'dont-know') {
+                  // where.querySelector('p').classList.add('hide');
+                  // where.querySelector('textarea[name="at-address"]').classList.add('hide');
+              }
+          };
+        }
+
+        // document.querySelectorAll('input[name=where]').forEach(function(input) {
+        //     input.onclick = function() {
+        //         if (input.value == 'at') {
+        //             // where.querySelector('p').classList.remove('hide');
+        //             // where.querySelector('textarea[name="at-address"]').classList.remove('hide');
+        //             where.querySelector('textarea[name="at-address"]').focus();
+        //             where.querySelector('textarea[name="at-address"]').select();
+        //         }
+        //         if (input.value == 'dont-know') {
+        //             // where.querySelector('p').classList.add('hide');
+        //             // where.querySelector('textarea[name="at-address"]').classList.add('hide');
+        //         }
+        //     };
+        // });
 
         // defaults for previously answered questions
-        document.querySelectorAll('input[name=where]').forEach(function(input) {
-            if (input.checked) input.onclick();
-        });
+        var nameWhere = document.querySelectorAll('input[name=where]');
+        for ( var i = 0; i < nameWhere.length; i++) {
+          var input = nameWhere[i];
+          if (input.checked) input.onclick();
+        }
+        // document.querySelectorAll('input[name=where]').forEach(function(input) {
+        //     if (input.checked) input.onclick();
+        // });
 
         // check #where-at if at-address receives focus
         document.querySelector('#at-address').onfocus = function() {
@@ -190,27 +293,50 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (document.querySelector('input[name=who]')) {
         // display/hide supplementary information fields on radio-box selection
-        document.querySelectorAll('input[name=who]').forEach(function(input) {
-            input.onclick = function() {
-                if (this.value == 'y') {
-                    this.parentElement.querySelector('#who-y-form').classList.remove('hide');
-                    this.parentElement.parentElement.querySelector('#who-n-form').classList.add('hide');
-                    document.querySelector('textarea[name="who-relationship"]').focus();
-                    document.querySelector('textarea[name="who-relationship"]').select();
-                }
-                if (this.value == 'n') {
-                    this.parentElement.querySelector('#who-n-form').classList.remove('hide');
-                    this.parentElement.parentElement.querySelector('#who-y-form').classList.add('hide');
-                    document.querySelector('textarea[name="who-description"]').focus();
-                    document.querySelector('textarea[name="who-description"]').select();
-                }
-            };
-        });
+        var nameWho1 = document.querySelectorAll('input[name=who]');
+        for ( var i = 0; i < nameWho1.length; i++) {
+          var input = nameWho1[i];
+          input.onclick = function() {
+              if (this.value == 'y') {
+                  this.parentElement.querySelector('#who-y-form').classList.remove('hide');
+                  this.parentElement.parentElement.querySelector('#who-n-form').classList.add('hide');
+                  document.querySelector('textarea[name="who-relationship"]').focus();
+                  document.querySelector('textarea[name="who-relationship"]').select();
+              }
+              if (this.value == 'n') {
+                  this.parentElement.querySelector('#who-n-form').classList.remove('hide');
+                  this.parentElement.parentElement.querySelector('#who-y-form').classList.add('hide');
+                  document.querySelector('textarea[name="who-description"]').focus();
+                  document.querySelector('textarea[name="who-description"]').select();
+              }
+          };
+        }
+        // document.querySelectorAll('input[name=who]').forEach(function(input) {
+        //     input.onclick = function() {
+        //         if (this.value == 'y') {
+        //             this.parentElement.querySelector('#who-y-form').classList.remove('hide');
+        //             this.parentElement.parentElement.querySelector('#who-n-form').classList.add('hide');
+        //             document.querySelector('textarea[name="who-relationship"]').focus();
+        //             document.querySelector('textarea[name="who-relationship"]').select();
+        //         }
+        //         if (this.value == 'n') {
+        //             this.parentElement.querySelector('#who-n-form').classList.remove('hide');
+        //             this.parentElement.parentElement.querySelector('#who-y-form').classList.add('hide');
+        //             document.querySelector('textarea[name="who-description"]').focus();
+        //             document.querySelector('textarea[name="who-description"]').select();
+        //         }
+        //     };
+        // });
 
         // defaults for previously answered questions
-        document.querySelectorAll('input[name=who]').forEach(function(input) {
-            if (input.checked) input.onclick();
-        });
+        var nameWho2 = document.querySelectorAll('input[name=who]');
+        for ( var i = 0; i < nameWho2.length; i++) {
+          var input = nameWho2[i];
+          if (input.checked) input.onclick();
+        }
+        // document.querySelectorAll('input[name=who]').forEach(function(input) {
+        //     if (input.checked) input.onclick();
+        // });
     }
 
 
@@ -220,26 +346,52 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (document.querySelector('input[name="action-taken"]')) {
         // defaults for previously answered questions
-        document.querySelectorAll('input[name=action-taken]').forEach(function(el) {
-            if (el.checked) {
-                var extra = el.parentElement.querySelector('input[type=text]');
-                extra.classList.remove('hide');
-            }
-        });
 
-        document.querySelectorAll('input[name=action-taken]').forEach(function(el) {
-            el.onclick = function() {
-                var extra = this.parentElement.querySelector('input[type=text]');
-                if (this.checked) {
-                    extra.classList.remove('hide');
-                    extra.focus();
-                    extra.select();
-                } else {
-                    extra.value = '';
-                    extra.classList.add('hide');
-                }
-            };
-        });
+        var nameActionTaken = document.querySelectorAll('input[name=action-taken]');
+        for ( var i = 0; i < nameActionTaken.length; i++) {
+          var el = nameActionTaken[i];
+          if (el.checked) {
+              var extra = el.parentElement.querySelector('input[type=text]');
+              extra.classList.remove('hide');
+          }
+        }
+
+        //
+        // document.querySelectorAll('input[name=action-taken]').forEach(function(el) {
+        //     if (el.checked) {
+        //         var extra = el.parentElement.querySelector('input[type=text]');
+        //         extra.classList.remove('hide');
+        //     }
+        // });
+
+        var nameActionTaken2 = document.querySelectorAll('input[name=action-taken]');
+        for ( var i = 0; i < nameActionTaken2.length; i++) {
+          var el = nameActionTaken2[i];
+          el.onclick = function() {
+              var extra = this.parentElement.querySelector('input[type=text]');
+              if (this.checked) {
+                  extra.classList.remove('hide');
+                  extra.focus();
+                  extra.select();
+              } else {
+                  extra.value = '';
+                  extra.classList.add('hide');
+              }
+          };
+        }
+        // document.querySelectorAll('input[name=action-taken]').forEach(function(el) {
+        //     el.onclick = function() {
+        //         var extra = this.parentElement.querySelector('input[type=text]');
+        //         if (this.checked) {
+        //             extra.classList.remove('hide');
+        //             extra.focus();
+        //             extra.select();
+        //         } else {
+        //             extra.value = '';
+        //             extra.classList.add('hide');
+        //         }
+        //     };
+        // });
     }
 
 

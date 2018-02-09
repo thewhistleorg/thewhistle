@@ -706,6 +706,7 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             const response = await appAdmin.get('/reports/export-pdf');
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('application/pdf');
+            // TODO: any way to reliably test for filename if timestamp ticks over minute boundary?
             expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${dateFormat('yyyy-mm-dd HH.MM')}.pdf"`);
         });
 

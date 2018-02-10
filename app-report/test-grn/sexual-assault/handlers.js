@@ -173,7 +173,7 @@ class Handlers {
             }
 
             ctx.session.id = await Report.submissionStart(ctx.params.database, ctx.params.project, alias, ctx.headers['user-agent']);
-            await Report.insertTag(ctx.params.database, ctx.session.id, 'incomplete', null);
+            // suspend complete/incomplete tags await Report.insertTag(ctx.params.database, ctx.session.id, 'incomplete', null);
             ctx.session.saved = true;
             ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
             debug('submissionStart', ctx.session.id);
@@ -242,8 +242,8 @@ class Handlers {
     static async getWhatnext(ctx) {
         if (ctx.session.report) {
             // tag report as complete
-            await Report.deleteTag(ctx.params.database, ctx.session.id, 'incomplete', null);
-            await Report.insertTag(ctx.params.database, ctx.session.id, 'complete', null);
+            // suspend complete/incomplete tags await Report.deleteTag(ctx.params.database, ctx.session.id, 'incomplete', null);
+            // suspend complete/incomplete tags await Report.insertTag(ctx.params.database, ctx.session.id, 'complete', null);
 
             // record submission complete
             if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {

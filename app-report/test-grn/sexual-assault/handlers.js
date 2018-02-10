@@ -12,13 +12,12 @@ const debug = Debug('app:report'); // submission process
 
 const LatLon = geodesy.LatLonSpherical;
 
-import Report    from '../../../models/report.js';
-import Question  from '../../../models/question.js';
-import Resource  from '../../../models/resource.js';
+import Report     from '../../../models/report.js';
+import Question   from '../../../models/question.js';
+import Resource   from '../../../models/resource.js';
 import Submission from '../../../models/submission.js';
-import UserAgent from '../../../models/user-agent.js';
-
-import Geocoder       from '../../../lib/geocode.js';
+import UserAgent  from '../../../models/user-agent.js';
+import Geocoder   from '../../../lib/geocode.js';
 
 const nPages = 8;
 

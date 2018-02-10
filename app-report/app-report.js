@@ -28,6 +28,13 @@ const maxage = app.env=='production' ? 1000*60*60 : 1000;
 app.use(serve('public', { maxage: maxage }));
 
 
+// don't cache, so that flash messages will get displayed correctly
+app.use(async function noCache(ctx, next) {
+    await next();
+    ctx.set('Cache-Control', 'no-cache');
+});
+
+
 // log requests (excluding static files, into capped collection)
 app.use(async function logAccess(ctx, next) {
     debug(ctx.method.padEnd(4) + ' ' + ctx.url);

@@ -84,7 +84,7 @@ class Handlers {
         if (!ctx.session.report) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
 
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num); // note '+' is allowed in windows filenames, '*' is not
-        if (page > ctx.session.completed+1) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); return; }
+        if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); }
 
         // supply any required self/other parameterised questions
         const questions = await Question.get(ctx.params.database, ctx.params.project);
@@ -95,6 +95,9 @@ class Handlers {
         const pages = Array(nPages).fill(null).map((p, i) => ({ page: i+1 }));
         if (page != '+') pages[page-1].class = 'current'; // to highlight current page
         const context = Object.assign({ pages: pages }, ctx.session.report, { incidentDate: ctx.session.incidentDate }, { q: q });
+
+        // users are not allowed to go 'back' to 'used-before' page
+        if (page==1 && ctx.session.saved) { ctx.flash = { error: 'Please continue with your current alias' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/2`); }
 
         await ctx.render('page'+page, context);
     }
@@ -248,7 +251,7 @@ class Handlers {
             }
 
             // remove all session data (to prevent duplicate submission)
-            ctx.session = {};
+            ctx.session = null;
 
         }
         const context = { address: ctx.query.address };

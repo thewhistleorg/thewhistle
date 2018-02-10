@@ -4,7 +4,7 @@
 
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 
-/* global cy */
+/* global Cypress, cy */
 
 
 describe('Submit test-grn/sexual-assault incident report', function () {

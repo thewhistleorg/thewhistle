@@ -143,18 +143,8 @@ describe(`Report app (test-grn/${app.env})`, function() {
             const responsePost = await appReport.post('/test-grn/sexual-assault/1').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/2');
-        });
-
-        it('returns to index page on back button', async function() {
-            const values = { // will have been remembered from session
-                'existing-alias':  '',
-                'used-before':     'n',
-                'generated-alias': 'testy terrain',
-                'nav-prev':        'prev',
-            };
-            const responsePost = await appReport.post('/test-grn/sexual-assault/1').send(values);
-            expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/');
+            reportId = responsePost.headers['x-insert-id'];
+            console.info('\treport id', reportId);
         });
 
         it('sees/submits page 2 (on-behalf-of)', async function() {
@@ -173,8 +163,6 @@ describe(`Report app (test-grn/${app.env})`, function() {
             const responsePost = await appReport.post('/test-grn/sexual-assault/2').send(values);
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/3');
-            reportId = responsePost.headers['x-insert-id'];
-            console.info('\treport id', reportId);
         });
 
         it('doesn’t allow access beyond next page', async function() {

@@ -356,25 +356,29 @@ document.addEventListener('DOMContentLoaded', function() {
         // listener to set focus to existing-alias if used-before-y selected
         document.querySelector('#used-before-y').onclick = function() {
             if (this.checked) {
-                document.querySelector('#usegenerated').classList.add('hide');
+                document.querySelector('#use-existing').classList.remove('hide');
+                document.querySelector('#use-generated').classList.add('hide');
                 document.querySelector('input[name="existing-alias"]').focus();
                 document.querySelector('input[name="existing-alias"]').select();
-            } else {
-                document.querySelector('#usegenerated').classList.remove('hide');
+            } else { // TODO: possible?
+                document.querySelector('#use-existing').classList.add('hide');
+                document.querySelector('#use-generated').classList.remove('hide');
                 document.querySelector('input[name="existing-alias"]').value = '';
             }
         };
 
-        // listener to display usegenerated and clear existing-alias if used-before-n clicked
+        // listener to display use-generated and clear existing-alias if used-before-n clicked
         document.querySelector('#used-before-n').onclick = function() {
             if (this.checked) {
-                document.querySelector('#usegenerated').classList.remove('hide');
+                document.querySelector('#use-generated').classList.remove('hide');
+                document.querySelector('#use-existing').classList.add('hide');
                 document.querySelector('input[name="existing-alias"]').value = '';
                 document.querySelector('#alias-ok').classList.add('hide');
                 document.querySelector('#alias-nok').classList.add('hide');
                 if (this.setCustomValidity) this.setCustomValidity('');
-            } else {
-                document.querySelector('#usegenerated').classList.add('hide');
+            } else { // TODO: possible?
+                document.querySelector('#use-generated').classList.add('hide');
+                document.querySelector('#use-existing').classList.remove('hide');
                 document.querySelector('input[name="existing-alias"]').focus();
                 document.querySelector('input[name="existing-alias"]').select();
             }
@@ -388,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // listener to check #used-before-y if existing-alias entered
         document.querySelector('input[name="existing-alias"]').onchange = function() {
             document.querySelector('#used-before-y').checked = this.value != '';
-            document.querySelector('#usegenerated').classList.add('hide');
+            document.querySelector('#use-generated').classList.add('hide');
         };
 
         // check entered existing alias letter-by-letter

@@ -1,6 +1,6 @@
 <form method="post" class="pure-form pure-form-aligned">
     {{> back}}{{> step}}
-    <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+    {{> flash}}
 
     <div  class="margin-top-3">
 
@@ -18,7 +18,7 @@
                         include how you know them (for example, it could be a relative, colleague,
                         or acquaintance.</p>
                   </label>
-                  <textarea type="text" rows="4" class="w100pc" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="w100pc"></textarea>
+                  <textarea name="who-relationship" id="who-relationship" rows="4" value="{{who-relationship}}" class="w100pc"></textarea>
                 </div>
             </li>
             <li>

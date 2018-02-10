@@ -276,19 +276,21 @@ class Report {
      *
      * @param   {string}   db - Database to use.
      * @param   {string}   project - Project report is part of.
+     * @param   {string}   alias - Alias to record for for submitter of report.
      * @param   {string}   userAgent - User agent from http request header.
      * @returns {ObjectId} New report id.
      */
-    static async submissionStart(db, project, userAgent) {
-        debug('submissionStart', db, project);
+    static async submissionStart(db, project, alias, userAgent) {
+        debug('submissionStart', db, project, alias);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (typeof alias != 'string' || alias.length == 0) throw new Error('Alias must be supplied');
 
         const reports = global.db[db].collection('reports');
 
         const values = {
             project:    project,
-            submitted:  {},
-            alias:      null,
+            submitted:  { Alias: alias },
+            alias:      alias,
             location:   { address: '', geocode: null, geojson: null },
             analysis:   {},
             // summary: null,
@@ -307,25 +309,6 @@ class Report {
         const { insertedId } = await reports.insertOne(values);
 
         return insertedId; // TODO: toString()?
-    }
-
-
-    /**
-     * Sets (or updates) alias for submitted report.
-     *
-     * @param {string}   db - Database to use.
-     * @param {ObjectId} id - Report Id.
-     * @param {string}   alias - Alias to record for given report.
-     */
-    static async submissionAlias(db, id, alias) {
-        debug('submissionAlias', db, id, alias);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
-
-        id = objectId(id);  // allow id as string
-
-        const reports = global.db[db].collection('reports');
-
-        await reports.updateOne({ _id: id }, { $set: { alias: alias } });
     }
 
 

@@ -1,6 +1,6 @@
 <form method="post" enctype="multipart/form-data" class="pure-form">
     {{> back}}{{> step}}
-    <ul class="validation-errors">{{#@koa.flash.validation}}<li>{{this}}</li>{{/@koa.flash.validation}}</ul>
+    {{> flash}}
 
     <div  class="margin-top-3">
         <script>

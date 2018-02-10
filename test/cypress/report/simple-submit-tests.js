@@ -45,7 +45,7 @@ describe('Submit test-grn/sexual-assault incident report', function () {
         cy.get('#who label').contains('No').click();
         cy.get('input.who-relationship').should('not.be.visible');
         // cy.get('textarea.who-description').should('be.visible'); // TODO why does this fail?
-        cy.get('#who textarea').type('Big fat guy');
+        cy.get('#who-description').type('Big fat guy');
         cy.contains('Submit and continue').click();
 
         cy.url().should('include', '/test-grn/sexual-assault/6'); // description

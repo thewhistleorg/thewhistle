@@ -29,6 +29,9 @@ class Handlers {
      */
     static async getIndex(ctx) {
         // clear previous session
+        ctx.session = null;
+
+        // initialise session with various defaults
         ctx.session = {};
 
         // set up values for date select elements
@@ -79,7 +82,7 @@ class Handlers {
      */
     static async getPage(ctx) {
         debug('getPage', 'p'+ctx.params.num, 'id:'+ctx.session.id);
-        if (!ctx.session.report) { ctx.flash = { expire: 'Your session has expired' }; ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
+        if (!ctx.session.report) { ctx.flash.error = 'Your session has expired'; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
 
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num); // note '+' is allowed in windows filenames, '*' is not
         if (page > ctx.session.completed+1) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); return; }
@@ -118,13 +121,13 @@ class Handlers {
      */
     static async postPage(ctx) {
         debug('postPage', 'p'+ctx.params.num, 'id:'+ctx.session.id, Object.keys(ctx.request.body));
-        if (!ctx.session.report) { ctx.flash = { expire: 'Your session has expired' }; ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); return; }
+        if (!ctx.session.report) { ctx.flash.error = 'Your session has expired'; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
 
         // page number, or '+' for single-page submission
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num);
 
         // don't allow jumping further forward than 'next' page
-        if (page > ctx.session.completed+1) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); return; }
+        if (page > ctx.session.completed+1) { ctx.flash.error = 'Cannot jump ahead'; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); }
 
         const body = ctx.request.body;
 
@@ -142,47 +145,37 @@ class Handlers {
             for (let f=0; f<body.files.length; f++) if (body.files[f].size == 0) body.files.splice(f, 1);
         }
 
-        let saved = ctx.session.saved; // TODO: this logic really needs cleaning up!
+        if (page==1 & ctx.session.saved) { ctx.flash.error = 'Trying to save already saved report!'; return ctx.redirect(ctx.url); }
 
-        // if this is page 2 (with report not already saved), or single page submission, create skeleton report in the database
-        if ((!saved && page==2) || page=='+') {
-            ctx.session.id = await Report.submissionStart(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
-            await Report.insertTag(ctx.params.database, ctx.session.id, 'incomplete', null);
-            saved = true;
-            ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
-            debug('submissionStart', ctx.session.id);
-        }
+        if (page==1 || page=='+') { // create the skeleton report (with alias)
+            let alias = null;
 
-        // if this is page 2 (with report not already saved), or page 1 with report already saved, or
-        // single page submission, check generated alias not already used, or existing alias does exist
-        if ((!ctx.session.saved && page==2) || (ctx.session.saved && page==1) || page=='+') { // record alias
-            switch (ctx.session.report['used-before']) {
+            switch (body['used-before']) {
                 case 'y':
                     // verify existing alias does exist
-                    const aliasExisting = ctx.session.report['existing-alias'];
-                    const reportsY = await Report.getBy(ctx.params.database, 'alias', aliasExisting);
-                    const reportsYexclCurr = reportsY.filter(r => r._d != ctx.session.id); // exclude current report
-                    if (reportsYexclCurr.length == 0) { ctx.flash.alias = `Anonymous alias not found`; ctx.redirect(ctx.url); return; }
+                    alias = body['existing-alias'];
+                    const reportsY = await Report.getBy(ctx.params.database, 'alias', alias);
+                    const reportsYExclCurr = reportsY.filter(r => r._id != ctx.session.id); // exclude current report
+                    if (reportsYExclCurr.length == 0) { ctx.flash.error = `Anonymous alias ‘${alias}’ not found`; return ctx.redirect(ctx.url); }
                     break;
                 case 'n':
                     // verify generated alias does not exist
-                    if (ctx.session.report['generated-alias'] == null) { ctx.flash = 'Alias not given'; ctx.redirect(ctx.url); }
-                    const aliasGenerated = ctx.session.report['generated-alias'];
-                    const reportsN = await Report.getBy(ctx.params.database, 'alias', aliasGenerated);
-                    const reportsNexclCurr = reportsN.filter(r => r._d != ctx.session.id); // exclude current report
-                    if (reportsNexclCurr.length > 0) { ctx.flash.alias = `Generated alias not available: please select another`; ctx.redirect(ctx.url); return; }
+                    if (body['generated-alias'] == null) { ctx.flash.error = 'Alias not given'; return ctx.redirect(ctx.url); }
+                    alias = body['generated-alias'];
+                    const reportsN = await Report.getBy(ctx.params.database, 'alias', alias);
+                    const reportsNExclCurr = reportsN.filter(r => r._id != ctx.session.id); // exclude current report
+                    if (reportsNExclCurr.length > 0) { ctx.flash.error = `Generated alias ‘${alias}’ not available: please select another`; return ctx.redirect(ctx.url); }
                     break;
+                default:
+                    ctx.flash.error = 'used-before must be y or n'; return ctx.redirect(ctx.url);
             }
 
-            // set/update alias
-            const alias = page=='+'
-                ? body['generated-alias'] || body['existing-alias']
-                : ctx.session.report['generated-alias'] || ctx.session.report['existing-alias'];
-            await Report.submissionDetails(ctx.params.database, ctx.session.id, { Alias: alias });
-            await Report.submissionAlias(ctx.params.database, ctx.session.id, alias);
+            ctx.session.id = await Report.submissionStart(ctx.params.database, ctx.params.project, alias, ctx.headers['user-agent']);
+            await Report.insertTag(ctx.params.database, ctx.session.id, 'incomplete', null);
+            ctx.session.saved = true;
+            ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
+            debug('submissionStart', ctx.session.id);
         }
-
-        ctx.session.saved = saved; // TODO: this logic really needs cleaning up!
 
         // remember if we're going forward or back, then delete nav from body
         const goNum = body['nav-next'] ? page + 1 : page - 1;
@@ -201,14 +194,8 @@ class Handlers {
             const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
             // const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, d.hour, d.minute);
             const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
-            if (isNaN(date.getTime())) {
-                ctx.flash = { validation: [ 'Invalid date' ] };
-                ctx.redirect(ctx.url); return;
-            }
-            if (date.getTime() > Date.now()) {
-                ctx.flash = { validation: [ 'Date is in the future' ] };
-                ctx.redirect(ctx.url); return;
-            }
+            if (isNaN(date.getTime())) { ctx.flash.validation = [ 'Invalid date' ]; return ctx.redirect(ctx.url); }
+            if (date.getTime() > Date.now()) { ctx.flash.validation = [ 'Date is in the future' ]; return ctx.redirect(ctx.url); }
         }
 
         const prettyReport = prettifyReport(page, body);

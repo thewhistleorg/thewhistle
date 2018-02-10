@@ -82,7 +82,7 @@ class Handlers {
      */
     static async getPage(ctx) {
         debug('getPage', 'p'+ctx.params.num, 'id:'+ctx.session.id);
-        if (!ctx.session.report) { ctx.flash.error = 'Your session has expired'; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
+        if (!ctx.session.report) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
 
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num); // note '+' is allowed in windows filenames, '*' is not
         if (page > ctx.session.completed+1) { ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); return; }
@@ -121,13 +121,13 @@ class Handlers {
      */
     static async postPage(ctx) {
         debug('postPage', 'p'+ctx.params.num, 'id:'+ctx.session.id, Object.keys(ctx.request.body));
-        if (!ctx.session.report) { ctx.flash.error = 'Your session has expired'; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
+        if (!ctx.session.report) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
 
         // page number, or '+' for single-page submission
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num);
 
         // don't allow jumping further forward than 'next' page
-        if (page > ctx.session.completed+1) { ctx.flash.error = 'Cannot jump ahead'; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); }
+        if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); }
 
         const body = ctx.request.body;
 
@@ -145,7 +145,7 @@ class Handlers {
             for (let f=0; f<body.files.length; f++) if (body.files[f].size == 0) body.files.splice(f, 1);
         }
 
-        if (page==1 & ctx.session.saved) { ctx.flash.error = 'Trying to save already saved report!'; return ctx.redirect(ctx.url); }
+        if (page==1 & ctx.session.saved) { ctx.flash = { error: 'Trying to save already saved report!' }; return ctx.redirect(ctx.url); }
 
         if (page==1 || page=='+') { // create the skeleton report (with alias)
             let alias = null;
@@ -156,18 +156,18 @@ class Handlers {
                     alias = body['existing-alias'];
                     const reportsY = await Report.getBy(ctx.params.database, 'alias', alias);
                     const reportsYExclCurr = reportsY.filter(r => r._id != ctx.session.id); // exclude current report
-                    if (reportsYExclCurr.length == 0) { ctx.flash.error = `Anonymous alias ‘${alias}’ not found`; return ctx.redirect(ctx.url); }
+                    if (reportsYExclCurr.length == 0) { ctx.flash = { error: `Anonymous alias ‘${alias}’ not found` }; return ctx.redirect(ctx.url); }
                     break;
                 case 'n':
                     // verify generated alias does not exist
-                    if (body['generated-alias'] == null) { ctx.flash.error = 'Alias not given'; return ctx.redirect(ctx.url); }
+                    if (body['generated-alias'] == null) { ctx.flash = { error: 'Alias not given' }; return ctx.redirect(ctx.url); }
                     alias = body['generated-alias'];
                     const reportsN = await Report.getBy(ctx.params.database, 'alias', alias);
                     const reportsNExclCurr = reportsN.filter(r => r._id != ctx.session.id); // exclude current report
-                    if (reportsNExclCurr.length > 0) { ctx.flash.error = `Generated alias ‘${alias}’ not available: please select another`; return ctx.redirect(ctx.url); }
+                    if (reportsNExclCurr.length > 0) { ctx.flash = { error: `Generated alias ‘${alias}’ not available: please select another` }; return ctx.redirect(ctx.url); }
                     break;
                 default:
-                    ctx.flash.error = 'used-before must be y or n'; return ctx.redirect(ctx.url);
+                    ctx.flash = { error: 'used-before must be y or n' }; return ctx.redirect(ctx.url);
             }
 
             ctx.session.id = await Report.submissionStart(ctx.params.database, ctx.params.project, alias, ctx.headers['user-agent']);
@@ -194,8 +194,8 @@ class Handlers {
             const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
             // const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, d.hour, d.minute);
             const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
-            if (isNaN(date.getTime())) { ctx.flash.validation = [ 'Invalid date' ]; return ctx.redirect(ctx.url); }
-            if (date.getTime() > Date.now()) { ctx.flash.validation = [ 'Date is in the future' ]; return ctx.redirect(ctx.url); }
+            if (isNaN(date.getTime())) { ctx.flash = { validation: [ 'Invalid date' ] }; return ctx.redirect(ctx.url); }
+            if (date.getTime() > Date.now()) { ctx.flash = { validation: [ 'Date is in the future' ] }; return ctx.redirect(ctx.url); }
         }
 
         const prettyReport = prettifyReport(page, body);

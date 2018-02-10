@@ -238,6 +238,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    /*
+    * 'description' page
+    */
+
+    if (document.getElementsByName('description').length > 0) {
+
+        // Make radio buttons act as a toggler
+        var allRadios = document.querySelectorAll('input[name="description"], input[name="survivor-age"]');
+        var booRadio;
+        var x = 0;
+        for(x = 0; x < allRadios.length; x++) {
+            allRadios[x].onclick = function() {
+                if(booRadio == this) {
+                    this.checked = false;
+                    booRadio = null;
+                } else {
+                    booRadio = this;
+                }
+            };
+        }
+
+        // uncheck radio when description box focused
+        document.querySelector('textarea[name="description"]').addEventListener('focus', function() {
+            document.querySelector('input[name="description"]').checked = false;
+        });
+
+        // uncheck radio when survivor-age focused
+        document.querySelector('select[name="survivor-age"]').addEventListener('change', function() {
+            document.querySelector('input[name="survivor-age"]').checked = false;
+        });
+    }
+
 
     /*
      * 'action-taken' page
@@ -246,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (document.querySelector('input[name="action-taken"]')) {
         // defaults for previously answered questions
 
-        var nameActionTaken = document.querySelectorAll('input[name=action-taken]');
+        var nameActionTaken = document.querySelectorAll('input[type=checkbox]');
         for ( var i = 0; i < nameActionTaken.length; i++) {
             var el = nameActionTaken[i];
             if (el.checked) {
@@ -256,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
 
-        var nameActionTaken2 = document.querySelectorAll('input[name=action-taken]');
+        var nameActionTaken2 = document.querySelectorAll('input[type=checkbox]');
         for ( var i = 0; i < nameActionTaken2.length; i++) {
             var el = nameActionTaken2[i];
             el.onclick = function() {
@@ -270,6 +302,38 @@ document.addEventListener('DOMContentLoaded', function() {
                     extra.classList.add('hide');
                 }
             };
+        }
+
+        // uncheck radio when survivor-age focused
+        document.querySelector('#action-taken-skip').addEventListener('change', function() {
+            var checkboxes =   document.querySelectorAll('input[type="checkbox"]');
+
+            // uncheck all checkboxes when skip radio is selected
+            if (this.checked == true) {
+                for( var i = 0; i < checkboxes.length; i++) {
+                    checkboxes[i].checked = false;
+                }
+
+            }
+
+            // uncheck skip radio when any checkbox is checked
+            for ( var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].addEventListener('change', function() {
+                    if (this.checked == true) {
+                        document.querySelector('#action-taken-skip').checked = false;
+                    }
+                });
+            }
+
+        });
+
+        // uncheck skip radio button when extra content are focused or when the input focused
+        var checkboxExtra = document.querySelectorAll('input[type="text"]');
+        for ( var i = 0; i < checkboxExtra.length; i++) {
+            checkboxExtra[i].addEventListener('focus', function() {
+                document.querySelector('#action-taken-skip').checked = false;
+                this.parentElement.firstElementChild.checked = true;
+            });
         }
     }
 

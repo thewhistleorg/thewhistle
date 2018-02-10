@@ -458,7 +458,11 @@ function prettifyReport(page, report) {
                 if (JSON.stringify(rpt['Spoken to anybody?']) == '["null"]') rpt['Spoken to anybody?'] = []; // kludge alert!
                 break;
             case 'description':
-                rpt.Description = report.description;
+                if (Array.isArray(report.description) && report.description[1].toLowerCase() == 'skipped') {
+                    rpt.Description = report.description[1];
+                }else{
+                    rpt.Description = report.description;
+                }
                 break;
             case 'survivor-gender':
                 const gender = {
@@ -470,7 +474,11 @@ function prettifyReport(page, report) {
                 rpt['Survivor gender'] = gender[report['survivor-gender']];
                 break;
             case 'survivor-age':
-                rpt['Survivor age'] = report['survivor-age'];
+                if (Array.isArray(report['survivor-age']) &&  report['survivor-age'][1].toLowerCase() == 'skipped') {
+                    rpt['Survivor age'] = report['survivor-age'][1];
+                }else{
+                    rpt['Survivor age'] = report['survivor-age'];
+                }
                 break;
             case 'extra-notes':
                 rpt['Extra notes'] = report['extra-notes'];

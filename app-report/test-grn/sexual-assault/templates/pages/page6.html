@@ -30,6 +30,7 @@
         <p class="hint-text">{{q.6a}}</p>
 
         <ul>
+          {{#checked description}}
             <li>
                 <label for="description">Description:</label>
                 <textarea class="pure-input-1" name="description" id="description" rows="4" autofocus>{{description}}</textarea>
@@ -50,6 +51,7 @@
                 <input type="radio" name="description" id="description-skip" value="skipped">
                 <label for="description-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
             </li>
+            {{/checked}}
         </ul>
 
         <h1>{{q.6b}}</h1>
@@ -70,6 +72,7 @@
 
         <h3>Age</h3>
         <ul>
+          {{#checked survivor-age}}
             <li>
                 <label for="survivor-age"></label>
                 <select name="survivor-age" id="survivor-age" class="w16">
@@ -87,6 +90,7 @@
                 <input type="radio" name="survivor-age" id="survivor-age-skip" value="skipped">
                 <label for="survivor-age-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
             </li>
+            {{/checked}}
         </ul>
 
         {{> continue}}

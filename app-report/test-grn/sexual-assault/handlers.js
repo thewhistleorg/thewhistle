@@ -31,14 +31,10 @@ class Handlers {
         ctx.session = null;
 
         // initialise session with various defaults
-        ctx.session = {};
 
-        // set up values for date select elements
-        ctx.session.incidentDate = {
-            days:   Array(31).fill(null).map((day, i) => i + 1),
-            months: [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ],
-            years:  Array(60).fill(null).map((year, i) => new Date().getFullYear() - i),
-            hours:  Array(24).fill(null).map((d, i) => i.toString().padStart(2, '0')+':00'),
+        ctx.session = {
+            id:        null, // submitted report id
+            completed: 0,    // number of pages completed; used to prevent users jumping ahead
         };
 
         // default the incident report date to today: this is a natural default, is quite easy to
@@ -46,10 +42,6 @@ class Handlers {
         // actual date, rather than leaving the option blank or selecting a 'within' option
         const today = { day: dateFormat('d'), month: dateFormat('mmm'), year: dateFormat('yyyy') };
         ctx.session.report = { when: 'date', date: today };
-
-        ctx.session.completed = 0; // number of pages completed; used to prevent users jumping ahead
-
-        ctx.session.saved = false;
 
         // record new submission has been started
         if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
@@ -81,20 +73,40 @@ class Handlers {
      */
     static async getPage(ctx) {
         debug('getPage', 'p'+ctx.params.num, 'id:'+ctx.session.id);
-        if (!ctx.session.report) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
+        if (!ctx.session) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
 
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num); // note '+' is allowed in windows filenames, '*' is not
         if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); }
+
+        // fetch already entered information to fill in defaults for this page if it is being revisited
+        const report = await Report.get(ctx.params.database, ctx.session.id);
+
+        // default the incident report date to today: this is a natural default, is quite easy to
+        // change to yesterday, or to any other day; it also maximises the chances of getting an
+        // actual date, rather than leaving the option blank or selecting a 'within' option
+        const today = { day: dateFormat('d'), month: dateFormat('mmm'), year: dateFormat('yyyy') };
+        const defaultIncidentDate = { when: 'date', date: today };
+
+        // default input values from entered information (with today as default for incident date if not entered)
+        const submitted = Object.assign(defaultIncidentDate, report ? report.submittedRaw : {});
 
         // supply any required self/other parameterised questions
         const questions = await Question.get(ctx.params.database, ctx.params.project);
         const q = {};
         questions.forEach(qn => q[qn.questionNo] = ctx.session.report['on-behalf-of']=='someone-else' ? qn.other : qn.self );
 
+        // set up values for date select elements
+        const incidentDate = {
+            days:   Array(31).fill(null).map((day, i) => i + 1),
+            months: [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ],
+            years:  Array(60).fill(null).map((year, i) => new Date().getFullYear() - i),
+            hours:  Array(24).fill(null).map((d, i) => i.toString().padStart(2, '0')+':00'),
+        };
+
         // progress indicator
         const pages = Array(nPages).fill(null).map((p, i) => ({ page: i+1 }));
         if (page != '+') pages[page-1].class = 'current'; // to highlight current page
-        const context = Object.assign({ pages: pages }, ctx.session.report, { incidentDate: ctx.session.incidentDate }, { q: q });
+        const context = Object.assign({ pages: pages }, submitted, { incidentDate: incidentDate }, { q: q });
 
         // users are not allowed to go 'back' to 'used-before' page
         if (page==1 && ctx.session.saved) { ctx.flash = { error: 'Please continue with your current alias' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/2`); }
@@ -147,7 +159,7 @@ class Handlers {
             for (let f=0; f<body.files.length; f++) if (body.files[f].size == 0) body.files.splice(f, 1);
         }
 
-        if (page==1 & ctx.session.saved) { ctx.flash = { error: 'Trying to save already saved report!' }; return ctx.redirect(ctx.url); }
+        if (page==1 & ctx.session.id) { ctx.flash = { error: 'Trying to save already saved report!' }; return ctx.redirect(ctx.url); }
 
         if (page==1 || page=='+') { // create the skeleton report (with alias)
             let alias = null;
@@ -174,7 +186,6 @@ class Handlers {
 
             ctx.session.id = await Report.submissionStart(ctx.params.database, ctx.params.project, alias, ctx.headers['user-agent']);
             // suspend complete/incomplete tags await Report.insertTag(ctx.params.database, ctx.session.id, 'incomplete', null);
-            ctx.session.saved = true;
             ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
             debug('submissionStart', ctx.session.id);
         }
@@ -184,9 +195,6 @@ class Handlers {
         const go = goNum==0 ? '' : goNum>nPages || page=='+' ? 'whatnext' : goNum;
         delete body['nav-prev'];
         delete body['nav-next'];
-
-        // record current body in session (before validation!), in order to show previously entered info
-        ctx.session.report = Object.assign(ctx.session.report, body);
 
         // if date specified, verify it is valid (to back up client-side validation)
         if (body.when == 'date') {
@@ -202,7 +210,7 @@ class Handlers {
 
         const prettyReport = prettifyReport(page, body);
 
-        if (page>1 || page=='+') await Report.submissionDetails(ctx.params.database, ctx.session.id, prettyReport);
+        if (page>1 || page=='+') await Report.submissionDetails(ctx.params.database, ctx.session.id, prettyReport, body);
 
         if (body.files) {
             for (const file of body.files) Report.submissionFile(ctx.params.database, ctx.session.id, file);

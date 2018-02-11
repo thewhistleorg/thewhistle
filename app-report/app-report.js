@@ -174,7 +174,7 @@ app.use(async function ctxAddDomain(ctx, next) {
 
 
 // force use of SSL (redirect http protocol to https)
-// TODO: temporarily suspend app.use(Middleware.ssl({ trustProxy: true }));
+app.use(Middleware.ssl({ trustProxy: true }));
 
 
 // compose appropriate sub-app for required database / project, in order to maximise modularity

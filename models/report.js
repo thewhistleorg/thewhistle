@@ -34,28 +34,29 @@ const schema = {
     type: 'object',
     required: [ '_id', 'project', 'alias', 'submitted', 'location', 'analysis', 'assignedTo', 'status', 'tags', 'comments', 'archived', 'views' ],
     properties: {
-        project:    { type:     'string' },               // name of project report belongs to
-        by:         { bsonType: [ 'objectId', 'null' ] }, // user entering incident report
-        alias:      { type:     [ 'string', 'null' ] },   // auto-generated alias of victim/survivor
-        submitted:  { type:     'object' },               // originally submitted report (flexible format following incident reporting format)
-        files:      { type:     'array',                  // uploaded files
+        project:      { type:     'string' },               // name of project report belongs to
+        by:           { bsonType: [ 'objectId', 'null' ] }, // user entering incident report
+        alias:        { type:     [ 'string', 'null' ] },   // auto-generated alias of victim/survivor
+        submitted:    { type:     'object' },               // originally submitted report (flexible format following incident reporting format)
+        submittedRaw: { type:     'object' },               // originally submitted report - fields as per HTML input field names
+        files:        { type:     'array',                  // uploaded files
             items: { type: 'object' },                    // ... 'formidable' File objects
         },
-        ua:         { type: [ 'objectId', 'null' ] },     // user agent of browser used to report incident
-        location:   { type: 'object',                     // geocoded incident location
+        ua:           { type: [ 'objectId', 'null' ] },     // user agent of browser used to report incident
+        location:     { type: 'object',                     // geocoded incident location
             properties: {
                 address: { type: 'string' },              // ... entered address used for geocoding
                 geocode: { type: [ 'object', 'null' ] },  // ... google geocoding data
                 geojson: { type: [ 'object', 'null' ] },  // ... GeoJSON (with spatial index)
             },
         },
-        analysis:   { type:     [ 'object', 'null' ] },   // exif data, weather, etc
-        assignedTo: { bsonType: [ 'objectId', 'null' ] }, // user report is assigned to
-        status:     { type:     [ 'string', 'null' ] },   // free-text status (to accomodate any workflow)
-        tags:       { type:     'array',                  // tags to classify/group reports
+        analysis:     { type:     [ 'object', 'null' ] },   // exif data, weather, etc
+        assignedTo:   { bsonType: [ 'objectId', 'null' ] }, // user report is assigned to
+        status:       { type:     [ 'string', 'null' ] },   // free-text status (to accomodate any workflow)
+        tags:         { type:     'array',                  // tags to classify/group reports
             items: { type: 'string' },
         },
-        comments:   { type: 'array',                      // notes/commentary documenting management of report
+        comments:     { type: 'array',                      // notes/commentary documenting management of report
             items: { type: 'object',
                 properties: {
                     byId:    { bsonType: 'objectId' },    // ... user making comment
@@ -65,8 +66,8 @@ const schema = {
                 },
             },
         },
-        archived:   { type: 'boolean' },                  // archived flag
-        views:      { type: [ 'object', 'null' ] },       // associative array of timestamps indexed by user id
+        archived:     { type: 'boolean' },                  // archived flag
+        views:        { type: [ 'object', 'null' ] },       // associative array of timestamps indexed by user id
     },
 };
 /* eslint-enable no-unused-vars, key-spacing */
@@ -281,25 +282,26 @@ class Report {
      * @returns {ObjectId} New report id.
      */
     static async submissionStart(db, project, alias, userAgent) {
-        debug('submissionStart', db, project, alias);
+        debug('Report.submissionStart', db, project, alias);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
         if (typeof alias != 'string' || alias.length == 0) throw new Error('Alias must be supplied');
 
         const reports = global.db[db].collection('reports');
 
         const values = {
-            project:    project,
-            submitted:  { Alias: alias },
-            alias:      alias,
-            location:   { address: '', geocode: null, geojson: null },
-            analysis:   {},
-            // summary: null,
-            assignedTo: null,
-            status:     null,
-            tags:       [],
-            comments:   [],
-            views:      {},
-            archived:   false,
+            project:      project,
+            submitted:    { Alias: alias },
+            submittedRaw: {},
+            alias:        alias,
+            location:     { address: '', geocode: null, geojson: null },
+            analysis:     {},
+            // summary:   null,
+            assignedTo:   null,
+            status:       null,
+            tags:         [],
+            comments:     [],
+            views:        {},
+            archived:     false,
         };
 
         // record user agent for potential later analyses
@@ -317,10 +319,11 @@ class Report {
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report Id.
-     * @param {Object}   details TODO
+     * @param {Object}   details - Report details to be added/updated, prettified for attractive display
+     * @param {Object}   detailsRaw- Report details to be added/updated, as per HTML input elements
      */
-    static async submissionDetails(db, id, details) {
-        debug('submissionDetails', db, id, details);
+    static async submissionDetails(db, id, details, detailsRaw) {
+        debug('Report.submissionDetails', db, id, details);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);  // allow id as string
@@ -329,6 +332,10 @@ class Report {
 
         for (const field in details) {
             await reports.updateOne({ _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
+        }
+
+        for (const field in detailsRaw) {
+            await reports.updateOne({ _id: id }, { $set: { [`submittedRaw.${field}`]: detailsRaw[field] } });
         }
 
     }
@@ -342,7 +349,7 @@ class Report {
      * @param {Object}   file TODO
      */
     static async submissionFile(db, id, file) {
-        debug('submissionFile');
+        debug('Report.submissionFile');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id); // allow id as string
@@ -401,7 +408,7 @@ class Report {
      * @throws  Error on validation or referential integrity errors.
      */
     static async insert(db, by, alias, submitted, project, files, userAgent) {
-        debug('insert');
+        debug('Report.insert');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         by = objectId(by); // allow id as string
@@ -488,7 +495,7 @@ class Report {
      * @throws Error on validation or referential integrity errors.
      */
     static async update(db, id, values, userId) {
-        debug('update');
+        debug('Report.update');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -512,7 +519,7 @@ class Report {
      * @throws Error if MongoDB delete fails or remove directory fails.
      */
     static async delete(db, id) {
-        debug('delete');
+        debug('Report.delete');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id); // allow id as string
@@ -598,7 +605,7 @@ class Report {
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async insertTag(db, id, tag, userId) {
-        debug('insertTag', db, id, tag, userId);
+        debug('Report.insertTag', db, id, tag, userId);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -620,7 +627,7 @@ class Report {
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async deleteTag(db, id, tag, userId) {
-        debug('deleteTag', db, id, tag, userId);
+        debug('Report.deleteTag', db, id, tag, userId);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -647,7 +654,7 @@ class Report {
      * @returns {Object} Inserted comment, including byId, byName, on, comment.
      */
     static async insertComment(db, id, comment, userId) {
-        debug('insertComment');
+        debug('Report.insertComment');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -688,7 +695,7 @@ class Report {
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async updateComment(db, id, by, on, comment, userId) {
-        debug('updateComment');
+        debug('Report.updateComment');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);                            // allow id as string
@@ -726,7 +733,7 @@ class Report {
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async deleteComment(db, id, by, on, userId) {
-        debug('deleteComment');
+        debug('Report.deleteComment');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);                            // allow id as string
@@ -750,7 +757,7 @@ class Report {
      * @param {ObjectId} userId - User id.
      */
     static async flagView(db, id, userId) {
-        debug('flagView');
+        debug('Report.flagView');
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string

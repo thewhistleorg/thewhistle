@@ -406,9 +406,8 @@ function prettifyReport(page, report) {
                 const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
                 const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ];
                 var dateVal = null;
-                console.log(d);
                 if (d.day && d.month && d.year) {
-                      dateVal =  new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1] );
+                    dateVal =  new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1] );
                 }
                 switch (report.when) {
                     case 'date':          rpt.Happened = dateVal; break;

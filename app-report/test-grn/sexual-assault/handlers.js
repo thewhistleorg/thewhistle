@@ -405,10 +405,7 @@ function prettifyReport(page, report) {
                 const d = typeof report.date=='object' ? report.date : JSON.parse(report.date);
                 const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
                 const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ];
-                // var dateVal = null;
-                // if (d.day && d.month && d.year) {
                 const dateVal =  new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1] );
-                // }
                 switch (report.when) {
                     case 'date':          rpt.Happened = dateVal; break;
                     case 'within':        rpt.Happened = report['within-options']; break;

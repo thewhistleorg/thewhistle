@@ -143,7 +143,7 @@ app.use(async function ctxAddDomain(ctx, next) {
 
 
 // force use of SSL (redirect http protocol to https)
-// TODO: temporarily suspend app.use(Middleware.ssl({ trustProxy: true }));
+app.use(Middleware.ssl({ trustProxy: true }));
 
 
 // check if user is signed in; leaves id in ctx.status.user.id if JWT verified

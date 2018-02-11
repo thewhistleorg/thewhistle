@@ -25,26 +25,29 @@
                         <tr>
                             <td>
                                 <select name="date.day" id="date.day" class="w4">
-                                    <option value="">&nbsp;</option>
+                                    {{#selected date.day}}
                                     {{#incidentDate.days}}
                                     <option value="{{this}}">{{this}}</option>
                                     {{/incidentDate.days}}
+                                    {{/selected}}
                                 </select>
                             </td>
                             <td>
                                 <select name="date.month" id="date.month" class="w5">
-                                    <option value="">&nbsp;</option>
+                                    {{#selected date.month}}
                                     {{#incidentDate.months}}
                                     <option value="{{this}}">{{this}}</option>
                                     {{/incidentDate.months}}
+                                    {{/selected}}
                                 </select>
                             </td>
                             <td>
                                 <select name="date.year" id="date.year" class="w6">
-                                    <option value="">&nbsp;</option>
+                                    {{#selected date.year}}
                                     {{#incidentDate.years}}
                                     <option value="{{this}}">{{this}}</option>
                                     {{/incidentDate.years}}
+                                    {{/selected}}
                                 </select>
                             </td>
                         </tr>

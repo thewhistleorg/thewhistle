@@ -8,6 +8,7 @@ body {
     font-family: 'Open Sans', 'Segoe UI', Tahoma, sans-serif;
     padding: 0;
     background: #f0f3f4;
+    min-width: 850px; 
     /* background-color: : #ffffff; */
 }
 

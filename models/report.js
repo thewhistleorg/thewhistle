@@ -38,6 +38,7 @@ const schema = {
         by:           { bsonType: [ 'objectId', 'null' ] }, // user entering incident report
         alias:        { type:     [ 'string', 'null' ] },   // auto-generated alias of victim/survivor
         submitted:    { type:     'object' },               // originally submitted report (flexible format following incident reporting format)
+        submittedRaw: { type:     'object' },               // originally submitted report - fields as per HTML input field names
         files:        { type:     'array',                  // uploaded files
             items: { type: 'object' },                    // ... 'formidable' File objects
         },
@@ -290,6 +291,7 @@ class Report {
         const values = {
             project:      project,
             submitted:    { Alias: alias },
+            submittedRaw: {},
             alias:        alias,
             location:     { address: '', geocode: null, geojson: null },
             analysis:     {},
@@ -317,9 +319,10 @@ class Report {
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report Id.
-     * @param {Object}   details TODO
+     * @param {Object}   details - Report details to be added/updated, prettified for attractive display
+     * @param {Object}   detailsRaw- Report details to be added/updated, as per HTML input elements
      */
-    static async submissionDetails(db, id, details) {
+    static async submissionDetails(db, id, details, detailsRaw) {
         debug('Report.submissionDetails', db, id, details);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
@@ -329,6 +332,10 @@ class Report {
 
         for (const field in details) {
             await reports.updateOne({ _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
+        }
+
+        for (const field in detailsRaw) {
+            await reports.updateOne({ _id: id }, { $set: { [`submittedRaw.${field}`]: detailsRaw[field] } });
         }
 
     }

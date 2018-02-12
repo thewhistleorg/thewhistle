@@ -20,10 +20,9 @@
             <li>
                 <input type="radio" name="used-before" id="used-before-n" value="n" checked>
                 <label for="used-before-n" class="pure-radio greyed-out-unless-checked">No</label>
-                <br>
-                <p>We make sure that your report is anonymous by creating a random identification alias.</p>
-                <p>If you want to follow up, use the anonymous alias below so we can access any relevant information.</p>
                 <div id="use-generated">
+                    <p>We make sure that your report is anonymous by creating a random identification alias.</p>
+                    <p>If you want to follow up, use the anonymous alias below so we can access any relevant information.</p>
                     <p>This report will use <b><output name="generated-alias">{{generated-alias}}</output></b>
                         <input type="hidden" name="generated-alias" value="{{generated-alias}}"></p>
                     <button type="button" id="get-alt-alias" class="inline-link">Generate another random alias</button>
@@ -134,6 +133,10 @@
                 <input type="radio" name="when" id="when-dont-remember" value="dont-remember">
                 <label for="when-dont-remember">I do not remember</label>
             </li>
+            <li>
+                <input type="radio" name="when" id="when-skip" value="skip">
+                <label for="when-skip">Skip</label>
+            </li>
             {{/checked}}
         </ul>
 
@@ -149,6 +152,11 @@
                 <input type="radio" name="still-happening" id="still-n" value="n"
                        class="radio-margin">
                 <label for="still-n">No</label>
+            </li>
+            <li>
+                <input type="radio" name="still-happening" id="still-skip" value="skip"
+                       class="radio-margin">
+                <label for="still-skip">Skip</label>
             </li>
             {{/checked}}
         </ul>
@@ -167,11 +175,15 @@
                 <input type="radio" name="where" id="where-at" value="at"> <label for="where-at">Location</label>
                 <p class="hint-text">Please provide as much detail as you are able – this could be
                     an address, restaurant name, or neighborhood or sights and landmarks you recall.</p>
-                <textarea rows="4" name="at-address" id="at-address" value="{{at-address}}" class="w100pc"></textarea>
+                <textarea rows="4" name="at-address" id="at-address" class="w100pc">{{at-address}}</textarea>
             </li>
             <li>
                 <input type="radio" name="where" id="where-dont-know" value="dont-know">
                 <label for="where-dont-know">I don’t know</label>
+            </li>
+            <li>
+                <input type="radio" name="where" id="where-skip" value="skip">
+                <label for="where-skip">Skip</label>
             </li>
             {{/checked}}
         </ul>
@@ -194,7 +206,7 @@
                             include how you know them (for example, it could be a relative, colleague,
                             or acquaintance.</p>
                     </label>
-                    <textarea type="text" rows="4" class="w100pc" name="who-relationship" id="who-relationship" value="{{who-relationship}}" class="w100pc"></textarea>
+                    <textarea name="who-relationship" id="who-relationship" rows="4" class="w100pc">{{who-relationship}}</textarea>
                 </div>
             </li>
             <li>
@@ -204,6 +216,10 @@
                     <p class="hint-text">Please give us as much description as you are able.</p>
                     <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
                 </div>
+            </li>
+            <li>
+                <input type="radio" name="who" id="who-skip" value="skip">
+                <label for="who-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
             </li>
             {{/checked}}
         </ul>
@@ -239,6 +255,7 @@
         <p class="hint-text">{{q.6a}}</p>
 
         <ul>
+            {{#checked description}}
             <li>
                 <label for="description">Description:</label>
                 <textarea class="pure-input-1" name="description" id="description" rows="4">{{description}}</textarea>
@@ -255,7 +272,11 @@
                 </label>
                 <input type="file" name="documents" value="0" id="document0" class="upload-file">
             </li>
-
+            <li>
+                <input type="radio" name="description" id="description-skip" value="skipped">
+                <label for="description-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
+            </li>
+            {{/checked}}
         </ul>
 
         <h1>{{q.6b}}</h1>
@@ -267,6 +288,9 @@
             </li>
             <li>
                 <input type="radio" name="survivor-gender" id="survivor-gender-f" value="f"> <label for="survivor-gender-f">Female</label>
+            </li>
+            <li>
+                <input type="radio" name="survivor-gender" id="survivor-gender-skip" value="skip"> <label for="survivor-gender-skip">Skip</label>
             </li>
             {{/checked}}
         </ul>
@@ -286,6 +310,10 @@
                     {{/selected}}
                 </select>
             </li>
+            <li>
+                <input type="radio" name="survivor-age" id="survivor-age-skip" value="skipped">
+                <label for="survivor-age-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
+            </li>
         </ul>
     </div>
 
@@ -294,7 +322,9 @@
     <div>
         <h1>{{q.7a}}</h1>
 
-        <p class="hint-text">Pick all options that apply.</p>
+        <p class="hint-text">Pick all options that apply. For each, please provide any additional
+            information you are able in the text fields (for example, whether any actions taken as a
+            result of your conversation).</p>
 
         <ul id="action-taken">
             {{#checked action-taken}}
@@ -322,6 +352,10 @@
                 <input type="checkbox" name="action-taken" id="action-taken-others" value="others">
                 <label for="action-taken-others">Others</label>
                 <input type="text" name="action-taken-others-details" id="action-taken-others-details" value="{{action-taken-others-details}}" class="details hide w16">
+            </li>
+            <li>
+                <input type="radio" name="action-taken" id="action-taken-skip" value="skip">
+                <label for="action-taken-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
             </li>
             {{/checked}}
         </ul>

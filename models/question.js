@@ -67,7 +67,7 @@ class Question {
 
         const qns = await questions.find({ project: project }).toArray();
 
-        return qns.sort((a, b) => a.questionNo < b.questionNo ? -1 : 1 );
+        return qns.sort((a, b) => a.questionNo < b.questionNo ? -1 : 1);
     }
 
 

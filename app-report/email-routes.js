@@ -2,6 +2,8 @@
 /* Routes for e-mail verification test                                             C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+/* eslint space-in-parens: off */
+
 import Router from 'koa-router'; // router middleware for koa
 const router = new Router();
 

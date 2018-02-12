@@ -14,7 +14,7 @@
     "test-intgn": "mocha --exit -r @std/esm test/integration/*.js",
     "test-frontend": "node -r @std/esm app.js & pid=$!; npx cypress run --browser chrome; kill -9 $pid; rm -r ./cypress",
     "test-smoke": "mocha --exit -r @std/esm test/staging-smoke-tests.js",
-    "lint": "npm run lint-node && npm run lint-browser",
+    "lint": "npm run lint-node; npm run lint-browser",
     "lint-node": "eslint --env node --ignore-pattern public --ignore-pattern /cypress .",
     "lint-browser": "eslint --env browser public/",
     "stylelint": "stylelint public/css/*.css",
@@ -115,6 +115,7 @@
       "curly": [ "error", "multi-line" ],
       "indent": [ "error", 4, { "SwitchCase": 1 } ],
       "key-spacing": [ "error", { "align": "value" } ],
+      "keyword-spacing": [ "error" ],
       "no-case-declarations": "off",
       "no-console": [ "warn", { "allow": [ "error", "info" ] } ],
       "no-redeclare": "warn",
@@ -127,6 +128,7 @@
       "require-await": "error",
       "semi": [ "error", "always" ],
       "space-before-blocks": [ "error", "always" ],
+      "space-in-parens": [ "error" ],
       "strict": [ "error", "global" ]
     }
   },

@@ -4,8 +4,9 @@
 
 /* eslint no-shadow:off */
 
-import chai from 'chai';            // BDD/TDD assertion library
-import dateFormat from'dateformat'; // Steven Levithan's dateFormat()
+import chai       from 'chai';       // BDD/TDD assertion library
+import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+
 const expect = chai.expect;
 
 import validationErrors from '../../lib/validation-errors.js';

@@ -8,8 +8,8 @@ const router = new Router();
 import webhooks from './post-event-webhooks.js';
 
 
-router.post(  '/messages',                  webhooks.postMessages);       // record received SMS message
-router.post(  '/fail',                      webhooks.postFail);           // record failure notification
+router.post('/messages',                  webhooks.postMessages);       // record received SMS message
+router.post('/fail',                      webhooks.postFail);           // record failure notification
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

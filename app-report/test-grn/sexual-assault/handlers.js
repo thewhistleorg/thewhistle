@@ -93,7 +93,7 @@ class Handlers {
         // supply any required self/other parameterised questions
         const questions = await Question.get(ctx.params.database, ctx.params.project);
         const q = {};
-        questions.forEach(qn => q[qn.questionNo] = ctx.session.report['on-behalf-of']=='someone-else' ? qn.other : qn.self );
+        questions.forEach(qn => q[qn.questionNo] = ctx.session.report['on-behalf-of']=='someone-else' ? qn.other : qn.self);
 
         // set up values for date select elements
         const incidentDate = {
@@ -404,7 +404,7 @@ function prettifyReport(page, report) {
                 const d = typeof report.date=='object' ? report.date : JSON.parse(report.date);
                 const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
                 const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ];
-                const dateVal =  new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1] );
+                const dateVal =  new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
                 switch (report.when) {
                     case 'date':          rpt.Happened = dateVal; break;
                     case 'within':        rpt.Happened = report['within-options']; break;
@@ -458,7 +458,7 @@ function prettifyReport(page, report) {
             case 'description':
                 if (Array.isArray(report.description) && report.description[1].toLowerCase() == 'skipped') {
                     rpt.Description = report.description[1];
-                }else{
+                } else {
                     rpt.Description = report.description;
                 }
                 break;
@@ -474,7 +474,7 @@ function prettifyReport(page, report) {
             case 'survivor-age':
                 if (Array.isArray(report['survivor-age']) &&  report['survivor-age'][1].toLowerCase() == 'skipped') {
                     rpt['Survivor age'] = report['survivor-age'][1];
-                }else{
+                } else {
                     rpt['Survivor age'] = report['survivor-age'];
                 }
                 break;

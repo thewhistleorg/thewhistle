@@ -239,7 +239,7 @@ describe(`Report model (${db})`, function() {
         });
         it('throws on unknown db', function() {
             Report.deleteComment(db, reportId, userId, 'bad date', userId).catch(error => expect(error).to.be.an('error'));
-        } );
+        });
 
     });
 

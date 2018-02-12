@@ -151,7 +151,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             const responseGet = await appReport.get('/test-grn/sexual-assault/2');
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
-            expect( [ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
+            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[1].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(2);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');

@@ -2,6 +2,8 @@
 /* Routes: scr (survivor-centred response).                                        C.Veness 2017  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+/* eslint space-in-parens: off */
+
 import Router from 'koa-router'; // router middleware for koa
 const router = new Router();
 

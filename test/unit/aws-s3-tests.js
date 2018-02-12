@@ -7,7 +7,7 @@ import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 const expect   = chai.expect;
 
 
-import AwsS3 from'../../lib/aws-s3.js';
+import AwsS3 from '../../lib/aws-s3.js';
 
 const test = it; // just an alias
 

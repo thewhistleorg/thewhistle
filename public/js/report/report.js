@@ -14,10 +14,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var prevButton = document.querySelector('button.prev');
     if (prevButton) {
         prevButton.onclick = function () {
-           var fields = document.querySelectorAll('input,textarea');
-           for(var i = 0; i < fields.length; i++) {
-              fields[i].required = false;
-           }
+            var fields = document.querySelectorAll('input,textarea');
+            for (var i = 0; i < fields.length; i++) {
+                fields[i].required = false;
+            }
             // document.querySelectorAll('input,textarea').forEach(function(i) { i.required = false; });
         };
     }
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // set focus to hour/day field if any 'when' radio button clicked
         var fields = document.querySelectorAll('input[name=when]');
-        for(var i = 0; i < fields.length; i++) {
+        for (var i = 0; i < fields.length; i++) {
             var input = fields[i];
             input.addEventListener('change', function() {
                 switch (this.value) {
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // check when-today if any today fields receive focus
         var nameToday = document.querySelectorAll('input[name^=today]');
-        for ( var i = 0; i < nameToday.length; i++) {
+        for (var i=0; i<nameToday.length; i++) {
             nameToday[i].onfocus = function() {
                 document.querySelector('#when-today').checked = true;
             };
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // check when-yesterday if any yesterday fields receive focus
         var nameYesterday = document.querySelectorAll('input[name^=yesterday]');
-        for ( var i = 0; i < nameYesterday.length; i++) {
+        for (var i=0; i<nameYesterday.length; i++) {
             nameYesterday[i].onfocus = function() {
                 document.querySelector('#when-yesterday').checked = true;
             };
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // check when-date if any date fields receive focus
         var nameDate = document.querySelectorAll('input[name^=date], select[name^=date]');
-        for ( var i = 0; i < nameDate.length; i++) {
+        for (var i=0; i<nameDate.length; i++) {
             nameDate[i].onfocus = function() {
                 document.querySelector('#when-date').checked = true;
             };
@@ -121,13 +121,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // on/within validation
         var nameWhen = document.querySelectorAll('input[name=when]');
-        for ( var i = 0; i < nameWhen.length; i++) {
+        for (var i=0; i<nameWhen.length; i++) {
             var input = nameWhen[i];
             input.addEventListener('change', function() {
                 if (this.setCustomValidity == undefined) return;
                 document.querySelector('#within-options').required = false;
                 var nameDate = document.querySelectorAll('input[name^=date]');
-                for ( var i = 0; i < nameDate.length; i++) {
+                for (var i=0; i<nameDate.length; i++) {
                     var el = nameDate[i];
                     el.required = false;
                 }
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // don't tab out of empty date field (in case tab typed after auto-advance)
         var nameDate = document.querySelectorAll('input[name^=date]');
-        for ( var i = 0; i < nameDate.length; i++) {
+        for (var i=0; i<nameDate.length; i++) {
             input = nameDate[i];
             // if (input.name=='date.hour' || input.name=='date.minute') return; // hour/min can be left blank
             if (input.name=='date.time') return; // hour/min can be left blank
@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // show/hide at-address according to selected option
         var nameWhere = document.querySelectorAll('input[name=where]');
-        for ( var i = 0; i < nameWhere.length; i++) {
+        for (var i=0; i<nameWhere.length; i++) {
             var input = nameWhere[i];
             input.onclick = function() {
                 if (input.value == 'at') {
@@ -193,9 +193,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // defaults for previously answered questions
         var nameWhere = document.querySelectorAll('input[name=where]');
-        for ( var i = 0; i < nameWhere.length; i++) {
-          var input = nameWhere[i];
-          if (input.checked) input.onclick();
+        for (var i=0; i<nameWhere.length; i++) {
+            var input = nameWhere[i];
+            if (input.checked) input.onclick();
         }
 
         // check #where-at if at-address receives focus
@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (document.querySelector('input[name=who]')) {
         // display/hide supplementary information fields on radio-box selection
         var nameWho1 = document.querySelectorAll('input[name=who]');
-        for ( var i = 0; i < nameWho1.length; i++) {
+        for (var i=0; i<nameWho1.length; i++) {
             var input = nameWho1[i];
             input.onclick = function() {
                 if (this.value == 'y') {
@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // defaults for previously answered questions
         var nameWho2 = document.querySelectorAll('input[name=who]');
-        for ( var i = 0; i < nameWho2.length; i++) {
+        for (var i=0; i<nameWho2.length; i++) {
             var input = nameWho2[i];
             if (input.checked) input.onclick();
         }
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var allRadios = document.querySelectorAll('input[name="description"], input[name="survivor-age"]');
         var booRadio;
         var x = 0;
-        for(x = 0; x < allRadios.length; x++) {
+        for (x = 0; x < allRadios.length; x++) {
             allRadios[x].onclick = function() {
                 if(booRadio == this) {
                     this.checked = false;
@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // defaults for previously answered questions
 
         var nameActionTaken = document.querySelectorAll('input[type=checkbox]');
-        for ( var i = 0; i < nameActionTaken.length; i++) {
+        for (var i=0; i<nameActionTaken.length; i++) {
             var el = nameActionTaken[i];
             if (el.checked) {
                 var extra = el.parentElement.querySelector('input[type=text]');
@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
         var nameActionTaken2 = document.querySelectorAll('input[type=checkbox]');
-        for ( var i = 0; i < nameActionTaken2.length; i++) {
+        for (var i=0; i<nameActionTaken2.length; i++) {
             var el = nameActionTaken2[i];
             el.onclick = function() {
                 var extra = this.parentElement.querySelector('input[type=text]');
@@ -310,14 +310,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // uncheck all checkboxes when skip radio is selected
             if (this.checked == true) {
-                for( var i = 0; i < checkboxes.length; i++) {
+                for (var i=0; i<checkboxes.length; i++) {
                     checkboxes[i].checked = false;
                 }
 
             }
 
             // uncheck skip radio when any checkbox is checked
-            for ( var i = 0; i < checkboxes.length; i++) {
+            for (var i=0; i<checkboxes.length; i++) {
                 checkboxes[i].addEventListener('change', function() {
                     if (this.checked == true) {
                         document.querySelector('#action-taken-skip').checked = false;
@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // uncheck skip radio button when extra content are focused or when the input focused
         var checkboxExtra = document.querySelectorAll('input[type="text"]');
-        for ( var i = 0; i < checkboxExtra.length; i++) {
+        for (var i=0; i<checkboxExtra.length; i++) {
             checkboxExtra[i].addEventListener('focus', function() {
                 document.querySelector('#action-taken-skip').checked = false;
                 this.parentElement.firstElementChild.checked = true;

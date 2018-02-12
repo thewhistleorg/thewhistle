@@ -7,7 +7,7 @@ import dotenv from 'dotenv'; // load environment variables from a .env file into
 const expect = chai.expect;
 dotenv.config();
 
-import Geocoder from'../../lib/geocode.js';
+import Geocoder from '../../lib/geocode.js';
 
 import './before.js'; // set up database connections
 

@@ -2,6 +2,8 @@
 /* Routes for main app (reports, messages, user-agents, notes).               C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+/* eslint space-in-parens: off */
+
 import Router from 'koa-router'; // router middleware for koa
 import send   from 'koa-send';   // static file serving
 const router = new Router();

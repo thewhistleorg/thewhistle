@@ -81,11 +81,10 @@ class Handlers {
         // fetch already entered information to fill in defaults for this page if it is being revisited
         const report = await Report.get(ctx.params.database, ctx.session.id);
 
-        // default the incident report date to today: this is a natural default, is quite easy to
-        // change to yesterday, or to any other day; it also maximises the chances of getting an
-        // actual date, rather than leaving the option blank or selecting a 'within' option
+        // default the incident report date to today if 'exactly when it happened' is selected: this
+        // is a natural default, is quite easy to change to yesterday, or to any other day
         const today = { day: dateFormat('d'), month: dateFormat('mmm'), year: dateFormat('yyyy') };
-        const defaultIncidentDate = { when: 'date', date: today };
+        const defaultIncidentDate = { date: today };
 
         // default input values from entered information (with today as default for incident date if not entered)
         const submitted = Object.assign(defaultIncidentDate, report ? report.submittedRaw : {});

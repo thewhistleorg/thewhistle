@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
         var fields = document.querySelectorAll('input[name=when]');
         for(var i = 0; i < fields.length; i++) {
             var input = fields[i];
-            input.checked = false;
             input.addEventListener('change', function() {
                 switch (this.value) {
                     case 'date':

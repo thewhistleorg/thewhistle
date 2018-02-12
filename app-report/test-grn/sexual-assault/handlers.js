@@ -61,6 +61,8 @@ class Handlers {
     /**
      * Render report page.
      *
+     * For single-page report, ctx.params.num is '*', which gets  translated to page '+'.
+     *
      * TODO: uploaded files requires more work: when returning to page, already uploaded files should
      *   be displayed (thumbnails), and when using the 'back' button, the 'choose file' should be
      *   reset, not left with the previous uploaded file.
@@ -108,16 +110,6 @@ class Handlers {
         if (page==1 && ctx.session.saved) { ctx.flash = { error: 'Please continue with your current alias' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/2`); }
 
         await ctx.render('page'+page, context);
-    }
-
-
-    /**
-     *
-     */
-    static async getPageSingle(ctx) {
-        ctx.params.num = '*';
-
-        await Handlers.getPage(ctx);
     }
 
 
@@ -220,15 +212,6 @@ class Handlers {
         }
 
         ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${go}`);
-    }
-
-
-    /**
-     *
-     */
-    static async postPageSingle(ctx) {
-        ctx.params.num = '*';
-        await Handlers.postPage(ctx);
     }
 
 

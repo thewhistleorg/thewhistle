@@ -10,14 +10,12 @@ const router = new Router();
 import handlers from './handlers.js';
 
 
-router.get( '/:database/:project',            handlers.getIndex);
-router.post('/:database/:project',            handlers.postIndex);
-router.get( '/:database/:project/:num(\\d+)', handlers.getPage);
-router.post('/:database/:project/:num(\\d+)', handlers.postPage);
-router.get( '/:database/:project/\\*',        handlers.getPageSingle);
-router.post('/:database/:project/\\*',        handlers.postPageSingle);
-router.get( '/:database/:project/whatnext',   handlers.getWhatnext);
-router.post('/:database/:project/whatnext',   handlers.postWhatnext);
+router.get( '/:database/:project',                handlers.getIndex);
+router.post('/:database/:project',                handlers.postIndex);
+router.get( '/:database/:project/:num(\\d+|\\*)', handlers.getPage);
+router.post('/:database/:project/:num(\\d+|\\*)', handlers.postPage);
+router.get( '/:database/:project/whatnext',       handlers.getWhatnext);
+router.post('/:database/:project/whatnext',       handlers.postWhatnext);
 
 
 // JUST FOR TESTING: supertest doesn't appear to manage to pass koa:jwt cookie between apps on

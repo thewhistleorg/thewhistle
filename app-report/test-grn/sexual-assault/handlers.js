@@ -88,6 +88,10 @@ class Handlers {
         // default input values from entered information (with today as default for incident date if not entered)
         const submitted = Object.assign(defaultIncidentDate, { alias: alias }, report ? report.submittedRaw : {});
 
+        // if e.g. 'anonymous alias not found' is thrown on single-page report, there is no
+        // submitted report to get values from, so assign values from flash.formdata
+        Object.assign(submitted, ctx.flash.formdata);
+
         // supply any required self/other parameterised questions
         const questions = await Question.get(ctx.params.database, ctx.params.project);
         const q = {};
@@ -155,7 +159,9 @@ class Handlers {
                     alias = body['existing-alias'];
                     const reportsY = await Report.getBy(ctx.params.database, 'alias', alias);
                     const reportsYExclCurr = reportsY.filter(r => r._id != ctx.session.id); // exclude current report
-                    if (reportsYExclCurr.length == 0) { ctx.flash = { error: `Anonymous alias ‘${alias}’ not found` }; return ctx.redirect(ctx.url); }
+                    const errorY = `Anonymous alias ‘${alias}’ not found`;
+                    const flashY = Object.assign({ error: errorY }, { formdata: body }); // include formdata for single-page report
+                    if (reportsYExclCurr.length == 0) { ctx.flash = flashY; return ctx.redirect(ctx.url); }
                     break;
                 case 'n':
                     // verify generated alias does not exist
@@ -163,7 +169,9 @@ class Handlers {
                     alias = body['generated-alias'];
                     const reportsN = await Report.getBy(ctx.params.database, 'alias', alias);
                     const reportsNExclCurr = reportsN.filter(r => r._id != ctx.session.id); // exclude current report
-                    if (reportsNExclCurr.length > 0) { ctx.flash = { error: `Generated alias ‘${alias}’ not available: please select another` }; return ctx.redirect(ctx.url); }
+                    const errorN = `Generated alias ‘${alias}’ not available: please select another`;
+                    const flashN = Object.assign({ error: errorN }, { formdata: body }); // include formdata for single-page report
+                    if (reportsNExclCurr.length > 0) { ctx.flash = flashN; return ctx.redirect(ctx.url); }
                     break;
                 default:
                     ctx.flash = { error: 'used-before must be y or n' }; return ctx.redirect(ctx.url);
@@ -189,7 +197,7 @@ class Handlers {
             const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
             // const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, d.hour, d.minute);
             const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
-            if (isNaN(date.getTime())) { ctx.flash = { validation: [ 'Invalid date' ] }; return ctx.redirect(ctx.url); }
+            if (isNaN(date.getTime())) { ctx.flash = { validation: [ 'Invalid date' ] }; return ctx.redirect(ctx.url); } // TODO: formdata
             if (date.getTime() > Date.now()) { ctx.flash = { validation: [ 'Date is in the future' ] }; return ctx.redirect(ctx.url); }
         }
 

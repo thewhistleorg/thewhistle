@@ -37,12 +37,6 @@ class Handlers {
             completed: 0,    // number of pages completed; used to prevent users jumping ahead
         };
 
-        // default the incident report date to today: this is a natural default, is quite easy to
-        // change to yesterday, or to any other day; it also maximises the chances of getting an
-        // actual date, rather than leaving the option blank or selecting a 'within' option
-        const today = { day: dateFormat('d'), month: dateFormat('mmm'), year: dateFormat('yyyy') };
-        ctx.session.report = { when: 'date', date: today };
-
         // record new submission has been started
         if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
             ctx.session.submissionId = await Submission.insert(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
@@ -95,7 +89,7 @@ class Handlers {
         // supply any required self/other parameterised questions
         const questions = await Question.get(ctx.params.database, ctx.params.project);
         const q = {};
-        questions.forEach(qn => q[qn.questionNo] = ctx.session.report['on-behalf-of']=='someone-else' ? qn.other : qn.self);
+        questions.forEach(qn => q[qn.questionNo] = submitted['on-behalf-of']=='someone-else' ? qn.other : qn.self);
 
         // set up values for date select elements
         const incidentDate = {
@@ -121,9 +115,6 @@ class Handlers {
      *
      */
     static async getPageSingle(ctx) {
-        const today = { day: dateFormat('d'), month: dateFormat('mmm'), year: dateFormat('yyyy') };
-        ctx.session.report = { when: 'date', date: today };
-
         ctx.params.num = '*';
 
         await Handlers.getPage(ctx);
@@ -137,7 +128,7 @@ class Handlers {
      */
     static async postPage(ctx) {
         debug('postPage', 'p'+ctx.params.num, 'id:'+ctx.session.id, Object.keys(ctx.request.body));
-        if (!ctx.session.report) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
+        if (!ctx.session) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
 
         // page number, or '+' for single-page submission
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num);
@@ -250,7 +241,7 @@ class Handlers {
      * Shows local resources grouped by services they offer.
      */
     static async getWhatnext(ctx) {
-        if (ctx.session.report) {
+        if (ctx.session) {
             // tag report as complete
             // suspend complete/incomplete tags await Report.deleteTag(ctx.params.database, ctx.session.id, 'incomplete', null);
             // suspend complete/incomplete tags await Report.insertTag(ctx.params.database, ctx.session.id, 'complete', null);

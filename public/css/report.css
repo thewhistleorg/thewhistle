@@ -40,6 +40,13 @@ button.inline-link {
   color: #767676;
 }
 
+.not-working { /* 'form not working' link */
+  color: #767676;
+  font-size: 13px;
+  margin-top: 2.4em;
+  text-align: center;
+}
+
 .greyed, .greyed button.inline-link {
   color: #888888;
 }

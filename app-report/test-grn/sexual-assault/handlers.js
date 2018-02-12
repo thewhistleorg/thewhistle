@@ -401,7 +401,6 @@ function prettifyReport(page, report) {
                 break;
             case 'date': // may be date object or string
                 // (note for some reason test suite leaves date as a string)
-
                 const d = typeof report.date=='object' ? report.date : JSON.parse(report.date);
                 const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
                 const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ];

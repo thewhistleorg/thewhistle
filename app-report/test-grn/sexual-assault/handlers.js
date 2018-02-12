@@ -86,8 +86,9 @@ class Handlers {
         const today = { day: dateFormat('d'), month: dateFormat('mmm'), year: dateFormat('yyyy') };
         const defaultIncidentDate = { date: today };
 
-        // default input values from entered information (with today as default for incident date if not entered)
-        const submitted = Object.assign(defaultIncidentDate, report ? report.submittedRaw : {});
+        // default input values from entered information (with today as default for incident date if
+        // not entered), including alias for alias confirmation message
+        const submitted = Object.assign(defaultIncidentDate, { alias: report.alias }, report ? report.submittedRaw : {});
 
         // supply any required self/other parameterised questions
         const questions = await Question.get(ctx.params.database, ctx.params.project);

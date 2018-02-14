@@ -249,7 +249,7 @@ class Handlers {
         const context = { address: ctx.query.address };
 
         // if we have a geocode result on the incident location, list local resources
-        const geocoded = ctx.query.address ? await Geocoder.geocode(ctx.query.address) : null;
+        const geocoded = ctx.query.address ? await Geocoder.geocode(ctx.query.address, 'ng') : null;
 
         if (geocoded) {
             // get all resources within 20km of geocoded location

@@ -59,7 +59,7 @@ handler.getAlias = async function(ctx) {
  * Mirrors similar function in admin app.
  */
 handler.geocode = async function(ctx) {
-    const corsAllow = [ 'http://rapeisacrime.org', 'http://www.rapeisacrime.org', 'http://www.movable-type.co.uk' ];
+    const corsAllow = [ 'http://rapeisacrime.org', 'http://www.rapeisacrime.org', 'http://www.movable-type.co.uk', 'http://mtl.local' ];
     const region = ctx.query.region ? ctx.query.region : await Ip.getCountry(ctx.ip);
     const geocoded = await Geocoder.geocode(ctx.query.address, region);
 

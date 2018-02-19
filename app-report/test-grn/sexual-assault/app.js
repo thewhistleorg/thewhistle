@@ -22,7 +22,8 @@ const app = new Koa(); // report app
 app.use(ReportMiddleware.mongoConnect()); // get db connection to ctx.params.database if not already available
 
 // handlebars templating (templates specific to this database/project)
-const handlebarsRoot = path.dirname(import.meta.url.replace(/.+\/app\//, '')); // get org/project from import.meta.url
+const handlebarsRoot = './'+path.dirname(import.meta.url.replace(/.+\/app\//, '')); // get org/project from import.meta.url
+console.log('CI handlebarsRoot', handlebarsRoot)
 app.use(handlebars({
     extension:     [ 'html' ],
     root:          handlebarsRoot,

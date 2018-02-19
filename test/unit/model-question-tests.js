@@ -17,6 +17,7 @@ const db = 'test-cam';
 import './before.js'; // set up database connections
 
 describe(`Question model (${db})`, function() {
+    this.slow(100);
 
     let questionId = null;
 

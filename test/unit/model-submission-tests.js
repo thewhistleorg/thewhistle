@@ -18,6 +18,7 @@ import './before.js'; // set up database connections
 
 describe(`Submission model (${db})`, function() {
     this.timeout(2e3); // 2 sec
+    this.slow(100);
 
     let submissionId = null;
 

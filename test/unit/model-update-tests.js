@@ -4,8 +4,9 @@
 /* Note these tests do not mock out database components, but operate on the live 'test-cam' db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import chai from 'chai'; // BDD/TDD assertion library
+import chai   from 'chai';   // BDD/TDD assertion library
 import dotenv from 'dotenv'; // load environment variables from a .env file into process.env
+
 const expect = chai.expect;
 
 dotenv.config();
@@ -22,6 +23,7 @@ import './before.js';
 
 describe(`Update model (${db})`, function() {
     this.timeout(5e3); // 5 sec
+    this.slow(100);
 
     let updateId = null;
     let reportId = null;

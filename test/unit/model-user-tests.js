@@ -16,6 +16,7 @@ import './before.js'; // set up database connections
 
 describe('User model', function() {
     this.timeout(5e3); // 5 sec
+    this.slow(100);
 
     let userId = null;
 

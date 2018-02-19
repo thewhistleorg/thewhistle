@@ -21,6 +21,7 @@ const appReport = supertest.agent(app.listen()).host('report.localhost');
 
 describe(`Report app (test-grn/${app.env})`, function() {
     this.timeout(10e3); // 10 sec
+    this.slow(250);
 
     let reportId = null;
 

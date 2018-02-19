@@ -32,6 +32,7 @@ const appReport = supertest.agent(app.listen()).host('report.localhost');
 
 describe(`Admin app (test-grn/${app.env})`, function() {
     this.timeout(20e3); // 10 sec
+    this.slow(250);
 
     before(async function() {
         // check testuser 'tester' exists and has access to test-grn (only)

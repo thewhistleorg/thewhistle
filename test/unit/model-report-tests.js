@@ -21,6 +21,7 @@ const db = 'test-cam';
 
 describe(`Report model (${db})`, function() {
     this.timeout(5e3); // 5 sec
+    this.slow(100);
 
     let reportId = null;
     let userId = null;

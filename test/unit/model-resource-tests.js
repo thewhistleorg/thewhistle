@@ -18,6 +18,7 @@ import './before.js'; // set up database connections
 
 describe(`Resource model (${db})`, function() {
     this.timeout(5e3); // 5 sec
+    this.slow(100);
 
     let resourceId = null;
 

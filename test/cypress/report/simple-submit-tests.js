@@ -51,7 +51,7 @@ describe('Submit test-grn/sexual-assault incident report', function () {
         cy.url().should('include', '/test-grn/sexual-assault/6'); // description
         cy.get('textarea[name=description]').type('Cypress test '+date);
         cy.get('label').contains('Female').click();
-        cy.get('select').select('18–22');
+        cy.get('select').select('20–24');
         cy.contains('Submit and continue').click();
 
         cy.url().should('include', '/test-grn/sexual-assault/7'); // action-taken

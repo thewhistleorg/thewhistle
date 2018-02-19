@@ -30,10 +30,10 @@
         <p class="hint-text">{{q.6a}}</p>
 
         <ul>
-          {{#checked description}}
+            {{#checked description}}
             <li>
                 <label for="description">Description:</label>
-                <textarea class="pure-input-1" name="description" id="description" rows="4" autofocus>{{description}}</textarea>
+                <textarea name="description" id="description" rows="4" autofocus class="pure-input-1">{{description}}</textarea>
             </li>
             <li>
                 <label for="document0">
@@ -45,10 +45,10 @@
                         if you wish to submit them</span>
                     {{/if}}
                 </label>
-                <input type="file" name="documents" value="0" id="document0" class="upload-file">
+                <input type="file" name="documents" id="document0" value="0" class="upload-file">
             </li>
             <li>
-                <input type="radio" name="description" id="description-skip" value="skipped">
+                <input type="radio" name="description" id="description-skip" value="skip">
                 <label for="description-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
             </li>
             {{/checked}}
@@ -72,7 +72,7 @@
 
         <h3>Age</h3>
         <ul>
-          {{#checked survivor-age}}
+            {{#checked survivor-age}}
             <li>
                 <label for="survivor-age"></label>
                 <select name="survivor-age" id="survivor-age" class="w16">
@@ -99,7 +99,7 @@
                 </select>
             </li>
             <li>
-                <input type="radio" name="survivor-age" id="survivor-age-skip" value="skipped">
+                <input type="radio" name="survivor-age" id="survivor-age-skip" value="skip"> <!-- radio with just one option? -->
                 <label for="survivor-age-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
             </li>
             {{/checked}}

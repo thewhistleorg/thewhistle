@@ -440,7 +440,7 @@ function prettifyReport(page, report) {
                 if (JSON.stringify(rpt['Spoken to anybody?']) == '["null"]') rpt['Spoken to anybody?'] = []; // kludge alert!
                 break;
             case 'description':
-                if (Array.isArray(report.description) && report.description[1].toLowerCase() == 'skipped') {
+                if (Array.isArray(report.description) && report.description[1].toLowerCase() == 'skip') {
                     rpt.Description = report.description[1];
                 } else {
                     rpt.Description = report.description;
@@ -456,7 +456,7 @@ function prettifyReport(page, report) {
                 rpt['Survivor gender'] = gender[report['survivor-gender']];
                 break;
             case 'survivor-age':
-                if (Array.isArray(report['survivor-age']) &&  report['survivor-age'][1].toLowerCase() == 'skipped') {
+                if (Array.isArray(report['survivor-age']) &&  report['survivor-age'][1].toLowerCase() == 'skip') {
                     rpt['Survivor age'] = report['survivor-age'][1];
                 } else {
                     rpt['Survivor age'] = report['survivor-age'];

@@ -26,7 +26,7 @@ describe('Submit test-grn/sexual-assault incident report', function () {
         cy.contains('Submit and continue').click();
 
         cy.url().should('include', '/test-grn/sexual-assault/2'); // on-behalf-of
-        cy.get('#myself + label').contains('Myself').click();
+        cy.get('#on-behalf-of-myself + label').contains('Myself').click();
         cy.contains('Submit and continue').click();
 
         cy.url().should('include', '/test-grn/sexual-assault/3'); // when / still-happening

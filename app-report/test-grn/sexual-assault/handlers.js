@@ -394,6 +394,7 @@ function prettifyReport(page, report) {
                     case 'within':        rpt.Happened = report['within-options']; break;
                     case 'dont-remember': rpt.Happened = 'Don’t remember'; break;
                     case 'skip':          rpt.Happened = 'Skipped'; break;
+                    case null:            rpt.Happened = null; break;
                 }
                 break;
             case 'still-happening':

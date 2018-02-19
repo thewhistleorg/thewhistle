@@ -208,8 +208,9 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             expect(document.querySelector('title').textContent).to.equal('Reports list');
             // nav should be /, Reports, Users, Resources, Submit, user-name, Logout
             expect(document.querySelectorAll('header nav > ul > li').length).to.equal(8);
-            // 'Submit' menu should have 'test-grn/sexual-assault (internal)' entry
+            // 'Submit' menu should have entry linking to /test-grn/sexual-assault
             expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('Rape is a Crime Internal Form');
+            expect(document.querySelector('header nav > ul > li ul li a').href).to.match(/test-grn\/sexual-assault\/\*$/);
         });
     });
 

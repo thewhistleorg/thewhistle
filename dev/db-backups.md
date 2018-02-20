@@ -26,6 +26,15 @@ This is run as a daily cron job.
 
 Once we have more cash available, we can look into mLab’s own (paid) backup procedures.
 
+Verify
+------
+
+A backup can be verifed with a command such as
+
+    mongorestore --dryRun --verbose --gzip --archive="$backupdir`date +%Y-%m-%d`-test-grn.ar.gz"
+
+Note that the archive format is [not standard `ar` format](https://stackoverflow.com/questions/37994743).
+
 Restore
 -------
 

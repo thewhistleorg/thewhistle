@@ -12,3 +12,5 @@ These are intended for use by developers only, and no not have entries in the na
 [Access log](/dev/log-access) – log of all page requests
 
 [Error log](/dev/log-error) – log of errors raised
+
+[New organisation](/dev/notes/new-organisation) – setting up a new organisation

@@ -18,6 +18,7 @@ import Resource   from '../../../models/resource.js';
 import Submission from '../../../models/submission.js';
 import UserAgent  from '../../../models/user-agent.js';
 import Geocoder   from '../../../lib/geocode.js';
+import log from '../../../lib/log';
 
 const nPages = 8;
 
@@ -206,7 +207,14 @@ class Handlers {
         if (page>1 || page=='+') await Report.submissionDetails(ctx.params.database, ctx.session.id, prettyReport, body);
 
         if (body.files) {
-            for (const file of body.files) Report.submissionFile(ctx.params.database, ctx.session.id, file);
+            for (const file of body.files) {
+                try {
+                    await Report.submissionFile(ctx.params.database, ctx.session.id, file);
+                } catch (e) {
+                    await log(ctx, 'error', null, null, e);
+                    ctx.flash = { error: e.message };
+                }
+            }
         }
 
         // record user-agent

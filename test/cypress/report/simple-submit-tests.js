@@ -2,12 +2,15 @@
 /* Cypress front-end integration tests - simple report submission.                 C.Veness 2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-
 /* global Cypress, cy */
 
+import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 
-describe('Submit test-grn/sexual-assault incident report', function () {
+const org = 'grn';              // the test organisation for the live ‘test-grn‘ organisation
+const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
+
+
+describe(`Submit ${org}/${proj} incident report`, function () {
     const report = 'http://report.thewhistle.local:3000';
     const admin = 'http://admin.thewhistle.local:3000';
 
@@ -16,30 +19,30 @@ describe('Submit test-grn/sexual-assault incident report', function () {
 
     it('loads home page', function() {
 
-        cy.visit(report+'/test-grn/sexual-assault');
+        cy.visit(`${report}/${org}/${proj}`);
         cy.contains('Get started').click();
 
-        cy.url().should('include', '/test-grn/sexual-assault/1'); // alias
+        cy.url().should('include', `/${org}/${proj}/1`); // alias
         cy.get('output[name=generated-alias]').then(($alias) => {
             alias = $alias.text();
         });
         cy.contains('Submit and continue').click();
 
-        cy.url().should('include', '/test-grn/sexual-assault/2'); // on-behalf-of
+        cy.url().should('include', `/${org}/${proj}/2`); // on-behalf-of
         cy.get('#on-behalf-of-myself + label').contains('Myself').click();
         cy.contains('Submit and continue').click();
 
-        cy.url().should('include', '/test-grn/sexual-assault/3'); // when / still-happening
+        cy.url().should('include', `/${org}/${proj}/3`); // when / still-happening
         cy.get('#when label').contains('Yes, exactly when it happened').click();
         cy.get('#still-happening label').contains('Yes').click();
         cy.contains('Submit and continue').click();
 
-        cy.url().should('include', '/test-grn/sexual-assault/4'); // where
+        cy.url().should('include', `/${org}/${proj}/4`); // where
         // cy.get('#where label').contains('Location').click();
         cy.get('textarea[name=at-address]').type('University of Lagos');
         cy.contains('Submit and continue').click();
 
-        cy.url().should('include', '/test-grn/sexual-assault/5'); // who
+        cy.url().should('include', `/${org}/${proj}/5`); // who
         cy.get('input.who-relationship').should('not.be.visible');
         cy.get('textarea.who-description').should('not.be.visible');
         cy.get('#who label').contains('No').click();
@@ -48,19 +51,19 @@ describe('Submit test-grn/sexual-assault incident report', function () {
         cy.get('#who-description').type('Big fat guy');
         cy.contains('Submit and continue').click();
 
-        cy.url().should('include', '/test-grn/sexual-assault/6'); // description
+        cy.url().should('include', `/${org}/${proj}/6`); // description
         cy.get('textarea[name=description]').type('Cypress test '+date);
         cy.get('label').contains('Female').click();
         cy.get('select').select('20–24');
         cy.contains('Submit and continue').click();
 
-        cy.url().should('include', '/test-grn/sexual-assault/7'); // action-taken
+        cy.url().should('include', `/${org}/${proj}/7`); // action-taken
         cy.contains('Teacher/tutor/lecturer').click();
         cy.get('input[name=action-taken-teacher-details]').type('Miss Brodie');
         cy.contains('Friends, family').click();
         cy.contains('Submit and continue').click();
 
-        cy.url().should('include', '/test-grn/sexual-assault/8'); // extra-notes
+        cy.url().should('include', `/${org}/${proj}/8`); // extra-notes
         cy.get('textarea').type('Nothing more');
         cy.contains('Submit and continue to Resources').click();
     });

@@ -12,30 +12,34 @@ const expect = chai.expect;
 
 import app from '../../app.js';
 
-const testuser = process.env.TESTUSER; // note testuser must have access to test-grn only
-const testpass = process.env.TESTPASS; // (for successful login & sexual-assault report submission)
+const testuser = process.env.TESTUSER; // note testuser must have access to ‘grn‘ organisation only
+const testpass = process.env.TESTPASS; // (for successful login & ‘rape-is-a-crime‘ report submission)
+
+const org = 'grn';              // the test organisation for the live ‘test-grn‘ organisation
+const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
 
 
 const appAdmin = supertest.agent(app.listen()).host('admin.localhost');
 const appReport = supertest.agent(app.listen()).host('report.localhost');
 
-describe(`Report app (test-grn/${app.env})`, function() {
+describe(`Report app (${org}/${app.env})`, function() {
     this.timeout(10e3); // 10 sec
     this.slow(250);
 
     let reportId = null;
 
     before(async function() {
-        // check testuser 'tester' exists and has access to test-grn (only)
+        // check testuser 'tester' exists and has access to ‘grn’ org (only)
         const responseUsr = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
-        if (responseUsr.body.databases.length != 1) throw new Error(`${testuser} must have access to test-grn (only)`);
-        if (responseUsr.body.databases[0] != 'test-grn') throw new Error(`${testuser} must have access to test-grn (only)`);
+        if (responseUsr.body.databases.length != 1) throw new Error(`${testuser} must have access to ‘${org}’ org (only)`);
+        if (responseUsr.body.databases[0] != org) throw new Error(`${testuser} must have access to ‘${org}’ org (only)`);
 
-        // force db connection to test-grn (ajax calls don't)
-        await appReport.get('/test-grn/sexual-assault');
+        // force db connection to ‘grn‘ db (ajax calls don't)
+        const responseGrnRpt = await appReport.get(`/${org}/${proj}`);
+        if (responseGrnRpt.status != 200) throw new Error(`${org}/${proj} not found`);
 
         // check previous test report deleted
-        const responseTestRpt = await appReport.get('/ajax/test-grn/aliases/testy+terrain');
+        const responseTestRpt = await appReport.get(`/ajax/${org}/aliases/testy+terrain`);
         if (responseTestRpt.status != 404) throw new Error('Previous test report was not deleted');
     });
 
@@ -70,14 +74,14 @@ describe(`Report app (test-grn/${app.env})`, function() {
         });
 
         it('fails on bad project', async function() {
-            const response = await appReport.get('/test-grn/no-such-project');
+            const response = await appReport.get(`/${org}/no-such-project`);
             expect(response.status).to.equal(404);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal(':(');
         });
 
         it('fails on bad page', async function() {
-            const response = await appReport.get('/test-grn/sexual-assault/no-such-page');
+            const response = await appReport.get(`/${org}/${proj}/no-such-page`);
             expect(response.status).to.equal(404);
         });
 
@@ -87,47 +91,47 @@ describe(`Report app (test-grn/${app.env})`, function() {
         });
 
         it('ajax: returns 404 for unrecognised function', async function() {
-            const response = await appReport.get('/ajax/test-grn/no-such-function');
+            const response = await appReport.get(`/ajax/${org}/no-such-function`);
             expect(response.status).to.equal(404);
         });
     });
 
-    describe('test-grn/sexual-assault inaccessible pages', function() {
+    describe(`${org}/${proj} inaccessible pages`, function() {
         it('request for page 2 gets redirected to page 1', async function() {
             // (note before() has already opened index page, so we go back to p1 rather than index
-            const response = await appReport.get('/test-grn/sexual-assault/2');
+            const response = await appReport.get(`/${org}/${proj}/2`);
             expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/test-grn/sexual-assault/1');
+            expect(response.headers.location).to.equal(`/${org}/${proj}/1`);
         });
     });
 
-    describe('test-grn/sexual-assault', function() {
+    describe(`${org}/${proj}`, function() {
         it('sees home page & starts submission', async function() {
-            const responseGet = await appReport.get('/test-grn/sexual-assault');
+            const responseGet = await appReport.get(`/${org}/${proj}`);
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect(document.querySelector('title').textContent).to.equal('The Whistle / Global Rights Nigeria Incident Report');
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Get started');
 
             const values = { 'nav-next': 'next' };
-            const responsePost = await appReport.post('/test-grn/sexual-assault').send(values);
+            const responsePost = await appReport.post(`/${org}/${proj}`).send(values);
             expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/1');
+            expect(responsePost.headers.location).to.equal(`/${org}/${proj}/1`);
         });
 
         it('ajax: gets a new random alias', async function() {
-            const response = await appReport.get('/ajax/test-grn/aliases/new');
+            const response = await appReport.get(`/ajax/${org}/aliases/new`);
             expect(response.status).to.equal(200);
             expect(response.body.alias.split(' ')).to.have.lengthOf(2);
         });
 
         it('ajax: checks ‘testy terrain’ is not already used', async function() {
-            const response = await appReport.get('/ajax/test-grn/aliases/testy+terrain');
+            const response = await appReport.get(`/ajax/${org}/aliases/testy+terrain`);
             expect(response.status).to.equal(404);
         });
 
         it('sees/submits page 1 (alias)', async function() {
-            const responseGet = await appReport.get('/test-grn/sexual-assault/1');
+            const responseGet = await appReport.get(`/${org}/${proj}/1`);
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
@@ -141,15 +145,15 @@ describe(`Report app (test-grn/${app.env})`, function() {
                 'generated-alias': 'testy terrain',
                 'nav-next':        'next',
             };
-            const responsePost = await appReport.post('/test-grn/sexual-assault/1').send(values);
+            const responsePost = await appReport.post(`/${org}/${proj}/1`).send(values);
             expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/2');
+            expect(responsePost.headers.location).to.equal(`/${org}/${proj}/2`);
             reportId = responsePost.headers['x-insert-id'];
             console.info('\treport id', reportId);
         });
 
         it('sees/submits page 2 (on-behalf-of)', async function() {
-            const responseGet = await appReport.get('/test-grn/sexual-assault/2');
+            const responseGet = await appReport.get(`/${org}/${proj}/2`);
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
@@ -161,25 +165,25 @@ describe(`Report app (test-grn/${app.env})`, function() {
                 'on-behalf-of': 'myself',
                 'nav-next':     'next',
             };
-            const responsePost = await appReport.post('/test-grn/sexual-assault/2').send(values);
+            const responsePost = await appReport.post(`/${org}/${proj}/2`).send(values);
             expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/3');
+            expect(responsePost.headers.location).to.equal(`/${org}/${proj}/3`);
         });
 
         it('doesn’t allow access beyond next page', async function() {
-            const response = await appReport.get('/test-grn/sexual-assault/4');
+            const response = await appReport.get(`/${org}/${proj}/4`);
             expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/test-grn/sexual-assault/3');
+            expect(response.headers.location).to.equal(`/${org}/${proj}/3`);
         });
 
         it('doesn’t allow post beyond next page', async function() {
-            const response = await appReport.post('/test-grn/sexual-assault/4').send({});
+            const response = await appReport.post(`/${org}/${proj}/4`).send({});
             expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/test-grn/sexual-assault/3');
+            expect(response.headers.location).to.equal(`/${org}/${proj}/3`);
         });
 
         it('sees/submits page 3 (when)', async function() {
-            const responseGet = await appReport.get('/test-grn/sexual-assault/3');
+            const responseGet = await appReport.get(`/${org}/${proj}/3`);
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
@@ -195,13 +199,13 @@ describe(`Report app (test-grn/${app.env})`, function() {
                 'still-happening': 'n',
                 'nav-next':        'next',
             };
-            const responsePost = await appReport.post('/test-grn/sexual-assault/3').send(values);
+            const responsePost = await appReport.post(`/${org}/${proj}/3`).send(values);
             expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/4');
+            expect(responsePost.headers.location).to.equal(`/${org}/${proj}/4`);
         });
 
         it('sees/submits page 4 (where)', async function() {
-            const responseGet = await appReport.get('/test-grn/sexual-assault/4');
+            const responseGet = await appReport.get(`/${org}/${proj}/4`);
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
@@ -215,13 +219,13 @@ describe(`Report app (test-grn/${app.env})`, function() {
                 'at-address': 'University of Lagos',
                 'nav-next':   'next',
             };
-            const responsePost = await appReport.post('/test-grn/sexual-assault/4').send(values);
+            const responsePost = await appReport.post(`/${org}/${proj}/4`).send(values);
             expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/5');
+            expect(responsePost.headers.location).to.equal(`/${org}/${proj}/5`);
         });
 
         it('sees/submits page 5 (who)', async function() {
-            const responseGet = await appReport.get('/test-grn/sexual-assault/5');
+            const responseGet = await appReport.get(`/${org}/${proj}/5`);
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
@@ -236,13 +240,13 @@ describe(`Report app (test-grn/${app.env})`, function() {
                 'who-description':  'Big fat guy',
                 'nav-next':         'next',
             };
-            const responsePost = await appReport.post('/test-grn/sexual-assault/5').send(values);
+            const responsePost = await appReport.post(`/${org}/${proj}/5`).send(values);
             expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/6');
+            expect(responsePost.headers.location).to.equal(`/${org}/${proj}/6`);
         });
 
         it('sees/submits page 6 (description)', async function() {
-            const responseGet = await appReport.get('/test-grn/sexual-assault/6');
+            const responseGet = await appReport.get(`/${org}/${proj}/6`);
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
@@ -257,13 +261,13 @@ describe(`Report app (test-grn/${app.env})`, function() {
                 'survivor-age':    '20–24',
                 'nav-next':        'next',
             };
-            const responsePost = await appReport.post('/test-grn/sexual-assault/6').send(values);
+            const responsePost = await appReport.post(`/${org}/${proj}/6`).send(values);
             expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/7');
+            expect(responsePost.headers.location).to.equal(`/${org}/${proj}/7`);
         });
 
         it('sees/submits page 7 (action-taken)', async function() {
-            const responseGet = await appReport.get('/test-grn/sexual-assault/7');
+            const responseGet = await appReport.get(`/${org}/${proj}/7`);
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
@@ -275,13 +279,13 @@ describe(`Report app (test-grn/${app.env})`, function() {
                 'action-taken-other-details': '',
                 'nav-next':                   'next',
             };
-            const responsePost = await appReport.post('/test-grn/sexual-assault/7').send(values);
+            const responsePost = await appReport.post(`/${org}/${proj}/7`).send(values);
             expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/8');
+            expect(responsePost.headers.location).to.equal(`/${org}/${proj}/8`);
         });
 
         it('sees page 8 & goes back to page 7', async function() {
-            const responseGet = await appReport.get('/test-grn/sexual-assault/8');
+            const responseGet = await appReport.get(`/${org}/${proj}/8`);
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
@@ -292,13 +296,13 @@ describe(`Report app (test-grn/${app.env})`, function() {
             const values = {
                 'nav-prev': 'prev',
             };
-            const responsePost = await appReport.post('/test-grn/sexual-assault/8').send(values);
+            const responsePost = await appReport.post(`/${org}/${proj}/8`).send(values);
             expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/7');
+            expect(responsePost.headers.location).to.equal(`/${org}/${proj}/7`);
         });
 
         it('sees page 6 (description) & submits corrected description with file', async function() {
-            const responseGet = await appReport.get('/test-grn/sexual-assault/6');
+            const responseGet = await appReport.get(`/${org}/${proj}/6`);
             expect(responseGet.status).to.equal(200);
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
@@ -318,18 +322,18 @@ describe(`Report app (test-grn/${app.env})`, function() {
             const imgFldr = 'test/img/';
             const imgFile = 's_gps.jpg';
             // superagent doesn't allow request.attach() to be used with request.send(), so instead use request.field()
-            const responsePost = await appReport.post('/test-grn/sexual-assault/6')
+            const responsePost = await appReport.post(`/${org}/${proj}/6`)
                 .field('description', values['description'])
                 .field('survivor-gender', values['survivor-gender'])
                 .field('survivor-age', values['survivor-age'])
                 .field('nav-next', values['nav-next'])
                 .attach('documents', imgFldr+imgFile);
             expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/7');
+            expect(responsePost.headers.location).to.equal(`/${org}/${proj}/7`);
         });
 
         it('sees whatnext page', async function() {
-            const response = await appReport.get('/test-grn/sexual-assault/whatnext');
+            const response = await appReport.get(`/${org}/${proj}/whatnext`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
@@ -355,18 +359,17 @@ describe(`Report app (test-grn/${app.env})`, function() {
         });
 
         it('sees whatnext resources', async function() {
-            const response = await appReport.get('/test-grn/sexual-assault/whatnext?address=university+of+lagos,+nigeria');
+            const response = await appReport.get(`/${org}/${proj}/whatnext?address=university+of+lagos,+nigeria`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
-            expect(document.querySelectorAll('tr')).to.have.lengthOf(39); // local resources
         });
 
         it('submits whatnext "back to start"', async function() {
             const values = { 'submit': 'end' };
-            const response = await appReport.post('/test-grn/sexual-assault/whatnext').send(values);
+            const response = await appReport.post(`/${org}/${proj}/whatnext`).send(values);
             expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/test-grn/sexual-assault');
+            expect(response.headers.location).to.equal(`/${org}/${proj}`);
         });
     });
 
@@ -430,7 +433,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
     });
 
     describe('single page report submission', function() { // TODO: check overlap with admin tests
-        const report = '/test-grn/sexual-assault/*';
+        const report = `/${org}/${proj}/*`;
 
         it('logs in', async function() {
             const values = { username: testuser, password: testpass };
@@ -444,7 +447,7 @@ describe(`Report app (test-grn/${app.env})`, function() {
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('#name').textContent).to.equal('tester');
-            expect(document.querySelector('#db').textContent).to.equal('test-grn');
+            expect(document.querySelector('#db').textContent).to.equal(`${org}`);
         });
 
         it('sees report submission page', async function() {
@@ -482,13 +485,13 @@ describe(`Report app (test-grn/${app.env})`, function() {
             };
             const response = await appReport.post(report).send(values);
             expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/test-grn/sexual-assault/whatnext');
+            expect(response.headers.location).to.equal(`/${org}/${proj}/whatnext`);
             reportId = response.headers['x-insert-id'];
             console.info('\treport id', reportId);
         });
 
         it('sees whatnext page', async function() {
-            const response = await appReport.get('/test-grn/sexual-assault/whatnext');
+            const response = await appReport.get(`/${org}/${proj}/whatnext`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
@@ -496,11 +499,10 @@ describe(`Report app (test-grn/${app.env})`, function() {
         });
 
         it('sees whatnext resources', async function() {
-            const response = await appReport.get('/test-grn/sexual-assault/whatnext?address=university+of+lagos');
+            const response = await appReport.get(`/${org}/${proj}/whatnext?address=university+of+lagos`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
-            expect(document.querySelectorAll('tr')).to.have.lengthOf(39); // local resources
         });
 
     });

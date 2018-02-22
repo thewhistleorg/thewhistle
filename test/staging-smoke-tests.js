@@ -16,8 +16,11 @@ dotenv.config();
 const requestAdmin = supertest.agent('http://admin.staging.thewhistle.org');
 const requestReport = supertest.agent('http://report.staging.thewhistle.org');
 
-const testuser = process.env.TESTUSER; // note testuser must have access to test-grn only
-const testpass = process.env.TESTPASS; // (for successful login & sexual-assault report submission)
+const testuser = process.env.TESTUSER; // note testuser must have access to ‘grn‘ organisation only
+const testpass = process.env.TESTPASS; // (for successful login)
+
+const org = 'grn';              // the test organisation for the live ‘test-grn‘ organisation
+const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
 
 
 describe('Admin app', function() {
@@ -61,8 +64,8 @@ describe('Admin app', function() {
 describe('Report app', function() {
     this.timeout(30e3); // 30 sec - app can take some time to wake
 
-    it('sees test-grn/sexual-assault home page', async function() {
-        const responseGet = await requestReport.get('/test-grn/sexual-assault');
+    it(`sees ${org}/${proj} home page`, async function() {
+        const responseGet = await requestReport.get(`/${org}/${proj}`);
         expect(responseGet.status).to.equal(200);
         const document = new jsdom.JSDOM(responseGet.text).window.document;
         expect(document.querySelector('title').textContent).to.equal('The Whistle / Global Rights Nigeria Incident Report');
@@ -71,8 +74,8 @@ describe('Report app', function() {
 
     it('moves on to page 1', async function() {
         const values = { 'nav-next': 'next' };
-        const responsePost = await requestReport.post('/test-grn/sexual-assault').send(values);
+        const responsePost = await requestReport.post(`/${org}/${proj}`).send(values);
         expect(responsePost.status).to.equal(302);
-        expect(responsePost.headers.location).to.equal('/test-grn/sexual-assault/1');
+        expect(responsePost.headers.location).to.equal(`/${org}/${proj}/1`);
     });
 });

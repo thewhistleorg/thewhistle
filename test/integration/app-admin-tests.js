@@ -20,8 +20,11 @@ const ObjectId = MongoDB.ObjectId;
 
 import app      from '../../app.js';
 
-const testuser = process.env.TESTUSER; // note testuser 'tester' must have access to test-grn only
-const testpass = process.env.TESTPASS; // (for successful login & sexual-assault report submission)
+const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn‘ organisation only
+const testpass = process.env.TESTPASS; // (for successful login & ‘rape-is-a-crime‘ report submission)
+
+const org = 'grn';              // the test organisation for the live ‘test-grn‘ organisation
+const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
 
 
 const appAdmin = supertest.agent(app.listen()).host('admin.localhost');
@@ -30,26 +33,26 @@ const appReport = supertest.agent(app.listen()).host('report.localhost');
 // note that document.querySelector() works with CSS ids which are more restrictive than HTML5 ids,
 // so getElementById() has to be used to find ObjectId ids instead of querySelector()
 
-describe(`Admin app (test-grn/${app.env})`, function() {
+describe(`Admin app (${org}/${app.env})`, function() {
     this.timeout(20e3); // 10 sec
     this.slow(250);
 
     before(async function() {
-        // check testuser 'tester' exists and has access to test-grn (only)
+        // check testuser 'tester' exists and has access to ‘grn’ org (only)
         const responseUsr = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
-        if (responseUsr.body.databases.length != 1) throw new Error(`${testuser} must have access to test-grn (only)`);
-        if (responseUsr.body.databases[0] != 'test-grn') throw new Error(`${testuser} must have access to test-grn (only)`);
+        if (responseUsr.body.databases.length != 1) throw new Error(`${testuser} must have access to ‘${org}’ org (only)`);
+        if (responseUsr.body.databases[0] != org) throw new Error(`${testuser} must have access to ‘${org}’ org (only)`);
 
         // check previous test user deleted
         const responseTestUsr = await appAdmin.get('/ajax/login/databases?user=test@user.com');
         if (responseTestUsr.body.databases.length != 0) throw new Error('Previous test user was not deleted');
 
-        // login to set up db connection to test-grn
+        // login to set up db connection to ‘grn’ db
         const values = { username: testuser, password: testpass, 'remember-me': 'on' };
         await appAdmin.post('/login').send(values);
 
         // check previous test report deleted
-        const responseTestRpt = await appReport.get('/ajax/test-grn/aliases/testy+terrain');
+        const responseTestRpt = await appReport.get(`/ajax/${org}/aliases/testy+terrain`);
         if (responseTestRpt.status != 404) throw new Error('Previous test report was not deleted');
 
         await appAdmin.get('/logout');
@@ -157,18 +160,19 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             expect(document.querySelectorAll('input')).to.have.lengthOf(3);
         });
 
-        it('login page shows org’s for user arg', async function() {
-            const response = await appAdmin.get('/login?user=review@thewhistle.org');
+        it('login page shows no org’s for user arg ‘tester‘', async function() {
+            const response = await appAdmin.get(`/login?user=${testuser}`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
-            expect(document.querySelectorAll('input').length).to.be.at.least(4);
+            expect(document.querySelectorAll('input').length).to.equal(3); // username, password, remember-me (no db)
+            expect(document.querySelector('input[name=username]').value).to.equal(testuser); // username prefilled
         });
 
         it('ajax: lists user databases', async function() {
             const response = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
             expect(response.status).to.equal(200);
             expect(response.body.databases).to.have.lengthOf(1);
-            expect(response.body.databases[0]).to.equal('test-grn');
+            expect(response.body.databases[0]).to.equal(org);
         });
 
         it('shows e-mail/password not recognised on failed login', async function() {
@@ -194,7 +198,7 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('#name').textContent).to.equal('tester');
-            expect(document.querySelector('#db').textContent).to.equal('test-grn');
+            expect(document.querySelector('#db').textContent).to.equal(org);
         });
 
         it('has home page with full nav links when logged-in', async function() {
@@ -209,9 +213,10 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             expect(document.querySelector('title').textContent).to.equal('Reports list');
             // nav should be /, Reports, Users, Resources, Submit, user-name, Logout
             expect(document.querySelectorAll('header nav > ul > li').length).to.equal(8);
-            // 'Submit' menu should have entry linking to /test-grn/sexual-assault
-            expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('Rape is a Crime Internal Form');
-            expect(document.querySelector('header nav > ul > li ul li a').href).to.match(/test-grn\/sexual-assault\/\*$/);
+            // 'Submit' menu should have entry linking to /grn/rape-is-a-crime
+            expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('Rape Is A Crime Internal Form');
+            const regexp = new RegExp(`${org}\\/${proj}\\/\\*$`);
+            expect(document.querySelector('header nav > ul > li ul li a').href).to.match(regexp);
         });
     });
 
@@ -224,13 +229,13 @@ describe(`Admin app (test-grn/${app.env})`, function() {
                 self:     'A question I’m answering for myself',
                 other:    'A question I’m answering for someone else',
             };
-            const response = await appAdmin.post('/ajax/questions/sexual-assault').send(values);
+            const response = await appAdmin.post(`/ajax/questions/${proj}`).send(values);
             expect(response.status).to.equal(201);
             questionId = response.headers['x-insert-id'];
         });
 
         it('sees question in questions page', async function() {
-            const response = await appAdmin.get('/questions/sexual-assault');
+            const response = await appAdmin.get(`/questions/${proj}`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(questionId)).to.not.be.null;
@@ -248,7 +253,7 @@ describe(`Admin app (test-grn/${app.env})`, function() {
         });
 
         it('sees updated question', async function() {
-            const response = await appAdmin.get('/questions/sexual-assault');
+            const response = await appAdmin.get(`/questions/${proj}`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(questionId)).to.not.be.null;
@@ -261,7 +266,7 @@ describe(`Admin app (test-grn/${app.env})`, function() {
         });
 
         it('no longer sees question in questions page', async function() {
-            const response = await appAdmin.get('/questions/sexual-assault');
+            const response = await appAdmin.get(`/questions/${proj}`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(questionId)).to.be.null;
@@ -287,20 +292,20 @@ describe(`Admin app (test-grn/${app.env})`, function() {
         // different ports, so log in explicitly to emulate browser behaviour
         it('logs in to report app (supertest doesn’t share login)', async function() {
             const values = { username: testuser, password: testpass, 'remember-me': 'on' };
-            const response = await appReport.post('/test-grn/sexual-assault/login').send(values);
+            const response = await appReport.post(`/${org}/${proj}/login`).send(values);
             expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/test-grn/sexual-assault');
+            expect(response.headers.location).to.equal(`/${org}/${proj}`);
         });
 
         it('sees new case intake page', async function() {
-            const response = await appReport.get('/test-grn/sexual-assault/*');
+            const response = await appReport.get(`/${org}/${proj}/*`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Have you used this anonymous reporting service before?');
         });
 
         it('reports new case intake invalid project', async function() {
-            const response = await appReport.get('/test-grn/no-such-project/*');
+            const response = await appReport.get(`/${org}/no-such-project/*`);
             expect(response.status).to.equal(404);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('p').textContent).to.equal('Couldn’t find that one!...');
@@ -327,7 +332,7 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             };
             // sadly, it seems that superagent doesn't allow request.attach() to be used with
             // request.send(), so instead we need to use request.field()
-            const response = await appReport.post('/test-grn/sexual-assault/*')
+            const response = await appReport.post(`/${org}/${proj}/*`)
                 .field('used-before', values['used-before'])
                 .field('generated-alias', values['generated-alias'])
                 .field('on-behalf-of', values['on-behalf-of'])
@@ -346,19 +351,19 @@ describe(`Admin app (test-grn/${app.env})`, function() {
                 .attach('documents', imgFldr+imgFile);
             expect(response.status).to.equal(302);
             const koaSession = base64.decode(response.headers['set-cookie'][0].match(/^koa:sess=([a-zA-Z0-9=.]+);.+/)[1]);
-            expect(response.headers.location).to.equal('/test-grn/sexual-assault/whatnext', koaSession); // koaSession['koa-flash'] fails??
+            expect(response.headers.location).to.equal(`/${org}/${proj}/whatnext`, koaSession); // koaSession['koa-flash'] fails??
             reportId = response.headers['x-insert-id'];
             console.info('\treport id', reportId);
         });
 
         it('gets new autogenerated alias (ajax)', async function() {
-            const response = await appReport.get('/ajax/test-grn/aliases/new');
+            const response = await appReport.get(`/ajax/${org}/aliases/new`);
             expect(response.status).to.equal(200);
             expect(response.body.alias.split(' ')).to.have.lengthOf(2);
         });
 
         it('sees whatnext page', async function() {
-            const response = await appReport.get('/test-grn/sexual-assault/whatnext');
+            const response = await appReport.get(`/${org}/${proj}/whatnext`);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
@@ -503,13 +508,13 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
-            const src = `/uploaded/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
+            const src = `/uploaded/${proj}/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
             expect(document.getElementById(imgFile).querySelector('td a').href).to.equal(src);
             expect(document.getElementById(imgFile).querySelector('td img').src).to.equal(src);
         });
 
         it('fetches uploaded image from AWS S3', async function() {
-            const response = await appAdmin.get(`/uploaded/sexual-assault/${dateFormat('yyyy-mm')}/${reportId}/s_gps.jpg`);
+            const response = await appAdmin.get(`/uploaded/${proj}/${dateFormat('yyyy-mm')}/${reportId}/s_gps.jpg`);
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('image/jpeg');
         });
@@ -535,13 +540,13 @@ describe(`Admin app (test-grn/${app.env})`, function() {
         });
 
         it('sees ‘testy terrain’ alias is used (ajax)', async function() {
-            const response = await appAdmin.get('/ajax/report/test-grn/aliases/testy+terrain');
+            const response = await appAdmin.get(`/ajax/report/${org}/aliases/testy+terrain`);
             expect(response.status).to.equal(200);
         });
 
-        // TODO: can 'test-grn' element of url be inferred from header credentials?
+        // TODO: can 'org' element of url be inferred from header credentials?
         it('sees unused alias is not used (ajax)', async function() {
-            const response = await appAdmin.get('/ajax/report/test-grn/aliases/no+way+this+should+be+a+used+alias');
+            const response = await appAdmin.get(`/ajax/report/${org}/aliases/no+way+this+should+be+a+used+alias`);
             expect(response.status).to.equal(404);
         });
 
@@ -779,7 +784,7 @@ describe(`Admin app (test-grn/${app.env})`, function() {
             email:     'test@user.com',
             username:  'test',
             roles:     'admin',
-            databases: 'test-grn',
+            databases: org,
         };
 
         it('gets add new user page', async function() {

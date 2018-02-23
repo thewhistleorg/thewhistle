@@ -56,7 +56,7 @@
                     <div class="inline">
                         <br>at
                         <select name="date.time" id="date.time">
-                            <option value="">&nbsp;</option>
+                            <option></option>
                             {{#selected date.time}}
                             {{#incidentDate.hours}}
                             <option value="{{this}}">{{this}}</option>
@@ -71,11 +71,13 @@
                 <label for="when-within">Yes, about when it happened</label>
                 <p class="hint-text">For example, last month, a couple of years ago, …</p>
                 <select name="within-options" id="within-options">
-                    <option value="">&nbsp;</option>
+                    {{#selected within-options}}
+                    <option></option>
                     <option value="within last week">last week</option>
                     <option value="within last month">last month</option>
                     <option value="within last year">last year</option>
                     <option value="more than a year ago">more than a year ago</option>
+                    {{/selected}}
                 </select>
             </li>
             <li>

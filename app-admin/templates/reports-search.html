@@ -75,7 +75,7 @@
         <li>
             <select data-prev="{{@key}}">
                 {{#selected @key}}
-                <option value="">&nbsp;</option>
+                <option></option>
                 {{#../fields}}
                 <option>{{this}}</option>
                 {{/../fields}}
@@ -86,7 +86,7 @@
         {{/each}}
         <li>
             <select>
-                <option value="">&nbsp;</option>
+                <option></option>
                 {{#fields}}
                 <option>{{this}}</option>
                 {{/fields}}

@@ -86,7 +86,7 @@
                                     <!-- <label for="assigned-to">Assigned to:</label> -->
                                     <select name="assigned-to" id="assigned-to">
                                         {{#selected assignedTo}}
-                                        <option value="">&nbsp;</option>
+                                        <option></option>
                                         {{#users}}
                                         <option value="{{_id}}">{{firstname}} {{lastname}}</option>
                                         {{/users}}

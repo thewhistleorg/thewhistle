@@ -57,7 +57,7 @@
             <label for="app">App</label>
             <select name="app" id="app">
                 {{#selected filter.app}}
-                <option value="">&nbsp;</option>
+                <option></option>
                 <option>admin</option>
                 <option>report</option>
                 {{/selected}}
@@ -67,7 +67,7 @@
             <label for="organisation">Organisation</label>
             <select name="organisation" id="organisation">
                 {{#selected filter.organisation}}
-                <option value="">&nbsp;</option>
+                <option></option>
                 {{#dbs}}
                 <option>{{this}}</option>
                 {{/dbs}}
@@ -77,7 +77,7 @@
             <label for="user">user</label>
             <select name="user" id="user">
                 {{#selected filter.user}}
-                <option value="">&nbsp;</option>
+                <option></option>
                 {{#users}}
                 <option>{{this}}</option>
                 {{/users}}
@@ -89,7 +89,7 @@
             <label for="status">Status</label>
             <select name="status" id="status">
                 {{#selected filter.status}}
-                <option value="">&nbsp;</option>
+                <option></option>
                 {{#statuses}}
                 <option>{{this}}</option>
                 {{/statuses}}

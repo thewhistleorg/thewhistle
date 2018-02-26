@@ -109,10 +109,11 @@ document.addEventListener('DOMContentLoaded', function() {
      */
 
     if (document.querySelector('input[name=who]')) {
+        var nameWho = document.querySelectorAll('input[name=who]');
+
         // display/hide supplementary information fields on radio-box selection
-        var nameWho1 = document.querySelectorAll('input[name=who]');
-        for (var i=0; i<nameWho1.length; i++) {
-            var input = nameWho1[i];
+        for (var i=0; i<nameWho.length; i++) {
+            var input = nameWho[i];
             input.onclick = function() {
                 if (this.value == 'y') {
                     this.parentElement.querySelector('#who-y-form').classList.remove('hide');
@@ -129,10 +130,9 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         }
 
-        // defaults for previously answered questions
-        var nameWho2 = document.querySelectorAll('input[name=who]');
-        for (var i=0; i<nameWho2.length; i++) {
-            var input = nameWho2[i];
+        // set defaults for previously answered questions
+        for (var i=0; i<nameWho.length; i++) {
+            var input = nameWho[i];
             if (input.checked) input.onclick();
         }
     }
@@ -146,8 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Make radio buttons act as a toggler
         var allRadios = document.querySelectorAll('input[name="description"], input[name="survivor-age"]');
         var booRadio;
-        var x = 0;
-        for (x = 0; x < allRadios.length; x++) {
+        for (var x=0; x<allRadios.length; x++) {
             allRadios[x].onclick = function() {
                 if (booRadio == this) {
                     this.checked = false;

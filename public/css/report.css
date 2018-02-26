@@ -208,8 +208,11 @@ form li {
 }
 
 /*
-* Custom Radio button
-*/
+ * custom radio button: move input off page, and use 24px circular empty string in place of input
+ *
+ * TODO: why :checked, :not(:checked) ??
+ * TODO: what is label:after doing ??
+ */
 
 [type='radio']:checked,
 [type='radio']:not(:checked) {

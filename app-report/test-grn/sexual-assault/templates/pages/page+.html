@@ -65,7 +65,7 @@
             <li>
                 <input type="radio" name="when" id="when-date" value="date">
                 <label for="when-date" class="pure-radio">Yes, exactly when it happened</label>
-                <div class="when-form" style="display:none;">
+                <div class="when-date-form" class="hide">
                     <p class="hint-text">Please select the date and approximate time</p>
                     <table class="inline">
                         <tr class="field-label">
@@ -120,16 +120,18 @@
             <li>
                 <input type="radio" name="when" id="when-within" value="within">
                 <label for="when-within">Yes, about when it happened</label>
-                <p class="hint-text">For example, last month, a couple of years ago, …</p>
-                <select name="within-options" id="within-options">
-                    {{#selected within-options}}
-                    <option></option>
-                    <option value="within last week">last week</option>
-                    <option value="within last month">last month</option>
-                    <option value="within last year">last year</option>
-                    <option value="more than a year ago">more than a year ago</option>
-                    {{/selected}}
-                </select>
+                <div id="when-within-form" class="hide">
+                    <p class="hint-text">For example, last month, a couple of years ago, …</p>
+                    <select name="within-options" id="within-options">
+                        {{#selected within-options}}
+                        <option></option>
+                        <option value="within last week">last week</option>
+                        <option value="within last month">last month</option>
+                        <option value="within last year">last year</option>
+                        <option value="more than a year ago">more than a year ago</option>
+                        {{/selected}}
+                    </select>
+                </div>
             </li>
             <li>
                 <input type="radio" name="when" id="when-dont-remember" value="dont-remember">

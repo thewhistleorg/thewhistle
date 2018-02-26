@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (prevButton) {
         prevButton.onclick = function () {
             var fields = document.querySelectorAll('input,textarea');
-            for (var i = 0; i < fields.length; i++) {
+            for (var i=0; i<fields.length; i++) {
                 fields[i].required = false;
             }
             // document.querySelectorAll('input,textarea').forEach(function(i) { i.required = false; });
@@ -30,138 +30,37 @@ document.addEventListener('DOMContentLoaded', function() {
     if (document.querySelector('input[name=when]')) {
         var months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
 
-        // set focus to hour/day field if any 'when' radio button clicked
-        var fields = document.querySelectorAll('input[name=when]');
-        for (var i = 0; i < fields.length; i++) {
-            var input = fields[i];
-            input.addEventListener('change', function() {
+        var whenInputs = document.querySelectorAll('input[name=when]');
+
+        for (var i=0; i<whenInputs.length; i++) {
+            whenInputs[i].onclick = function() {
+                const ul = this.parentElement.parentElement;
                 switch (this.value) {
                     case 'date':
-                        document.querySelector('select[name="date.day"]').focus();
-                        // document.querySelector('select[name="date.day"]').select();
-                        this.parentElement.parentElement.querySelector('.when-form').style.display = document.querySelector('#when-date').checked ? 'block' : 'none';
+                        ul.querySelector('#when-date-form').classList.remove('hide');
+                        ul.querySelector('#when-within-form').classList.add('hide');
                         break;
                     case 'within':
-                        document.querySelector('select[name="within-options"]').focus();
-                        this.parentElement.parentElement.querySelector('.when-form').style.display='none';
+                        ul.querySelector('#when-date-form').classList.add('hide');
+                        ul.querySelector('#when-within-form').classList.remove('hide');
+                        ul.querySelector('select[name="within-options"]').focus();
                         break;
                     case 'dont-remember':
-                        this.parentElement.parentElement.querySelector('.when-form').style.display='none';
+                        ul.querySelector('#when-date-form').classList.add('hide');
+                        ul.querySelector('#when-within-form').classList.add('hide');
                         break;
                     case 'skip':
-                        this.parentElement.parentElement.querySelector('.when-form').style.display='none';
+                        ul.querySelector('#when-date-form').classList.add('hide');
+                        ul.querySelector('#when-within-form').classList.add('hide');
                         break;
                 }
-            });
-        }
-
-        if (document.querySelector('#when-date').checked == true) {
-            document.querySelector('input[name=when]').parentElement.querySelector('.when-form').style.display='block';
-        }
-
-        // check when-today if any today fields receive focus
-        var nameToday = document.querySelectorAll('input[name^=today]');
-        for (var i=0; i<nameToday.length; i++) {
-            nameToday[i].onfocus = function() {
-                document.querySelector('#when-today').checked = true;
             };
         }
 
-
-        // check when-yesterday if any yesterday fields receive focus
-        var nameYesterday = document.querySelectorAll('input[name^=yesterday]');
-        for (var i=0; i<nameYesterday.length; i++) {
-            nameYesterday[i].onfocus = function() {
-                document.querySelector('#when-yesterday').checked = true;
-            };
+        // set defaults for previously answered questions
+        for (var i=0; i<whenInputs.length; i++) {
+            if (whenInputs[i].checked) whenInputs[i].onclick();
         }
-
-
-        // check when-date if any date fields receive focus
-        var nameDate = document.querySelectorAll('input[name^=date], select[name^=date]');
-        for (var i=0; i<nameDate.length; i++) {
-            nameDate[i].onfocus = function() {
-                document.querySelector('#when-date').checked = true;
-            };
-        }
-
-        // check when-within if within-options is changed, clear it if no value set
-        // (note not on focus, as tabbing to it from date would auto-select it)
-        document.querySelector('#within-options').onchange = function() {
-            document.querySelector('#when-within').checked = this.value!='';
-        };
-
-        // auto-advance day field when completed
-        document.querySelector('select[name="date.day"]').onkeypress = function(event) {
-            if (!event.key.match(/\d/)) { event.preventDefault(); return; }
-            var newValue = this.value + event.key;
-            if (newValue.length==2 || newValue>3) {
-                document.querySelector('select[name="date.month"]').focus();
-                document.querySelector('select[name="date.month"]').select();
-            }
-        };
-
-        // auto-advance month field when completed
-        document.querySelector('select[name="date.month"]').onkeypress = function(event) {
-            //if (this.value.length == 3) { event.preventDefault(); return; }
-            var newValue = this.value + event.key;
-            if (months.indexOf(newValue.toLowerCase()) >= 0) {
-                document.querySelector('select[name="date.year"]').focus();
-                document.querySelector('select[name="date.year"]').select();
-            }
-        };
-
-        // month field validation
-        document.querySelector('select[name="date.month"]').onchange = function() {
-            if (this.setCustomValidity == undefined) return;
-            var err = 'Please enter a valid three-letter abbreviation of a month';
-            var ok = months.indexOf(this.value.toLowerCase()) >= 0;
-            this.setCustomValidity(ok ? '' : err);
-        };
-
-        // on/within validation
-        var nameWhen = document.querySelectorAll('input[name=when]');
-        for (var i=0; i<nameWhen.length; i++) {
-            var input = nameWhen[i];
-            input.addEventListener('change', function() {
-                if (this.setCustomValidity == undefined) return;
-                document.querySelector('#within-options').required = false;
-                var nameDate = document.querySelectorAll('input[name^=date]');
-                for (var i=0; i<nameDate.length; i++) {
-                    var el = nameDate[i];
-                    el.required = false;
-                }
-                // document.querySelectorAll('input[name^=date]').forEach(function(el) { el.required = false; });
-                switch (input.value) {
-                    case 'date':
-                        document.querySelector('select[name="date.day"]').required = true;
-                        document.querySelector('select[name="date.month"]').required = true;
-                        document.querySelector('select[name="date.year"]').required = true;
-                        document.querySelector('select[name="date.day"]').focus();
-                        // document.querySelector('select[name="date.day"]').select();
-                        break;
-                    case 'within':
-                        document.querySelector('select[name="within-options"]').required = true;
-                        document.querySelector('select[name="within-options"]').focus();
-                        break;
-                }
-            });
-        }
-
-
-        // don't tab out of empty date field (in case tab typed after auto-advance)
-        var nameDate = document.querySelectorAll('input[name^=date]');
-        for (var i=0; i<nameDate.length; i++) {
-            input = nameDate[i];
-            // if (input.name=='date.hour' || input.name=='date.minute') return; // hour/min can be left blank
-            if (input.name=='date.time') return; // hour/min can be left blank
-
-            input.onkeydown = function (event) {
-                if (event.key == 'Tab' && this.value == '') event.preventDefault();
-            };
-
-        }
-
     }
 
 
@@ -250,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var x = 0;
         for (x = 0; x < allRadios.length; x++) {
             allRadios[x].onclick = function() {
-                if(booRadio == this) {
+                if (booRadio == this) {
                     this.checked = false;
                     booRadio = null;
                 } else {

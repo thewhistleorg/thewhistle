@@ -110,31 +110,37 @@ document.addEventListener('DOMContentLoaded', function() {
      */
 
     if (document.querySelector('input[name=who]')) {
-        var nameWho = document.querySelectorAll('input[name=who]');
+        var ul = document.querySelector('#who');
+
+        var whoInputs = document.querySelectorAll('input[name=who]');
 
         // display/hide supplementary information fields on radio-box selection
-        for (var i=0; i<nameWho.length; i++) {
-            var input = nameWho[i];
-            input.onclick = function() {
-                if (this.value == 'y') {
-                    this.parentElement.querySelector('#who-y-form').classList.remove('hide');
-                    this.parentElement.parentElement.querySelector('#who-n-form').classList.add('hide');
-                    document.querySelector('textarea[name="who-relationship"]').focus();
-                    document.querySelector('textarea[name="who-relationship"]').select();
-                }
-                if (this.value == 'n') {
-                    this.parentElement.querySelector('#who-n-form').classList.remove('hide');
-                    this.parentElement.parentElement.querySelector('#who-y-form').classList.add('hide');
-                    document.querySelector('textarea[name="who-description"]').focus();
-                    document.querySelector('textarea[name="who-description"]').select();
+        for (var i=0; i<whoInputs.length; i++) {
+            whoInputs[i].onclick = function() {
+                switch (this.value) {
+                    case 'y':
+                        ul.querySelector('#who-n-form').classList.add('hide');
+                        ul.querySelector('#who-y-form').classList.remove('hide');
+                        ul.querySelector('textarea[name="who-relationship"]').focus();
+                        ul.querySelector('textarea[name="who-relationship"]').select();
+                        break;
+                    case 'n':
+                        ul.querySelector('#who-y-form').classList.add('hide');
+                        ul.querySelector('#who-n-form').classList.remove('hide');
+                        ul.querySelector('textarea[name="who-description"]').focus();
+                        ul.querySelector('textarea[name="who-description"]').select();
+                        break;
+                    case 'skip':
+                        ul.querySelector('#who-y-form').classList.add('hide');
+                        ul.querySelector('#who-n-form').classList.add('hide');
+                        break;
                 }
             };
         }
 
         // set defaults for previously answered questions
-        for (var i=0; i<nameWho.length; i++) {
-            var input = nameWho[i];
-            if (input.checked) input.onclick();
+        for (var i=0; i<whoInputs.length; i++) {
+            if (whoInputs[i].checked) whoInputs[i].onclick();
         }
     }
 

@@ -69,32 +69,33 @@ document.addEventListener('DOMContentLoaded', function() {
      */
 
     if (document.querySelector('#where')) {
-        var where = document.querySelector('#where');
+        var ul = document.querySelector('#where');
+
+        var whereInputs = document.querySelectorAll('input[name=where]');
 
         // show/hide at-address according to selected option
-        var nameWhere = document.querySelectorAll('input[name=where]');
-        for (var i=0; i<nameWhere.length; i++) {
-            var input = nameWhere[i];
-            input.onclick = function() {
-                if (input.value == 'at') {
-                    // where.querySelector('p').classList.remove('hide');
-                    // where.querySelector('textarea[name="at-address"]').classList.remove('hide');
-                    where.querySelector('textarea[name="at-address"]').focus();
-                    where.querySelector('textarea[name="at-address"]').select();
-                }
-                if (input.value == 'dont-know') {
-                    // where.querySelector('p').classList.add('hide');
-                    // where.querySelector('textarea[name="at-address"]').classList.add('hide');
+        for (var i=0; i<whereInputs.length; i++) {
+            whereInputs[i].onclick = function() {
+                switch (this.value) {
+                    case 'at':
+                        ul.querySelector('#where-at-form').classList.remove('hide');
+                        where.querySelector('textarea[name="at-address"]').focus();
+                        where.querySelector('textarea[name="at-address"]').select();
+                        break;
+                    case 'dont-know':
+                        ul.querySelector('#where-at-form').classList.add('hide');
+                        break;
+                    case 'skip':
+                        ul.querySelector('#where-at-form').classList.add('hide');
+                        break;
                 }
             };
         }
 
 
         // defaults for previously answered questions
-        var nameWhere = document.querySelectorAll('input[name=where]');
-        for (var i=0; i<nameWhere.length; i++) {
-            var input = nameWhere[i];
-            if (input.checked) input.onclick();
+        for (var i=0; i<whereInputs.length; i++) {
+            if (whereInputs[i].checked) whereInputs[i].onclick();
         }
 
         // check #where-at if at-address receives focus

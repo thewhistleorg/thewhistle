@@ -174,10 +174,13 @@
         <ul id="where">
             {{#checked where}}
             <li>
-                <input type="radio" name="where" id="where-at" value="at"> <label for="where-at">Location</label>
-                <p class="hint-text">Please provide as much detail as you are able – this could be
-                    an address, restaurant name, or neighborhood or sights and landmarks you recall.</p>
-                <textarea rows="4" name="at-address" id="at-address" class="w100pc">{{at-address}}</textarea>
+                <input type="radio" name="where" id="where-at" value="at">
+                <label for="where-at">Location</label>
+                <div id="where-at-form">
+                    <p class="hint-text">Please provide as much detail as you are able – this could be
+                        an address, restaurant name, or neighborhood or sights and landmarks you recall.</p>
+                    <textarea rows="4" name="at-address" id="at-address" class="w100pc">{{at-address}}</textarea>
+                </div>
             </li>
             <li>
                 <input type="radio" name="where" id="where-dont-know" value="dont-know">

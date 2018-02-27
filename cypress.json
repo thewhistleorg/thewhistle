@@ -1,4 +1,5 @@
 {
     "integrationFolder": "test/cypress",
-    "pluginsFile": "test/cypress/plugins.js"
+    "pluginsFile": "test/cypress/plugins.js",
+    "videoRecording": false
 }

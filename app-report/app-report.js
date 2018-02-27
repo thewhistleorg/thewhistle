@@ -234,7 +234,7 @@ router.all('/:database/:project', async function composeDbProject(ctx) {
         const appReport = await import(`./${ctx.params.database}/${ctx.params.project}/app.js`);
         await compose(appReport.default.middleware)(ctx);
     } catch (e) {
-        if (e.code == 'ERR_MISSING_MODULE') ctx.throw(404);
+        if (e.code == 'MODULE_NOT_FOUND') ctx.throw(404);
         throw e;
     }
 });
@@ -243,7 +243,7 @@ router.all('/:database/:project/:page', async function composeDbProjectPage(ctx)
         const appReport = await import(`./${ctx.params.database}/${ctx.params.project}/app.js`);
         await compose(appReport.default.middleware)(ctx);
     } catch (e) {
-        if (e.code == 'ERR_MISSING_MODULE') ctx.throw(404);
+        if (e.code == 'MODULE_NOT_FOUND') ctx.throw(404);
         throw e;
     }
 });

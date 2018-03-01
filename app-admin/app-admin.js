@@ -126,7 +126,7 @@ const luscaCspDefaultSrc = `'self' 'unsafe-inline' 'unsafe-eval' ${luscaCspTrust
 app.use(convert(lusca({ // note koa-lusca@2.2.0 is v1 middleware which generates deprecation notice
     csp:           { policy: { 'default-src': luscaCspDefaultSrc } }, // Content-Security-Policy
     cto:           'nosniff',                                         // X-Content-Type-Options
-    hsts:          { maxAge: 0, includeSubDomains: true },   // HTTP Strict-Transport-Security
+    hsts:          { maxAge: 60*60*24*365, includeSubDomains: true }, // HTTP Strict-Transport-Security
     xframe:        'SAMEORIGIN',                                      // X-Frame-Options
     xssProtection: true,                                              // X-XSS-Protection
 })));

@@ -302,10 +302,10 @@ class ReportsHandlers {
         // check whether current list of reports is for a single project, with homogeneous submitted details
         // incomplete submissions are considered homogeneous: hence [ { a: 'x' }, {  a: 'x', b: 'y' } ] is ok,
         // but [ { a: 'x' }, {  c: 'z' } ] is not
-        function isListSingleProject(rpts) {
+        function isListSingleProject(rptsList) {
             const fields = [];
 
-            for (const rpt of rpts) {
+            for (const rpt of rptsList) {
                 const flds = Object.keys(rpt.submitted);
                 for (let f=0; f<flds.length; f++) {
                     if (fields[f] == undefined) fields[f] = {};

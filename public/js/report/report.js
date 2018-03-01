@@ -24,6 +24,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     /*
+     * 'survivor-gender/-age' page (note select & radio with same name)
+     */
+    if (document.querySelector('[name^=survivor]')) {
+        // uncheck 'survivor-age-skip' when 'survivor-age' value selected
+        document.querySelector('#survivor-age').onchange = function() {
+            document.querySelector('#survivor-age-skip').checked = false;
+        };
+        // clear 'survivor-age' when 'survivor-age-skip' selected
+        document.querySelector('#survivor-age-skip').onclick = function() {
+            document.querySelector('select[name=survivor-age]').value = '';
+        };
+    }
+
+
+    /*
      * 'when' page
      */
 
@@ -145,34 +160,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /*
-    * 'description' page
-    */
+     * 'description' page
+     */
 
     if (document.getElementsByName('description').length > 0) {
 
-        // Make radio buttons act as a toggler
-        var allRadios = document.querySelectorAll('input[name="description"], input[name="survivor-age"]');
-        var booRadio;
-        for (var x=0; x<allRadios.length; x++) {
-            allRadios[x].onclick = function() {
-                if (booRadio == this) {
-                    this.checked = false;
-                    booRadio = null;
-                } else {
-                    booRadio = this;
-                }
-            };
-        }
-
         // uncheck radio when description box focused
-        document.querySelector('textarea[name="description"]').addEventListener('focus', function() {
+        document.querySelector('textarea[name="description"]').onfocus = function() {
             document.querySelector('input[name="description"]').checked = false;
-        });
+        };
 
-        // uncheck radio when survivor-age focused
-        document.querySelector('select[name="survivor-age"]').addEventListener('change', function() {
-            document.querySelector('input[name="survivor-age"]').checked = false;
-        });
+        // TODO: hide description when skip selected?
     }
 
 
@@ -360,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    /**
+    /*
      * whatnext (resources) page
      */
 

@@ -83,6 +83,8 @@ describe(`Report app (${org}/${app.env})`, function() {
         it('fails on bad page', async function() {
             const response = await appReport.get(`/${org}/${proj}/no-such-page`);
             expect(response.status).to.equal(404);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal(':(');
         });
 
         it('ajax: returns 404 for unrecognised project', async function() {

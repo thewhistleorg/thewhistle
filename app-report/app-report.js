@@ -65,16 +65,23 @@ app.use(async function handleErrors(ctx, next) {
         ctx.status = e.status || 500;
         switch (ctx.status) {
             case 404: // Not Found
-                const context404 = { msg: e.message=='Not Found'?null:e.message };
-                // TODO: fix!
-                try { await ctx.render('404-not-found', context404); } catch (e) { }
+                const context404 = { msg: e.message=='Not Found' ? null : e.message };
+                try {
+                    await ctx.render('404-not-found', context404);                       // 404 from app-report
+                } catch (renderErr) {
+                    await ctx.render('../../../../templates/404-not-found', context404); // 404 from composed sub-app
+                }
                 break;
             default:
-            case 500: // Internal Server Error TODO: 500-internal-server-error gets looked for within individual project
+            case 500: // Internal Server Error
                 console.error('handleErrors', ctx.status, e.message, e.stack);
                 const context500 = app.env=='production' ? {} : { e: e };
-                await ctx.render('500-internal-server-error', context500);
-                ctx.app.emit('error', e.message); // github.com/koajs/koa/wiki/Error-Handling
+                try {
+                    await ctx.render('500-internal-server-error', context500);                       // error from app-report
+                } catch (renderErr) {
+                    await ctx.render('../../../../templates/500-internal-server-error', context500); // error from composed sub-app
+                }
+                // ctx.app.emit('error', e.message); // github.com/koajs/koa/wiki/Error-Handling
                 break;
         }
         await log(ctx, 'error', null, null, e);

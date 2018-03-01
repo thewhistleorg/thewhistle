@@ -160,12 +160,14 @@ describe(`Report app (${org}/${app.env})`, function() {
             const document = new jsdom.JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[1].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(2);
+            expect(document.querySelectorAll('input')).to.have.lengthOf(6);
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
-                'on-behalf-of': 'myself',
-                'nav-next':     'next',
+                'on-behalf-of':    'myself',
+                'survivor-gender': 'f',
+                'survivor-age':    '20–24',
+                'nav-next':        'next',
             };
             const responsePost = await appReport.post(`/${org}/${proj}/2`).send(values);
             expect(responsePost.status).to.equal(302);
@@ -254,14 +256,12 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
-            expect(document.querySelectorAll('input')).to.have.lengthOf(6); // file selector, age, gender
+            expect(document.querySelectorAll('input')).to.have.lengthOf(2); // desc, file selector
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
-                'description':     'erroneous description',
-                'survivor-gender': 'f',
-                'survivor-age':    '20–24',
-                'nav-next':        'next',
+                'description': 'erroneous description',
+                'nav-next':    'next',
             };
             const responsePost = await appReport.post(`/${org}/${proj}/6`).send(values);
             expect(responsePost.status).to.equal(302);
@@ -310,24 +310,20 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
-            expect(document.querySelectorAll('input')).to.have.lengthOf(6); // file selector, age, gender
+            expect(document.querySelectorAll('input')).to.have.lengthOf(2); // file selector
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
 
             expect(document.querySelector('textarea').textContent).to.equal('erroneous description');
 
             const values = {
-                'description':     'Test',
-                'survivor-gender': 'f',
-                'survivor-age':    '20–24',
-                'nav-next':        'next',
+                'description': 'Test',
+                'nav-next':    'next',
             };
             const imgFldr = 'test/img/';
             const imgFile = 's_gps.jpg';
             // superagent doesn't allow request.attach() to be used with request.send(), so instead use request.field()
             const responsePost = await appReport.post(`/${org}/${proj}/6`)
                 .field('description', values['description'])
-                .field('survivor-gender', values['survivor-gender'])
-                .field('survivor-age', values['survivor-age'])
                 .field('nav-next', values['nav-next'])
                 .attach('documents', imgFldr+imgFile);
             expect(responsePost.status).to.equal(302);
@@ -394,20 +390,20 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(tds[0].textContent).to.equal('testy terrain');
             expect(ths[1].textContent).to.equal('On behalf of');
             expect(tds[1].textContent).to.equal('Myself');
-            expect(ths[2].textContent).to.equal('Happened');
-            expect(tds[2].textContent).to.equal(dateFormat('d mmm yyyy'));
-            expect(ths[3].textContent).to.equal('Still happening?');
-            expect(tds[3].textContent).to.equal('no');
-            expect(ths[4].textContent).to.equal('Where');
-            expect(tds[4].textContent).to.equal('University of Lagos');
-            expect(ths[5].textContent).to.equal('Who');
-            expect(tds[5].textContent).to.equal('Not known: Big fat guy');
-            expect(ths[6].textContent).to.equal('Description');
-            expect(tds[6].textContent).to.equal('Test');
-            expect(ths[7].textContent).to.equal('Survivor gender');
-            expect(tds[7].textContent).to.equal('female');
-            expect(ths[8].textContent).to.equal('Survivor age');
-            expect(tds[8].textContent).to.equal('20–24');
+            expect(ths[2].textContent).to.equal('Survivor gender');
+            expect(tds[2].textContent).to.equal('female');
+            expect(ths[3].textContent).to.equal('Survivor age');
+            expect(tds[3].textContent).to.equal('20–24');
+            expect(ths[4].textContent).to.equal('Happened');
+            expect(tds[4].textContent).to.equal(dateFormat('d mmm yyyy'));
+            expect(ths[5].textContent).to.equal('Still happening?');
+            expect(tds[5].textContent).to.equal('no');
+            expect(ths[6].textContent).to.equal('Where');
+            expect(tds[6].textContent).to.equal('University of Lagos');
+            expect(ths[7].textContent).to.equal('Who');
+            expect(tds[7].textContent).to.equal('Not known: Big fat guy');
+            expect(ths[8].textContent).to.equal('Description');
+            expect(tds[8].textContent).to.equal('Test');
             expect(ths[9].textContent).to.equal('Spoken to anybody?');
             expect(tds[9].textContent).to.equal('—');
             expect(ths[10].textContent).to.equal('Extra notes');
@@ -465,6 +461,8 @@ describe(`Report app (${org}/${app.env})`, function() {
                 'generated-alias':  'testy terrain',
                 'existing-alias':   '',
                 'on-behalf-of':     'myself',
+                'survivor-gender':  'f',
+                'survivor-age':     '20–24',
                 'when':             'date',
                 'date.day':         dateFormat('d'),
                 'date.month':       dateFormat('mmm'),
@@ -480,8 +478,6 @@ describe(`Report app (${org}/${app.env})`, function() {
                 'who-description':  'Big fat guy',
                 'description':      'Single-page submission test',
                 'action-taken':     'teacher',
-                'survivor-gender':  'f',
-                'survivor-age':     '20–24',
                 'extra-notes':      '',
                 'nav-next':         'next',
             };
@@ -521,20 +517,20 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(tds[0].textContent).to.equal('testy terrain');
             expect(ths[1].textContent).to.equal('On behalf of');
             expect(tds[1].textContent).to.equal('Myself');
-            expect(ths[2].textContent).to.equal('Happened');
-            expect(tds[2].textContent).to.equal(dateFormat('d mmm yyyy'));
-            expect(ths[3].textContent).to.equal('Still happening?');
-            expect(tds[3].textContent).to.equal('no');
-            expect(ths[4].textContent).to.equal('Where');
-            expect(tds[4].textContent).to.equal('University of Lagos');
-            expect(ths[5].textContent).to.equal('Who');
-            expect(tds[5].textContent).to.equal('Not known: Big fat guy');
-            expect(ths[6].textContent).to.equal('Description');
-            expect(tds[6].textContent).to.equal('Single-page submission test');
-            expect(ths[7].textContent).to.equal('Survivor gender');
-            expect(tds[7].textContent).to.equal('female');
-            expect(ths[8].textContent).to.equal('Survivor age');
-            expect(tds[8].textContent).to.equal('20–24');
+            expect(ths[2].textContent).to.equal('Survivor gender');
+            expect(tds[2].textContent).to.equal('female');
+            expect(ths[3].textContent).to.equal('Survivor age');
+            expect(tds[3].textContent).to.equal('20–24');
+            expect(ths[4].textContent).to.equal('Happened');
+            expect(tds[4].textContent).to.equal(dateFormat('d mmm yyyy'));
+            expect(ths[5].textContent).to.equal('Still happening?');
+            expect(tds[5].textContent).to.equal('no');
+            expect(ths[6].textContent).to.equal('Where');
+            expect(tds[6].textContent).to.equal('University of Lagos');
+            expect(ths[7].textContent).to.equal('Who');
+            expect(tds[7].textContent).to.equal('Not known: Big fat guy');
+            expect(ths[8].textContent).to.equal('Description');
+            expect(tds[8].textContent).to.equal('Single-page submission test');
             expect(ths[9].textContent).to.equal('Spoken to anybody?');
             expect(tds[9].textContent).to.equal('Teacher/tutor/lecturer');
             expect(ths[10].textContent).to.equal('Extra notes');

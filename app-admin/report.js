@@ -139,7 +139,7 @@ class IncidentReport {
 
         ctx.set('X-Insert-Id', id); // for integration tests
 
-        ctx.session = null;
+        ctx.session = null; // note on next request, ctx.session will be {} not null, but session.isNew will be true
         ctx.redirect(`/report/${ctx.params.project}/${id}/confirm`);
     }
 

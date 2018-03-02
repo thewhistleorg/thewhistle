@@ -70,7 +70,7 @@ class Handlers {
      */
     static async getPage(ctx) {
         debug('getPage', 'p'+ctx.params.num, 'id:'+ctx.session.id);
-        if (!ctx.session) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
+        if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
 
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num); // note '+' is allowed in windows filenames, '*' is not
         if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); }
@@ -125,7 +125,7 @@ class Handlers {
      */
     static async postPage(ctx) {
         debug('postPage', 'p'+ctx.params.num, 'id:'+ctx.session.id, Object.keys(ctx.request.body));
-        if (!ctx.session) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
+        if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
 
         // page number, or '+' for single-page submission
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num);
@@ -240,7 +240,7 @@ class Handlers {
      * Shows local resources grouped by services they offer.
      */
     static async getWhatnext(ctx) {
-        if (ctx.session) {
+        if (!ctx.session.isNew) {
             // tag report as complete
             // suspend complete/incomplete tags await Report.deleteTag(ctx.params.database, ctx.session.id, 'incomplete', null);
             // suspend complete/incomplete tags await Report.insertTag(ctx.params.database, ctx.session.id, 'complete', null);
@@ -251,7 +251,7 @@ class Handlers {
             }
 
             // remove all session data (to prevent duplicate submission)
-            ctx.session = null;
+            ctx.session = null; // note on next request, ctx.session will be {} not null, but session.isNew will be true
 
         }
         const context = { address: ctx.query.address };

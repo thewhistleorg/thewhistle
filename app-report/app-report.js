@@ -157,6 +157,8 @@ const luscaCspTrustedCdns = [
     'fonts.gstatic.com',
     'cdnjs.cloudflare.com',
     'unpkg.com',
+    'www.google.com',
+    'www.gstatic.com',
     'www.googletagmanager.com',
     'www.google-analytics.com',
 ].join(' ');

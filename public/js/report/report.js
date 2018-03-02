@@ -1,5 +1,9 @@
 'use strict';
 
+function reCaptchaSubmitCallback(token) {
+     document.querySelector('form').submit();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
 
     // add 'required' indicators for form labels

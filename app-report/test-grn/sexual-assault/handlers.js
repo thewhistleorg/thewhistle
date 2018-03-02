@@ -4,9 +4,11 @@
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-import geodesy    from 'geodesy';    // library of geodesy functions
-import Debug      from 'debug';      // small debugging utility
+import fetch       from 'node-fetch';  // window.fetch in node.js
+import querystring from 'querystring'; // nodejs.org/api/querystring.html
+import dateFormat  from 'dateformat';  // Steven Levithan's dateFormat()
+import geodesy     from 'geodesy';     // library of geodesy functions
+import Debug       from 'debug';       // small debugging utility
 
 const debug = Debug('app:report'); // submission process
 
@@ -18,7 +20,7 @@ import Resource   from '../../../models/resource.js';
 import Submission from '../../../models/submission.js';
 import UserAgent  from '../../../models/user-agent.js';
 import Geocoder   from '../../../lib/geocode.js';
-import log from '../../../lib/log';
+import log        from '../../../lib/log';
 
 const nPages = 8;
 
@@ -51,6 +53,27 @@ class Handlers {
      * Process index page submission - just goes to page 1.
      */
     static async postIndex(ctx) {
+        if (ctx.app.env == 'production') {
+            // verify client-side reCAPTCHA: developers.google.com/recaptcha/docs/verify
+            const params = {
+                secret:   process.env.RECAPTCHA_SECRET_KEY,
+                response: ctx.request.body['g-recaptcha-response'],
+                remoteip: ctx.request.ip,
+            };
+            const qs = querystring.stringify(params);
+            const response = await fetch(`https://www.google.com/recaptcha/api/siteverify?${qs}`);
+            if (response.ok) {
+                const responseJs = await response.json();
+                if (responseJs.success == false) {
+                    ctx.flash = { error: `reCAPTCHA verification failed: ${responseJs['error-codes']} – are you a bot?` };
+                    return ctx.redirect(ctx.url);
+                }
+            } else {
+                ctx.flash = { error: `reCAPTCHA verification failed: ${response.status} / ${response.statusText}` };
+                return ctx.redirect(ctx.url);
+            }
+        }
+
         // record user-agent
         await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
 

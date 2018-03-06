@@ -1,82 +1,82 @@
 <div id="search">
-  <div id="search-display" class="pure-form">
-    <div class="magnifying-glass">
-        <div class="fa fa-search"></div>
+    <div id="search-display" class="pure-form">
+        <div class="magnifying-glass">
+            <div class="fa fa-search"></div>
+        </div>
+        <input class="description-filter" name="description" placeholder="Search description">
+        <a href="#" class="remove-desc-srch hide">×</a>
+        <button id="filter-toggle-button" class="pure-button pure-button-primary filter-toggle">Show filters</button>
+        <div id="filter-container" style="display:none">
+            <div class="pure-menu pure-menu-horizontal border-top blue-grey-background">
+                <ul class="pure-menu-list">
+
+                    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                        <a href="#" class="pure-menu-link">searching in <b>{{filterLists.activeNow}}</b></a>
+                        <ul class="pure-menu-children">
+                            {{#each filterLists.activeAlt}}
+                            <li class="pure-menu-item" data-key="active" data-value="{{value}}"><a href="#" class="pure-menu-link">search in <b>{{display}}</b></a></li>
+                            {{/each}}
+                        </ul>
+                    </li>
+
+                    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                        <a href="#" class="pure-menu-link">project</a>
+                        <ul class="pure-menu-children">
+                            {{#filterLists.projects}}
+                            <li class="pure-menu-item" data-key="project" data-value="{{this}}"><a href="#" class="pure-menu-link">{{this}}</a></li>
+                            {{/filterLists.projects}}
+                        </ul>
+                    </li>
+
+                    <li class="pure-menu-item pure-menu-disabled">
+                        <a href="#" class="pure-menu-link">updated</a>
+                    </li>
+
+                    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                        <a href="#" class="pure-menu-link">submitted</a>
+                        <ul class="pure-menu-children range-filter">
+                            <li class="pure-menu-item"><input name="submitted" class="submitted"></li>
+                        </ul>
+                    </li>
+
+                    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                        <a href="#" class="pure-menu-link">assigned to</a>
+                        <ul class="pure-menu-children">
+                            {{#filterLists.assignees}}
+                            <li class="pure-menu-item" data-key="assigned" data-value="{{username}}"><a href="#" class="pure-menu-link {{fmt}}">{{firstname}} {{lastname}}</a></li>
+                            {{/filterLists.assignees}}
+                        </ul>
+                    </li>
+
+                    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                        <a href="#" class="pure-menu-link">status</a>
+                        <ul class="pure-menu-children">
+                            {{#filterLists.statuses}}
+                            <li class="pure-menu-item" data-key="status" data-value="{{status}}"><a href="#" class="pure-menu-link">{{{display}}}</a></li>
+                            {{/filterLists.statuses}}
+                        </ul>
+                    </li>
+
+                    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                        <a href="#" class="pure-menu-link">tags</a>
+                        <ul class="pure-menu-children">
+                            {{#filterLists.tags}}
+                            <li class="pure-menu-item" data-key="tag" data-value="{{this}}"><a href="#" class="pure-menu-link">{{this}}</a></li>
+                            {{/filterLists.tags}}
+                        </ul>
+                    </li>
+
+                    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                        <a href="#" class="pure-menu-link">report fields</a>
+                        <ul class="pure-menu-children">
+                            {{#filterLists.fields}}
+                            <li class="pure-menu-item" data-key="field:{{this}}"><a href="#" class="pure-menu-link">{{this}}</a></li>
+                            {{/filterLists.fields}}
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
     </div>
-    <input class="description-filter" name="description" placeholder="Search description">
-    <a href="#" class="remove-desc-srch hide">×</a>
-    <button id="filter-toggle-button" class="pure-button pure-button-primary filter-toggle">Show filters</button>
-    <div id="filter-container" style="display:none">
-      <div class="pure-menu pure-menu-horizontal border-top blue-grey-background">
-      <ul class="pure-menu-list">
-
-          <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-              <a href="#" class="pure-menu-link">searching in <b>{{filterLists.activeNow}}</b></a>
-              <ul class="pure-menu-children">
-                  {{#each filterLists.activeAlt}}
-                  <li class="pure-menu-item" data-key="active" data-value="{{value}}"><a href="#" class="pure-menu-link">search in <b>{{display}}</b></a></li>
-                  {{/each}}
-              </ul>
-          </li>
-
-          <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-              <a href="#" class="pure-menu-link">project</a>
-              <ul class="pure-menu-children">
-                  {{#filterLists.projects}}
-                  <li class="pure-menu-item" data-key="project" data-value="{{this}}"><a href="#" class="pure-menu-link">{{this}}</a></li>
-                  {{/filterLists.projects}}
-              </ul>
-          </li>
-
-          <li class="pure-menu-item pure-menu-disabled"><a href="#" class="pure-menu-link">updated</a></li>
-
-          <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-              <a href="#" class="pure-menu-link">submitted</a>
-              <ul class="pure-menu-children range-filter">
-                  <li class="pure-menu-item">
-                      <input name="submitted" class="submitted">
-                  </li>
-              </ul>
-          </li>
-
-          <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-              <a href="#" class="pure-menu-link">assigned to</a>
-              <ul class="pure-menu-children">
-                  {{#filterLists.assignees}}
-                  <li class="pure-menu-item" data-key="assigned" data-value="{{username}}"><a href="#" class="pure-menu-link {{fmt}}">{{firstname}} {{lastname}}</a></li>
-                  {{/filterLists.assignees}}
-              </ul>
-          </li>
-
-          <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-              <a href="#" class="pure-menu-link">status</a>
-              <ul class="pure-menu-children">
-                  {{#filterLists.statuses}}
-                  <li class="pure-menu-item" data-key="status" data-value="{{status}}"><a href="#" class="pure-menu-link">{{{display}}}</a></li>
-                  {{/filterLists.statuses}}
-              </ul>
-          </li>
-
-          <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-              <a href="#" class="pure-menu-link">tags</a>
-              <ul class="pure-menu-children">
-                  {{#filterLists.tags}}
-                  <li class="pure-menu-item" data-key="tag" data-value="{{this}}"><a href="#" class="pure-menu-link">{{this}}</a></li>
-                  {{/filterLists.tags}}
-              </ul>
-          </li>
-
-          <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-              <a href="#" class="pure-menu-link">report fields</a>
-              <ul class="pure-menu-children">
-                  {{#filterLists.fields}}
-                  <li class="pure-menu-item" data-key="field:{{this}}"><a href="#" class="pure-menu-link">{{this}}</a></li>
-                  {{/filterLists.fields}}
-              </ul>
-          </li>
-
-      </ul>
-  </div>
-    </div>
-  </div>
 </div>

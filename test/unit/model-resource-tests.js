@@ -1,18 +1,19 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Resource model unit tests.                                                 C.Veness 2017-2018  */
 /*                                                                                                */
-/* Note these tests do not mock out database components, but operate on the live 'test-cam' db.   */
+/* Note these tests do not mock out database components, but operate on the live 'grn' test db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import chai   from 'chai';   // BDD/TDD assertion library
 import dotenv from 'dotenv'; // load environment variables from a .env file into process.env
+
 const expect = chai.expect;
 
 dotenv.config();
 
 import Resource from '../../models/resource.js';
 
-const db = 'test-cam';
+const db = 'grn'; // the test organisation for the live ‘test-grn‘ organisation
 
 import './before.js'; // set up database connections
 

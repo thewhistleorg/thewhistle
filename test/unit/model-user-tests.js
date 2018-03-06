@@ -1,11 +1,12 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* User model unit tests.                                                          C.Veness 2017  */
+/* User model unit tests.                                                     C.Veness 2017-2018  */
 /*                                                                                                */
-/* Note these tests do not mock out database components, but operate on the live 'test-cam' db.   */
+/* Note these tests do not mock out database components, but operate on the live 'user' db.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import chai from 'chai'; // BDD/TDD assertion library
+import chai   from 'chai';   // BDD/TDD assertion library
 import dotenv from 'dotenv'; // load environment variables from a .env file into process.env
+
 const expect = chai.expect;
 
 dotenv.config();

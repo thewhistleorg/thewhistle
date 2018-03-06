@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Report model unit tests.                                                   C.Veness 2017-2018  */
 /*                                                                                                */
-/* Note these tests do not mock out database components, but operate on the live 'test-cam' db.   */
+/* Note these tests do not mock out database components, but operate on the live 'grn' test db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import chai       from 'chai';       // BDD/TDD assertion library
@@ -17,7 +17,7 @@ import User   from '../../models/user.js';
 
 import './before.js'; // set up database connections
 
-const db = 'test-cam';
+const db = 'grn'; // the test organisation for the live ‘test-grn‘ organisation
 
 describe(`Report model (${db})`, function() {
     this.timeout(5e3); // 5 sec

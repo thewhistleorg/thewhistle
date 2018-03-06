@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Question model unit tests.                                                      C.Veness 2018  */
 /*                                                                                                */
-/* Note these tests do not mock out database components, but operate on the live 'test-cam' db.   */
+/* Note these tests do not mock out database components, but operate on the live 'grn' test db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import chai   from 'chai';   // BDD/TDD assertion library
@@ -12,7 +12,7 @@ dotenv.config();
 
 import Question from '../../models/question.js';
 
-const db = 'test-cam';
+const db = 'grn'; // the test organisation for the live ‘test-grn‘ organisation
 
 import './before.js'; // set up database connections
 

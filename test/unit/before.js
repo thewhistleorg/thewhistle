@@ -6,7 +6,8 @@
 /* 'mocha test/unit/*.js'!                                                                        */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import MongoDB from 'mongodb';  // MongoDB driver for Node.js
+import MongoDB from 'mongodb'; // MongoDB driver for Node.js
+
 const MongoClient = MongoDB.MongoClient;
 
 before(async function() {
@@ -14,7 +15,7 @@ before(async function() {
 
     try {
         global.db = {};
-        for (const db of [ 'users', 'test-cam' ]) {
+        for (const db of [ 'users', 'grn' ]) {
             const connectionString = process.env['DB_'+db.toUpperCase().replace('-', '_')];
             if (connectionString == undefined) throw new Error(`No configuration available for db ‘${db}’`);
             const client = await MongoClient.connect(connectionString);

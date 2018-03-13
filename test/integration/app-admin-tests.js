@@ -704,22 +704,24 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const response = await appAdmin.get('/reports/export-csv');
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('text/csv; charset=utf-8');
-            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${dateFormat('yyyy-mm-dd HH.MM')}.csv"`);
+            const timestamp = response.headers['x-timestamp'];
+            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${timestamp}.csv"`);
         });
 
         it('downloads reports list as PDF', async function() {
             const response = await appAdmin.get('/reports/export-pdf');
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('application/pdf');
-            // TODO: any way to reliably test for filename if timestamp ticks over minute boundary?
-            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${dateFormat('yyyy-mm-dd HH.MM')}.pdf"`);
+            const timestamp = response.headers['x-timestamp'];
+            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${timestamp}.pdf"`);
         });
 
         it('downloads single report as PDF', async function() {
             const response = await appAdmin.get('/reports/export-pdf/'+reportId);
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('application/pdf');
-            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident report ${dateFormat('yyyy-mm-dd HH.MM')}.pdf"`);
+            const timestamp = response.headers['x-timestamp'];
+            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident report ${timestamp}.pdf"`);
         });
 
         it('deletes report tag (ajax)', async function() {

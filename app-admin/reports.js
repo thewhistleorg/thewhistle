@@ -294,9 +294,11 @@ class ReportsHandlers {
 
         const csv = json2csv({ data: reports });
         const filenameFilter = filterDesc.size>0 ? `(filtered by ${[ ...filterDesc ].join(', ')}) ` : '';
-        const filename = `the whistle incident reports ${filenameFilter}${dateFormat('yyyy-mm-dd HH.MM')}.csv`;
+        const timestamp = dateFormat('yyyy-mm-dd HH.MM');
+        const filename = `the whistle incident reports ${filenameFilter}${timestamp}.csv`;
         ctx.status = 200;
         ctx.body = csv;
+        ctx.set('X-Timestamp', timestamp); // for integration tests
         ctx.attachment(filename);
 
         // check whether current list of reports is for a single project, with homogeneous submitted details
@@ -439,10 +441,12 @@ class ReportsHandlers {
         };
 
         // return PDF as attachment
-        const filenameFilter = filterDesc.size>0 ? ` (filtered by ${[ ...filterDesc ].join(', ')}) ` : ' ';
-        const filename = 'the whistle incident reports' + filenameFilter +  dateFormat('yyyy-mm-dd HH.MM') + '.pdf';
+        const filenameFilter = filterDesc.size>0 ? ` (filtered by ${[ ...filterDesc ].join(', ')}) ` : '';
+        const timestamp = dateFormat('yyyy-mm-dd HH.MM');
+        const filename = `the whistle incident reports ${filenameFilter}${timestamp}.pdf`;
         ctx.status = 200;
         ctx.body = await reportsPdf.toBufferPromise();
+        ctx.set('X-Timestamp', timestamp); // for integration tests
         ctx.attachment(filename);
     }
 
@@ -522,9 +526,11 @@ class ReportsHandlers {
         };
 
         // return PDF as attachment
-        const filename = 'the whistle incident report ' +  dateFormat('yyyy-mm-dd HH.MM') + '.pdf';
+        const timestamp = dateFormat('yyyy-mm-dd HH.MM');
+        const filename = `the whistle incident report ${timestamp}.pdf`;
         ctx.status = 200;
         ctx.body = await reportsPdf.toBufferPromise();
+        ctx.set('X-Timestamp', timestamp); // for integration tests
         ctx.attachment(filename);
     }
 

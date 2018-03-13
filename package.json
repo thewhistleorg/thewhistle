@@ -18,9 +18,9 @@
     "lint-node": "eslint --env node --ignore-pattern public .",
     "lint-browser": "eslint --env browser public/",
     "stylelint": "stylelint public/css/*.css",
-    "cover": "nyc --require @std/esm --reporter=html npm test",
-    "cover-unit": "nyc --reporter=html npm run test-unit",
-    "cover-intgn": "nyc --reporter=html npm run test-intgn",
+    "cover": "nyc --require @std/esm --reporter=html npm test; rm -r ./.nyc_output",
+    "cover-unit": "nyc --require @std/esm --reporter=html npm run test-unit; rm -r ./.nyc_output",
+    "cover-intgn": "nyc --require @std/esm --reporter=html npm run test-intgn; rm -r ./.nyc_output",
     "apidoc": "apidoc -i app-api -o app-api/apidoc/apidoc"
   },
   "engines": {

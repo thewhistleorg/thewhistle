@@ -2,13 +2,14 @@
 
 /* stylelint block-opening-brace-space-before: [ "always", { "severity": "warning" } ] */
 
+/* fonts.google.com/specimen/Open+Sans; 300 = light, 400 = regular, 700 = bold */
 @import url('//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i');
 
 body {
     font-family: 'Open Sans', 'Segoe UI', Tahoma, sans-serif;
     padding: 0;
     background: #f0f3f4;
-    min-width: 850px; 
+    min-width: 850px;
     /* background-color: : #ffffff; */
 }
 

@@ -53,8 +53,11 @@ class Handlers {
      * Process index page submission - just goes to page 1.
      */
     static async postIndex(ctx) {
+        const org = ctx.params.database;
+        const project = ctx.params.project;
+
+        // verify client-side reCAPTCHA: developers.google.com/recaptcha/docs/verify
         if (ctx.app.env == 'production') {
-            // verify client-side reCAPTCHA: developers.google.com/recaptcha/docs/verify
             const params = {
                 secret:   process.env.RECAPTCHA_SECRET_KEY,
                 response: ctx.request.body['g-recaptcha-response'],
@@ -75,10 +78,10 @@ class Handlers {
         }
 
         // record user-agent
-        await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
+        await UserAgent.log(org, ctx.ip, ctx.headers);
 
         // redirect to page 1 of the submission
-        ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/1`);
+        ctx.redirect(`/${org}/${project}/1`);
     }
 
 
@@ -93,13 +96,17 @@ class Handlers {
      */
     static async getPage(ctx) {
         debug('getPage', 'p'+ctx.params.num, 'id:'+ctx.session.id);
-        if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
+
+        const org = ctx.params.database;
+        const project = ctx.params.project;
+
+        if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${org}/${project}`); }
 
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num); // note '+' is allowed in windows filenames, '*' is not
-        if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); }
+        if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
 
         // fetch already entered information to fill in defaults for this page if it is being revisited
-        const report = await Report.get(ctx.params.database, ctx.session.id);
+        const report = await Report.get(org, ctx.session.id);
 
         // default the incident report date to today if 'exactly when it happened' is selected: this
         // is a natural default, is quite easy to change to yesterday, or to any other day
@@ -117,7 +124,7 @@ class Handlers {
         Object.assign(submitted, ctx.flash.formdata);
 
         // supply any required self/other parameterised questions
-        const questions = await Question.get(ctx.params.database, ctx.params.project);
+        const questions = await Question.get(org, project);
         const q = {};
         questions.forEach(qn => q[qn.questionNo] = submitted['on-behalf-of']=='someone-else' ? qn.other : qn.self);
 
@@ -135,7 +142,7 @@ class Handlers {
         const context = Object.assign({ pages: pages }, submitted, { incidentDate: incidentDate }, { q: q });
 
         // users are not allowed to go 'back' to 'used-before' page
-        if (page==1 && ctx.session.saved) { ctx.flash = { error: 'Please continue with your current alias' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/2`); }
+        if (page==1 && ctx.session.saved) { ctx.flash = { error: 'Please continue with your current alias' }; return ctx.redirect(`/${org}/${project}/2`); }
 
         await ctx.render('page'+page, context);
     }
@@ -148,13 +155,17 @@ class Handlers {
      */
     static async postPage(ctx) {
         debug('postPage', 'p'+ctx.params.num, 'id:'+ctx.session.id, Object.keys(ctx.request.body));
-        if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}`); }
+
+        const org = ctx.params.database;
+        const project = ctx.params.project;
+
+        if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${org}/${project}`); }
 
         // page number, or '+' for single-page submission
         const page = ctx.params.num=='*' ? '+' : Number(ctx.params.num);
 
         // don't allow jumping further forward than 'next' page
-        if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${ctx.session.completed+1}`); }
+        if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
 
         const body = ctx.request.body;
 
@@ -181,7 +192,7 @@ class Handlers {
                 case 'y':
                     // verify existing alias does exist
                     alias = body['existing-alias'];
-                    const reportsY = await Report.getBy(ctx.params.database, 'alias', alias);
+                    const reportsY = await Report.getBy(org, 'alias', alias);
                     const reportsYExclCurr = reportsY.filter(r => r._id != ctx.session.id); // exclude current report
                     const errorY = `Anonymous alias ‘${alias}’ not found`;
                     const flashY = Object.assign({ error: errorY }, { formdata: body }); // include formdata for single-page report
@@ -191,7 +202,7 @@ class Handlers {
                     // verify generated alias does not exist
                     if (body['generated-alias'] == null) { ctx.flash = { error: 'Alias not given' }; return ctx.redirect(ctx.url); }
                     alias = body['generated-alias'];
-                    const reportsN = await Report.getBy(ctx.params.database, 'alias', alias);
+                    const reportsN = await Report.getBy(org, 'alias', alias);
                     const reportsNExclCurr = reportsN.filter(r => r._id != ctx.session.id); // exclude current report
                     const errorN = `Generated alias ‘${alias}’ not available: please select another`;
                     const flashN = Object.assign({ error: errorN }, { formdata: body }); // include formdata for single-page report
@@ -201,8 +212,10 @@ class Handlers {
                     ctx.flash = { error: 'used-before must be y or n' }; return ctx.redirect(ctx.url);
             }
 
-            ctx.session.id = await Report.submissionStart(ctx.params.database, ctx.params.project, alias, ctx.headers['user-agent']);
-            // suspend complete/incomplete tags await Report.insertTag(ctx.params.database, ctx.session.id, 'incomplete', null);
+            // save the skeleton report
+            ctx.session.id = await Report.submissionStart(org, project, alias, ctx.headers['user-agent']);
+            // TODO? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.id, 'incomplete', null);
+
             ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
             debug('submissionStart', ctx.session.id);
         }
@@ -227,12 +240,12 @@ class Handlers {
 
         const prettyReport = prettifyReport(page, body);
 
-        if (page>1 || page=='+') await Report.submissionDetails(ctx.params.database, ctx.session.id, prettyReport, body);
+        if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.id, prettyReport, body);
 
         if (body.files) {
             for (const file of body.files) {
                 try {
-                    await Report.submissionFile(ctx.params.database, ctx.session.id, file);
+                    await Report.submissionFile(org, ctx.session.id, file);
                 } catch (e) {
                     await log(ctx, 'error', null, null, e);
                     ctx.flash = { error: e.message };
@@ -241,16 +254,16 @@ class Handlers {
         }
 
         // record user-agent
-        await UserAgent.log(ctx.params.database, ctx.ip, ctx.headers);
+        await UserAgent.log(org, ctx.ip, ctx.headers);
 
         if (page != '+') ctx.session.completed = page;
 
         // record submission progress
         if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
-            await Submission.progress(ctx.params.database, ctx.session.submissionId, page);
+            await Submission.progress(org, ctx.session.submissionId, page);
         }
 
-        ctx.redirect(`/${ctx.params.database}/${ctx.params.project}/${go}`);
+        ctx.redirect(`/${org}/${project}/${go}`);
     }
 
 
@@ -263,14 +276,16 @@ class Handlers {
      * Shows local resources grouped by services they offer.
      */
     static async getWhatnext(ctx) {
+        const org = ctx.params.database;
+
         if (!ctx.session.isNew) {
             // tag report as complete
-            // suspend complete/incomplete tags await Report.deleteTag(ctx.params.database, ctx.session.id, 'incomplete', null);
-            // suspend complete/incomplete tags await Report.insertTag(ctx.params.database, ctx.session.id, 'complete', null);
+            // suspend complete/incomplete tags await Report.deleteTag(org, ctx.session.id, 'incomplete', null);
+            // suspend complete/incomplete tags await Report.insertTag(org, ctx.session.id, 'complete', null);
 
             // record submission complete
             if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
-                await Submission.complete(ctx.params.database, ctx.session.submissionId, ctx.session.id);
+                await Submission.complete(org, ctx.session.submissionId, ctx.session.id);
             }
 
             // remove all session data (to prevent duplicate submission)
@@ -284,7 +299,7 @@ class Handlers {
 
         if (geocoded) {
             // get all resources within 20km of geocoded location
-            const resources = await Resource.getNear(ctx.params.database, geocoded.latitude, geocoded.longitude, 20e3);
+            const resources = await Resource.getNear(org, geocoded.latitude, geocoded.longitude, 20e3);
 
             // add distance from geocoded location to each resource, & convert phone/email arrays to lists
             const locn = new LatLon(geocoded.latitude, geocoded.longitude);

@@ -784,9 +784,10 @@ class ReportsHandlers {
      */
     static async viewReport(ctx) {
         const db = ctx.state.user.db;
+        const reportId = ctx.params.id;
 
         // report details
-        const report = await Report.get(db, ctx.params.id);
+        const report = await Report.get(db, reportId);
         if (!report) ctx.throw(404, 'Report not found');
 
         report.reported = dateFormat(report._id.getTimestamp(), 'yyyy-mm-dd HH:MM');
@@ -798,7 +799,7 @@ class ReportsHandlers {
         const statuses = await Report.statuses(db); // for status datalist
 
         // other reports from same reporter
-        const otherReports = await Report.find(db, { $and: [ { alias: report.alias }, { _id: { $ne: ObjectId(ctx.params.id) } } ] });
+        const otherReports = await Report.find(db, { $and: [ { alias: report.alias }, { _id: { $ne: ObjectId(reportId) } } ] });
         for (const rpt of otherReports) {
             rpt.reported = dateFormat(rpt._id.getTimestamp(), 'd mmm yyyy HH:MM');
             rpt.desc = truncate(rpt.submitted.Description, 24);
@@ -838,7 +839,7 @@ class ReportsHandlers {
         });
 
         // audit trail
-        const updates = await Update.getByReport(db, ctx.params.id);
+        const updates = await Update.getByReport(db, reportId);
 
         const y = 1000*60*60*24*365;
         const desc = report.submitted['Description'] || report.submitted['brief-description']; // TODO: transition code until all early test report are deleted
@@ -903,7 +904,7 @@ class ReportsHandlers {
         //if (Object.keys(report.location.geocode).length == 0) report.location.geocode = false;
 
         await ctx.render('reports-view', Object.assign(report, extra));
-        Report.flagView(db, ctx.params.id, ctx.state.user.id);
+        Report.flagView(db, reportId, ctx.state.user.id);
     }
 
 
@@ -918,24 +919,25 @@ class ReportsHandlers {
     static async processView(ctx) {
         if (!ctx.state.user.roles.includes('admin')) return ctx.redirect('/login'+ctx.url);
         const db = ctx.state.user.db;
+        const reportId = ctx.params.id;
 
         try {
             if (ctx.request.body.summary !== undefined) {
-                await Report.update(db, ctx.params.id, { summary: ctx.request.body.summary }, ctx.state.user.id);
+                await Report.update(db, reportId, { summary: ctx.request.body.summary }, ctx.state.user.id);
             }
 
             if (ctx.request.body['assigned-to'] !== undefined) {
                 const assignedTo = ctx.request.body['assigned-to']==null ? null : ObjectId(ctx.request.body['assigned-to']);
-                await Report.update(db, ctx.params.id, { assignedTo }, ctx.state.user.id);
+                await Report.update(db, reportId, { assignedTo }, ctx.state.user.id);
             }
 
             if (ctx.request.body.status !== undefined) {
                 if (ctx.request.body.status == '*') throw new Error('Cannot use ‘*’ for status');
-                await Report.update(db, ctx.params.id, { status: ctx.request.body.status }, ctx.state.user.id);
+                await Report.update(db, reportId, { status: ctx.request.body.status }, ctx.state.user.id);
             }
 
             if (ctx.request.body.archived !== undefined) {
-                await Report.update(db, ctx.params.id, { archived: ctx.request.body.archived=='y' }, ctx.state.user.id);
+                await Report.update(db, reportId, { archived: ctx.request.body.archived=='y' }, ctx.state.user.id);
             }
 
             // remain on same page
@@ -955,10 +957,11 @@ class ReportsHandlers {
     static async processDelete(ctx) {
         if (!ctx.state.user.roles.includes('admin')) return ctx.redirect('/login'+ctx.url);
         const db = ctx.state.user.db;
+        const reportId = ctx.params.id;
 
         try {
 
-            await Report.delete(db, ctx.params.id);
+            await Report.delete(db, reportId);
 
             // return to list of reports
             ctx.redirect('/reports');
@@ -1084,14 +1087,16 @@ class ReportsHandlers {
     static async ajaxReportPostComment(ctx) {
         // qv similar code in reports.js / viewCommentary()
         const db = ctx.state.user.db;
+        const reportId = ctx.params.id;
 
         if (!ctx.request.body.comment) { ctx.status = 403; return; } // Forbidden
 
-        const comment = await Report.insertComment(db, ctx.params.id, ctx.request.body.comment, ctx.state.user.id);
+        const comment = await Report.insertComment(db, reportId, ctx.request.body.comment, ctx.state.user.id);
 
         // for returned comment, make links for #tags...
         const tagList = await Report.tags(db);
         for (const tag of tagList) comment.comment = comment.comment.replace('#'+tag, `[#${tag}](/reports?tag=${tag})`);
+
         // ... and convert stored [@mention](id) references to actual links
         const reMention = /\[@([a-z0-9]+)\]\(([0-9a-f]{24})\)/;
         comment.comment = comment.comment.replace(reMention, '[@$1](/users/$2)');

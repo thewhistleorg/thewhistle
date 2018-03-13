@@ -71,7 +71,7 @@ describe(`Update model (${db})`, function() {
     it('gets updates for user', async function() {
         const updates = await Update.getByUser(db, userId);
         expect(updates).to.be.an('array');
-        expect(updates.length).to.equal(1);
+        expect(updates.length).to.be.at.least(1);
     });
 
     it('gets all updates', async function() {
@@ -83,7 +83,7 @@ describe(`Update model (${db})`, function() {
     it('gets updates using flexible query', async function() {
         const updates = await Update.find(db, { userId: userId });
         expect(updates).to.be.an('array');
-        expect(updates.length).to.equal(1);
+        expect(updates.length).to.be.at.least(1);
     });
 
     it('deletes dummy report', async function() {

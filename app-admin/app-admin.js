@@ -80,7 +80,7 @@ app.use(async function handleErrors(ctx, next) {
             case 500: // Internal Server Error
                 const context500 = app.env=='production' ? {} : { e: e };
                 await ctx.render('500-internal-server-error', context500);
-                ctx.app.emit('error', e, ctx); // github.com/koajs/koa/wiki/Error-Handling
+                // ctx.app.emit('error', e, ctx); // github.com/koajs/koa/wiki/Error-Handling
                 break;
         }
         await log(ctx, 'error', null, null, e);

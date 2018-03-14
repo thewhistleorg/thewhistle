@@ -9,8 +9,14 @@ These are intended for use by developers only, and no not have entries in the na
 
 [Submissions](/dev/submissions) – record of how far reporters progress through the submission process
 
-[Access log](/dev/log-access) – log of all page requests
+[Access log](/dev/log-access) – log of all page requests 
+  (and [IP cache](/dev/ip-cache) & [CSV export](/dev/log-access/export-csv))
 
 [Error log](/dev/log-error) – log of errors raised
+
+[UserAgents](/dev/user-agents) - browser user agents 
+  ([admin](/dev/user-agents/admin), [report](/dev/user-agents/report), [reports](/dev/user-agents/reports))
+
+[NodeInfo](/dev/nodeinfo) - config information
 
 [New organisation](/dev/notes/new-organisation) – setting up a new organisation

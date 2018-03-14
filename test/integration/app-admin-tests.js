@@ -954,19 +954,18 @@ describe(`Admin app (${org}/${app.env})`, function() {
     });
 
     describe('dev', function() {
+        it('sees dev home page', async function() {
+            const response = await appAdmin.get('/dev');
+            expect(response.status).to.equal(200);
+        });
+
         it('sees dev/notes page', async function() {
             const response = await appAdmin.get('/dev/notes');
             expect(response.status).to.equal(200);
-        });
-
-        it('sees dev/notes/readme page', async function() {
-            const response = await appAdmin.get('/dev/notes/readme');
-            expect(response.status).to.equal(200);
-        });
-
-        it('sees dev/notes md page', async function() {
-            const response = await appAdmin.get('/dev/notes/development-workflow');
-            expect(response.status).to.equal(200);
+            const responseReadme = await appAdmin.get('/dev/notes/readme');
+            expect(responseReadme.status).to.equal(200);
+            const responseWorkflow = await appAdmin.get('/dev/notes/development-workflow');
+            expect(responseWorkflow.status).to.equal(200);
         });
 
         it('returns 404 for non-existent dev/notes md page', async function() {
@@ -974,14 +973,45 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(404);
         });
 
+        it('sees questions page', async function() {
+            const response = await appAdmin.get('/questions');
+            expect(response.status).to.equal(200);
+        });
+
+        it('sees dev/submissions page', async function() {
+            const responseReadme = await appAdmin.get('/dev/submissions');
+            expect(responseReadme.status).to.equal(200);
+        });
+
+        it('sees dev/log pages', async function() {
+            // NOTE: can take c. 30 sec for reverse dns lookups, so leave access.log out of regular tests
+            // const responseAccess = await appAdmin.get('/dev/log-access');
+            // expect(responseAccess.status).to.equal(200);
+            const responseError = await appAdmin.get('/dev/log-error');
+            expect(responseError.status).to.equal(200);
+            const responseIpCache = await appAdmin.get('/dev/ip-cache');
+            expect(responseIpCache.status).to.equal(200);
+        });
+
         it('sees dev/nodeinfo page', async function() {
             const response = await appAdmin.get('/dev/nodeinfo');
             expect(response.status).to.equal(200);
         });
 
-        it('sees dev/user-agents', async function() {
-            const response = await appAdmin.get('/dev/user-agents');
-            expect(response.status).to.equal(200);
+        it('sees dev/user-agents pages', async function() {
+            const responseV1 = await appAdmin.get('/dev/user-agents');
+            expect(responseV1.status).to.equal(200);
+            const responseAdmin = await appAdmin.get('/dev/user-agents/admin');
+            expect(responseAdmin.status).to.equal(200);
+            const responseReport = await appAdmin.get('/dev/user-agents/report');
+            expect(responseReport.status).to.equal(200);
+            const responseReports = await appAdmin.get('/dev/user-agents/reports');
+            expect(responseReports.status).to.equal(200);
+        });
+
+        it('throws error', async function() {
+            const response = await appAdmin.get('/dev/throw');
+            expect(response.status).to.equal(500);
         });
     });
 

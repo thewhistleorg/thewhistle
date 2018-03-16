@@ -45,7 +45,7 @@ class Handlers {
             ctx.session.submissionId = await Submission.insert(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
         }
 
-        await ctx.render('index');
+        await ctx.render('index', { recaptcha: ctx.app.env=='production' });
     }
 
 

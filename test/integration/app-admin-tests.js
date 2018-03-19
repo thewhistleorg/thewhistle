@@ -211,8 +211,8 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const document = new jsdom.JSDOM(response.text).window.document;
             //expect(document.querySelector('title').textContent).to.match(/.*Activity.+/); home page is temporarily list of reports
             expect(document.querySelector('title').textContent).to.equal('Reports list');
-            // nav should be /, Reports, Users, Resources, Submit, user-name, Logout
-            expect(document.querySelectorAll('header nav > ul > li').length).to.equal(8);
+            // nav should be /, Reports, Users, Resources, Submit – feedback, user-name, notifications, Logout
+            expect(document.querySelectorAll('header nav > ul > li').length).to.equal(9);
             // 'Submit' menu should have entry linking to /grn/rape-is-a-crime
             expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('Rape Is A Crime Internal Form');
             const regexp = new RegExp(`${org}\\/${proj}\\/\\*$`);
@@ -276,6 +276,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
     describe('submit (internal single-page) incident report', function() { // TODO: check overlap with report tests
         let reportId = null;
         let commentId = null;
+        let notificationId = null;
         let testUserDetails = null;
 
         const imgFldr = 'test/img/';
@@ -375,6 +376,53 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(200);
             const document = new jsdom.JSDOM(response.text).window.document;
             expect(document.getElementById(reportId)).to.not.be.null;
+        });
+
+        it('sees notification details of new submission', async function() {
+            const response = await appAdmin.get('/ajax/notifications');
+            expect(response.status).to.equal(200);
+            expect(response.headers['cache-control']).to.equal('no-cache, no-store, must-revalidate');
+            expect(response.body.events['new report submitted']).to.be.an('array');
+            expect(response.body.events['new report submitted'].length).to.be.at.least(1);
+            const notfcn = response.body.events['new report submitted'].filter(n => n.rId == reportId);
+            notificationId = notfcn[0].nId;
+        });
+
+        it('sees notification timestamp of new submission', async function() {
+            // note the normal flow would be to check /ajax/notifications/last-update before
+            // /ajax/notifications, but we can't validate the timestamp without having the
+            // notification id
+            const response = await appAdmin.get('/ajax/notifications/last-update');
+            expect(response.status).to.equal(200);
+            expect(response.headers['cache-control']).to.equal('no-cache, no-store, must-revalidate');
+            expect(response.body.timestamp).to.equal(ObjectId(notificationId).getTimestamp().toISOString().slice(0, -5));
+            // (unless someone else has slipped in a report in the test environment in the meantime!)
+        });
+
+        it('sees notification details of new submission in debug', async function() {
+            // note it's hard to do robust tests using /ajax/notifications, as the  events[event]
+            // array may or may not exist according to other notifications in test db, so use
+            // /ajax/notifications/debug instead, which tells us abut whether notifications have
+            // been recorded, even if it doesn't tell us whether they're being correctly reported
+            // through the front-end
+            const response = await appAdmin.get('/ajax/notifications/debug');
+            const notfcnsForRpt = JSON.parse(response.text).filter(notfcns => notfcns.report == reportId);
+            expect(notfcnsForRpt.length).to.equal(1);
+            expect(notfcnsForRpt[0].event).to.equal('new report submitted');
+        });
+
+        it('dismisses notification', async function() {
+            const response = await appAdmin.delete(`/ajax/notifications/${notificationId}`);
+            expect(response.status).to.equal(200);
+        });
+
+        it('sees notification remains for other users but is gone for tester', async function() {
+            const response = await appAdmin.get('/ajax/notifications/debug');
+            expect(response.status).to.equal(200);
+            const notfcnsForRpt = JSON.parse(response.text).filter(notfcns => notfcns.report == reportId);
+            expect(notfcnsForRpt.length).to.equal(1); // remains for other users
+            expect(notfcnsForRpt[0].event).to.equal('new report submitted');
+            expect(notfcnsForRpt[0].users.filter(usr => usr.id == testUserDetails._id).length).to.equal(0);
         });
 
         it('sees new report with nicely formatted information', async function() {
@@ -515,6 +563,13 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(response.headers.location).to.equal('/reports/'+reportId);
         });
 
+        it('doesn’t see notification of self-assignment', async function() {
+            const response = await appAdmin.get('/ajax/notifications/debug');
+            expect(response.status).to.equal(200);
+            const notfcnsForRpt = JSON.parse(response.text).filter(notfcns => notfcns.report == reportId);
+            expect(notfcnsForRpt.length).to.equal(0);
+        });
+
         it('sees assigned-to in audit trail', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
@@ -591,6 +646,13 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const response = await appAdmin.post(`/ajax/reports/${reportId}/comments`).send(values);
             expect(response.status).to.equal(201);
             commentId = response.body.id;
+        });
+
+        it('doesn’t see notification of self-mention', async function() {
+            const response = await appAdmin.get('/ajax/notifications/debug');
+            expect(response.status).to.equal(200);
+            const notfcnsForRpt = JSON.parse(response.text).filter(notfcns => notfcns.report == reportId);
+            expect(notfcnsForRpt.length).to.equal(0);
         });
 
         it('sees comment in report page, with @mention/#tag links', async function() {

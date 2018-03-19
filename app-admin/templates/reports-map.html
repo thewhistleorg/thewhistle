@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/notifications.css">
     <link rel="stylesheet" href="/css/reports-filter.css">
     <style>
         #map {
@@ -16,10 +17,13 @@
         }
     </style>
     <script src="//cdnjs.cloudflare.com/ajax/libs/qs/6.4.0/qs.min.js" integrity="sha256-Epo8Yj1phr7IExs51UisfSWpmD5bmSf/DMeCcIUoBbM=" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js" integrity="sha256-+JMHsXRyeTsws/tzbIh5YHQxRdKCuNjmvNcTFtY6DLc=" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js" integrity="sha256-9Nt2r+tJnSd2A2CRUvnjgsD+ES1ExvjbjBNqidm9doI=" crossorigin="anonymous"></script>
     <script src="//unpkg.com/dateformat@2.0.0/lib/dateformat.js"></script>
     <script src="/js/admin/reports.js"></script>
     <script src="//maps.googleapis.com/maps/api/js?callback=initMap&key=AIzaSyAZTZ78oNn4Y9sFZ1gIWfAsaqVNGav5DGw" defer></script>
     <script src="//developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+    <script src="/js/admin/notifications.js" defer></script>
     <script>
         const reports = [
             {{#each reports}}

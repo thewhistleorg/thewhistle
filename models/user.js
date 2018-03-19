@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* User model; users allowed to access the system.                                 C.Veness 2017  */
+/* User model; users allowed to access the system.                            C.Veness 2017-2018  */
 /*                                                                                                */
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -66,6 +66,20 @@ class User {
         if (typeof field != 'string') throw new Error('User.getBy: field must be a string');
         const users = global.db.users.collection('users');
         const usrs = await users.find({ [field]: value }).toArray();
+        return usrs;
+    }
+
+
+    /**
+     * Returns Users who have access to given database.
+     *
+     * @param   {string}        database - Database users have access to.
+     * @returns {Object[]}      Users details.
+     */
+    static async getForDb(db) {
+        if (typeof db != 'string') throw new Error('User.getForDb: db must be a string');
+        const users = global.db.users.collection('users');
+        const usrs = await users.find({ databases: db }).toArray();
         return usrs;
     }
 

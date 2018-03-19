@@ -8,6 +8,7 @@ import supertest  from 'supertest';  // SuperAgent driven library for testing HT
 import chai       from 'chai';       // BDD/TDD assertion library
 import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+
 const expect = chai.expect;
 
 import app from '../../app.js';
@@ -27,6 +28,7 @@ describe(`Report app (${org}/${app.env})`, function() {
     this.slow(250);
 
     let reportId = null;
+    let notificationId = null;
 
     before(async function() {
         // check testuser 'tester' exists and has access to ‘grn’ org (only)
@@ -377,6 +379,27 @@ describe(`Report app (${org}/${app.env})`, function() {
             const response = await appAdmin.post('/login/reports').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
+        });
+
+        it('sees notification details of new submission', async function() {
+            const response = await appAdmin.get('/ajax/notifications');
+            expect(response.status).to.equal(200);
+            expect(response.body.events['new report submitted']).to.be.an('array');
+            expect(response.body.events['new report submitted'].length).to.be.at.least(1);
+            const notfcn = response.body.events['new report submitted'].filter(n => n.rId == reportId);
+            notificationId = notfcn[0].nId;
+        });
+
+        it('dismisses notification', async function() {
+            const response = await appAdmin.delete(`/ajax/notifications/${notificationId}`);
+            expect(response.status).to.equal(200);
+        });
+
+        it('sees notification is gone', async function() {
+            const response = await appAdmin.get('/ajax/notifications');
+            expect(response.status).to.equal(200);
+            expect(response.body.events['new report submitted']).to.be.undefined;
+            // hopefully no other new submission lurking in test db!
         });
 
         it('sees new report with nicely formatted information', async function() {

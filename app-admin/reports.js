@@ -29,6 +29,7 @@ import jsObjectToHtml from '../lib/js-object-to-html';
 import Geocoder       from '../lib/geocode';
 import Weather        from '../lib/weather';
 import log            from '../lib/log';
+import Notification   from '../models/notification';
 
 
 class ReportsHandlers {
@@ -903,6 +904,9 @@ class ReportsHandlers {
         // TODO: ??
         //if (Object.keys(report.location.geocode).length == 0) report.location.geocode = false;
 
+        // dismiss any notifications for this report for current user
+        await Notification.dismissForUserReport(db, ctx.state.user.id, reportId);
+
         await ctx.render('reports-view', Object.assign(report, extra));
         Report.flagView(db, reportId, ctx.state.user.id);
     }
@@ -926,18 +930,33 @@ class ReportsHandlers {
                 await Report.update(db, reportId, { summary: ctx.request.body.summary }, ctx.state.user.id);
             }
 
+            // update assigned-to
             if (ctx.request.body['assigned-to'] !== undefined) {
                 const assignedTo = ctx.request.body['assigned-to']==null ? null : ObjectId(ctx.request.body['assigned-to']);
                 await Report.update(db, reportId, { assignedTo }, ctx.state.user.id);
+
+                // cancel any current 'new report submitted' notification
+                const [ notfcnNewReportSubmitted ] = await Notification.listForReport(db, 'new report submitted', reportId);
+                if (notfcnNewReportSubmitted) await Notification.cancel(db, notfcnNewReportSubmitted._id);
+                // cancel any current 'report assigned to user' notification
+                const [ notfcnReportAssigned ] = await Notification.listForReport(db, 'report assigned to user', reportId);
+                if (notfcnReportAssigned) await Notification.dismiss(db, notfcnReportAssigned._id, notfcnReportAssigned.users[0]);
+
+                // create 'report assigned to user' notification (unless self-assigned)
+                if (assignedTo != ctx.state.user.id) await Notification.notify(db, 'report assigned to user', assignedTo, reportId);
             }
 
+            // update status
             if (ctx.request.body.status !== undefined) {
                 if (ctx.request.body.status == '*') throw new Error('Cannot use ‘*’ for status');
                 await Report.update(db, reportId, { status: ctx.request.body.status }, ctx.state.user.id);
             }
 
+            // update archived
             if (ctx.request.body.archived !== undefined) {
                 await Report.update(db, reportId, { archived: ctx.request.body.archived=='y' }, ctx.state.user.id);
+                // cancel any notifications associated with report
+                await Notification.cancelForReport(db, reportId);
             }
 
             // remain on same page
@@ -962,6 +981,9 @@ class ReportsHandlers {
         try {
 
             await Report.delete(db, reportId);
+
+            // cancel any outstanding notifications concerning this report
+            await Notification.cancelForReport(db, reportId);
 
             // return to list of reports
             ctx.redirect('/reports');
@@ -1091,7 +1113,22 @@ class ReportsHandlers {
 
         if (!ctx.request.body.comment) { ctx.status = 403; return; } // Forbidden
 
+        // record the comment
         const comment = await Report.insertComment(db, reportId, ctx.request.body.comment, ctx.state.user.id);
+
+        // notify @mentioned users (except current user)
+        const mentions = [];
+        const users = await User.getAll();
+        for (const user of users) {
+            if (comment.comment.match(user._id) && user._id!=ctx.state.user.id) mentions.push(user._id);
+        }
+        if (mentions.length > 0) Notification.notifyMultiple(db, 'user mentioned in comment', mentions, reportId);
+
+        // and notify assignee of report (if not current user)
+        const rpt = await Report.get(db, reportId);
+        if (rpt.assignedTo && rpt.assignedTo != ctx.state.user.id) {
+            Notification.notify(db, 'user’s report received new comment', rpt.assignedTo, reportId);
+        }
 
         // for returned comment, make links for #tags...
         const tagList = await Report.tags(db);

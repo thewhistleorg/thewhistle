@@ -13,10 +13,22 @@ const router = new Router();
 /*  Dashboard routes - TBC                                                                        */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-//import dashboard from './dashboard.js';
+// import dashboard from './dashboard.js';
 //
-//router.get('/dashboard/\\*',       dashboard.general); // render general dashboard page
-//router.get('/dashboard/:username', dashboard.user);    // render users’ dashboard page
+// router.get('/dashboard/\\*',       dashboard.general); // render general dashboard page
+// router.get('/dashboard/:username', dashboard.user);    // render users’ dashboard page
+
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/*  Notifications routes                                                                          */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+import notifications from './notifications.js';
+
+router.get(   '/ajax/notifications',               notifications.ajaxList);       // list current notifications
+router.get(   '/ajax/notifications/last-update',   notifications.ajaxLastUpdate); // timestamp of last notification
+router.delete('/ajax/notifications/:notification', notifications.ajaxDismiss);    // dismiss notification
+router.get(   '/ajax/notifications/debug',         notifications.ajaxListDebug);  // list all notifications for debug
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

@@ -16,6 +16,7 @@ const debug = Debug('app:db'); // db write ops
 const ObjectId = MongoDB.ObjectId;
 
 import User         from '../models/user.js';
+import Notification from '../models/notification.js';
 import AwsS3        from '../lib/aws-s3.js';
 import Update       from './update.js';
 
@@ -529,6 +530,9 @@ class Report {
 
         // delete audit trail
         await Update.deleteForReport(db, id);
+
+        // delete any notifications
+        await Notification.cancelForReport(db, id);
 
         // delete report
         const reports = global.db[db].collection('reports');

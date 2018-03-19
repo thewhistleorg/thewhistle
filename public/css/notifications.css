@@ -1,0 +1,48 @@
+/* Styles for facebook-style dropdown notifications */
+
+nav li.notifications { /* the 'bell' */
+    color: #ffffff; /* fa only sets <a> color */
+    cursor: default;
+    min-width: 2em;    /* add a little space to the left of the bell, */
+    text-align: right; /* to make navigating down to the list easier  */
+}
+
+nav li.notifications div.counter { /* the red notification counter */
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: #e1141e;
+    font: 700 0.5em 'Open Sans', 'Segoe UI', Tahoma, sans-serif; /* reset from FontAwesome */
+    padding: 0 2px;
+    border-radius: 3px;
+}
+
+#notifications { /* the drop-down list */
+    position: absolute;
+    right: 0;
+    top: auto;
+    width: inherit;
+    background-color: #fdfdfd;
+    border: 1px solid #eeeeee;
+    color: #666666;
+    font: 300 0.8em 'Open Sans', 'Segoe UI', Tahoma, sans-serif; /* reset from FontAwesome */
+    text-align: left; /* override nav li.notifications */
+}
+
+#notifications a { /* make <a> match plain text */
+    color: #666666;
+}
+
+#notifications td {
+    padding: 0.2em 0.4em;
+}
+
+#notifications .event { /* event serves as section heading */
+    color: #333333;
+    font-weight: 400;
+    font-style: italic;
+}
+
+#notifications .dismiss { /* indicate clickable */
+    cursor: pointer;
+}

@@ -388,14 +388,14 @@ function prettifyReport(page, report) {
     const nulls = {
         '1a': 'used-before',
         '2a': 'on-behalf-of',
+        '2b': 'survivor-gender',
+        '2c': 'survivor-age',
         '3a': 'when',
         '3b': 'date',
         '3c': 'still-happening',
         '4a': 'where',
         '5a': 'who',
         '6a': 'description', // TODO: what about files?
-        '6b': 'survivor-gender',
-        '6c': 'survivor-age',
         '7a': 'action-taken',
         '8a': 'extra-notes',
     };

@@ -45,7 +45,7 @@ class Handlers {
             ctx.session.submissionId = await Submission.insert(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
         }
 
-        await ctx.render('index', { recaptcha: ctx.app.env=='production' });
+        await ctx.render('index', { recaptcha: ctx.app.env!='development' });
     }
 
 
@@ -57,7 +57,7 @@ class Handlers {
         const project = ctx.params.project;
 
         // verify client-side reCAPTCHA: developers.google.com/recaptcha/docs/verify
-        if (ctx.app.env == 'production') {
+        if (ctx.app.env != 'development') {
             const params = {
                 secret:   process.env.RECAPTCHA_SECRET_KEY,
                 response: ctx.request.body['g-recaptcha-response'],

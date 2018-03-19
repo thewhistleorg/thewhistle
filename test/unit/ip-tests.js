@@ -56,7 +56,7 @@ describe('IP caching', function() {
 
     describe('domain', function() {
         test('IP domain cache starts empty', function() {
-            expect(global.ipsDomain.size).to.equal(0);
+            expect(global.ipsDomain.size, global.ipsDomain.toString()).to.equal(0);
         });
         test('get IP domain (from node.js dns module)', async function() {
             const t0 = process.hrtime();

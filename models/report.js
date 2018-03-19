@@ -15,9 +15,9 @@ import Debug      from 'debug';             // small debugging utility
 const debug = Debug('app:db'); // db write ops
 const ObjectId = MongoDB.ObjectId;
 
-import User    from '../models/user.js';
-import AwsS3   from '../lib/aws-s3.js';
-import Update  from './update.js';
+import User         from '../models/user.js';
+import AwsS3        from '../lib/aws-s3.js';
+import Update       from './update.js';
 
 /*
  * A report holds the original submitted incident report, and various metadata.
@@ -282,7 +282,7 @@ class Report {
      * @returns {ObjectId} New report id.
      */
     static async submissionStart(db, project, alias, userAgent) {
-        debug('Report.submissionStart', db, project, alias);
+        debug('Report.submissionStart', 'db:'+db, 'p:'+project, alias);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
         if (typeof alias != 'string' || alias.length == 0) throw new Error('Alias must be supplied');
 
@@ -323,7 +323,7 @@ class Report {
      * @param {Object}   detailsRaw- Report details to be added/updated, as per HTML input elements
      */
     static async submissionDetails(db, id, details, detailsRaw) {
-        debug('Report.submissionDetails', db, id, details);
+        debug('Report.submissionDetails', 'db:'+db, 'r:'+id, details);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);  // allow id as string
@@ -349,7 +349,7 @@ class Report {
      * @param {Object}   file TODO
      */
     static async submissionFile(db, id, file) {
-        debug('Report.submissionFile');
+        debug('Report.submissionFile', 'db:'+db, 'r:'+id);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id); // allow id as string
@@ -408,7 +408,7 @@ class Report {
      * @throws  Error on validation or referential integrity errors.
      */
     static async insert(db, by, alias, submitted, project, files, userAgent) {
-        debug('Report.insert');
+        debug('Report.insert', 'db:'+db, alias, submitted, 'p:'+project);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         by = objectId(by); // allow id as string
@@ -495,7 +495,7 @@ class Report {
      * @throws Error on validation or referential integrity errors.
      */
     static async update(db, id, values, userId) {
-        debug('Report.update');
+        debug('Report.update', 'db:'+db, 'r:'+id, values);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -519,7 +519,7 @@ class Report {
      * @throws Error if MongoDB delete fails or remove directory fails.
      */
     static async delete(db, id) {
-        debug('Report.delete');
+        debug('Report.delete', 'db:'+db, 'r:'+id);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id); // allow id as string
@@ -605,7 +605,7 @@ class Report {
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async insertTag(db, id, tag, userId) {
-        debug('Report.insertTag', db, id, tag, userId);
+        debug('Report.insertTag', 'db:'+db, 'r:'+id, 't:'+tag, userId);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -627,7 +627,7 @@ class Report {
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async deleteTag(db, id, tag, userId) {
-        debug('Report.deleteTag', db, id, tag, userId);
+        debug('Report.deleteTag', 'db:'+db, 'r:'+id, 't:'+tag, userId);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -654,7 +654,7 @@ class Report {
      * @returns {Object} Inserted comment, including byId, byName, on, comment.
      */
     static async insertComment(db, id, comment, userId) {
-        debug('Report.insertComment');
+        debug('Report.insertComment', 'db:'+db, 'r:'+id);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string
@@ -695,7 +695,7 @@ class Report {
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async updateComment(db, id, by, on, comment, userId) {
-        debug('Report.updateComment');
+        debug('Report.updateComment', 'db:'+db, 'r:'+id);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);                            // allow id as string
@@ -733,7 +733,7 @@ class Report {
      * @param {ObjectId} userId - User id (for update audit trail).
      */
     static async deleteComment(db, id, by, on, userId) {
-        debug('Report.deleteComment');
+        debug('Report.deleteComment', 'db:'+db, 'r:'+id);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);                            // allow id as string
@@ -757,7 +757,7 @@ class Report {
      * @param {ObjectId} userId - User id.
      */
     static async flagView(db, id, userId) {
-        debug('Report.flagView');
+        debug('Report.flagView', 'db:'+db, 'r:'+id, 'u:'+userId);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id);         // allow id as string

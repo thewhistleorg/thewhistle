@@ -487,11 +487,11 @@ function prettifyReport(page, report) {
                 if (JSON.stringify(rpt['Spoken to anybody?']) == '["null"]') rpt['Spoken to anybody?'] = []; // kludge alert!
                 break;
             case 'description':
-                if (Array.isArray(report.description) && report.description[1].toLowerCase() == 'skip') {
-                    rpt.Description = report.description[1];
-                } else {
-                    rpt.Description = report.description;
-                }
+                // description is a textarea (always submitted), skip is a radio button (only
+                // submitted if selected), so if description is an array, 'skip' was selected
+                rpt.Description = Array.isArray(report.description) ? 'Skipped' : report.description;
+                // note that if a description is entered, then 'skip' selected and the page submitted,
+                // then 'back' is selected, the description will have ',skip' appended!
                 break;
             case 'survivor-gender':
                 const gender = {
@@ -503,11 +503,9 @@ function prettifyReport(page, report) {
                 rpt['Survivor gender'] = gender[report['survivor-gender']];
                 break;
             case 'survivor-age':
-                if (Array.isArray(report['survivor-age']) &&  report['survivor-age'][1].toLowerCase() == 'skip') {
-                    rpt['Survivor age'] = report['survivor-age'][1];
-                } else {
-                    rpt['Survivor age'] = report['survivor-age'];
-                }
+                // age is a select (always submitted), skip is a radio button (only submitted if
+                // selected), so if survivor-age is an array, 'skip' was selected
+                rpt['Survivor age'] = Array.isArray(report['survivor-age']) ? 'Skipped' : report['survivor-age'];
                 break;
             case 'extra-notes':
                 rpt['Extra notes'] = report['extra-notes'];

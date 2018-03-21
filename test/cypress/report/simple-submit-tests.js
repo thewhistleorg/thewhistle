@@ -30,6 +30,8 @@ describe(`Submit ${org}/${proj} incident report`, function () {
 
         cy.url().should('include', `/${org}/${proj}/2`); // on-behalf-of
         cy.get('#on-behalf-of-myself + label').contains('Myself').click();
+        cy.get('label').contains('Female').click();
+        cy.get('select').select('20–24');
         cy.contains('Submit and continue').click();
 
         cy.url().should('include', `/${org}/${proj}/3`); // when / still-happening
@@ -53,8 +55,6 @@ describe(`Submit ${org}/${proj} incident report`, function () {
 
         cy.url().should('include', `/${org}/${proj}/6`); // description
         cy.get('textarea[name=description]').type('Cypress test '+date);
-        cy.get('label').contains('Female').click();
-        cy.get('select').select('20–24');
         cy.contains('Submit and continue').click();
 
         cy.url().should('include', `/${org}/${proj}/7`); // action-taken

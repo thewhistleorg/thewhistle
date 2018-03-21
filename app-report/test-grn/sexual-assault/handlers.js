@@ -479,11 +479,13 @@ function prettifyReport(page, report) {
                     teacher:      'Teacher/tutor/lecturer',
                     friends:      'Friends, family',
                     others:       'Others',
+                    skip:         'Skipped',
                     null:         null, // no checkboxes ticked
                 };
                 if (report['action-taken'] == null) report['action-taken'] = [ null ]; // no value: convert to array
                 if (typeof report['action-taken'] == 'string') report['action-taken'] = [ report['action-taken'] ]; // single value: convert to array
                 rpt['Spoken to anybody?'] = report['action-taken'].map(a => action[a] + (report[`action-taken-${a}-details`] ? ` (${report[`action-taken-${a}-details`]})` : ''));
+                if (report['action-taken'].includes('skip')) rpt['Spoken to anybody?'] = [ 'Skipped' ]; // skipped cancels other values
                 if (JSON.stringify(rpt['Spoken to anybody?']) == '["null"]') rpt['Spoken to anybody?'] = []; // kludge alert!
                 break;
             case 'description':

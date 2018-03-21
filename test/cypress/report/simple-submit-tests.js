@@ -5,6 +5,7 @@
 /* global Cypress, cy */
 
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
 
 const org = 'grn';              // the test organisation for the live ‘test-grn‘ organisation
 const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
@@ -79,8 +80,34 @@ describe(`Submit ${org}/${proj} incident report`, function () {
         cy.url().should('include', '/reports');
         cy.contains('Cypress test '+date).click();
 
-        // cy.url().should('include', '/reports/'+id);
-        cy.get('table.js-obj-to-html td').contains(alias);
+        cy.get('table.js-obj-to-html').then(($table) => {
+            const html = `<table>${$table.html()}</table>`; // yucky kludge: how to get html with enclosing element?
+            const tbl = new jsdom.JSDOM(html).window.document;
+            const ths = tbl.querySelectorAll('th');
+            const tds = tbl.querySelectorAll('td');
+            expect(ths[0].textContent).to.equal('Alias');
+            expect(tds[0].textContent).to.equal(alias);
+            expect(ths[1].textContent).to.equal('On behalf of');
+            expect(tds[1].textContent).to.equal('Myself');
+            expect(ths[2].textContent).to.equal('Survivor gender');
+            expect(tds[2].textContent).to.equal('female');
+            expect(ths[3].textContent).to.equal('Survivor age');
+            expect(tds[3].textContent).to.equal('20–24');
+            expect(ths[4].textContent).to.equal('Happened');
+            expect(tds[4].textContent).to.equal(dateFormat('d mmm yyyy'));
+            expect(ths[5].textContent).to.equal('Still happening?');
+            expect(tds[5].textContent).to.equal('yes');
+            expect(ths[6].textContent).to.equal('Where');
+            expect(tds[6].textContent).to.equal('University of Lagos');
+            expect(ths[7].textContent).to.equal('Who');
+            expect(tds[7].textContent).to.equal('Not known: Big fat guy');
+            expect(ths[8].textContent).to.equal('Description');
+            expect(tds[8].textContent).to.equal('Cypress test '+date);
+            expect(ths[9].textContent).to.equal('Spoken to anybody?');
+            expect(tds[9].textContent).to.equal('Teacher/tutor/lecturer (Miss Brodie), Friends, family');
+            expect(ths[10].textContent).to.equal('Extra notes');
+            expect(tds[10].textContent).to.equal('Nothing more');
+        });
         cy.get('button[name=delete]').click();
         cy.url().should('include', '/reports');
 

@@ -2,7 +2,7 @@
 /* Cypress front-end integration tests - simple report submission.                 C.Veness 2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-/* global Cypress, cy */
+/* global Cypress, cy, expect */
 
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
@@ -11,14 +11,14 @@ const org = 'grn';              // the test organisation for the live ‘test-gr
 const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
 
 
-describe(`Submit ${org}/${proj} incident report`, function () {
+describe(`Submit ${org}/${proj} incident report simply visiting each page`, function () {
     const report = 'http://report.thewhistle.local:3000';
     const admin = 'http://admin.thewhistle.local:3000';
 
     const date = dateFormat('d mmm yyyy HH:MM');
     let alias = null;
 
-    it('loads home page', function() {
+    it('visits each page', function() {
 
         cy.visit(`${report}/${org}/${proj}`);
         cy.contains('Get started').click();
@@ -82,9 +82,9 @@ describe(`Submit ${org}/${proj} incident report`, function () {
 
         cy.get('table.js-obj-to-html').then(($table) => {
             const html = `<table>${$table.html()}</table>`; // yucky kludge: how to get html with enclosing element?
-            const tbl = new jsdom.JSDOM(html).window.document;
-            const ths = tbl.querySelectorAll('th');
-            const tds = tbl.querySelectorAll('td');
+            const table = new jsdom.JSDOM(html).window.document;
+            const ths = table.querySelectorAll('th');
+            const tds = table.querySelectorAll('td');
             expect(ths[0].textContent).to.equal('Alias');
             expect(tds[0].textContent).to.equal(alias);
             expect(ths[1].textContent).to.equal('On behalf of');

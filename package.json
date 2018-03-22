@@ -9,7 +9,7 @@
     "start": "forever --minUptime 1000 --spinSleepTime 1000 -c 'node -r @std/esm' app.js",
     "start-dev": "nodemon -e js,json,html --ignore db/reports.json --ignore static/report-docs/ -r @std/esm app.js",
     "start-devtools": "nodemon --inspect -e js,json,html app.js",
-    "test": "mocha --exit -r @std/esm test/*/*.js",
+    "test": "mocha --exit -r @std/esm test/*/*.js && npm run test-frontend",
     "test-unit": "mocha --exit -r @std/esm test/unit/*.js",
     "test-intgn": "mocha --exit -r @std/esm test/integration/*.js",
     "test-frontend": "node -r @std/esm app.js & pid=$!; cypress run; kill -9 $pid; rm -r ./cypress",

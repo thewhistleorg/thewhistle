@@ -60,8 +60,9 @@ app.use(body({ multipart: true }));
 
 // set signed cookie keys for JWT cookie & session cookie; keys are rotated monthly with 3-month
 // lifetime, stem is taken from environment variable to protect against source code leak; note keys
-// are set on app startup, which on Heroku happens at least daily
-app.keys = [ 0, 1, 2 ].map(x => process.env.COOKIE_KEY + dateFormat(new Date(new Date().getFullYear(), new Date().getMonth()-x, 1), '-yyyy-mm'));
+// are set on app startup (which on Heroku happens at least daily), not per request
+const date = { y: new Date().getFullYear(), m: new Date().getMonth(), d: 1 };
+app.keys = [ 0, 1, 2 ].map(x => process.env.COOKIE_KEY + dateFormat(new Date(date.y, date.m-x, date.d), '-yyyy-mm'));
 
 // session for flash messages (uses signed session cookies, with no server storage)
 app.use(session(app));

@@ -135,7 +135,7 @@ class Dev {
         }
 
         const csv = json2csv({ data: entries });
-        const filename = 'the whistle access log ' + dateFormat('yyyy-mm-dd HH:MM') + '.csv';
+        const filename = 'the whistle access log ' + dateFormat('yyyy-mm-dd HH.MM') + '.csv';
         ctx.status = 200;
         ctx.body = csv;
         ctx.attachment(filename);

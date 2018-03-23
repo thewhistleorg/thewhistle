@@ -8,13 +8,13 @@
 
 // TODO: modularise this? How to handle login/logout if so?
 
-import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
-import chai       from 'chai';       // BDD/TDD assertion library
-import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
-import MongoDB    from 'mongodb';    // MongoDB driver for Node.js
-import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-import base64     from 'base-64';    // base64 encoder/decoder
-import fs         from 'fs';         // nodejs.org/api/fs.html
+import supertest  from 'supertest';          // SuperAgent driven library for testing HTTP servers
+import chai       from 'chai';               // BDD/TDD assertion library
+import jsdom      from 'jsdom';              // JavaScript implementation of DOM and HTML standards
+import MongoDB    from 'mongodb';            // MongoDB driver for Node.js
+import dateFormat from 'dateformat';         // Steven Levithan's dateFormat()
+import base64     from 'base-64';            // base64 encoder/decoder
+import fs         from 'fs';                 // nodejs.org/api/fs.html
 const expect   = chai.expect;
 const ObjectId = MongoDB.ObjectId;
 
@@ -705,7 +705,8 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('text/csv; charset=utf-8');
             const timestamp = response.headers['x-timestamp'];
-            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${timestamp}.csv"`);
+            const filename = `the whistle incident reports ${timestamp.replace(':', '.')}.csv`;
+            expect(response.headers['content-disposition']).to.equal(`attachment; filename="${filename}"`);
         });
 
         it('downloads reports list as PDF', async function() {
@@ -713,7 +714,8 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('application/pdf');
             const timestamp = response.headers['x-timestamp'];
-            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident reports ${timestamp}.pdf"`);
+            const filename = `the whistle incident reports ${timestamp.replace(':', '.')}.pdf`;
+            expect(response.headers['content-disposition']).to.equal(`attachment; filename="${filename}"`);
         });
 
         it('downloads single report as PDF', async function() {
@@ -721,7 +723,8 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('application/pdf');
             const timestamp = response.headers['x-timestamp'];
-            expect(response.headers['content-disposition']).to.equal(`attachment; filename="the whistle incident report ${timestamp}.pdf"`);
+            const filename = `the whistle incident report ${timestamp.replace(':', '.')}.pdf`;
+            expect(response.headers['content-disposition']).to.equal(`attachment; filename="${filename}"`);
         });
 
         it('deletes report tag (ajax)', async function() {

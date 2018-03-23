@@ -267,17 +267,21 @@ class ReportsHandlers {
         for (const rpt of rpts) {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
             const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
-            const dateFmt = dateFormat(rpt.submitted.Date, 'HH:MM:ss:l') == '00:00:00:000' ? 'dd mmm yyyy' : 'dd mmm yyyy HH:MM';
+            // rpt.submitted.Happened may be undefined, null, a date, or a description; if it's a date,
+            // format will depend on whether time was recorded or not (midnight is assumed to be no time)
+            const isDate = !isNaN(rpt.submitted.Happened) && rpt.submitted.Happened!=null;
+            const dateFmt = dateFormat(isDate ? rpt.submitted.Happened : null, 'HH:MM:ss:l') == '00:00:00:000' ? 'd mmm yyyy' : 'd mmm yyyy HH:MM';
+            const incidentDate = isDate ? dateFormat(rpt.submitted.Happened, dateFmt) : rpt.submitted.Happened;
             const fields = {
                 'project':       rpt.project,
                 'alias':         rpt.alias,
-                'incident date': rpt.submitted ? dateFormat(rpt.submitted.Date, dateFmt) : '',
-                'reported on':   dateFormat(rpt._id.getTimestamp(), 'dd mmm yyyy HH:MM'),
+                'incident date': rpt.submitted.Happened ? incidentDate : '',
+                'reported on':   dateFormat(rpt._id.getTimestamp(), 'd mmm yyyy HH:MM'),
                 'reported by':   rpt.by ? (await User.get(rpt.by)).username : '',
                 'assigned to':   assignedTo ? assignedTo.username : '', // replace 'assignedTo' ObjectId with username
                 'status':        rpt.status,
                 'tags':          rpt.tags.join(', '),
-                'updated on':    lastUpdate.on ? dateFormat(lastUpdate.on, 'dd mmm yyyy HH:MM') : '',
+                'updated on':    lastUpdate.on ? dateFormat(lastUpdate.on, 'd mmm yyyy HH:MM') : '',
                 'updated by':    lastUpdate.by,
                 'active?':       rpt.archived ? 'archived' : 'active',
                 'url':           ctx.origin + '/reports/'+rpt._id,
@@ -294,8 +298,8 @@ class ReportsHandlers {
 
         const csv = json2csv({ data: reports });
         const filenameFilter = filterDesc.size>0 ? `(filtered by ${[ ...filterDesc ].join(', ')}) ` : '';
-        const timestamp = dateFormat('yyyy-mm-dd HH.MM');
-        const filename = `the whistle incident reports ${filenameFilter}${timestamp}.csv`;
+        const timestamp = dateFormat('yyyy-mm-dd HH:MM');
+        const filename = `the whistle incident reports ${filenameFilter}${timestamp.replace(':', '.')}.csv`;
         ctx.status = 200;
         ctx.body = csv;
         ctx.set('X-Timestamp', timestamp); // for integration tests
@@ -442,8 +446,8 @@ class ReportsHandlers {
 
         // return PDF as attachment
         const filenameFilter = filterDesc.size>0 ? ` (filtered by ${[ ...filterDesc ].join(', ')}) ` : '';
-        const timestamp = dateFormat('yyyy-mm-dd HH.MM');
-        const filename = `the whistle incident reports ${filenameFilter}${timestamp}.pdf`;
+        const timestamp = dateFormat('yyyy-mm-dd HH:MM');
+        const filename = `the whistle incident reports ${filenameFilter}${timestamp.replace(':', '.')}.pdf`;
         ctx.status = 200;
         ctx.body = await reportsPdf.toBufferPromise();
         ctx.set('X-Timestamp', timestamp); // for integration tests
@@ -526,8 +530,8 @@ class ReportsHandlers {
         };
 
         // return PDF as attachment
-        const timestamp = dateFormat('yyyy-mm-dd HH.MM');
-        const filename = `the whistle incident report ${timestamp}.pdf`;
+        const timestamp = dateFormat('yyyy-mm-dd HH:MM');
+        const filename = `the whistle incident report ${timestamp.replace(':', '.')}.pdf`;
         ctx.status = 200;
         ctx.body = await reportsPdf.toBufferPromise();
         ctx.set('X-Timestamp', timestamp); // for integration tests

@@ -8,13 +8,14 @@
 
 // TODO: modularise this? How to handle login/logout if so?
 
-import supertest  from 'supertest';          // SuperAgent driven library for testing HTTP servers
-import chai       from 'chai';               // BDD/TDD assertion library
-import jsdom      from 'jsdom';              // JavaScript implementation of DOM and HTML standards
-import MongoDB    from 'mongodb';            // MongoDB driver for Node.js
-import dateFormat from 'dateformat';         // Steven Levithan's dateFormat()
-import base64     from 'base-64';            // base64 encoder/decoder
-import fs         from 'fs';                 // nodejs.org/api/fs.html
+import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
+import chai       from 'chai';       // BDD/TDD assertion library
+import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
+import MongoDB    from 'mongodb';    // MongoDB driver for Node.js
+import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+import base64     from 'base-64';    // base64 encoder/decoder
+import fs         from 'fs';         // nodejs.org/api/fs.html
+import csvParse   from 'csv-parse/lib/sync'; // full featured CSV parser
 const expect   = chai.expect;
 const ObjectId = MongoDB.ObjectId;
 
@@ -707,6 +708,10 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const timestamp = response.headers['x-timestamp'];
             const filename = `the whistle incident reports ${timestamp.replace(':', '.')}.csv`;
             expect(response.headers['content-disposition']).to.equal(`attachment; filename="${filename}"`);
+            const csv = csvParse(response.text);
+            expect(csv[0].length).to.be.at.least(13); // header row should included submitted fields
+            const rpt = csv.filter(row => row[1]=='testy terrain'); // 2nd col is 'alias'
+            expect(rpt.length).to.equal(1, response.text); // submitted test report should be included
         });
 
         it('downloads reports list as PDF', async function() {

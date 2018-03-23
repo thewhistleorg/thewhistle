@@ -296,7 +296,7 @@ class ReportsHandlers {
 
         reports.sort((a, b) => a['reported on'] < b['reported on'] ? 1 : -1); // sort in reverse chronological order (match main list default)
 
-        const csv = json2csv({ data: reports });
+        const csv = json2csv.parse(reports);
         const filenameFilter = filterDesc.size>0 ? `(filtered by ${[ ...filterDesc ].join(', ')}) ` : '';
         const timestamp = dateFormat('yyyy-mm-dd HH:MM');
         const filename = `the whistle incident reports ${filenameFilter}${timestamp.replace(':', '.')}.csv`;

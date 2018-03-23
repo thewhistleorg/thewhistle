@@ -24,8 +24,10 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
         cy.contains('Get started').click();
 
         cy.url().should('include', `/${org}/${proj}/1`); // alias
+        cy.get('output[name=generated-alias]').should('not.be.empty');
         cy.get('output[name=generated-alias]').then(($alias) => {
-            alias = $alias.text();
+            alias = $alias.text(); // record alias to delete report later
+            cy.log('alias', alias);
         });
         cy.contains('Submit and continue').click();
 
@@ -80,6 +82,10 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
         cy.url().should('include', '/reports');
         cy.contains('Cypress test '+date).click();
 
+        // wait a bit to be sure the alias assignment has worked through the event loop...
+        // in principle, using .as('@alias'), cy.wait('@alias'), and this.alias should be a better
+        // way of doing this, but I've not managed to make it work
+        cy.wait(200);
         cy.get('table.js-obj-to-html').then(($table) => {
             const html = `<table>${$table.html()}</table>`; // yucky kludge: how to get html with enclosing element?
             const table = new jsdom.JSDOM(html).window.document;

@@ -69,10 +69,12 @@ class Handlers {
                 const responseJs = await response.json();
                 if (responseJs.success == false) {
                     ctx.flash = { error: `reCAPTCHA verification failed: ${responseJs['error-codes']} – are you a bot?` };
+                    ctx.set('X-Redirect-Reason', 'reCAPTCHA verification failed'); // for smoke tests
                     return ctx.redirect(ctx.url);
                 }
             } else {
                 ctx.flash = { error: `reCAPTCHA verification failed: ${response.status} / ${response.statusText}` };
+                ctx.set('X-Redirect-Reason', 'reCAPTCHA verification failed'); // for smoke tests
                 return ctx.redirect(ctx.url);
             }
         }

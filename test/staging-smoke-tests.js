@@ -72,10 +72,11 @@ describe('Report app', function() {
         expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Get started');
     });
 
-    it('moves on to page 1', async function() {
+    it('fails recaptcha check', async function() {
         const values = { 'nav-next': 'next' };
         const responsePost = await requestReport.post(`/${org}/${proj}`).send(values);
         expect(responsePost.status).to.equal(302);
-        expect(responsePost.headers.location).to.equal(`/${org}/${proj}/1`);
+        expect(responsePost.headers.location).to.equal(`/${org}/${proj}`);
+        expect(responsePost.headers['x-redirect-reason']).to.equal('reCAPTCHA verification failed');
     });
 });

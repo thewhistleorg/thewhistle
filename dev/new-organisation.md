@@ -62,6 +62,6 @@ AWS S3: create a new bucket `thewhistle.neworg-test`.
 Then create a symbolic link which will make the submission reports available under a test 
 organisation url:
 
-    $ ln -s app-report/neworg app-report/neworg-test
+    $ cd app-report && ln -s ../neworg neworg-test
 
 If parameterised questions are used, they will have to be replicated from *neworg* to *neworg-test*.

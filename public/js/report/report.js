@@ -208,9 +208,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // uncheck all checkboxes when skip radio is selected
             if (this.checked == true) {
                 for (i=0; i<actionTakenInputs.length; i++) {
-                    var input = actionTakenInputs[i];
-                    input.checked = false;
-                    var details = input.parentElement.querySelector('input[type=text]');
+                    var checkbox = actionTakenInputs[i];
+                    checkbox.checked = false;
+                    var details = checkbox.parentElement.querySelector('input[type=text]');
                     details.value = '';
                     details.classList.add('hide');
                 }

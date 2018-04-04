@@ -14,13 +14,15 @@ const debug = Debug('app:report'); // submission process
 
 const LatLon = geodesy.LatLonSpherical;
 
-import Report     from '../../../models/report.js';
-import Question   from '../../../models/question.js';
-import Resource   from '../../../models/resource.js';
-import Submission from '../../../models/submission.js';
-import UserAgent  from '../../../models/user-agent.js';
-import Geocoder   from '../../../lib/geocode.js';
-import log        from '../../../lib/log';
+import Report       from '../../../models/report.js';
+import Question     from '../../../models/question.js';
+import Resource     from '../../../models/resource.js';
+import Submission   from '../../../models/submission.js';
+import UserAgent    from '../../../models/user-agent.js';
+import Notification from '../../../models/notification';
+import User         from '../../../models/user';
+import Geocoder     from '../../../lib/geocode.js';
+import log          from '../../../lib/log';
 
 const nPages = 8;
 
@@ -217,6 +219,10 @@ class Handlers {
             // save the skeleton report
             ctx.session.id = await Report.submissionStart(org, project, alias, ctx.headers['user-agent']);
             // TODO? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.id, 'incomplete', null);
+
+            // notify users of 'new report submitted'
+            const users = await User.getForDb(org);
+            await Notification.notifyMultiple(org, 'new report submitted', users.map(u => u._id), ctx.session.id);
 
             ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
             debug('submissionStart', ctx.session.id);

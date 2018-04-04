@@ -11,12 +11,14 @@
 import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
 import chai       from 'chai';       // BDD/TDD assertion library
 import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
+import MongoDB    from 'mongodb';    // MongoDB driver for Node.js
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 import base64     from 'base-64';    // base64 encoder/decoder
 import fs         from 'fs';         // nodejs.org/api/fs.html
 import csvParse   from 'csv-parse/lib/sync'; // full featured CSV parser
 
 const expect   = chai.expect;
+const ObjectId = MongoDB.ObjectId;
 
 import app      from '../../app.js';
 

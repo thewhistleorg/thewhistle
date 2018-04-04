@@ -11,13 +11,12 @@
 import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
 import chai       from 'chai';       // BDD/TDD assertion library
 import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
-import MongoDB    from 'mongodb';    // MongoDB driver for Node.js
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 import base64     from 'base-64';    // base64 encoder/decoder
 import fs         from 'fs';         // nodejs.org/api/fs.html
 import csvParse   from 'csv-parse/lib/sync'; // full featured CSV parser
+
 const expect   = chai.expect;
-const ObjectId = MongoDB.ObjectId;
 
 import app      from '../../app.js';
 
@@ -494,61 +493,6 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             // not much obvious to search for!
-        });
-
-        it('sees weather conditions in report page', async function() {
-            return; // TODO investigate why wunderground is returning 400 Bad Request
-            const response = await appAdmin.get('/reports/'+reportId); // eslint-disable-line no-unreachable
-            expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
-            const iconRe = new RegExp('^/img/weather/underground/icons/black/png/32x32/[a-z]+.png$');
-            expect(document.querySelector('#weather div.weather-body img').src).to.match(iconRe);
-        });
-
-        it('sees uploaded image in report page', async function() {
-            const response = await appAdmin.get('/reports/'+reportId);
-            expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
-            const src = `/uploaded/${proj}/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
-            expect(document.getElementById(imgFile).querySelector('td a').href).to.equal(src);
-            expect(document.getElementById(imgFile).querySelector('td img').src).to.equal(src);
-        });
-
-        it('fetches uploaded image from AWS S3', async function() {
-            const response = await appAdmin.get(`/uploaded/${proj}/${dateFormat('yyyy-mm')}/${reportId}/s_gps.jpg`);
-            expect(response.status).to.equal(200);
-            expect(response.headers['content-type']).to.equal('image/jpeg');
-        });
-
-        it('sees uploaded image exif metadata in report page', async function() {
-            const response = await appAdmin.get('/reports/'+reportId);
-            expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
-            const distRe = new RegExp('^5400 km N from incident location');
-            expect(document.getElementById(imgFile).querySelector('td.exif div').textContent).to.match(distRe);
-        });
-
-        it('gets timestamp of new report (ajax)', async function() {
-            const response = await appAdmin.get('/ajax/reports/latest-timestamp');
-            expect(response.status).to.equal(200);
-            expect(response.body.latest.timestamp).to.equal(ObjectId(reportId).getTimestamp().toISOString());
-        });
-
-        it('gets reports in bounding box (ajax)', async function() {
-            const response = await appAdmin.get('/ajax/reports/within/6.5,3.3:6.6,3.4');
-            expect(response.status).to.equal(200);
-            expect(response.body.reports.filter(r => r._id == reportId).length).to.equal(1);
-        });
-
-        it('sees ‘testy terrain’ alias is used (ajax)', async function() {
-            const response = await appAdmin.get(`/ajax/report/${org}/aliases/testy+terrain`);
-            expect(response.status).to.equal(200);
-        });
-
-        // TODO: can 'org' element of url be inferred from header credentials?
-        it('sees unused alias is not used (ajax)', async function() {
-            const response = await appAdmin.get(`/ajax/report/${org}/aliases/no+way+this+should+be+a+used+alias`);
-            expect(response.status).to.equal(404);
         });
 
         // Summary function is disabled for this release

@@ -20,6 +20,8 @@ const ObjectId = (rnd = r16 => Math.floor(r16).toString(16)) =>
 import './before.js'; // set up database connections
 
 describe('AWS S3', function() {
+    if (!process.env.CIRCLECI) return; // AWS Free Tier is just 2,000 put requests per month, so limit to CI tests
+
     this.timeout(5e3); // 5 sec
 
     const date = dateFormat('yyyy-mm');

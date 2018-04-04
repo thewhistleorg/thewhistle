@@ -71,44 +71,68 @@ describe(`Report model (${db})`, function() {
         });
     });
 
-    describe('insert', function() {
-        it('creates minimal incident report', async function() {
-            const submitted = { Date: new Date(), Description: 'a test report' };
-
-            // spoof file upload (copy file to /tmp & create formidable object)
-            await fs.copy('./test/img/s_gps.jpg', '/tmp/upload_s_gps.jpg');
-            const stat = await fs.stat('/tmp/upload_s_gps.jpg');
-            const files = [ {
-                size:  stat.size,
-                path:  '/tmp/upload_s_gps.jpg',
-                name:  's_gps.jpg',
-                type:  'image/jpeg',
-                mtime: stat.mtime,
-            } ];
-
+    describe('report submission', function() {
+        it('starts submission', async function() {
             const ua = 'node-superagent/x.x.x';
-            reportId = await Report.insert(db, undefined, 'test test', submitted, 'test-project', files, ua);
+
+            reportId = await Report.submissionStart(db, 'test-project', 'test test', ua);
+
             console.info('\treport id:', reportId);
             expect(reportId.constructor.name).to.equal('ObjectID');
+
             const report = await Report.get(db, reportId);
             expect(report).to.be.an('object');
             expect(report).to.have.property('alias');
         });
-        it('has uploaded file data in submitted report', async function() {
+
+        it('submits details', async function() {
+            const details = {
+                'Alias':            'test test',
+                'On behalf of':     'Myself',
+                'Survivor gender':  null,
+                'Survivor age':     null,
+                'Happened':         new Date(dateFormat('yyyy-mm-dd')),
+                'Still happening?': 'no',
+                'Where':            'Around the corner',
+            };
+            const detailsRaw = {
+                'on-belalf-of':    'myself',
+                'survivor-gender': null,
+                'survivor-age':    null,
+                'date':            { day: dateFormat('d'), month: dateFormat('mmm'), year: dateFormat('yyyy'), time: '' },
+                'still-happening': 'n',
+                'where':           'Around the corner',
+            };
+
+            await Report.submissionDetails(db, reportId, details, detailsRaw);
+
             const report = await Report.get(db, reportId);
             expect(report.submitted).to.be.an('object');
-            expect(report.submitted.files).to.be.an('array');
-            expect(report.submitted.files[0].name).to.equal('s_gps.jpg');
-            expect(report.submitted.files[0].path).to.equal(`test-project/${dateFormat('yyyy-mm')}/${reportId}/`);
+            expect(report.submitted.Alias).to.equal('test test');
+            expect(report.submitted.Happened.getTime()).to.equal(new Date(dateFormat('yyyy-mm-dd')).getTime());
         });
-        it('has extracted uploaded file data in analysis', async function() {
+
+        it('submits file', async function() {
+            // spoof file upload (copy file to /tmp & create formidable object)
+            await fs.copy('./test/img/s_gps.jpg', '/tmp/upload_s_gps.jpg');
+            const stat = await fs.stat('/tmp/upload_s_gps.jpg');
+            const file = {
+                size:             stat.size,
+                path:             '/tmp/upload_s_gps.jpg',
+                name:             's_gps.jpg',
+                type:             'image/jpeg',
+                lastModifiedDate: stat.mtime,
+            };
+
+            await Report.submissionFile(db, reportId, file);
+
             const report = await Report.get(db, reportId);
-            expect(report.analysis).to.be.an('object');
-            expect(report.analysis.files).to.be.an('array');
-            expect(report.analysis.files[0].name).to.equal('s_gps.jpg');
-            expect(report.analysis.files[0].path).to.equal(`test-project/${dateFormat('yyyy-mm')}/${reportId}/`);
+            expect(report.files).to.be.an('array');
+            expect(report.files[0].name).to.equal('s_gps.jpg');
+            expect(report.files[0].path).to.equal(`test-project/${dateFormat('yyyy-mm')}/${reportId}/`);
         });
-        it('has extracted exif data', async function() {
+
+        it('has extracted exif data in analysis', async function() {
             const report = await Report.get(db, reportId);
             expect(report.analysis).to.be.an('object');
             expect(report.analysis.files).to.be.an('array');
@@ -163,7 +187,7 @@ describe(`Report model (${db})`, function() {
     describe('filter', function() {
         it('filter by submitted test search', async function() {
             // emulate buildFilter() free-text filter
-            const query = { $and: [ { archived: false }, { 'submitted.Description': { '$regex': 'test report', '$options': 'i' } } ] };
+            const query = { $and: [ { archived: false }, { 'submitted.Where': 'Around the corner' } ] };
             const rpts = await Report.find(db, query);
             expect(rpts).to.be.an('array');
             expect(rpts.length).to.equal(1);

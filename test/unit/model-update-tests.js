@@ -12,12 +12,15 @@ const expect = chai.expect;
 dotenv.config();
 
 import Update from '../../models/update.js';
-import Report from '../../models/report.js';
 import User from '../../models/user.js';
 
 const testuser = process.env.TESTUSER;
 
 const db = 'grn'; // the test organisation for the live ‘test-grn‘ organisation
+
+// fake ObjectId: stackoverflow.com/questions/10593337
+const ObjectId = (rnd = r16 => Math.floor(r16).toString(16)) =>
+    rnd(Date.now()/1000) + ' '.repeat(16).replace(/./g, () => rnd(Math.random()*16));
 
 import './before.js';
 
@@ -25,21 +28,14 @@ describe(`Update model (${db})`, function() {
     this.timeout(5e3); // 5 sec
     this.slow(100);
 
+    const reportId = ObjectId();
     let updateId = null;
-    let reportId = null;
     let userId = null;
 
     it('gets test user id', async function() {
         const [ user ] = await User.getBy('email', testuser);
         userId = user._id;
         console.info('\tuser id', userId);
-    });
-
-    it('creates dummy report', async function() {
-        const submitted = { Date: new Date(), Description: 'a test report' };
-        const ua = 'node-superagent/x.x.x';
-        reportId = await Report.insert(db, undefined, 'update test', submitted, 'test-project', undefined, ua);
-        console.info('\treport id', reportId);
     });
 
     it('creates update record', async function() {
@@ -84,10 +80,6 @@ describe(`Update model (${db})`, function() {
         const updates = await Update.find(db, { userId: userId });
         expect(updates).to.be.an('array');
         expect(updates.length).to.be.at.least(1);
-    });
-
-    it('deletes dummy report', async function() {
-        await Report.delete(db, reportId);
     });
 
 });

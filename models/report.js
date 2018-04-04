@@ -34,40 +34,51 @@ const schema = {
     type: 'object',
     required: [ '_id', 'project', 'alias', 'submitted', 'location', 'analysis', 'assignedTo', 'status', 'tags', 'comments', 'archived', 'views' ],
     properties: {
-        project:      { type:     'string' },               // name of project report belongs to
-        by:           { bsonType: [ 'objectId', 'null' ] }, // user entering incident report
-        alias:        { type:     [ 'string', 'null' ] },   // auto-generated alias of victim/survivor
-        submitted:    { type:     'object' },               // originally submitted report (flexible format following incident reporting format)
-        submittedRaw: { type:     'object' },               // originally submitted report - fields as per HTML input field names
-        files:        { type:     'array',                  // uploaded files
-            items: { type: 'object' },                    // ... 'formidable' File objects
+        project:      { type:     'string' },                // name of project report belongs to
+        by:           { bsonType: [ 'objectId', 'null' ] },  // user entering incident report
+        alias:        { type:     [ 'string', 'null' ] },    // auto-generated alias of victim/survivor
+        submitted:    { type:     'object' },                // originally submitted report (flexible format following incident reporting format)
+        submittedRaw: { type:     'object' },                // originally submitted report - fields as per HTML input field names
+        files:        { type:     'array',                   // uploaded files
+            items: { type: 'object' },                       // ... 'formidable' File objects
         },
-        ua:           { type: [ 'objectId', 'null' ] },     // user agent of browser used to report incident
-        location:     { type: 'object',                     // geocoded incident location
+        ua:           { type: [ 'objectId', 'null' ] },      // user agent of browser used to report incident
+        location:     { type: 'object',                      // geocoded incident location
             properties: {
-                address: { type: 'string' },              // ... entered address used for geocoding
-                geocode: { type: [ 'object', 'null' ] },  // ... google geocoding data
-                geojson: { type: [ 'object', 'null' ] },  // ... GeoJSON (with spatial index)
+                address: { type: 'string' },                 // ... entered address used for geocoding
+                geocode: { type: [ 'object', 'null' ] },     // ... google geocoding data
+                geojson: { type: [ 'object', 'null' ] },     // ... GeoJSON (with spatial index)
             },
         },
-        analysis:     { type:     [ 'object', 'null' ] },   // exif data, weather, etc
-        assignedTo:   { bsonType: [ 'objectId', 'null' ] }, // user report is assigned to
-        status:       { type:     [ 'string', 'null' ] },   // free-text status (to accomodate any workflow)
-        tags:         { type:     'array',                  // tags to classify/group reports
+        analysis:     { type: [ 'object', 'null' ],          // digital verification metadata
+            properties: {
+                files: { type:  'array',
+                    items: { type: 'object',
+                        properties: {
+                            exif:    { type: [ 'object' ] }, // ... image exif data: lat/lon, create date
+                        },
+                    },
+                },
+                weather: { type: [ 'object' ] },             // ... wunderground weather info from report date/location
+            },
+        },
+        assignedTo:   { bsonType: [ 'objectId', 'null' ] },  // user report is assigned to
+        status:       { type:     [ 'string', 'null' ] },    // free-text status (to accomodate any workflow)
+        tags:         { type:     'array',                   // tags to classify/group reports
             items: { type: 'string' },
         },
-        comments:     { type: 'array',                      // notes/commentary documenting management of report
+        comments:     { type: 'array',                       // notes/commentary documenting management of report
             items: { type: 'object',
                 properties: {
-                    byId:    { bsonType: 'objectId' },    // ... user making comment
-                    byName:  { type:     'string' },      // ... username of user making comment (in case user gets deleted)
-                    on:      { bsonType: 'date' },        // ... timestamp comment added
-                    comment: { type:     'string' },      // ... comment in markdown format
+                    byId:    { bsonType: 'objectId' },       // ... user making comment
+                    byName:  { type:     'string' },         // ... username of user making comment (in case user gets deleted)
+                    on:      { bsonType: 'date' },           // ... timestamp comment added
+                    comment: { type:     'string' },         // ... comment in markdown format
                 },
             },
         },
-        archived:     { type: 'boolean' },                  // archived flag
-        views:        { type: [ 'object', 'null' ] },       // associative array of timestamps indexed by user id
+        archived:     { type: 'boolean' },                   // archived flag
+        views:        { type: [ 'object', 'null' ] },        // associative array of timestamps indexed by user id
     },
 };
 /* eslint-enable no-unused-vars, key-spacing */
@@ -344,46 +355,63 @@ class Report {
     /**
      * Stores uploaded file.
      *
+     * This uploads the file to AWS S3, records the file metadata, and records analysis such as EXIF
+     * data.
+     *
+     * It takes the location of the uploaded file from the 'Formidable' file object; it deletes the
+     * uploaded file from /tmp.
+     *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report Id.
-     * @param {Object}   file TODO
+     * @param {Object}   formidableFile 'formidable' object from body.files: npmjs.com/package/formidable
      */
-    static async submissionFile(db, id, file) {
-        debug('Report.submissionFile', 'db:'+db, 'r:'+id);
+    static async submissionFile(db, id, formidableFile) {
+        debug('Report.submissionFile', 'db:'+db, 'r:'+id, formidableFile.path, formidableFile.name);
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         id = objectId(id); // allow id as string
 
         const reports = global.db[db].collection('reports');
 
-        if (file.size == 0) return;
+        if (formidableFile.size == 0) return;
 
         const rpt = await Report.get(db, id);
         const project = rpt.project;
 
         // store uploaded files in AWS S3
-        const date = dateFormat(id.getTimestamp(), 'yyyy-mm');
-        const fldr = `${project}/${date}/${id}/`;
-        const src = file.path;
-        const dst = slug(file.name, { lower: true, remove: null });
+        const src = formidableFile.path;                                       // path to uploaded file
+        const date = dateFormat(id.getTimestamp(), 'yyyy-mm');                 // S3 sub-folder
+        const name = slug(formidableFile.name, { lower: true, remove: null }); // slugified filename
 
         // upload /tmp file to S3
-        await AwsS3.put(db, project, date, id, dst, src);
+        await AwsS3.put(db, project, date, id, name, src);
 
-        // augment files object with EXIF metadata
-
-        file.path = fldr; // S3 folder
-        file.name = dst;  // slugified name
-
-        // extract EXIF metadata from files
-        const exif = await exiftool.exiftool.read(src);
-        file.exif = {
-            GPSLatitude:  exif.GPSLatitude,
-            GPSLongitude: exif.GPSLongitude,
-            CreateDate:   exif.CreateDate, // TODO: JS Date object?
+        // extract documented Formidable.File properties (we don't want to keep the other junk),
+        // with patched values for path & name
+        const file = {
+            size:             formidableFile.size,
+            path:             `${project}/${date}/${id}/`, // S3 folder
+            name:             name,                        // slugified name
+            type:             formidableFile.type,
+            hash:             formidableFile.hash,
+            lastModifiedDate: formidableFile.lastModifiedDate,
         };
 
+        // and store it in the submitted report
         await reports.updateOne({ _id: id }, { $push: { files: file } });
+
+        // extract EXIF metadata from files & save it in analysis
+        const exifData = await exiftool.exiftool.read(src);
+        const fileAnalysis = {
+            exif: {
+                name:         file.name,
+                GPSLatitude:  exifData.GPSLatitude,
+                GPSLongitude: exifData.GPSLongitude,
+                CreateDate:   exifData.CreateDate, // as returned by exiftool-vendored: TZ usage TBD
+            },
+        };
+
+        await reports.updateOne({ _id: id }, { $push: { 'analysis.files': fileAnalysis } });
 
         // delete uploaded file from /tmp
         await fs.remove(src);
@@ -408,7 +436,8 @@ class Report {
      * @throws  Error on validation or referential integrity errors.
      */
     static async insert(db, by, alias, submitted, project, files, userAgent) {
-        debug('Report.insert', 'db:'+db, alias, submitted, 'p:'+project);
+        throw new Error('Report.insert: this function has been superceded by submissionStart / submissionDetails');
+        debug('Report.insert', 'db:'+db, alias, submitted, 'p:'+project); // eslint-disable-line no-unreachable
         if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
 
         by = objectId(by); // allow id as string

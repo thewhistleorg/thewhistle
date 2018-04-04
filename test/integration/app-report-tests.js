@@ -7,8 +7,11 @@
 import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
 import chai       from 'chai';       // BDD/TDD assertion library
 import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
+import MongoDB    from 'mongodb';    // MongoDB driver for Node.js
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
+
 const expect = chai.expect;
+const ObjectId = MongoDB.ObjectId;
 
 import app from '../../app.js';
 
@@ -27,6 +30,8 @@ describe(`Report app (${org}/${app.env})`, function() {
     this.slow(250);
 
     let reportId = null;
+    const imgFldr = 'test/img/';
+    const imgFile = 's_gps.jpg';
 
     before(async function() {
         // check testuser 'tester' exists and has access to ‘grn’ org (only)
@@ -312,15 +317,11 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
             expect(document.querySelectorAll('input')).to.have.lengthOf(2); // file selector
             expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
-
             expect(document.querySelector('textarea').textContent).to.equal('erroneous description');
-
             const values = {
                 'description': 'Test',
                 'nav-next':    'next',
             };
-            const imgFldr = 'test/img/';
-            const imgFile = 's_gps.jpg';
             // superagent doesn't allow request.attach() to be used with request.send(), so instead use request.field()
             const responsePost = await appReport.post(`/${org}/${proj}/6`)
                 .field('description', values['description'])
@@ -417,6 +418,81 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(document.getElementById(reportId).textContent).to.equal(reportId);
         });
 
+        it('gets report page', async function() {
+            const response = await appAdmin.get(`/reports/${reportId}`);
+            expect(response.status).to.equal(200);
+            // not much obvious to search for!
+        });
+
+        it('sees weather conditions in report page', async function() {
+            return; // TODO investigate why wunderground is returning 400 Bad Request
+            const response = await appAdmin.get('/reports/'+reportId); // eslint-disable-line no-unreachable
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const iconRe = new RegExp('^/img/weather/underground/icons/black/png/32x32/[a-z]+.png$');
+            expect(document.querySelector('#weather div.weather-body img').src).to.match(iconRe);
+        });
+
+        it('fetches uploaded image from AWS S3', async function() {
+            const src = `/uploaded/${proj}/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
+            const response = await appAdmin.get(src);
+            expect(response.status).to.equal(200);
+            expect(response.headers['content-type']).to.equal('image/jpeg');
+        });
+
+        it('sees uploaded image in report page', async function() {
+            const response = await appAdmin.get(`/reports/${reportId}`);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const src = `/uploaded/${proj}/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
+            expect(document.getElementById(imgFile).querySelector('td a').href).to.equal(src);
+            expect(document.getElementById(imgFile).querySelector('td img').src).to.equal(src);
+        });
+
+        it('gets address for Heddon-on-the-Wall (close to test photo) (ajax)', async function() {
+            const response = await appAdmin.get('/ajax/geocode?address=Heddon-on-the-Wall');
+            expect(response.status).to.equal(200);
+            expect(response.body.formattedAddress).to.equal('Heddon-on-the-Wall, UK');
+        });
+
+        it('sets report location to Heddon-on-the-Wall (ajax)', async function() {
+            const values = { address: 'Heddon-on-the-Wall' };
+            const response = await appAdmin.put(`/ajax/reports/${reportId}/location`).send(values);
+            expect(response.status).to.equal(200);
+        });
+
+        it('sees uploaded image exif metadata in report page', async function() {
+            const response = await appAdmin.get('/reports/'+reportId);
+            expect(response.status).to.equal(200);
+            const document = new jsdom.JSDOM(response.text).window.document;
+            const distRe = new RegExp('^7.2 km W from incident location');
+            expect(document.getElementById(imgFile).querySelector('td.exif div').textContent).to.match(distRe);
+            // note don't bother checking time as it will change in future
+        });
+
+        it('gets timestamp of new report (ajax)', async function() {
+            const response = await appAdmin.get('/ajax/reports/latest-timestamp');
+            expect(response.status).to.equal(200);
+            expect(response.body.latest.timestamp).to.equal(ObjectId(reportId).getTimestamp().toISOString());
+        });
+
+        it('gets reports in bounding box (ajax)', async function() {
+            const response = await appAdmin.get('/ajax/reports/within/54.9,-1.9:55.1,-1.7');
+            expect(response.status).to.equal(200);
+            expect(response.body.reports.filter(r => r._id == reportId).length).to.equal(1);
+        });
+
+        it('sees ‘testy terrain’ alias is used (ajax)', async function() {
+            const response = await appAdmin.get(`/ajax/report/${org}/aliases/testy+terrain`);
+            expect(response.status).to.equal(200);
+        });
+
+        // TODO: can 'org' element of url be inferred from header credentials?
+        it('sees unused alias is not used (ajax)', async function() {
+            const response = await appAdmin.get(`/ajax/report/${org}/aliases/no+way+this+should+be+a+used+alias`);
+            expect(response.status).to.equal(404);
+        });
+
         it('deletes submitted incident report', async function() {
             const response = await appAdmin.post(`/reports/${reportId}/delete`).send();
             expect(response.status).to.equal(302);
@@ -440,6 +516,7 @@ describe(`Report app (${org}/${app.env})`, function() {
             // note redirect has full url as it is changing subdomains
             expect(response.headers.location.slice(-report.length)).to.equal(report);
         });
+
         it('shows logged in user on login page when logged-in', async function() {
             const response = await appAdmin.get('/login');
             expect(response.status).to.equal(200);

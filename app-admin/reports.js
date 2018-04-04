@@ -880,27 +880,30 @@ class ReportsHandlers {
             const incidentTime = new Date(report.submitted.Date);
             const submissionTime = report._id.getTimestamp();
             for (const file of report.files) {
+                // get analysis data
+                const [ fileAnalysis ] = report.analysis ? report.analysis.files.filter(f => f.exif.name == file.name) : [];
+                if (!fileAnalysis) continue;
                 // proxy url
-                file.url = `/uploaded/${report.project}/${dateFormat(report._id.getTimestamp(), 'yyyy-mm')}/${report._id}/${file.name}`;
-                file.isImage = file.type.slice(0, 5) == 'image';
-                if (!incidentLocn) continue;
+                fileAnalysis.url = `/uploaded/${report.project}/${dateFormat(report._id.getTimestamp(), 'yyyy-mm')}/${report._id}/${file.name}`;
+                fileAnalysis.isImage = file.type.slice(0, 5) == 'image';
                 // exif location
-                if (file.exif && incidentLocn.lat && incidentLocn.lon) {
-                    const d = incidentLocn.distanceTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
-                    file.distance = d > 1e3 ? Number(d.toPrecision(2)) / 1e3 + ' km' : Number(d.toPrecision(2)) + ' metres';
-                    file.bearing = incidentLocn.bearingTo(new LatLon(file.exif.GPSLatitude, file.exif.GPSLongitude));
-                    file.direction = Dms.compassPoint(file.bearing);
+                if (fileAnalysis.exif && incidentLocn) {
+                    const d = incidentLocn.distanceTo(new LatLon(fileAnalysis.exif.GPSLatitude, fileAnalysis.exif.GPSLongitude));
+                    fileAnalysis.distance = d > 1e3 ? Number(d.toPrecision(2)) / 1e3 + ' km' : Number(d.toPrecision(2)) + ' metres';
+                    fileAnalysis.bearing = incidentLocn.bearingTo(new LatLon(fileAnalysis.exif.GPSLatitude, fileAnalysis.exif.GPSLongitude));
+                    fileAnalysis.direction = Dms.compassPoint(fileAnalysis.bearing);
                 }
                 // exif date
-                if (file.exif && file.exif.CreateDate) {
-                    const date = file.exif.CreateDate;
-                    file.time = new Date(Date.UTC(date.year, date.month-1, date.day, date.hour, date.minute - date.tzoffsetMinutes)); // TODO: exif tz?
-                    if (file.time) {
-                        file.timeDesc = !isNaN(incidentTime)
-                            ? moment(file.time).from(incidentTime)+' from incident'
-                            : moment(file.time).from(submissionTime)+' from submission';
+                if (fileAnalysis.exif && fileAnalysis.exif.CreateDate) {
+                    const date = fileAnalysis.exif.CreateDate;
+                    fileAnalysis.time = new Date(Date.UTC(date.year, date.month-1, date.day, date.hour, date.minute - date.tzoffsetMinutes)); // TODO: exif tz?
+                    if (fileAnalysis.time) {
+                        fileAnalysis.timeDesc = !isNaN(incidentTime)
+                            ? moment(fileAnalysis.time).from(incidentTime)+' from incident'
+                            : moment(fileAnalysis.time).from(submissionTime)+' from submission';
                     }
                 }
+                Object.assign(file, fileAnalysis);
             }
         }
 

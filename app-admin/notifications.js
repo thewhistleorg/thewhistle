@@ -9,7 +9,7 @@
 import Notification from '../models/notification.js';
 import Report       from '../models/report.js';
 import User         from '../models/user.js';
-import log          from '../lib/log';
+import Log          from '../lib/log';
 import dateFormat from 'dateformat';
 
 
@@ -32,7 +32,7 @@ class NotificationsHandlers {
         } catch (e) {
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
         }
         ctx.set('Cache-Control', 'no-cache, no-store, must-revalidate');
         ctx.body.root = 'notifications';
@@ -80,7 +80,7 @@ class NotificationsHandlers {
         } catch (e) {
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
         }
         ctx.set('Cache-Control', 'no-cache, no-store, must-revalidate');
         ctx.body.root = 'notifications';
@@ -102,7 +102,7 @@ class NotificationsHandlers {
         } catch (e) {
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
         }
         ctx.body.root = 'notifications';
     }
@@ -137,7 +137,7 @@ class NotificationsHandlers {
         } catch (e) {
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
         }
         // ctx.body.root = 'notifications';
     }

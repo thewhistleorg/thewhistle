@@ -28,7 +28,7 @@ import Update from '../models/update.js';
 import jsObjectToHtml from '../lib/js-object-to-html';
 import Geocoder       from '../lib/geocode';
 import Weather        from '../lib/weather';
-import log            from '../lib/log';
+import Log            from '../lib/log';
 import Notification   from '../models/notification';
 
 
@@ -869,7 +869,7 @@ class ReportsHandlers {
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
             submittedDesc:    truncate(desc, 70) || `<i title="submitted description" class="grey">No Description</i>`, // eslint-disable-line quotes
             showDeleteButton: ctx.app.env != 'production',
-            referer:          ctx.headers.referer || '/reports',
+            referrer:         ctx.headers.referer || '/reports', // for 'back' button
         };
         extra.reportDescription = report.summary
             ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`
@@ -1020,7 +1020,7 @@ class ReportsHandlers {
             ctx.status = 200;
             ctx.body = { latest: { timestamp: latest } };
         } catch (e) {
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
@@ -1056,7 +1056,7 @@ class ReportsHandlers {
             ctx.status = 200;
             ctx.body = { reports };
         } catch (e) {
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
@@ -1083,7 +1083,7 @@ class ReportsHandlers {
             ctx.status = 201;
             ctx.body = {};
         } catch (e) {
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
@@ -1102,7 +1102,7 @@ class ReportsHandlers {
             ctx.status = 200;
             ctx.body = {};
         } catch (e) {
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
@@ -1213,7 +1213,7 @@ class ReportsHandlers {
             ctx.status = 200;
             ctx.body = { updates: updates };
         } catch (e) {
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
             ctx.status = 500; // Internal Server Error
             ctx.body = { message: e.message };
         }
@@ -1296,7 +1296,7 @@ class ReportsHandlers {
             ctx.body = { lat, lon };
             ctx.body.root = 'reports';
         } catch (e) {
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
             ctx.status = 500; // Internal Server Error
             ctx.body = { message: e.message };
         }

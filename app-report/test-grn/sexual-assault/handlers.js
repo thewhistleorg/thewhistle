@@ -22,7 +22,7 @@ import UserAgent    from '../../../models/user-agent.js';
 import Notification from '../../../models/notification';
 import User         from '../../../models/user';
 import Geocoder     from '../../../lib/geocode.js';
-import log          from '../../../lib/log';
+import Log          from '../../../lib/log';
 
 const nPages = 8;
 
@@ -255,7 +255,7 @@ class Handlers {
                 try {
                     await Report.submissionFile(org, ctx.session.id, file);
                 } catch (e) {
-                    await log(ctx, 'error', null, null, e);
+                    await Log.error(ctx, e);
                     ctx.flash = { error: e.message };
                 }
             }

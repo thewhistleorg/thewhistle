@@ -9,7 +9,7 @@ import scrypt     from 'scrypt';       // scrypt library
 
 import User from '../models/user.js';
 import Mail from '../lib/mail.js';
-import log  from '../lib/log';
+import Log  from '../lib/log';
 
 
 /*
@@ -65,7 +65,7 @@ class PasswordResetHandlers {
             const context = { firstname: user.firstname, host: ctx.host, token: token };
             if (ctx.app.env != 'development') await Mail.send(email, 'password-reset.email', context);
         } catch (e) {
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
         }
 
         ctx.set('X-Reset-Token', token); // for testing

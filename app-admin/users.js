@@ -14,7 +14,7 @@ import crypto     from 'crypto';     // nodejs.org/api/crypto.html
 
 import User   from '../models/user.js';
 import Report from '../models/report.js';
-import log    from '../lib/log';
+import Log    from '../lib/log';
 import Mail   from '../lib/mail';
 
 /*
@@ -208,7 +208,7 @@ class UsersHandlers {
                 if (ctx.app.env != 'development') await Mail.send(body.email, 'users-add.email', context);
                 ctx.flash = { notification: `Notification e-mail sent to ${body.email}` };
             } catch (e) {
-                await log(ctx, 'error', null, null, e);
+                await Log.error(ctx, e);
                 throw e;
             }
 
@@ -328,7 +328,7 @@ class UsersHandlers {
             ctx.status = 200;
             ctx.body = { users: usrsNoPw };
         } catch (e) {
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }

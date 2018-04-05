@@ -11,7 +11,7 @@
 import glob from 'glob-promise'; // match files using the patterns the shell uses
 
 import Question from '../models/question.js';
-import log      from '../lib/log';
+import Log      from '../lib/log';
 
 
 class QuestionsHandlers {
@@ -63,7 +63,7 @@ class QuestionsHandlers {
             ctx.body = {};
             ctx.set('X-Insert-Id', id); // for integration tests
         } catch (e) {
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
@@ -84,7 +84,7 @@ class QuestionsHandlers {
             ctx.status = 200; // Ok
             ctx.body = {};
         } catch (e) {
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }
@@ -104,7 +104,7 @@ class QuestionsHandlers {
             ctx.status = 200;
             ctx.body = {};
         } catch (e) {
-            await log(ctx, 'error', null, null, e);
+            await Log.error(ctx, e);
             ctx.status = 500; // Internal Server Error
             ctx.body = e;
         }

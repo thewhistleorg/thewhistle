@@ -15,7 +15,7 @@ const debug  = Debug('app:req:a'); // debug each request
 const router = koaRouter();
 
 import HandlebarsHelpers from '../lib/handlebars-helpers.js';
-import log               from '../lib/log.js';
+import Log               from '../lib/log.js';
 import Middleware        from '../lib/middleware.js';
 
 const app = new Koa(); // admin app
@@ -52,7 +52,7 @@ app.use(async function logAccess(ctx, next) {
     await next();
     const t2 = Date.now();
 
-    await log(ctx, 'access', t1, t2);
+    await Log.access(ctx, t2 - t1);
 });
 
 
@@ -83,7 +83,7 @@ app.use(async function handleErrors(ctx, next) {
                 // ctx.app.emit('error', e, ctx); // github.com/koajs/koa/wiki/Error-Handling
                 break;
         }
-        await log(ctx, 'error', null, null, e);
+        await Log.error(ctx, e);
     }
 });
 

@@ -44,7 +44,7 @@ describe('Admin app', function() {
         expect(response.status).to.equal(200);
         const document = new jsdom.JSDOM(response.text).window.document;
         expect(document.querySelector('title').textContent).to.equal('Reports list');
-        expect(document.querySelectorAll('header nav > ul > li').length).to.equal(8);
+        expect(document.querySelectorAll('header nav > ul > li').length).to.equal(9);
     });
 
     it('sees list of users', async function() {

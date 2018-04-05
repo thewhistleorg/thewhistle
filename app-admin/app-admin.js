@@ -62,28 +62,28 @@ app.use(async function handleErrors(ctx, next) {
 
         await next();
 
-    } catch (e) {
-        ctx.status = e.status || 500;
+    } catch (err) {
+        ctx.status = err.status || 500;
+        if (app.env == 'production') delete err.stack; // don't leak sensitive info!
         switch (ctx.status) {
             case 401: // Unauthorised (eg invalid JWT auth token)
                 ctx.redirect('/login'+ctx.url);
                 break;
             case 404: // Not Found
-                const context404 = { msg: e.message=='Not Found'?null:e.message };
-                await ctx.render('404-not-found', context404);
+                if (err.message == 'Not Found') err.message = null; // personalised 404
+                await ctx.render('404-not-found',  { err });
                 break;
             case 403: // Forbidden
             case 409: // Conflict
-                await ctx.render('400-bad-request', e);
+                await ctx.render('400-bad-request',  { err });
                 break;
             default:
-            case 500: // Internal Server Error
-                const context500 = app.env=='production' ? {} : { e: e };
-                await ctx.render('500-internal-server-error', context500);
-                // ctx.app.emit('error', e, ctx); // github.com/koajs/koa/wiki/Error-Handling
+            case 500: // Internal Server Error (for uncaught or programming errors)
+                await ctx.render('500-internal-server-error',  { err });
+                // ctx.app.emit('error', err, ctx); // github.com/koajs/koa/wiki/Error-Handling
                 break;
         }
-        await Log.error(ctx, e);
+        await Log.error(ctx, err);
     }
 });
 

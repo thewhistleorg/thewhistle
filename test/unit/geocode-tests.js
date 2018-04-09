@@ -45,7 +45,7 @@ describe('Geocode', function() {
         expect(result.longitude).to.equal(3.397181);
         expect(result.country).to.equal('Nigeria');
         expect(result.administrativeLevels).to.be.empty;
-        expect(result.extra.neighborhood).to.equal('Yaba,');
+        expect(result.extra.neighborhood).to.equal('Yaba');
         expect(result.city).to.equal('Lagos State.');
         expect(result.streetName).to.be.undefined;
     });

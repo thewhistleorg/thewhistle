@@ -129,6 +129,7 @@ app.use(convert(lusca({ // note koa-lusca@2.2.0 is v1 middleware which generates
     hsts:           { maxAge: 60*60*24*365, includeSubDomains: true }, // HTTP Strict-Transport-Security
     xframe:         'SAMEORIGIN',                                      // X-Frame-Options
     xssProtection:  true,                                              // X-XSS-Protection
+    referrerPolicy: 'strict-origin-when-cross-origin',                 // Referrer-Policy
 })));
 
 

@@ -20,6 +20,10 @@ tests, and review apps.
 
 MongoDB database backup procedures.
 
+## [Event notifications](/dev/notes/notifications)
+
+Description of the operation of notifications.
+
 ## [Form generation wizard](/dev/notes/form-wizard)
 
 The long-term objective is that incident report submission forms should be created by NGO staff with

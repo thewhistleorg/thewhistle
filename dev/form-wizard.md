@@ -64,9 +64,3 @@ Sample cases
 ------------
 
 - [GRN sexual assault](form-wizard/sexual-assault)
-
-
-Common library code
--------------------
-
-[Common library code](form-wizard/common-library-code) which will be identical for all projects.

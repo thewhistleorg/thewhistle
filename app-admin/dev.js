@@ -432,13 +432,23 @@ class Dev {
      * Development notes relating to plans about form wizards.
      */
     static async notesFormWizard(ctx) {
-        const notesFile = `dev/form-wizard/${ctx.params.notes}.md`;
+        const notesFile = ctx.params.notes.match(/yaml$/)
+            ? `dev/form-wizard/${ctx.params.notes}`
+            : `dev/form-wizard/${ctx.params.notes}.md`;
+
         try {
-            const notesMarkdown = await fs.readFile(notesFile, 'utf8');
-            const content = md.render(notesMarkdown);
-            const document = new jsdom.JSDOM(content).window.document;
-            const title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'The Whistle Development Notes';
-            await ctx.render('dev-notes', { content, title });
+            switch (notesFile.match(/\.[a-z]+$/)[0]) {
+                case '.md':
+                    const notesMarkdown = await fs.readFile(notesFile, 'utf8');
+                    const content = md.render(notesMarkdown);
+                    const document = new jsdom.JSDOM(content).window.document;
+                    const title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'The Whistle Development Notes';
+                    await ctx.render('dev-notes', { content, title });
+                    break;
+                case '.yaml':
+                    ctx.body = await fs.readFile(`dev/form-wizard/${ctx.params.notes}`, 'utf8');
+                    break;
+            }
         } catch (e) {
             switch (e.code) {
                 case 'ENOENT': ctx.throw(404, 'Notes not found'); break;

@@ -1,0 +1,27 @@
+- text:
+    on-behalf-of:self:  '# Do you remember anything about where this happened?'
+    on-behalf-of:other: '# Do you know anything about where this happened?'
+
+- input:
+    name: where
+    display-as: Where
+    type: radio
+    values:
+      - at:
+          label: 'Yes'
+          subsidiary-show:
+            - text: Please provide as much detail as you are able – this could be an address,
+                restaurant name, or neighborhood or sights and landmarks you recall.
+            - input:
+                name: address
+                type: textbox
+      - dont-know: I don’t know
+      - skip: Skip
+
+- input:
+    name: nav-next
+    display-as: false
+    type: button
+    value: next
+    text: Submit and continue
+    accesskey: c

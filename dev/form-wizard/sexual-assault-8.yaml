@@ -1,0 +1,16 @@
+- text: |
+    # Is there any other information that might be useful to us?
+
+- input:
+    name: extra-notes
+    display-as: Extra notes
+    type: textbox
+    label: 'Extra notes:'
+
+- input:
+    name: nav-next
+    display-as: false
+    type: button
+    value: next
+    text: Submit and continue to Resources
+    accesskey: c

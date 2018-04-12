@@ -196,9 +196,9 @@ describe(`Submit ${org}/${proj} incident report covering various enter-next-back
         cy.get('h1').contains('Do you know anything about where this happened?');
 
         cy.get('#at-address').should('be.visible'); // TODO: TBC
-        // select 'where-at'
-        cy.get('label').contains('Yes').click();
-        cy.get('#at-address').should('be.visible');
+        // select 'where-at' by clicking within textarea
+        cy.get('#at-address').click();
+        cy.get('#where-at').should('be.checked');
         cy.get('#at-address').type('Here and there');
         cy.contains('Submit and continue').click(); // next
         cy.get('#nav-prev').click();                // and back

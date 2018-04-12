@@ -9,12 +9,12 @@
         <p class="hint-text">We understand this can be difficult. Please take your time and tell us
             as much as you are able.</p>
 
-        <ul id="when">
+        <ul id="question-when" class="question">
             {{#checked when}}
             <li>
                 <input type="radio" name="when" id="when-date" value="date">
                 <label for="when-date" class="pure-radio">Yes, exactly when it happened</label>
-                <div id="when-date-form" class="hide">
+                <div class="subsidiary hide">
                     <p class="hint-text">Please select the date and approximate time</p>
                     <table class="inline">
                         <tr class="field-label">
@@ -69,7 +69,7 @@
             <li>
                 <input type="radio" name="when" id="when-within" value="within">
                 <label for="when-within">Yes, about when it happened</label>
-                <div id="when-within-form" class="hide">
+                <div class="subsidiary hide">
                     <p class="hint-text">For example, last month, a couple of years ago, …</p>
                     <select name="within-options" id="within-options">
                         {{#selected within-options}}
@@ -95,7 +95,7 @@
 
         <h1>Is it still happening?</h1>
 
-        <ul id="still-happening">
+        <ul id="question-still-happening" class="question">
             {{#checked still-happening}}
             <li>
                 <input type="radio" name="still-happening" id="still-happening-y" value="y">

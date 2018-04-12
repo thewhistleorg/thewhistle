@@ -38,8 +38,8 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
         cy.contains('Submit and continue').click();
 
         cy.url().should('include', `/${org}/${proj}/3`); // when / still-happening
-        cy.get('#when label').contains('Yes, exactly when it happened').click();
-        cy.get('#still-happening label').contains('Yes').click();
+        cy.get('#question-when label').contains('Yes, exactly when it happened').click();
+        cy.get('#question-still-happening label').contains('Yes').click();
         cy.contains('Submit and continue').click();
 
         cy.url().should('include', `/${org}/${proj}/4`); // where
@@ -50,7 +50,7 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
         cy.url().should('include', `/${org}/${proj}/5`); // who
         cy.get('input.who-relationship').should('not.be.visible');
         cy.get('textarea.who-description').should('not.be.visible');
-        cy.get('#who label').contains('No').click();
+        cy.get('#question-who label').contains('No').click();
         cy.get('input.who-relationship').should('not.be.visible');
         // cy.get('textarea.who-description').should('be.visible'); // TODO why does this fail?
         cy.get('#who-description').type('Big fat guy');

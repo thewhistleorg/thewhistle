@@ -5,7 +5,7 @@
     <div>
         <h1>Have you used this anonymous reporting service before?</h1>
 
-        <ul>
+        <ul id="question-used-before">
             {{#checked used-before}}
             <li>
                 <input type="radio" name="used-before" id="used-before-y" value="y">
@@ -38,7 +38,7 @@
 
         <h1>Are you reporting on behalf of yourself or someone else?</h1>
 
-        <ul id="on-behalf-of">
+        <ul id="question-on-behalf-of" class="question">
             {{#checked on-behalf-of}}
             <li>
                 <input type="radio" name="on-behalf-of" id="on-behalf-of-myself" value="myself">
@@ -53,7 +53,7 @@
 
         <h1>{{q.2a}}</h1>
         <h3>Gender</h3>
-        <ul>
+        <ul id="question-survivor-gender" class="question">
             {{#checked survivor-gender}}
             <li>
                 <input type="radio" name="survivor-gender" id="survivor-gender-m" value="m"> <label for="survivor-gender-m">Male</label>
@@ -68,7 +68,7 @@
         </ul>
 
         <h3>Age</h3>
-        <ul>
+        <ul id="question-survivor-age" class="question">
             <li>
                 <label for="survivor-age"></label>
                 <select name="survivor-age" id="survivor-age" class="w16">
@@ -111,12 +111,12 @@
         <p class="hint-text">We understand this can be difficult. Please take your time and tell us
             as much as you are able.</p>
 
-        <ul id="when">
+        <ul id="question-when" class="question">
             {{#checked when}}
             <li>
                 <input type="radio" name="when" id="when-date" value="date">
                 <label for="when-date" class="pure-radio">Yes, exactly when it happened</label>
-                <div class="when-date-form" class="hide">
+                <div class="subsidiary hide">
                     <p class="hint-text">Please select the date and approximate time</p>
                     <table class="inline">
                         <tr class="field-label">
@@ -171,7 +171,7 @@
             <li>
                 <input type="radio" name="when" id="when-within" value="within">
                 <label for="when-within">Yes, about when it happened</label>
-                <div id="when-within-form" class="hide">
+                <div class="subsidiary hide">
                     <p class="hint-text">For example, last month, a couple of years ago, …</p>
                     <select name="within-options" id="within-options">
                         {{#selected within-options}}
@@ -197,7 +197,7 @@
 
         <h1>Is it still happening?</h1>
 
-        <ul id="still-happening">
+        <ul id="question-still-happening" class="question">
             {{#checked still-happening}}
             <li>
                 <input type="radio" name="still-happening" id="still-happening-y" value="y">
@@ -222,12 +222,12 @@
         <h1>{{q.4a}}</h1>
 
         <p class="hint-text"></p>
-        <ul id="where">
+        <ul id="question-where" class="question">
             {{#checked where}}
             <li>
                 <input type="radio" name="where" id="where-at" value="at">
                 <label for="where-at">Location</label>
-                <div id="where-at-form">
+                <div class="subsidiary">
                     <p class="hint-text">Please provide as much detail as you are able – this could be
                         an address, restaurant name, or neighborhood or sights and landmarks you recall.</p>
                     <textarea rows="4" name="at-address" id="at-address" class="w100pc">{{at-address}}</textarea>
@@ -251,12 +251,12 @@
         <h1>Do you know who did it?</h1>
 
         <p class="hint-text">This could be one person or multiple people.</p>
-        <ul id="who">
+        <ul id="question-who" class="question">
             {{#checked who}}
             <li>
                 <input type="radio" name="who" id="who-y" value="y">
                 <label for="who-y" class="pure-radio greyed-out-unless-checked">Yes</label>
-                <div id="who-y-form" class="hide">
+                <div class="subsidiary hide">
                     <label for="who-relationship">
                         <p class="hint-text">Please give us a description of the person/people. Please
                             include how you know them (for example, it could be a relative, colleague,
@@ -268,7 +268,7 @@
             <li>
                 <input type="radio" name="who" id="who-n" value="n">
                 <label for="who-n" class="pure-radio greyed-out-unless-checked">No</label>
-                <div id="who-n-form" class="hide">
+                <div class="subsidiary hide">
                     <p class="hint-text">Please give us as much description as you are able.</p>
                     <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
                 </div>
@@ -310,7 +310,7 @@
 
         <p class="hint-text">{{q.6a}}</p>
 
-        <ul>
+        <ul id="question-description" class="question">
             {{#checked description}}
             <li>
                 <label for="description">Description:</label>
@@ -345,32 +345,42 @@
             information you are able in the text fields (for example, whether any actions taken as a
             result of your conversation).</p>
 
-        <ul id="action-taken">
+        <ul id="question-action-taken" class="question">
             {{#checked action-taken}}
             <li>
                 <input type="checkbox" name="action-taken" id="action-taken-police" value="police">
                 <label for="action-taken-police">Police or government officials</label>
-                <input type="text" name="action-taken-police-details" id="action-taken-police-details" value="{{action-taken-police-details}}" class="details hide w16">
+                <div class="subsidiary hide">
+                    <input type="text" name="action-taken-police-details" id="action-taken-police-details" value="{{action-taken-police-details}}" class="w16">
+                </div>
             </li>
             <li>
                 <input type="checkbox" name="action-taken" id="action-taken-organisation" value="organisation">
                 <label for="action-taken-organisation">Somebody within an organisation</label>
-                <input type="text" name="action-taken-organisation-details" id="action-taken-organisation-details" value="{{action-taken-organisation-details}}" class="details hide w16">
+                <div class="subsidiary hide">
+                    <input type="text" name="action-taken-organisation-details" id="action-taken-organisation-details" value="{{action-taken-organisation-details}}" class="w16">
+                </div>
             </li>
             <li>
                 <input type="checkbox" name="action-taken" id="action-taken-teacher" value="teacher">
                 <label for="action-taken-teacher">Teacher/tutor/lecturer</label>
-                <input type="text" name="action-taken-teacher-details" id="action-taken-teacher-details" value="{{action-taken-teacher-details}}" class="details hide w16">
+                <div class="subsidiary hide">
+                    <input type="text" name="action-taken-teacher-details" id="action-taken-teacher-details" value="{{action-taken-teacher-details}}" class="w16">
+                </div>
             </li>
             <li>
                 <input type="checkbox" name="action-taken" id="action-taken-friends" value="friends">
                 <label for="action-taken-friends">Friends, family</label>
-                <input type="text" name="action-taken-friends-details" id="action-taken-friends-details" value="{{action-taken-friends-details}}" class="details hide w16">
+                <div class="subsidiary hide">
+                    <input type="text" name="action-taken-friends-details" id="action-taken-friends-details" value="{{action-taken-friends-details}}" class="w16">
+                </div>
             </li>
             <li>
                 <input type="checkbox" name="action-taken" id="action-taken-others" value="others">
                 <label for="action-taken-others">Others</label>
-                <input type="text" name="action-taken-others-details" id="action-taken-others-details" value="{{action-taken-others-details}}" class="details hide w16">
+                <div class="subsidiary hide">
+                    <input type="text" name="action-taken-others-details" id="action-taken-others-details" value="{{action-taken-others-details}}" class="w16">
+                </div>
             </li>
             <li>
                 <input type="radio" name="action-taken" id="action-taken-skip" value="skip"> <!-- checkbox/radio with same name? -->
@@ -383,9 +393,9 @@
     <hr>
 
     <div>
-        <h1>Is there anything else you would like to add?.</h1>
+        <h1>Is there any other information that might be useful to us?</h1>
 
-        <ul>
+        <ul id="question-extra-notes" class="question">
             <li>
                 <label for="extra-notes">Extra notes:</label>
                 <textarea class="pure-input-1" name="extra-notes" id="extra-notes" rows="4">{{extra-notes}}</textarea>

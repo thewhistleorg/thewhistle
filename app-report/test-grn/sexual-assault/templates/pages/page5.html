@@ -7,12 +7,12 @@
         <h1>Do you know who did it?</h1>
 
         <p class="hint-text">This could be one person or multiple people.</p>
-        <ul id="who">
+        <ul id="question-who" class="question">
             {{#checked who}}
             <li>
                 <input type="radio" name="who" id="who-y" value="y">
                 <label for="who-y" class="pure-radio greyed-out-unless-checked">Yes</label>
-                <div id="who-y-form" class="hide">
+                <div class="subsidiary hide">
                     <p class="hint-text">Please give us a description of the person/people. Please
                         include how you know them (for example, it could be a relative, colleague,
                         or acquaintance.</p>
@@ -22,7 +22,7 @@
             <li>
                 <input type="radio" name="who" id="who-n" value="n">
                 <label for="who-n" class="pure-radio greyed-out-unless-checked">No</label>
-                <div id="who-n-form" class="hide">
+                <div class="subsidiary hide">
                     <p class="hint-text">Please give us as much description as you are able.</p>
                     <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
                 </div>

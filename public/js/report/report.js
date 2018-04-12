@@ -27,195 +27,76 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-
-    /*
-     * 'survivor-gender/-age' page (note select & radio with same name)
-     */
-    if (document.querySelector('[name^=survivor]')) {
-        // uncheck 'survivor-age-skip' when 'survivor-age' value selected
-        document.querySelector('#survivor-age').onchange = function() {
-            document.querySelector('#survivor-age-skip').checked = false;
-        };
-        // clear 'survivor-age' when 'survivor-age-skip' selected
-        document.querySelector('#survivor-age-skip').onclick = function() {
-            document.querySelector('select[name=survivor-age]').value = '';
-        };
+    // set up listeners to manage visibility of subsidiary details and selection of associated inputs
+    var questions = document.querySelectorAll('.question');
+    for (var q=0; q<questions.length; q++) {
+        manageVisibility(questions[q].id.replace('question-', ''));
     }
 
 
-    /*
-     * 'when' page
-     */
+    function manageVisibility(inputName) {
+        // get list of inputs named 'inputName'
+        var inputsSelector = 'input[name='+inputName+'], textarea[name='+inputName+'], select[name='+inputName+']';
+        var inputs = document.querySelectorAll(inputsSelector);
 
-    if (document.querySelector('input[name=when]')) {
-        var whenInputs = document.querySelectorAll('input[name=when]');
+        // set up listeners to show current subsidiary and hide others
+        for (i=0; i<inputs.length; i++) {
+            inputs[i].onclick = function() {
+                var sub = this.parentElement.querySelector('.subsidiary');
+                // show current input's subsidiary, if any - unless it's a checked checkbox, in
+                // which case hide it
+                if (sub) {
+                    if (this.type != 'checkbox' || this.checked) {
+                        sub.classList.remove('hide');
+                        sub.querySelector('input,textarea,select').focus();
+                    } else {
+                        sub.classList.add('hide');
+                    }
+                }
 
-        for (i=0; i<whenInputs.length; i++) {
-            whenInputs[i].onclick = function() {
-                var ul = this.parentElement.parentElement;
-                switch (this.value) {
-                    case 'date':
-                        ul.querySelector('#when-date-form').classList.remove('hide');
-                        ul.querySelector('#when-within-form').classList.add('hide');
-                        break;
-                    case 'within':
-                        ul.querySelector('#when-date-form').classList.add('hide');
-                        ul.querySelector('#when-within-form').classList.remove('hide');
-                        ul.querySelector('select[name=within-options]').focus();
-                        break;
-                    case 'dont-remember':
-                        ul.querySelector('#when-date-form').classList.add('hide');
-                        ul.querySelector('#when-within-form').classList.add('hide');
-                        break;
-                    case 'skip':
-                        ul.querySelector('#when-date-form').classList.add('hide');
-                        ul.querySelector('#when-within-form').classList.add('hide');
-                        break;
+                // if 'this' is a radio button, hide other subsidiary divs, and uncheck any checkbox
+                // inputs of the same name (eg action-taken 'skip')
+                if (this.type == 'radio') {
+                    inputs.forEach(function(input) {
+                        var otherSub = input.parentElement.querySelector('.subsidiary');
+                        if (otherSub && otherSub!=sub) otherSub.classList.add('hide');
+                        var otherCheckboxes = document.querySelectorAll('input[type=checkbox][name='+inputName+']');
+                        otherCheckboxes.forEach(function(c) { c.checked = false; });
+                    });
+                }
+
+                // if 'this' is a skip option, clear any selects of the same name (eg survivor-age)
+                if (this.value == 'skip') {
+                    var otherSelects = document.querySelectorAll('select[name='+inputName+']');
+                    otherSelects.forEach(function(s) { s.value = ''; });
                 }
             };
-        }
 
-        // set defaults for previously answered questions
-        for (i=0; i<whenInputs.length; i++) {
-            if (whenInputs[i].checked) whenInputs[i].onclick();
-        }
-    }
-
-
-    /*
-     * 'where' page
-     */
-
-    if (document.querySelector('#where')) {
-        var whereInputs = document.querySelectorAll('input[name=where]');
-
-        // show/hide at-address according to selected option
-        for (i=0; i<whereInputs.length; i++) {
-            whereInputs[i].onclick = function() {
-                var ul = document.querySelector('#where');
-                switch (this.value) {
-                    case 'at':
-                        ul.querySelector('#where-at-form').classList.remove('hide');
-                        ul.querySelector('textarea[name=at-address]').focus();
-                        ul.querySelector('textarea[name=at-address]').select();
-                        break;
-                    case 'dont-know':
-                        ul.querySelector('#where-at-form').classList.add('hide');
-                        break;
-                    case 'skip':
-                        ul.querySelector('#where-at-form').classList.add('hide');
-                        break;
-                }
-            };
-        }
-
-
-        // defaults for previously answered questions
-        for (i=0; i<whereInputs.length; i++) {
-            if (whereInputs[i].checked) whereInputs[i].onclick();
-        }
-
-        // check #where-at if at-address receives focus
-        document.querySelector('#at-address').onfocus = function() {
-            document.querySelector('#where-at').checked = true;
-        };
-    }
-
-
-    /*
-     * 'who' page
-     */
-
-    if (document.querySelector('input[name=who]')) {
-        var whoInputs = document.querySelectorAll('input[name=who]');
-
-        // display/hide supplementary information fields on radio-box selection
-        for (i=0; i<whoInputs.length; i++) {
-            whoInputs[i].onclick = function() {
-                var ul = document.querySelector('#who');
-                switch (this.value) {
-                    case 'y':
-                        ul.querySelector('#who-n-form').classList.add('hide');
-                        ul.querySelector('#who-y-form').classList.remove('hide');
-                        ul.querySelector('textarea[name=who-relationship]').focus();
-                        ul.querySelector('textarea[name=who-relationship]').select();
-                        break;
-                    case 'n':
-                        ul.querySelector('#who-y-form').classList.add('hide');
-                        ul.querySelector('#who-n-form').classList.remove('hide');
-                        ul.querySelector('textarea[name=who-description]').focus();
-                        ul.querySelector('textarea[name=who-description]').select();
-                        break;
-                    case 'skip':
-                        ul.querySelector('#who-y-form').classList.add('hide');
-                        ul.querySelector('#who-n-form').classList.add('hide');
-                        break;
-                }
-            };
-        }
-
-        // set defaults for previously answered questions
-        for (i=0; i<whoInputs.length; i++) {
-            if (whoInputs[i].checked) whoInputs[i].onclick();
-        }
-    }
-
-    /*
-     * 'description' page
-     */
-
-    if (document.getElementsByName('description').length > 0) {
-
-        // uncheck radio when description box focused
-        document.querySelector('textarea[name=description]').onfocus = function() {
-            document.querySelector('input[name=description]').checked = false;
-        };
-
-        // TODO: hide description when skip selected?
-    }
-
-
-    /*
-     * 'action-taken' page
-     */
-
-    if (document.querySelector('input[name=action-taken]')) {
-        var actionTakenInputs = document.querySelectorAll('input[type=checkbox]');
-
-        for (i=0; i<actionTakenInputs.length; i++) {
-            var input = actionTakenInputs[i];
-            // defaults for previously answered questions
-            if (input.checked) {
-                input.parentElement.querySelector('input[type=text]').classList.remove('hide');
-            }
-            // listener to show/hide details input
-            input.onclick = function() {
-                var details = this.parentElement.querySelector('input[type=text]');
-                if (this.checked) {
-                    document.querySelector('#action-taken-skip').checked = false; // uncheck skip option
-                    details.classList.remove('hide');
-                    details.focus();
-                    details.select();
-                } else {
-                    details.value = '';
-                    details.classList.add('hide');
-                }
-            };
-        }
-
-        // uncheck checkboxes when skip selected
-        document.querySelector('#action-taken-skip').onchange = function() {
-            // uncheck all checkboxes when skip radio is selected
-            if (this.checked == true) {
-                for (i=0; i<actionTakenInputs.length; i++) {
-                    var checkbox = actionTakenInputs[i];
-                    checkbox.checked = false;
-                    var details = checkbox.parentElement.querySelector('input[type=text]');
-                    details.value = '';
-                    details.classList.add('hide');
+            // if a subsidiary is initially displayed, setting focus to an input within that
+            // subsidiary should select the option the subsidiary belongs to (eg 'where')
+            var subInputs = inputs[i].parentElement.querySelectorAll('.subsidiary input, .subsidiary textarea');
+            if (subInputs) {
+                for (var j=0; j<subInputs.length; j++) {
+                    subInputs[j].onfocus = function() {
+                        var parentInput = this.closest('.subsidiary').parentElement.querySelector('input');
+                        parentInput.checked = true;
+                    };
                 }
             }
-        };
+
+            // if a top-level input receives focus, any radio button of the same name should be
+            // unchecked (eg 'description')
+            inputs[i].onfocus = function() {
+                var radios = document.querySelector('input[type=radio][name='+inputName+']');
+                if (radios) radios.checked = false;
+            };
+
+        }
+
+        // set visibility defaults for previously answered questions
+        for (i=0; i<inputs.length; i++) {
+            if (inputs[i].checked) inputs[i].onclick();
+        }
     }
 
 

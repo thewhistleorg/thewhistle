@@ -8,7 +8,7 @@
 
         <h1>Are you reporting on behalf of yourself or someone else?</h1>
 
-        <ul id="on-behalf-of">
+        <ul id="question-on-behalf-of" class="question">
             {{#checked on-behalf-of}}
             <li>
                 <input type="radio" name="on-behalf-of" id="on-behalf-of-myself" value="myself">
@@ -23,7 +23,7 @@
 
         <h1>{{q.2a}}</h1>
         <h3>Gender</h3>
-        <ul>
+        <ul id="question-survivor-gender" class="question">
             {{#checked survivor-gender}}
             <li>
                 <input type="radio" name="survivor-gender" id="survivor-gender-m" value="m"> <label for="survivor-gender-m">Male</label>
@@ -38,7 +38,7 @@
         </ul>
 
         <h3>Age</h3>
-        <ul>
+        <ul id="question-survivor-age" class="question">
             <li>
                 <label for="survivor-age"></label>
                 <select name="survivor-age" id="survivor-age" class="w16">

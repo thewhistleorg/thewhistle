@@ -1,3 +1,12 @@
+- back:
+    type: standard
+
+- step:
+    type: standard
+
+- flash:
+    type: standard
+
 - text: |
     # This is an anonymous service. Any information you provide will be seen only by staff and
     volunteers of Global Rights Nigeria.
@@ -30,10 +39,6 @@
     options:
       - skip: Skip
 
-- input:
-    name: nav-next
-    display-as: false
-    type: button
-    value: next
+- next:
     text: Submit and continue
     accesskey: c

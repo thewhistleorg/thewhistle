@@ -1,3 +1,12 @@
+- back:
+    type: standard
+
+- step:
+    type: standard
+
+- flash:
+    type: standard
+
 - text:
     on-behalf-of:self:  '# Have you spoken to anybody about what happened?'
     on-behalf-of:other: '# Have you or your friend spoken to anybody about what happened?'
@@ -48,10 +57,6 @@
     options:
       - skip: Skip
 
-- input:
-    name: nav-next
-    display-as: false
-    type: button
-    value: next
+- next:
     text: Submit and continue
     accesskey: c

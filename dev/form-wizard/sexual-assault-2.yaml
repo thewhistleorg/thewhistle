@@ -1,3 +1,9 @@
+- step:
+    type: standard
+
+- flash:
+    type: standard
+
 - text: |
     Your alias for this session is {{alias}}. Please keep this alias in a safe place so you can
     check back in with us if necessary.
@@ -8,7 +14,7 @@
     name: on-behalf-of
     display-as: On behalf of
     type: radio
-    values:
+    options:
       - myself:       Me
       - someone-else: Someone else
 
@@ -22,7 +28,7 @@
     name: survivor-gender
     display-as: Survivor gender
     type: radio
-    values:
+    options:
       - m:    Male
       - f:    Female
       - skip: Skip
@@ -58,12 +64,8 @@
     display-as: Survivor age
     type: radio
     options:
-      - Skip
+      - skip: Skip
 
-- input:
-    name: nav-next
-    display-as: false
-    type: button
-    value: next
+- next:
     text: Submit and continue
     accesskey: c

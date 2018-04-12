@@ -1,3 +1,12 @@
+- back:
+    type: standard
+
+- step:
+    type: standard
+
+- flash:
+    type: standard
+
 - text:
     on-behalf-of:self:  '# Do you remember anything about where this happened?'
     on-behalf-of:other: '# Do you know anything about where this happened?'
@@ -6,7 +15,7 @@
     name: where
     display-as: Where
     type: radio
-    values:
+    options:
       - at:
           label: 'Yes'
           subsidiary-show:
@@ -18,10 +27,6 @@
       - dont-know: I don’t know
       - skip: Skip
 
-- input:
-    name: nav-next
-    display-as: false
-    type: button
-    value: next
+- next:
     text: Submit and continue
     accesskey: c

@@ -1,3 +1,9 @@
+- step:
+    type: standard
+
+- flash:
+    type: standard
+
 - text: |
     # Have you used this anonymous reporting service before?'
 
@@ -5,7 +11,7 @@
     name: used-before
     display-as: Alias
     type: radio
-    values:
+    options:
       - used-before-y: Yes
         subsidiary:
           - input:
@@ -26,10 +32,6 @@
 
           [Generate another random alias]
 
-- input:
-    name: nav-next
-    display-as: false
-    type: button
-    value: next
+- next:
     text: Submit and continue
     accesskey: c

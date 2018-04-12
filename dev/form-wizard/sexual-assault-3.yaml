@@ -1,3 +1,12 @@
+- back:
+    type: standard
+
+- step:
+    type: standard
+
+- flash:
+    type: standard
+
 - text:
     on-behalf-of:self:  '# To start, do you remember when this happened or when it began?'
     on-behalf-of:other: '# To start, does your friend remember when this happened or when it began?'
@@ -8,7 +17,7 @@
     name: when
     display-as: Happened
     type: radio
-    values:
+    options:
       - date:
           label: Yes, exactly when it happened
           subsidiary:
@@ -44,10 +53,6 @@
       - n: No
       - skip: Skip
 
-- input:
-    name: nav-next
-    display-as: false
-    type: button
-    value: next
+- next:
     text: Submit and continue
     accesskey: c

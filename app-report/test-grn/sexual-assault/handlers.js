@@ -406,6 +406,7 @@ function prettifyReport(page, report) {
         '6a': 'description', // TODO: what about files?
         '7a': 'action-taken',
         '8a': 'extra-notes',
+        '8b': 'contact-details',
     };
     // if (nulls[page] && report[nulls[page]]==undefined) report[nulls[page]] = null; // kludgy or what!
     if (page == '+') {
@@ -519,6 +520,9 @@ function prettifyReport(page, report) {
                 break;
             case 'extra-notes':
                 rpt['Extra notes'] = report['extra-notes'];
+                break;
+            case 'contact-details':
+                rpt['Contact details'] = report['contact-details'];
                 break;
         }
     }

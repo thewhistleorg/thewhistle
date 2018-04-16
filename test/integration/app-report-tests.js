@@ -431,6 +431,8 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(tds[9].textContent).to.equal('—');
             expect(ths[10].textContent).to.equal('Extra notes');
             expect(tds[10].textContent).to.equal('—');
+            expect(ths[11].textContent).to.equal('Contact details');
+            expect(tds[11].textContent).to.equal('—');
         });
 
         it('sees report in submissions page', async function() {
@@ -578,6 +580,7 @@ describe(`Report app (${org}/${app.env})`, function() {
                 'description':      'Single-page submission test',
                 'action-taken':     'teacher',
                 'extra-notes':      '',
+                'contact-details':  'help@me.com',
                 'nav-next':         'next',
             };
             const response = await appReport.post(report).send(values);
@@ -634,6 +637,8 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(tds[9].textContent).to.equal('Teacher/tutor/lecturer');
             expect(ths[10].textContent).to.equal('Extra notes');
             expect(tds[10].textContent).to.equal('—');
+            expect(ths[11].textContent).to.equal('Contact details');
+            expect(tds[11].textContent).to.equal('help@me.com');
         });
 
 

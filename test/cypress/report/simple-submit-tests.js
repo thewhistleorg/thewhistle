@@ -66,8 +66,9 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
         cy.contains('Friends, family').click();
         cy.contains('Submit and continue').click();
 
-        cy.url().should('include', `/${org}/${proj}/8`); // extra-notes
-        cy.get('textarea').type('Nothing more');
+        cy.url().should('include', `/${org}/${proj}/8`); // extra-notes / contact-details
+        cy.get('textarea[name=extra-notes]').type('Nothing more');
+        cy.get('input[name=contact-details]').type('help@me.com');
         cy.contains('Submit and continue to Resources').click();
     });
 
@@ -91,6 +92,7 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
             const table = new jsdom.JSDOM(html).window.document;
             const ths = table.querySelectorAll('th');
             const tds = table.querySelectorAll('td');
+            expect(tds.length).to.equal(12);
             expect(ths[0].textContent).to.equal('Alias');
             expect(tds[0].textContent).to.equal(alias);
             expect(ths[1].textContent).to.equal('On behalf of');
@@ -113,6 +115,8 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
             expect(tds[9].textContent).to.equal('Teacher/tutor/lecturer (Miss Brodie), Friends, family');
             expect(ths[10].textContent).to.equal('Extra notes');
             expect(tds[10].textContent).to.equal('Nothing more');
+            expect(ths[11].textContent).to.equal('Contact details');
+            expect(tds[11].textContent).to.equal('help@me.com');
         });
         cy.get('button[name=delete]').click();
         cy.url().should('include', '/reports');

@@ -16,12 +16,14 @@ describe('Geocode', function() {
     it('geocodes Free School Lane', async function() {
         const result = await Geocoder.geocode('Department of Sociology, Free School Lane, Cambridge', 'uk');
         expect(result).to.be.an('object');
-        expect(result.latitude).to.equal(52.2033924);
-        expect(result.longitude).to.equal(0.1189126);
+        // expect(result.latitude).to.equal(52.2033924); // google knows the sociology dept has moved,
+        // expect(result.longitude).to.equal(0.1189126); // even though the request is Free School Lane!
+        expect(result.latitude).to.equal(52.2017766);
+        expect(result.longitude).to.equal(0.116593);
         expect(result.country).to.equal('United Kingdom');
         expect(result.city).to.equal('Cambridge');
-        expect(result.streetName).to.equal('Free School Lane');
-        expect(result.formattedAddress).to.equal('3QA, Free School Ln, Cambridge CB2, United Kingdom');
+        expect(result.streetName).to.equal('Mill Lane');
+        expect(result.formattedAddress).to.equal('16 Mill Ln, Cambridge CB2 1SB, UK');
     });
 
     it('reverse geocodes Free School Lane', async function() {

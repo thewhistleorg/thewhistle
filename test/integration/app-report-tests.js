@@ -409,6 +409,7 @@ describe(`Report app (${org}/${app.env})`, function() {
             const reportInfo = document.querySelector('table.js-obj-to-html');
             const ths = reportInfo.querySelectorAll('th');
             const tds = reportInfo.querySelectorAll('td');
+            expect(tds.length).to.equal(13);
             expect(ths[0].textContent).to.equal('Alias');
             expect(tds[0].textContent).to.equal('testy terrain');
             expect(ths[1].textContent).to.equal('On behalf of');
@@ -431,8 +432,10 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(tds[9].textContent).to.equal('—');
             expect(ths[10].textContent).to.equal('Extra notes');
             expect(tds[10].textContent).to.equal('—');
-            expect(ths[11].textContent).to.equal('Contact details');
+            expect(ths[11].textContent).to.equal('Contact e-mail');
             expect(tds[11].textContent).to.equal('—');
+            expect(ths[12].textContent).to.equal('Contact phone');
+            expect(tds[12].textContent).to.equal('—');
         });
 
         it('sees report in submissions page', async function() {
@@ -580,7 +583,8 @@ describe(`Report app (${org}/${app.env})`, function() {
                 'description':      'Single-page submission test',
                 'action-taken':     'teacher',
                 'extra-notes':      '',
-                'contact-details':  'help@me.com',
+                'contact-email':    'help@me.com',
+                'contact-phone':    '01234 123456',
                 'nav-next':         'next',
             };
             const response = await appReport.post(report).send(values);
@@ -615,6 +619,7 @@ describe(`Report app (${org}/${app.env})`, function() {
             const reportInfo = document.querySelector('table.js-obj-to-html');
             const ths = reportInfo.querySelectorAll('th');
             const tds = reportInfo.querySelectorAll('td');
+            expect(tds.length).to.equal(13);
             expect(ths[0].textContent).to.equal('Alias');
             expect(tds[0].textContent).to.equal('testy terrain');
             expect(ths[1].textContent).to.equal('On behalf of');
@@ -637,8 +642,10 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(tds[9].textContent).to.equal('Teacher/tutor/lecturer');
             expect(ths[10].textContent).to.equal('Extra notes');
             expect(tds[10].textContent).to.equal('—');
-            expect(ths[11].textContent).to.equal('Contact details');
+            expect(ths[11].textContent).to.equal('Contact e-mail');
             expect(tds[11].textContent).to.equal('help@me.com');
+            expect(ths[12].textContent).to.equal('Contact phone');
+            expect(tds[12].textContent).to.equal('01234 123456');
         });
 
 

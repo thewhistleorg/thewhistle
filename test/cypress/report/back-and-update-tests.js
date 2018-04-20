@@ -329,7 +329,8 @@ describe(`Submit ${org}/${proj} incident report covering various enter-next-back
 
         // TODO: broken functionality: no skip
 
-        cy.get('input[name=contact-details]').type('help@me.com');
+        cy.get('input[name=contact-email]').type('help@me.com');
+        cy.get('input[name=contact-phone]').type('01234 123456');
 
         cy.contains('Submit and continue').click(); // next
         cy.url().should('include', `/${org}/${proj}/whatnext`);
@@ -365,7 +366,7 @@ describe(`Submit ${org}/${proj} incident report covering various enter-next-back
             const table = new jsdom.JSDOM(html).window.document;
             const ths = table.querySelectorAll('th');
             const tds = table.querySelectorAll('td');
-            expect(tds.length).to.equal(12);
+            expect(tds.length).to.equal(13);
             expect(ths[0].textContent).to.equal('Alias');
             expect(tds[0].textContent).to.equal(alias);
             expect(ths[1].textContent).to.equal('On behalf of');
@@ -388,8 +389,10 @@ describe(`Submit ${org}/${proj} incident report covering various enter-next-back
             expect(tds[9].textContent).to.equal('Skipped');
             expect(ths[10].textContent).to.equal('Extra notes');
             expect(tds[10].textContent).to.equal('—'); // TODO: broken functionality: no skip
-            expect(ths[11].textContent).to.equal('Contact details');
+            expect(ths[11].textContent).to.equal('Contact e-mail');
             expect(tds[11].textContent).to.equal('help@me.com');
+            expect(ths[12].textContent).to.equal('Contact phone');
+            expect(tds[12].textContent).to.equal('01234 123456');
         });
         cy.get('button[name=delete]').click();
         cy.url().should('include', '/reports');

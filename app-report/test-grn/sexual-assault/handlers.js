@@ -406,7 +406,8 @@ function prettifyReport(page, report) {
         '6a': 'description', // TODO: what about files?
         '7a': 'action-taken',
         '8a': 'extra-notes',
-        '8b': 'contact-details',
+        '8b': 'contact-email',
+        '8c': 'contact-phone',
     };
     // if (nulls[page] && report[nulls[page]]==undefined) report[nulls[page]] = null; // kludgy or what!
     if (page == '+') {
@@ -521,8 +522,10 @@ function prettifyReport(page, report) {
             case 'extra-notes':
                 rpt['Extra notes'] = report['extra-notes'];
                 break;
+            case 'contact-email':
+                rpt['Contact e-mail'] = report['contact-email'];
             case 'contact-details':
-                rpt['Contact details'] = report['contact-details'];
+                rpt['Contact phone'] = report['contact-phone'];
                 break;
         }
     }

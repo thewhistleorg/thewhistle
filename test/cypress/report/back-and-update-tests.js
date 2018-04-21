@@ -14,7 +14,7 @@ const org = 'grn';              // the test organisation for the live ‘test-gr
 const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
 
 
-describe(`Submit ${org}/${proj} incident report covering various enter-next-back-alter combinations`, function () {
+describe.skip(`Submit ${org}/${proj} incident report covering various enter-next-back-alter combinations`, function () {
     const report = 'http://report.thewhistle.local:3000';
     const admin = 'http://admin.thewhistle.local:3000';
 

@@ -13,9 +13,8 @@
                 <input type="radio" name="who" id="who-y" value="y">
                 <label for="who-y" class="pure-radio greyed-out-unless-checked">Yes</label>
                 <div class="subsidiary hide">
-                    <p class="hint-text">Please give us a description of the person/people. Please
-                        include how you know them (for example, it could be a relative, colleague,
-                        or acquaintance.</p>
+                    <p class="hint-text">Please provide any description you are able (e.g. their
+                        relationship to you, etc.)</p>
                     <textarea name="who-relationship" id="who-relationship" rows="4" class="w100pc">{{who-relationship}}</textarea>
                 </div>
             </li>
@@ -24,7 +23,35 @@
                 <label for="who-n" class="pure-radio greyed-out-unless-checked">No</label>
                 <div class="subsidiary hide">
                     <p class="hint-text">Please give us as much description as you are able.</p>
-                    <textarea name="who-description" id="who-description" rows="4" class="pure-input-1">{{who-description}}</textarea>
+                    <h3>Gender</h3>
+                    <ul id="question-perpetrator-gender" class="question">
+                        {{#checked perpetrator-gender}}
+                        <li>
+                            <input type="radio" name="perpetrator-gender" id="perpetrator-gender-m" value="m"> <label for="perpetrator-gender-m">Male</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="perpetrator-gender" id="perpetrator-gender-f" value="f"> <label for="perpetrator-gender-f">Female</label>
+                        </li>
+                        {{/checked}}
+                    </ul>
+
+                    <h3>Age</h3>
+                    <ul id="question-perpetrator-age" class="question">
+                        <li>
+                            <label for="perpetrator-age"></label>
+                            <select name="perpetrator-age" id="perpetrator-age" class="w16">
+                                {{#selected perpetrator-age}}
+                                <option></option>
+                                <option>Infant</option>
+                                <option>Pre-teen</option>
+                                <option>Teenage</option>
+                                <option>Young adult</option>
+                                <option>Middle-aged</option>
+                                <option>Above 50</option>
+                                {{/selected}}
+                            </select>
+                        </li>
+                    </ul>
                 </div>
             </li>
             <li>

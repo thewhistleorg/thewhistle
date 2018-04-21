@@ -4,29 +4,34 @@
 
     <div  class="margin-top-3">
 
-        <h1>{{q.4a}}</h1>
+        <h1>If you are able, please select where it happened.</h1>
 
-        <p class="hint-text"></p>
         <ul id="question-where" class="question">
-            {{#checked where}}
             <li>
-                <input type="radio" name="where" id="where-at" value="at">
-                <label for="where-at">Yes</label>
-                <div class="subsidiary">
-                    <p class="hint-text">Please provide as much detail as you are able – this could be
-                        an address, restaurant name, or neighborhood or sights and landmarks you recall.</p>
-                    <textarea name="at-address" id="at-address" rows="4" class="w100pc">{{at-address}}</textarea>
+                <label for="where"></label>
+                <select name="where" id="where" class="w16">
+                    {{#selected where}}
+                    <option></option>
+                    <option>School</option>
+                    <option>Place of work</option>
+                    <option>Neighbourhood</option>
+                    <option>Survivor’s home</option>
+                    <option>Perpetrator’s home</option>
+                    <option>Other</option>
+                    <option>I don’t remember / don’t know</option>
+                    {{/selected}}
+                </select>
+                <div class="subsidiary hide">
+                    <p>Please provide any more detail that might be useful (e.g. address, name of school).</p>
+                    <input type="text" name="where-details" id="where-details" value="{{where-details}}" class="w100pc">
                 </div>
             </li>
             <li>
-                <input type="radio" name="where" id="where-dont-know" value="dont-know">
-                <label for="where-dont-know">I don’t know</label>
+                {{#checked where}}
+                <input type="radio" name="where" id="where-skip" value="skip"> <!-- note same name as select -->
+                <label for="where-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
+                {{/checked}}
             </li>
-            <li>
-                <input type="radio" name="where" id="where-skip" value="skip">
-                <label for="where-skip">Skip</label>
-            </li>
-            {{/checked}}
         </ul>
         {{> continue}}
         {{> notworking}}

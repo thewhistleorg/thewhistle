@@ -54,6 +54,51 @@
             {{/checked}}
         </ul>
 
+        <h2>Select any of the following which apply to this case.</h2>
+        <ul id="question-applicable" class="question">
+            {{#checked applicable}}
+            <li>
+                <input type="checkbox" name="applicable" id="applicable-multiple-people" value="multiple-people">
+                <label for="applicable-multiple-people">More than one person</label>
+                <div class="subsidiary hide">
+                    <input type="text" name="applicable-multiple-people-details" id="applicable-multiple-people-details" value="{{applicable-multiple-people-details}}" class="w100pc">
+                </div>
+            </li>
+            <li>
+                <input type="checkbox" name="applicable" id="applicable-objects" value="objects">
+                <label for="applicable-objects">Objects</label>
+                <div class="subsidiary hide">
+                    <input type="text" name="applicable-objects-details" id="applicable-objects-details" value="{{applicable-objects-details}}" class="w100pc">
+                </div>
+            </li>
+            <li>
+                <input type="checkbox" name="applicable" id="applicable-penetration" value="penetration">
+                <label for="applicable-penetration">Penetration</label>
+                <div class="subsidiary hide">
+                    <input type="text" name="applicable-penetration-details" id="applicable-penetration-details" value="{{applicable-penetration-details}}" class="w100pc">
+                </div>
+            </li>
+            <li>
+                <input type="checkbox" name="applicable" id="applicable-foreplay" value="foreplay">
+                <label for="applicable-foreplay">Foreplay</label>
+                <div class="subsidiary hide">
+                    <input type="text" name="applicable-foreplay-details" id="applicable-foreplay-details" value="{{applicable-foreplay-details}}" class="w100pc">
+                </div>
+            </li>
+            <li>
+                <input type="checkbox" name="applicable" id="applicable-blackmail" value="blackmail">
+                <label for="applicable-blackmail">Blackmail</label>
+                <div class="subsidiary hide">
+                    <input type="text" name="applicable-blackmail-details" id="applicable-blackmail-details" value="{{applicable-blackmail-details}}" class="w100pc">
+                </div>
+            </li>
+            <li>
+                <input type="radio" name="applicable" id="applicable-skip" value="skip"> <!-- checkbox/radio with same name? -->
+                <label for="applicable-skip" class="pure-radio greyed-out-unless-checked">Skip</label>
+            </li>
+            {{/checked}}
+        </ul>
+
         {{> continue}}
         {{> notworking}}
     </div>

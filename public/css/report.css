@@ -329,6 +329,17 @@ header nav img {
     margin: 7px 0 0 15px;
 }
 
+
+/*
+ * Back button
+ */
+button.prev {
+    color: #ffffff;
+    background-color: #50addb;
+    font-weight: bold;
+}
+
+
 /*
 * Progress-bar
 */
@@ -380,8 +391,9 @@ table.progress td {
 }
 
 table.progress td.current {
-    background-color: #50addb;
+    background-color: #aaaaaa;
     color: #ffffff;
+    font-weight: bold;
 }
 
 .progress a {

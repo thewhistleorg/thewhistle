@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // set up listeners to show current subsidiary and hide others
         for (i=0; i<inputs.length; i++) {
-            inputs[i].onclick = function() {
+            inputs[i].onchange = function() {
                 var sub = this.parentElement.querySelector('.subsidiary');
                 // show current input's subsidiary, if any - unless it's a checked checkbox, in
                 // which case hide it
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // set visibility defaults for previously answered questions
         for (i=0; i<inputs.length; i++) {
-            if (inputs[i].checked) inputs[i].onclick();
+            if (inputs[i].checked) inputs[i].onchange();
         }
     }
 

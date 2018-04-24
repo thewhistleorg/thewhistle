@@ -8,6 +8,9 @@ import useragent from 'useragent'; // parse browser user agent string
 import MongoDB   from 'mongodb';   // MongoDB driver for Node.js
 const ObjectId = MongoDB.ObjectId;
 
+import Db from '../lib/db.js';
+
+
 /* eslint-disable no-unused-vars, key-spacing */
 const schema = {
     type: 'object',
@@ -29,7 +32,7 @@ class Submission {
      * Return all submission records.
      */
     static async getAll(db) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const submissions = global.db[db].collection('submissions');
         return await submissions.find({}).toArray();
@@ -45,7 +48,7 @@ class Submission {
      * @returns {ObjectId} Id of submission document.
      */
     static async insert(db, project, hdrUserAgent) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const submissions = global.db[db].collection('submissions');
 
@@ -67,7 +70,7 @@ class Submission {
      * @param {number} page - Page being submitted ('0' for post of report home page).
      */
     static async progress(db, submissionId, page) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(submissionId instanceof ObjectId)) submissionId = new ObjectId(submissionId); // allow id as string
 
@@ -86,7 +89,7 @@ class Submission {
      * @param {ObjectId} reportId - Id of submitted report document.
      */
     static async complete(db, submissionId, reportId) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(submissionId instanceof ObjectId)) submissionId = new ObjectId(submissionId); // allow id as string
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId);             // allow id as string

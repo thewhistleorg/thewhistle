@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Update model - audit trail of updates made to reports.                          C.Veness 2017  */
+/* Update model - audit trail of updates made to reports.                     C.Veness 2017-2018  */
 /*                                                                                                */
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -10,6 +10,7 @@ const ObjectId = MongoDB.ObjectId;
 
 import User   from './user.js';
 import Report from './report.js';
+import Db     from '../lib/db.js';
 
 
 /*
@@ -28,6 +29,7 @@ const schema = {
 /* eslint-enable no-unused-vars, key-spacing */
 /* once we have MongoDB 3.6, we can use db.runCommand({ 'collMod': 'reports' , validator: { $jsonSchema: schema } }); */
 
+
 class Update {
 
     /**
@@ -38,7 +40,7 @@ class Update {
      * @returns {Object[]} Updates details.
      */
     static async find(db, query) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const updates = global.db[db].collection('updates');
         const update = await updates.find(query).toArray();
@@ -54,7 +56,7 @@ class Update {
      * @returns {Object}   Update details or null if not found.
      */
     static async get(db, id) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         try {
             if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
@@ -76,6 +78,8 @@ class Update {
      * @returns {Object[]} Updates details.
      */
     static async getAll(db, limit=12) {
+        if (!global.db[db]) await Db.connect(db);
+
         const updates = global.db[db].collection('updates');
 
         const upd = await updates.find({}).sort([ [ '_id', -1 ] ]).limit(limit).toArray();
@@ -107,7 +111,7 @@ class Update {
      * @throws  Error on validation or referential integrity errors.
      */
     static async insert(db, reportId, userId, update) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow id as string
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
@@ -132,6 +136,8 @@ class Update {
      * @param  {ObjectId} id - Update id.
      */
     static async deleteForReport(db, reportId) {
+        if (!global.db[db]) await Db.connect(db);
+
         const updates = global.db[db].collection('updates');
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow id as string
         await updates.deleteMany({ reportId: reportId });
@@ -146,7 +152,7 @@ class Update {
      * @returns {Object[]} Updates details.
      */
     static async getByReport(db, reportId) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow id as string
 
@@ -178,7 +184,7 @@ class Update {
      * @returns {Object[]} Updates details.
      */
     static async getByUser(db, userId, limit=12) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
 
@@ -207,7 +213,7 @@ class Update {
      * @returns { by, on , description } Update details (or {} if no updates made).
      */
     static async lastForReport(db, reportId) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow id as string
 

@@ -12,10 +12,9 @@
 import Koa       from 'koa';          // Koa framework
 import xmlify    from 'xmlify';       // JS object to XML
 import yaml      from 'js-yaml';      // JS object to YAML
-import MongoDB   from 'mongodb';      // MongoDB driver for Node.js
-const MongoClient = MongoDB.MongoClient;
 
 import Log from '../lib/log.js';
+import Db from  '../lib/db.js';
 
 
 const app = new Koa(); // twilio app
@@ -102,13 +101,10 @@ app.use(async function handleErrors(ctx, next) {
 // something... for now we'll just hardwire the test-grn organisation
 app.use(async function(ctx, next) {
     if (!global.db['test-grn']) {
-        const connectionString = process.env.DB_TEST_GRN;
-        if (connectionString == undefined) ctx.throw(404, 'No configuration available for organisation ‘test-grn’');
         try {
-            const client = await MongoClient.connect(connectionString);
-            global.db['test-grn'] = client.db(client.s.options.dbName);
+            await Db.connect('test-grn');
         } catch (e) {
-            console.error('Mongo connection error', e.toString());
+            console.error(e.message);
             process.exit(1);
         }
     }

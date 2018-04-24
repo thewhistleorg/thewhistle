@@ -6,10 +6,13 @@ import useragent from 'useragent'; // parse browser user agent string
 import MongoDB   from 'mongodb';
 const ObjectId = MongoDB.ObjectId;
 
+import Db from '../lib/db.js';
+
+
 class UserAgent {
 
     static async log(db, ip, headers) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
         const useragents = global.db[db].collection('useragents');
 
         const ignore = [
@@ -28,7 +31,7 @@ class UserAgent {
 
 
     static async counts(db, since=null) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
         const useragents = global.db[db].collection('useragents');
 
         const sinceSecs = Math.floor(new Date(since)/1000).toString(16);

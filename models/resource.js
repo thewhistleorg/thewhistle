@@ -1,11 +1,14 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Resource model; rape/crisis resources for victim/survivor support.              C.Veness 2017  */
+/* Resource model; rape/crisis resources for victim/survivor support.         C.Veness 2017-2018  */
 /*                                                                                                */
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import MongoDB from 'mongodb'; // MongoDB driver for Node.js
 const ObjectId = MongoDB.ObjectId;
+
+import Db from '../lib/db.js';
+
 
 /*
  * Rape crisis resources are provided as support information e.g. after incident report submission.
@@ -39,7 +42,7 @@ class Resource {
      * @param {string} db - Database to use.
      */
     static async init(db) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         // if no 'resources' collection, create it
         const collections = await global.db[db].collections();
@@ -68,7 +71,7 @@ class Resource {
      * @returns {Object[]} Resources details.
      */
     static async find(db, query) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const resources = global.db[db].collection('resources');
         const rpts = await resources.find(query).toArray();
@@ -84,7 +87,7 @@ class Resource {
      * @returns {Object}   Resource details.
      */
     static async get(db, id) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
@@ -103,7 +106,7 @@ class Resource {
      * @returns {Object[]} Resources details.
      */
     static async getAll(db) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const resources = global.db[db].collection('resources');
 
@@ -122,7 +125,7 @@ class Resource {
      * @returns {Object[]}      Resources details.
      */
     static async getBy(db, field, value) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const resources = global.db[db].collection('resources');
         const cntrs = await resources.find({ [field]: value }).toArray();
@@ -141,7 +144,7 @@ class Resource {
      * @returns {Object[]} Resources details.
      */
     static async getNear(db, lat, lon, distance) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const resources = global.db[db].collection('resources');
 
@@ -163,7 +166,7 @@ class Resource {
      * @throws  Error on validation or referential integrity errors.
      */
     static async insert(db, values, geocode) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const resources = global.db[db].collection('resources');
 
@@ -189,7 +192,7 @@ class Resource {
      * @throws Error on referential integrity errors.
      */
     static async update(db, id, values, geocode) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
@@ -216,7 +219,7 @@ class Resource {
      * @throws Error
      */
     static async delete(db, id) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 

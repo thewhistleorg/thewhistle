@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* App: civilian (public) incident reporting (boilerplate).                        C.Veness 2017  */
+/* App: civilian (public) incident reporting (boilerplate).                   C.Veness 2017-2018  */
 /*                                                                                                */
 /* This is a composed sup-app, in order that the database and project for the MongoDB connection  */
 /* and the handlebars templates can be taken from the URL.                                        */
@@ -18,11 +18,8 @@ import Koa        from 'koa';            // koa framework
 import handlebars from 'koa-handlebars'; // handlebars templating
 
 import HandlebarsHelpers from '../../../lib/handlebars-helpers.js';
-import ReportMiddleware  from '../../middleware.js';
 
 const app = new Koa(); // report app
-
-app.use(ReportMiddleware.mongoConnect()); // get db connection to ctx.params.database if not already available
 
 // handlebars templating (templates specific to this database/project)
 app.use(handlebars({

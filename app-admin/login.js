@@ -6,13 +6,12 @@
 
 import scrypt  from 'scrypt';       // scrypt library
 import jwt     from 'jsonwebtoken'; // JSON Web Token implementation
-import MongoDB from 'mongodb';      // MongoDB driver for Node.js
-const MongoClient = MongoDB.MongoClient;
 
 import User     from '../models/user.js';
 import Report   from '../models/report.js';
 import Resource from '../models/resource.js';
 import Question from '../models/question.js';
+import Db       from '../lib/db.js';
 
 
 class LoginHandlers {
@@ -112,16 +111,10 @@ class LoginHandlers {
         // if we don't have db connection for this user's (current) db, get it now (qv app.admin.js)
         // (these will remain in global for entire app, this doesn't happen per request)
         if (!global.db[db]) {
-            const connectionString = process.env[`DB_${db.toUpperCase().replace('-', '_')}`];
-            if (connectionString == undefined) ctx.throw(404, `No configuration available for organisation ‘${db}’`);
             try {
-                const client = await MongoClient.connect(connectionString);
-                global.db[db] = client.db(client.s.options.dbName);
+                await Db.connect(db);
             } catch (e) {
-                const loginfailmsg = connectionString
-                    ? `Invalid database credentials for ‘${db}’` // rejected credentials
-                    : `No database credentials for ‘${db}’`;     // connection string missing!
-                ctx.flash = { formdata: body, loginfailmsg: loginfailmsg };
+                ctx.flash = { formdata: body, loginfailmsg: e.message };
                 ctx.redirect(ctx.url);
                 return;
             }

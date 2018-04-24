@@ -18,7 +18,9 @@ const ObjectId = MongoDB.ObjectId;
 import User         from '../models/user.js';
 import Notification from '../models/notification.js';
 import AwsS3        from '../lib/aws-s3.js';
+import Db           from '../lib/db.js';
 import Update       from './update.js';
+
 
 /*
  * A report holds the original submitted incident report, and various metadata.
@@ -95,7 +97,7 @@ class Report {
      * @param {string} db - Database to use.
      */
     static async init(db) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         // if no 'reports' collection, create it
         const collections = await global.db[db].collections();
@@ -155,7 +157,7 @@ class Report {
      * @returns {Object[]} Reports details.
      */
     static async find(db, query) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const reports = global.db[db].collection('reports');
         const rpts = await reports.find(query).toArray();
@@ -171,7 +173,7 @@ class Report {
      * @returns {Object}   Report details or null if not found.
      */
     static async get(db, id) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id); // allow id as string
         if (!id) return null;
@@ -189,7 +191,7 @@ class Report {
      * @returns {Object[]} Reports details.
      */
     static async getAll(db, active='active') {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const reports = global.db[db].collection('reports');
         const query = active=='active'
@@ -214,7 +216,7 @@ class Report {
      * @returns {Object[]}             Reports details.
      */
     static async getBy(db, field, value) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const reports = global.db[db].collection('reports');
         const rpts = await reports.find({ [field]: value }).toArray();
@@ -232,7 +234,7 @@ class Report {
      * @returns {Object[]} Reports details.
      */
     static async getByTag(db, tag) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const reports = global.db[db].collection('reports');
         const rpts = await reports.find({ ['tags']: tag }).toArray();
@@ -248,7 +250,7 @@ class Report {
      * @returns {string} Timestamp as ISO8601 string (or empty string if no reports of given category). TODO: return as Date?
      */
     static async getLatestTimestamp(db, active='all') {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const reports = global.db[db].collection('reports');
         const query = active=='active'
@@ -270,7 +272,7 @@ class Report {
      * @returns {string} Timestamp as ISO8601 string (or empty string if no reports of given category). TODO: return as Date?
      */
     static async getOldestTimestamp(db, active='all') {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const reports = global.db[db].collection('reports');
         const query = active=='active'
@@ -295,7 +297,7 @@ class Report {
      */
     static async submissionStart(db, project, alias, userAgent) {
         debug('Report.submissionStart', 'db:'+db, 'p:'+project, alias);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
         if (typeof alias != 'string' || alias.length == 0) throw new Error('Alias must be supplied');
 
         const reports = global.db[db].collection('reports');
@@ -336,7 +338,7 @@ class Report {
      */
     static async submissionDetails(db, id, details, detailsRaw) {
         debug('Report.submissionDetails', 'db:'+db, 'r:'+id, details);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);  // allow id as string
 
@@ -368,7 +370,7 @@ class Report {
      */
     static async submissionFile(db, id, formidableFile) {
         debug('Report.submissionFile', 'db:'+db, 'r:'+id, formidableFile.path, formidableFile.name);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id); // allow id as string
 
@@ -439,7 +441,7 @@ class Report {
     static async insert(db, by, alias, submitted, project, files, userAgent) {
         throw new Error('Report.insert: this function has been superceded by submissionStart / submissionDetails');
         debug('Report.insert', 'db:'+db, alias, submitted, 'p:'+project); // eslint-disable-line no-unreachable
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         by = objectId(by); // allow id as string
 
@@ -526,7 +528,7 @@ class Report {
      */
     static async update(db, id, values, userId) {
         debug('Report.update', 'db:'+db, 'r:'+id, values);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow id as string
@@ -550,7 +552,7 @@ class Report {
      */
     static async delete(db, id) {
         debug('Report.delete', 'db:'+db, 'r:'+id);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id); // allow id as string
 
@@ -582,7 +584,7 @@ class Report {
      * @returns {string[]} Array of statuses currently in use (unsorted).
      */
     static async statuses(db) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         // TODO: more efficient way to do this?
         const reports = await Report.getAll(db);
@@ -615,7 +617,7 @@ class Report {
      * @returns {string[]} Array of tags currently in use.
      */
     static async tags(db) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         // TODO: more efficient way to do this?
         const reports = await Report.getAll(db);
@@ -639,7 +641,7 @@ class Report {
      */
     static async insertTag(db, id, tag, userId) {
         debug('Report.insertTag', 'db:'+db, 'r:'+id, 't:'+tag, userId);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow userId as string
@@ -661,7 +663,7 @@ class Report {
      */
     static async deleteTag(db, id, tag, userId) {
         debug('Report.deleteTag', 'db:'+db, 'r:'+id, 't:'+tag, userId);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow id as string
@@ -688,7 +690,7 @@ class Report {
      */
     static async insertComment(db, id, comment, userId) {
         debug('Report.insertComment', 'db:'+db, 'r:'+id);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow userId as string
@@ -729,7 +731,7 @@ class Report {
      */
     static async updateComment(db, id, by, on, comment, userId) {
         debug('Report.updateComment', 'db:'+db, 'r:'+id);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);                            // allow id as string
         by = objectId(by);                            // allow id as string
@@ -767,7 +769,7 @@ class Report {
      */
     static async deleteComment(db, id, by, on, userId) {
         debug('Report.deleteComment', 'db:'+db, 'r:'+id);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);                            // allow id as string
         by = objectId(by);                            // allow id as string
@@ -791,7 +793,7 @@ class Report {
      */
     static async flagView(db, id, userId) {
         debug('Report.flagView', 'db:'+db, 'r:'+id, 'u:'+userId);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow id as string
@@ -818,7 +820,7 @@ class Report {
      * @returns {Date} Timestamp this user last viewed this report.
      */
     static async lastViewed(db, id, userId) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow id as string

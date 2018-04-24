@@ -6,6 +6,9 @@
 import MongoDB from 'mongodb'; // MongoDB driver for Node.js
 const ObjectId = MongoDB.ObjectId;
 
+import Db from '../lib/db.js';
+
+
 /* eslint-disable no-unused-vars, key-spacing */
 const schema = {
     type: 'object',
@@ -31,7 +34,7 @@ class Question {
      * @param {string} db - Database to use.
      */
     static async init(db) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         // if no 'questions' collection, create it
         const collections = await global.db[db].collections();
@@ -61,7 +64,7 @@ class Question {
      * @returns {Object[]} - Array of { questionNo, self, other } objects
      */
     static async get(db, project) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const questions = global.db[db].collection('questions');
 
@@ -82,7 +85,7 @@ class Question {
      * @returns {ObjectId} New question id.
      */
     static async insert(db, project, questionNo, self, other) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const questions = global.db[db].collection('questions');
 
@@ -104,7 +107,7 @@ class Question {
      * @param {string} other - Copy for 'someone else' version of question.
      */
     static async update(db, id, questionNo, self, other) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
@@ -127,7 +130,7 @@ class Question {
      * @param {string} other - Copy for 'someone else' version of question.
      */
     static async delete(db, id) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 

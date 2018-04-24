@@ -6,21 +6,16 @@
 /* 'mocha test/unit/*.js'!                                                                        */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import MongoDB from 'mongodb'; // MongoDB driver for Node.js
+import Db from '../../lib/db.js';
 
-const MongoClient = MongoDB.MongoClient;
 
 before(async function() {
     this.timeout(10e3); // 10 sec
 
     try {
         global.db = {};
-        for (const db of [ 'users', 'grn' ]) {
-            const connectionString = process.env['DB_'+db.toUpperCase().replace('-', '_')];
-            if (connectionString == undefined) throw new Error(`No configuration available for db ‘${db}’`);
-            const client = await MongoClient.connect(connectionString);
-            global.db[db] = client.db(client.s.options.dbName);
-        }
+        await Db.connect('users');
+        await Db.connect('grn');
     } catch (e) {
         console.error(e.message);
         process.exit(1);

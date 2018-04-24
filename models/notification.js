@@ -19,6 +19,9 @@ import Debug   from 'debug';   // small debugging utility
 const debug = Debug('app:db'); // db write ops
 const ObjectId = MongoDB.ObjectId;
 
+import Db from '../lib/db.js';
+
+
 /*
  *
  */
@@ -54,7 +57,7 @@ class Notification {
      */
     static async notify(db, event, userId, reportId) {
         debug('Notification.notify', 'db:'+db, 'u:'+userId, 'r:'+reportId, event);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const notifications = global.db[db].collection('notifications');
 
@@ -90,7 +93,7 @@ class Notification {
      */
     static async notifyMultiple(db, event, userIds, reportId) {
         debug('Notification.notifyMultiple', 'db:'+db, 'r:'+reportId, event);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         for (let id=0; id<userIds.length; id++) if (!(userIds[id] instanceof ObjectId)) userIds[id] = new ObjectId(userIds[id]); // allow userId as string
         // userIds.forEach(id => { if (!(id instanceof ObjectId)) id = new ObjectId(id); }); // allow userId as string
@@ -121,7 +124,7 @@ class Notification {
      * @returns {Object[]} Notifications.
      */
     static async listForReport(db, event, reportId) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow reportId as string
 
@@ -142,7 +145,7 @@ class Notification {
      * @returns {Object[]} Notifications.
      */
     static async listForUser(db, userId, event) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow userId as string
 
@@ -161,7 +164,7 @@ class Notification {
      * @returns {Object[]} Notifications.
      */
     static async listDebug(db) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const notifications = global.db[db].collection('notifications');
 
@@ -181,7 +184,7 @@ class Notification {
      */
     static async dismiss(db, notificationId, userId) {
         debug('Notification.dismiss', 'db:'+db, 'n:'+notificationId, 'u:'+userId);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(notificationId instanceof ObjectId)) notificationId = new ObjectId(notificationId); // allow notificationId as string
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow userId as string
@@ -207,7 +210,7 @@ class Notification {
      */
     static async dismissForUserReport(db, userId, reportId) {
         debug('Notification.dismissForUserReport', 'db:'+db, 'u:'+userId, 'r:'+reportId);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId);       // allow userId as string
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow reportId as string
@@ -235,7 +238,7 @@ class Notification {
      */
     static async cancel(db, notificationId) {
         debug('Notification.cancel', 'db:'+db, 'n:'+notificationId);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(notificationId instanceof ObjectId)) notificationId = new ObjectId(notificationId); // allow notificationId as string
 
@@ -257,7 +260,7 @@ class Notification {
      */
     static async cancelForReport(db, reportId) {
         debug('Notification.cancelForReport', 'db:'+db, 'r:'+reportId);
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow reportId as string
 
@@ -276,7 +279,7 @@ class Notification {
      * @returns {string[]} List of events.
      */
     static async events(db) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
+        if (!global.db[db]) await Db.connect(db);
 
         const notifications = global.db[db].collection('notifications');
 
@@ -302,8 +305,6 @@ class Notification {
      * @returns {string} Timestamp as ISO-8601 string (or empty string if no notifications).
      */
     static lastUpdate(db) {
-        if (!global.db[db]) throw new Error(`database ‘${db}’ not found`);
-
         // if not set, set it now
         if (!lastUpdate[db]) lastUpdate[db] = new Date().toISOString().slice(0, -5);
 

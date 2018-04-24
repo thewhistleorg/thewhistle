@@ -15,11 +15,11 @@ import compose         from 'koa-compose';    // middleware composer
 import compress        from 'koa-compress';   // HTTP compression
 import session         from 'koa-session';    // session for flash messages
 import dateFormat      from 'dateformat';     // Steven Levithan's dateFormat()
-import MongoDB         from 'mongodb';
-const MongoClient = MongoDB.MongoClient;
 
 import dotenv from 'dotenv';
 dotenv.config(); // loads environment variables from .env file (if available - eg dev env)
+
+import Db from './lib/db';
 
 const app = new Koa();
 
@@ -73,16 +73,10 @@ app.use(session(app));
 global.db = {}; // initialise global.db to empty object on app startup
 app.use(async function(ctx, next) {
     if (!global.db.users) {
-        const connectionString = process.env.DB_USERS;
-        if (connectionString == undefined) {
-            console.error('No configuration available for ‘users’ db');
-            process.exit(1);
-        }
         try {
-            const client = await MongoClient.connect(connectionString);
-            global.db.users = client.db(client.s.options.dbName);
+            await Db.connect('users');
         } catch (e) {
-            console.error('Mongo connection error', e.toString());
+            console.error(e.message);
             process.exit(1);
         }
     }

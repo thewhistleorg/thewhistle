@@ -159,7 +159,7 @@ function prettyDate(date) {
     }
 
     // within past week
-    const days = (new Date().getTime() - new Date(date).getTime()) / (1000*60*60*24*7);
+    const days = (new Date().getTime() - new Date(date).getTime()) / (1000*60*60*24);
     if (days < 7) {
         return dateFormat(date, 'ddd');
     }

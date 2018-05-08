@@ -48,7 +48,7 @@ describe('Geocode', function() {
         expect(result.country).to.equal('Nigeria');
         expect(result.administrativeLevels.level1long).to.equal('Lagos');
         expect(result.extra.neighborhood).to.equal('Akoka');
-        expect(result.city).to.equal('Yaba');
+        expect(result.city).to.equal('Lagos');
         expect(result.streetName).to.be.undefined;
     });
 

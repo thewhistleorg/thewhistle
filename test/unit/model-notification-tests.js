@@ -35,6 +35,7 @@ describe(`Notification model (${db})`, function() {
     let nIdNewReport = null;
     let nIdReportAssigned = null;
     let nIdReportMention = null;
+    let initNotifications = null;
     let userId = null;
     const reportId = ObjectId(pseudoObjectId());
 
@@ -44,13 +45,12 @@ describe(`Notification model (${db})`, function() {
         const [ user ] = await User.getBy('email', testuser);
         userId = user._id;
 
-        // check no notifications exist for testuser
-        const ntfcnsNewRpt = await Notification.listForUser(db, userId, 'new report submitted');
-        if (ntfcnsNewRpt.length != 0) throw new Error(`${testuser} has outstanding ‘new report submitted’ notification ${ntfcnsNewRpt[0]._id}`);
-        const ntfcnsAssgnd = await Notification.listForUser(db, userId, 'report assigned to user');
-        if (ntfcnsAssgnd.length != 0) throw new Error(`${testuser} has outstanding ‘report assigned to user’ notification ${ntfcnsAssgnd[0]._id}`);
-        const ntfcnsMntnd = await Notification.listForUser(db, userId, 'user mentioned in comment');
-        if (ntfcnsMntnd.length != 0) throw new Error(`${testuser} has outstanding ‘user mentioned in comment’ notification ${ntfcnsMntnd[0]._id}`);
+        // check for any current notifications for testuser
+        initNotifications = {
+            'new report submitted':      await Notification.listForUser(db, userId.toString(), 'new report submitted'),
+            'report assigned to user':   await Notification.listForUser(db, userId.toString(), 'report assigned to user'),
+            'user mentioned in comment': await Notification.listForUser(db, userId.toString(), 'user mentioned in comment'),
+        };
     });
 
 
@@ -89,18 +89,20 @@ describe(`Notification model (${db})`, function() {
 
         it('lists notifications of ‘new report submitted’ for testuser', async function() {
             const notifications = await Notification.listForUser(db, userId.toString(), 'new report submitted');
-            expect(notifications.length).to.equal(1);
-            expect(notifications[0].event).to.equal('new report submitted');
-            expect(notifications[0].users).to.deep.include(userId);
-            expect(notifications[0].report).to.deep.equal(reportId);
+            expect(notifications.length).to.equal(initNotifications['new report submitted'].length + 1);
+            const [ notification ] = notifications.filter(ntfcn => ntfcn.report.toString() == reportId.toString());
+            expect(notification.event).to.equal('new report submitted');
+            expect(notification.users).to.deep.include(userId);
+            expect(notification.report).to.deep.equal(reportId);
         });
 
         it('lists notifications of ‘new report submitted’ in listForReport', async function() {
             const notifications = await Notification.listForReport(db, 'new report submitted', reportId.toString());
             expect(notifications.length).to.equal(1);
-            expect(notifications[0].event).to.equal('new report submitted');
-            expect(notifications[0].users).to.deep.include(userId);
-            expect(notifications[0].report).to.deep.equal(reportId);
+            const [ notification ] = notifications;
+            expect(notification.event).to.equal('new report submitted');
+            expect(notification.users).to.deep.include(userId);
+            expect(notification.report).to.deep.equal(reportId);
         });
 
         it('lists all notifications (for debugging)', async function() {
@@ -111,7 +113,7 @@ describe(`Notification model (${db})`, function() {
         it('cancels ‘new report submitted’ notification', async function() {
             await Notification.cancel(db, nIdNewReport.toString());
             const notifications = await Notification.listForUser(db, userId, 'new report submitted');
-            expect(notifications.length).to.equal(0);
+            expect(notifications.length).to.equal(initNotifications['new report submitted'].length);
         });
     });
 
@@ -132,17 +134,18 @@ describe(`Notification model (${db})`, function() {
 
         it('lists notifications of ‘report assigned to user’ for testuser', async function() {
             const notifications = await Notification.listForUser(db, userId, 'report assigned to user');
-            expect(notifications.length).to.equal(1);
-            expect(notifications[0].event).to.equal('report assigned to user');
-            expect(notifications[0].users.length).to.equal(1);
-            expect(notifications[0].users).to.deep.include(userId);
-            expect(notifications[0].report).to.deep.equal(reportId);
+            expect(notifications.length).to.equal(initNotifications['report assigned to user'].length + 1);
+            const [ notification ] = notifications.filter(ntfcn => ntfcn.report.toString() == reportId.toString());
+            expect(notification.event).to.equal('report assigned to user');
+            expect(notification.users.length).to.equal(1);
+            expect(notification.users).to.deep.include(userId);
+            expect(notification.report).to.deep.equal(reportId);
         });
 
         it('dismisses notification', async function() {
             await Notification.dismiss(db, nIdReportAssigned.toString(), userId.toString());
             const notifications = await Notification.listForUser(db, userId, 'report assigned to user');
-            expect(notifications.length).to.equal(0);
+            expect(notifications.length).to.equal(initNotifications['report assigned to user'].length);
         });
     });
 
@@ -158,17 +161,18 @@ describe(`Notification model (${db})`, function() {
 
         it('lists notifications of ‘user mentioned in comment’ for testuser', async function() {
             const notifications = await Notification.listForUser(db, userId, 'user mentioned in comment');
-            expect(notifications.length).to.equal(1);
-            expect(notifications[0].event).to.equal('user mentioned in comment');
-            expect(notifications[0].users.length).to.equal(1);
-            expect(notifications[0].users).to.deep.include(userId);
-            expect(notifications[0].report).to.deep.equal(reportId);
+            expect(notifications.length).to.equal(initNotifications['user mentioned in comment'].length + 1);
+            const [ notification ] = notifications.filter(ntfcn => ntfcn.report.toString() == reportId.toString());
+            expect(notification.event).to.equal('user mentioned in comment');
+            expect(notification.users.length).to.equal(1);
+            expect(notification.users).to.deep.include(userId);
+            expect(notification.report).to.deep.equal(reportId);
         });
 
         it('dismisses notifications for user/report', async function() {
             await Notification.dismissForUserReport(db, userId.toString(), reportId.toString());
             const notifications = await Notification.listForUser(db, userId, 'user mentioned in comment');
-            expect(notifications.length).to.equal(0);
+            expect(notifications.length).to.equal(initNotifications['user mentioned in comment'].length);
         });
 
         it('cancels (already dismissed) notifications for report (just for coverage!)', async function() {

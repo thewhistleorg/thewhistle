@@ -2,14 +2,14 @@
 /* Dev tools handlers.                                                        C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import nodeinfo   from 'nodejs-info';         // node info
-import dateFormat from 'dateformat';          // Steven Levithan's dateFormat()
-import json2csv   from 'json2csv';            // converts json into csv
-import jsdom      from 'jsdom';               // DOM Document interface in Node!
-import fs         from 'fs-extra';            // fs with extra functions & promise interface
-import markdown   from 'markdown-it';         // markdown parser
-import mda        from 'markdown-it-anchor';  // header anchors for markdown-it
-import mdi        from 'markdown-it-include'; // include markdown fragment files
+import nodeinfo           from 'nodejs-info';         // node info
+import dateFormat         from 'dateformat';          // Steven Levithan's dateFormat()
+import json2csv           from 'json2csv';            // converts json into csv
+import jsdom              from 'jsdom';               // DOM Document interface in Node!
+import { promises as fs } from 'fs';                  // nodejs.org/api/fs.html#fs_fs_promises_api
+import markdown           from 'markdown-it';         // markdown parser
+import mda                from 'markdown-it-anchor';  // header anchors for markdown-it
+import mdi                from 'markdown-it-include'; // include markdown fragment files
 const md = markdown();
 md.use(mda);
 md.use(mdi, 'dev/form-wizard');

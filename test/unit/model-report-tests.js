@@ -4,10 +4,10 @@
 /* Note these tests do not mock out database components, but operate on the live 'grn' test db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import chai       from 'chai';       // BDD/TDD assertion library
-import fs         from 'fs-extra';   // fs with extra functions & promise interface
-import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-import dotenv     from 'dotenv';     // load environment variables from a .env file into process.env
+import chai               from 'chai';       // BDD/TDD assertion library
+import { promises as fs } from 'fs';         // nodejs.org/api/fs.html#fs_fs_promises_api
+import dateFormat         from 'dateformat'; // Steven Levithan's dateFormat()
+import dotenv             from 'dotenv';     // load environment variables from a .env file into process.env
 const expect = chai.expect;
 
 dotenv.config();
@@ -114,7 +114,7 @@ describe(`Report model (${db})`, function() {
 
         it('submits file', async function() {
             // spoof file upload (copy file to /tmp & create formidable object)
-            await fs.copy('./test/img/s_gps.jpg', '/tmp/upload_s_gps.jpg');
+            await fs.copyFile('./test/img/s_gps.jpg', '/tmp/upload_s_gps.jpg');
             const stat = await fs.stat('/tmp/upload_s_gps.jpg');
             const file = {
                 size:             stat.size,

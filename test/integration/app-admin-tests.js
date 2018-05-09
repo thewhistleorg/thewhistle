@@ -8,14 +8,14 @@
 
 // TODO: modularise this? How to handle login/logout if so?
 
-import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
-import chai       from 'chai';       // BDD/TDD assertion library
-import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
-import MongoDB    from 'mongodb';    // MongoDB driver for Node.js
-import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-import base64     from 'base-64';    // base64 encoder/decoder
-import fs         from 'fs';         // nodejs.org/api/fs.html
-import csvParse   from 'csv-parse/lib/sync'; // full featured CSV parser
+import supertest          from 'supertest';          // SuperAgent driven library for testing HTTP servers
+import chai               from 'chai';               // BDD/TDD assertion library
+import jsdom              from 'jsdom';              // JavaScript implementation of DOM and HTML standards
+import MongoDB            from 'mongodb';            // MongoDB driver for Node.js
+import dateFormat         from 'dateformat';         // Steven Levithan's dateFormat()
+import base64             from 'base-64';            // base64 encoder/decoder
+import { promises as fs } from 'fs';                 // nodejs.org/api/fs.html#fs_fs_promises_api
+import csvParse           from 'csv-parse/lib/sync'; // full featured CSV parser
 
 const expect   = chai.expect;
 const ObjectId = MongoDB.ObjectId;
@@ -512,7 +512,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         });
 
         it('gets map marker (newly built)', async function() {
-            try { fs.unlinkSync('./static/map/marker-red-80.png'); } catch (e) { /* ignore if not present */} // force regeneration of marker
+            try { await fs.unlink('./static/map/marker-red-80.png'); } catch (e) { /* ignore if not present */ } // force regeneration of marker
             const response = await appAdmin.get('/map-marker/red/80');
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('image/png');

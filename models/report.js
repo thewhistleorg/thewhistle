@@ -4,13 +4,13 @@
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import fs         from 'fs-extra';          // fs with extra functions & promise interface
-import slug       from 'slug';              // make strings url-safe
-import dateFormat from 'dateformat';        // Steven Levithan's dateFormat()
-import exiftool   from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
-import useragent  from 'useragent';         // parse browser user agent string
-import MongoDB    from 'mongodb';           // MongoDB driver for Node.js
-import Debug      from 'debug';             // small debugging utility
+import { promises as fs } from 'fs';                // nodejs.org/api/fs.html#fs_fs_promises_api
+import slug               from 'slug';              // make strings url-safe
+import dateFormat         from 'dateformat';        // Steven Levithan's dateFormat()
+import exiftool           from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
+import useragent          from 'useragent';         // parse browser user agent string
+import MongoDB            from 'mongodb';           // MongoDB driver for Node.js
+import Debug              from 'debug';             // small debugging utility
 
 const debug = Debug('app:db'); // db write ops
 const ObjectId = MongoDB.ObjectId;
@@ -417,7 +417,7 @@ class Report {
         await reports.updateOne({ _id: id }, { $push: { 'analysis.files': fileAnalysis } });
 
         // delete uploaded file from /tmp
-        await fs.remove(src);
+        await fs.unlink(src);
     }
 
 
@@ -508,7 +508,7 @@ class Report {
                     await reports.updateOne({ _id: insertedId }, { $push: { 'analysis.files': file } });
 
                     // delete uploaded file from /tmp
-                    await fs.remove(src);
+                    await fs.unlink(src);
                 }
             }
         }

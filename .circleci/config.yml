@@ -7,5 +7,6 @@ jobs:
     steps:
       - checkout
       - run: echo 127.0.0.1 admin.localhost admin.thewhistle.local report.localhost report.thewhistle.local | sudo tee -a /etc/hosts
+      - run: sudo apt-get install libgconf-2-4
       - run: npm install
       - run: npm test

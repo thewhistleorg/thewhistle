@@ -5,7 +5,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { promises as fs } from 'fs';                // nodejs.org/api/fs.html#fs_fs_promises_api
-import slug               from 'slug';              // make strings url-safe
+import slugify            from 'slugify';           // make strings url-safe
 import dateFormat         from 'dateformat';        // Steven Levithan's dateFormat()
 import exiftool           from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
 import useragent          from 'useragent';         // parse browser user agent string
@@ -382,9 +382,9 @@ class Report {
         const project = rpt.project;
 
         // store uploaded files in AWS S3
-        const src = formidableFile.path;                                       // path to uploaded file
-        const date = dateFormat(id.getTimestamp(), 'yyyy-mm');                 // S3 sub-folder
-        const name = slug(formidableFile.name, { lower: true, remove: null }); // slugified filename
+        const src = formidableFile.path;                                          // path to uploaded file
+        const date = dateFormat(id.getTimestamp(), 'yyyy-mm');                    // S3 sub-folder
+        const name = slugify(formidableFile.name, { lower: true, remove: null }); // slugified filename
 
         // upload /tmp file to S3
         await AwsS3.put(db, project, date, id, name, src);
@@ -482,7 +482,7 @@ class Report {
             for (const file of files) {
                 if (file.size > 0) {
                     const src = file.path;
-                    const dst = slug(file.name, { lower: true, remove: null });
+                    const dst = slugify(file.name, { lower: true, remove: null });
 
                     // upload /tmp file to S3
                     await AwsS3.put(db, project, date, insertedId, dst, src);

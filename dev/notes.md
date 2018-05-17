@@ -16,6 +16,10 @@ notes set out in detail the developer workflow used in the project, in order tha
 successfully collaborate on development. The notes also explain the use of continuous integration
 tests, and review apps.
 
+## [Information Security Risk Assessment](/dev/notes/information-security)
+
+Assessment of controls in place to mitigate InfoSec threats relevant to The Whistle.
+
 ## [New organisation](/dev/notes/new-organisation)
 
 Notes on setting up a new organisation

@@ -16,6 +16,10 @@ notes set out in detail the developer workflow used in the project, in order tha
 successfully collaborate on development. The notes also explain the use of continuous integration
 tests, and review apps.
 
+## [New organisation](/dev/notes/new-organisation)
+
+Notes on setting up a new organisation
+
 ## [Database backups](/dev/notes/db-backups)
 
 MongoDB database backup procedures.

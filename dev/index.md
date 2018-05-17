@@ -18,5 +18,3 @@ These are intended for use by developers only, and no not have entries in the na
   ([admin](/dev/user-agents/admin), [report](/dev/user-agents/report), [reports](/dev/user-agents/reports))
 
 [NodeInfo](/dev/nodeinfo) - config information
-
-[New organisation](/dev/notes/new-organisation) – setting up a new organisation

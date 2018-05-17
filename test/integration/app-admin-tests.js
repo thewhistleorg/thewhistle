@@ -9,16 +9,13 @@
 // TODO: modularise this? How to handle login/logout if so?
 
 import supertest          from 'supertest';          // SuperAgent driven library for testing HTTP servers
-import chai               from 'chai';               // BDD/TDD assertion library
-import jsdom              from 'jsdom';              // JavaScript implementation of DOM and HTML standards
-import MongoDB            from 'mongodb';            // MongoDB driver for Node.js
+import { expect }         from 'chai';               // BDD/TDD assertion library
+import { JSDOM }          from 'jsdom';              // JavaScript implementation of DOM and HTML standards
+import { ObjectId }       from 'mongodb';            // MongoDB driver for Node.js
 import dateFormat         from 'dateformat';         // Steven Levithan's dateFormat()
 import base64             from 'base-64';            // base64 encoder/decoder
 import { promises as fs } from 'fs';                 // nodejs.org/api/fs.html#fs_fs_promises_api
 import csvParse           from 'csv-parse/lib/sync'; // full featured CSV parser
-
-const expect   = chai.expect;
-const ObjectId = MongoDB.ObjectId;
 
 import app      from '../../app.js';
 
@@ -66,7 +63,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees password reset page', async function() {
             const response = await appAdmin.get('/password/reset-request');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('input').name).to.equal('email');
         });
 
@@ -82,21 +79,21 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees password reset request confirmation page', async function() {
             const response = await appAdmin.get('/password/reset-request-confirm');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('title').textContent).to.equal('Reset password request');
         });
 
         it('sees password reset page', async function() {
             const response = await appAdmin.get(`/password/reset/${resetToken}`);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('input').name).to.equal('password');
         });
 
         it('throws out invalid token', async function() {
             const response = await appAdmin.get('/password/reset/not-a-good-token');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('p').textContent).to.equal('This password reset link is either invalid, expired, or previously used.');
         });
 
@@ -105,7 +102,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const expiredTimestamp = (parseInt(timestamp, 36) - 60*60*24 - 1).toString(36);
             const response = await appAdmin.get(`/password/reset/${expiredTimestamp}-${hash}`);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('p').textContent).to.equal('This password reset link is either invalid, expired, or previously used.');
         });
 
@@ -114,7 +111,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const [ timestamp ] = resetToken.split('-'); // (we don't need the hash here)
             const response = await appAdmin.get(`/password/reset/${timestamp}-abcdefgh`);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('p').textContent).to.equal('This password reset link is either invalid, expired, or previously used.');
         });
 
@@ -135,7 +132,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees password reset confirmation page', async function() {
             const response = await appAdmin.get('/password/reset/confirm');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('title').textContent).to.equal('Reset password');
         });
     });
@@ -158,14 +155,14 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('has login page with login fields when not logged-in', async function() {
             const response = await appAdmin.get('/login');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelectorAll('input')).to.have.lengthOf(3);
         });
 
         it('login page shows no org’s for user arg ‘tester‘', async function() {
             const response = await appAdmin.get(`/login?user=${testuser}`);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelectorAll('input').length).to.equal(3); // username, password, remember-me (no db)
             expect(document.querySelector('input[name=username]').value).to.equal(testuser); // username prefilled
         });
@@ -184,7 +181,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(responsePost.headers.location).to.equal('/login');
             const responseGet = await appAdmin.get('/login');
             expect(responseGet.status).to.equal(200);
-            const document = new jsdom.JSDOM(responseGet.text).window.document;
+            const document = new JSDOM(responseGet.text).window.document;
             expect(document.querySelector('button').nextElementSibling.textContent).to.equal('E-mail / password not recognised');
         });
 
@@ -198,7 +195,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('shows logged in user on login page when logged-in', async function() {
             const response = await appAdmin.get('/login');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('#name').textContent).to.equal('tester');
             expect(document.querySelector('#db').textContent).to.equal(org);
         });
@@ -210,7 +207,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
             location = res1.headers.location;
             const response = await appAdmin.get(location);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             //expect(document.querySelector('title').textContent).to.match(/.*Activity.+/); home page is temporarily list of reports
             expect(document.querySelector('title').textContent).to.equal('Reports list');
             // nav should be /, Reports, Users, Resources, Submit – feedback, user-name, notifications, Logout
@@ -239,7 +236,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees question in questions page', async function() {
             const response = await appAdmin.get(`/questions/${proj}`);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(questionId)).to.not.be.null;
             expect(document.getElementById(questionId).querySelector('td').textContent).to.equal('1a');
         });
@@ -257,7 +254,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees updated question', async function() {
             const response = await appAdmin.get(`/questions/${proj}`);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(questionId)).to.not.be.null;
             expect(document.getElementById(questionId).querySelector('td').textContent).to.equal('2b');
         });
@@ -270,7 +267,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('no longer sees question in questions page', async function() {
             const response = await appAdmin.get(`/questions/${proj}`);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(questionId)).to.be.null;
         });
     });
@@ -303,14 +300,14 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees new case intake page', async function() {
             const response = await appReport.get(`/${org}/${proj}/*`);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Have you used this anonymous reporting service before?');
         });
 
         it('reports new case intake invalid project', async function() {
             const response = await appReport.get(`/${org}/no-such-project/*`);
             expect(response.status).to.equal(404);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('p').textContent).to.equal('Couldn’t find that one!...');
         });
 
@@ -368,7 +365,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees whatnext page', async function() {
             const response = await appReport.get(`/${org}/${proj}/whatnext`);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
             expect(document.querySelectorAll('tr')).to.have.lengthOf(0); // local resources
         });
@@ -376,7 +373,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('has new report in list of reports', async function() {
             const response = await appAdmin.get('/reports');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(reportId)).to.not.be.null;
         });
 
@@ -430,7 +427,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees new report with nicely formatted information', async function() {
             const response = await appAdmin.get(`/reports/${reportId}`);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const reportInfo = document.querySelector('table.js-obj-to-html');
             const ths = reportInfo.querySelectorAll('th');
             const tds = reportInfo.querySelectorAll('td');
@@ -468,7 +465,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees location in update address field', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const input = document.querySelector('input#address');
             expect(input.value).to.equal('University of Lagos');
         });
@@ -476,7 +473,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees location in audit trail', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const matches = document.evaluate('count(//td[text()="Set location to ‘University of Lagos’"])', document, null, 0, null);
             expect(matches.numberValue).to.equal(1);
         });
@@ -490,7 +487,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees refined location in update address field', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const input = document.querySelector('input#address');
             expect(input.value).to.equal('Department Of Mass Communication, Tafawa Balewa Way, University Of Lagos, Lagos, Nigeria');
         });
@@ -498,7 +495,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees refined location in audit trail', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const matches = document.evaluate('count(//td[text()="Set location to ‘Department Of Mass Communication, Tafawa Balewa Way, University Of Lagos, Lagos, Nigeria’"])', document, null, 0, null);
             expect(matches.numberValue).to.equal(1);
         });
@@ -506,7 +503,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('has new report in report-map page', async function() {
             const response = await appAdmin.get('/reports-map');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const script = document.querySelector('script:not([src])');
             expect(script.textContent.match(reportId)).to.not.be.null;
         });
@@ -527,7 +524,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees report in reports list filtered by description', async function() {
             const response = await appAdmin.get('/reports?description=test');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(reportId).nodeName).to.equal('TR');
         });
 
@@ -535,7 +532,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const dates = encodeURI(dateFormat(Date.now()-1000*60*60*24, 'dd-mmm-yyyy')+'–'+dateFormat('dd-mmm-yyyy'));
             const response = await appAdmin.get('/reports?submitted='+dates);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(reportId).nodeName).to.equal('TR');
         });
 
@@ -552,7 +549,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         //     expect(responsePost.status).to.equal(302);
         //     const response = await appAdmin.get(responsePost.headers.location);
         //     expect(response.status).to.equal(200);
-        //     const document = new jsdom.JSDOM(response.text).window.document;
+        //     const document = new JSDOM(response.text).window.document;
         //     expect(document.querySelector('#summary').value).to.equal('test report');
         //     const matches = document.evaluate('count(//td[text()="Set summary to ‘test report’"])', document, null, 0, null);
         //     expect(matches.numberValue).to.equal(1);
@@ -575,7 +572,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees assigned-to in audit trail', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const matches = document.evaluate('count(//td[text()="Set assignedTo to @tester"])', document, null, 0, null);
             expect(matches.numberValue).to.equal(1);
         });
@@ -583,7 +580,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees report in reports list filtered by assigned-to', async function() {
             const response = await appAdmin.get('/reports?assigned=tester');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(reportId).nodeName).to.equal('TR');
         });
 
@@ -597,7 +594,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees status in audit trail', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const matches = document.evaluate('count(//td[text()="Set status to ‘test rpt’"])', document, null, 0, null);
             expect(matches.numberValue).to.equal(1);
         });
@@ -605,7 +602,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees report in reports list filtered by status', async function() {
             const response = await appAdmin.get('/reports?status=test+rpt');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(reportId).nodeName).to.equal('TR');
         });
 
@@ -618,7 +615,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees report in reports list filtered by tag', async function() {
             const response = await appAdmin.get('/reports?tag=test');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(reportId).nodeName).to.equal('TR');
         });
 
@@ -626,7 +623,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
             return; //  TODO - we have one span.tag with textContent=='complete', need to fix test!
             const response = await appAdmin.get('/reports/'+reportId); // eslint-disable-line no-unreachable
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const tags = [ ...document.querySelectorAll('span.tag') ];
             expect(tags.filter(span => span.textContent=='complete')).to.have.lengthOf(1);
         });
@@ -634,7 +631,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees add tag in report page audit trail', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const matches = document.evaluate('count(//td[text()="Add tag ‘test’"])', document, null, 0, null);
             expect(matches.numberValue).to.equal(1);
         });
@@ -660,7 +657,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees comment in report page, with @mention/#tag links', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const commentDivs = document.getElementById(commentId).querySelectorAll('div');
             expect(commentDivs[0].textContent.slice(0, 16)).to.equal('tester commented'); // don't bother testing time!
             expect(commentDivs[0].querySelectorAll('button')[0].classList.contains('fa-times'));  // delete button
@@ -673,7 +670,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees add comment in report page audit trail', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const comment = `Testing testing 1-2-3 including references to [@tester](${testUserDetails._id}) and #test`;
             const matches = document.evaluate(`count(//td[text()="Add comment ‘${comment}’"])`, document, null, 0, null);
             expect(matches.numberValue).to.equal(1);
@@ -688,7 +685,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees updated comment in report page, with @mention/#tag links', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const commentDivs = document.getElementById(commentId).querySelectorAll('div');
             expect(commentDivs[0].textContent.slice(0, 16)).to.equal('tester commented'); // don't bother testing time!
             expect(commentDivs[0].querySelectorAll('button')[0].classList.contains('fa-times'));  // delete button
@@ -701,7 +698,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees updated comment in report page audit trail', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const [ , onBase36 ] = commentId.split('-');
             const on = dateFormat(new Date(parseInt(onBase36, 36)), 'yyyy-mm-dd@HH:MM');
             const comment = 'Updated test including references to @tester and #test';
@@ -749,14 +746,14 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('no longer sees tag in report page', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect([ ...document.querySelectorAll('span.tag') ].filter(span => span.textContent=='complete')).to.have.lengthOf(0);
         });
 
         it('sees delete tag in report page audit trail', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             const matches = document.evaluate('count(//td[text()="Delete tag ‘test’"])', document, null, 0, null);
             expect(matches.numberValue).to.equal(1);
         });
@@ -769,7 +766,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('no longer sees comment in report page', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(commentId)).to.be.null;
         });
 
@@ -808,7 +805,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('gets add new user page', async function() {
             const response = await appAdmin.get('/users/add');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('input').name).to.equal('firstname');
         });
 
@@ -823,14 +820,14 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees password reset page', async function() {
             const response = await appAdmin.get('/password/reset/'+pwResetToken);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Password Reset');
         });
 
         it('lists users including test user', async function() {
             const response = await appAdmin.get('/users');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(userId).querySelector('td').textContent).to.equal('Test');
         });
 
@@ -847,7 +844,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('gets edit user page', async function() {
             const response = await appAdmin.get('/users/'+userId+'/edit');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Edit User Test User');
         });
 
@@ -861,21 +858,21 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('sees updated details', async function() {
             const response = await appAdmin.get('/users/'+userId+'/edit');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('input').value).to.equal('Test-bis');
         });
 
         it('gets view user page (by id)', async function() {
             const response = await appAdmin.get('/users/'+userId);
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Test-bis User (@test)');
         });
 
         it('gets view user page (by username)', async function() {
             const response = await appAdmin.get('/users/test');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Test-bis User (@test)');
         });
 
@@ -898,7 +895,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('returns 404 for non-existent user', async function() {
             const response = await appAdmin.get('/users/no-one-here-by-that-name');
             expect(response.status).to.equal(404);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal(':(');
         });
     });
@@ -917,7 +914,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('gets adds new resource page', async function() {
             const response = await appAdmin.get('/resources/add');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelectorAll('input')).to.have.lengthOf(9);
         });
 
@@ -931,7 +928,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('lists resources including test resource', async function() {
             const response = await appAdmin.get('/resources');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(resourceId).querySelectorAll('td')[0].textContent).to.equal('Test');
             expect(document.getElementById(resourceId).querySelectorAll('td')[5].textContent).to.equal('testing');
         });
@@ -939,7 +936,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('edits test resource', async function() {
             const response = await appAdmin.get('/resources/'+resourceId+'/edit');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal('Edit resource Test');
             values.services = 'testing; validation';
             const responsePost = await appAdmin.post('/resources/'+resourceId+'/edit').send(values);
@@ -950,7 +947,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('lists resources including updated test resource', async function() {
             const response = await appAdmin.get('/resources');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.getElementById(resourceId).querySelectorAll('td')[0].textContent).to.equal('Test');
             expect(document.getElementById(resourceId).querySelectorAll('td')[5].textContent).to.equal('testing; validation');
         });
@@ -964,7 +961,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('returns 404 for non-existent resource', async function() {
             const response = await appAdmin.get('/resources/no-one-here-by-that-name');
             expect(response.status).to.equal(404);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal(':(');
         });
     });
@@ -1037,7 +1034,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('returns 404 for non-existent page', async function() {
             const response = await appAdmin.get('/zzzzzz');
             expect(response.status).to.equal(404);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent).to.equal(':(');
         });
 

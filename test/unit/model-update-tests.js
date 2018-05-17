@@ -4,10 +4,8 @@
 /* Note these tests do not mock out database components, but operate on the live 'grn' test db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import chai   from 'chai';   // BDD/TDD assertion library
-import dotenv from 'dotenv'; // load environment variables from a .env file into process.env
-
-const expect = chai.expect;
+import { expect } from 'chai';   // BDD/TDD assertion library
+import dotenv     from 'dotenv'; // load environment variables from a .env file into process.env
 
 dotenv.config();
 

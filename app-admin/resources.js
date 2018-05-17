@@ -1,5 +1,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Resources handlers - manage adding, editing, deleting rape/crisis resources.    C.Veness 2017  */
+/* Resources handlers - manage adding, editing, deleting rape/crisis resources.                   */
+/*                                                                            C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */
@@ -7,15 +8,14 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import libphonenumber from 'google-libphonenumber'; // wrapper for Google's libphonenumber
-import isEmail        from 'isemail';               // email address validation library
+import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'; // wrapper for Google's libphonenumber
+import isEmail                                from 'isemail';               // email address validation library
 
 import Resource         from '../models/resource.js';
 import validationErrors from '../lib/validation-errors.js';
 import Geocoder         from '../lib/geocode.js';
 
-const phoneUtil         = libphonenumber.PhoneNumberUtil.getInstance();
-const PhoneNumberFormat = libphonenumber.PhoneNumberFormat;
+const phoneUtil = PhoneNumberUtil.getInstance();
 
 
 const validation = {

@@ -1,14 +1,13 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Twilio app integration/acceptance tests.                                        C.Veness 2017  */
+/* Twilio app integration/acceptance tests.                                   C.Veness 2017-2018  */
 /*                                                                                                */
 /* These tests require admin.localhost to be set in /etc/hosts.                                   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
-import chai       from 'chai';       // BDD/TDD assertion library
-import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
+import { expect } from 'chai';       // BDD/TDD assertion library
+import { JSDOM }  from 'jsdom';      // JavaScript implementation of DOM and HTML standards
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-const expect = chai.expect;
 
 import app from '../../app.js';
 
@@ -75,7 +74,7 @@ describe('Twilio app'+' ('+app.env+')', function() {
         it('views messages list page', async function() {
             const response = await requestAdmin.get('/messages');
             expect(response.status).to.equal(200);
-            const document = new jsdom.JSDOM(response.text).window.document;
+            const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('title').textContent.slice(0, 8)).to.equal('Messages');
             expect(document.getElementById(msgId).querySelector('a').textContent).to.equal('07973 559336');
         });

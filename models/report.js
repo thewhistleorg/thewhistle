@@ -9,11 +9,10 @@ import slugify            from 'slugify';           // make strings url-safe
 import dateFormat         from 'dateformat';        // Steven Levithan's dateFormat()
 import exiftool           from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
 import useragent          from 'useragent';         // parse browser user agent string
-import MongoDB            from 'mongodb';           // MongoDB driver for Node.js
+import { ObjectId }       from 'mongodb';           // MongoDB driver for Node.js
 import Debug              from 'debug';             // small debugging utility
 
 const debug = Debug('app:db'); // db write ops
-const ObjectId = MongoDB.ObjectId;
 
 import User         from '../models/user.js';
 import Notification from '../models/notification.js';

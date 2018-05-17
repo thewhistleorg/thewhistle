@@ -1,10 +1,9 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* EXIF header extraction unit tests.                                              C.Veness 2017  */
+/* EXIF header extraction unit tests.                                         C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import chai     from 'chai';              // BDD/TDD assertion library
-import exiftool from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
-const expect = chai.expect;
+import { expect } from 'chai';              // BDD/TDD assertion library
+import exiftool   from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
 
 describe('EXIF', function() {
     describe('extract EXIF metadata', function() {

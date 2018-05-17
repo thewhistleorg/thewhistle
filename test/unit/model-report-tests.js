@@ -4,11 +4,10 @@
 /* Note these tests do not mock out database components, but operate on the live 'grn' test db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import chai               from 'chai';       // BDD/TDD assertion library
+import { expect }         from 'chai';       // BDD/TDD assertion library
 import { promises as fs } from 'fs';         // nodejs.org/api/fs.html#fs_fs_promises_api
 import dateFormat         from 'dateformat'; // Steven Levithan's dateFormat()
 import dotenv             from 'dotenv';     // load environment variables from a .env file into process.env
-const expect = chai.expect;
 
 dotenv.config();
 

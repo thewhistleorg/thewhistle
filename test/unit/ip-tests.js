@@ -2,8 +2,7 @@
 /* IP caching unit tests.                                                     C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import chai from 'chai'; // BDD/TDD assertion library
-const expect = chai.expect;
+import { expect } from 'chai'; // BDD/TDD assertion library
 
 import ip from '../../lib/ip.js';
 

@@ -4,9 +4,8 @@
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import useragent from 'useragent'; // parse browser user agent string
-import MongoDB   from 'mongodb';   // MongoDB driver for Node.js
-const ObjectId = MongoDB.ObjectId;
+import useragent    from 'useragent'; // parse browser user agent string
+import { ObjectId } from 'mongodb';   // MongoDB driver for Node.js
 
 import Db from '../lib/db.js';
 

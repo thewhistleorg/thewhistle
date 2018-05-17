@@ -4,15 +4,13 @@
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import fetch       from 'node-fetch';  // window.fetch in node.js
-import querystring from 'querystring'; // nodejs.org/api/querystring.html
-import dateFormat  from 'dateformat';  // Steven Levithan's dateFormat()
-import geodesy     from 'geodesy';     // library of geodesy functions
-import Debug       from 'debug';       // small debugging utility
+import fetch                         from 'node-fetch';  // window.fetch in node.js
+import querystring                   from 'querystring'; // nodejs.org/api/querystring.html
+import dateFormat                    from 'dateformat';  // Steven Levithan's dateFormat()
+import { LatLonSpherical as LatLon } from 'geodesy';     // library of geodesy functions
+import Debug                         from 'debug';       // small debugging utility
 
 const debug = Debug('app:report'); // submission process
-
-const LatLon = geodesy.LatLonSpherical;
 
 import Report       from '../../../models/report.js';
 import Question     from '../../../models/question.js';

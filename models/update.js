@@ -4,9 +4,8 @@
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import MongoDB    from 'mongodb';    // MongoDB driver for Node.js
-import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-const ObjectId = MongoDB.ObjectId;
+import { ObjectId } from 'mongodb';    // MongoDB driver for Node.js
+import dateFormat   from 'dateformat'; // Steven Levithan's dateFormat()
 
 import User   from './user.js';
 import Report from './report.js';

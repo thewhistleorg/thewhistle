@@ -2,9 +2,8 @@
 /* Record browser user agent.                                                 C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import useragent from 'useragent'; // parse browser user agent string
-import MongoDB   from 'mongodb';
-const ObjectId = MongoDB.ObjectId;
+import useragent    from 'useragent'; // parse browser user agent string
+import { ObjectId } from 'mongodb';   // MongoDB driver for Node.js
 
 import Db from '../lib/db.js';
 

@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Dashboard handlers - user & general dashboards.                                 C.Veness 2017  */
+/* Dashboard handlers - user & general dashboards.                            C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */
@@ -7,9 +7,8 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import MongoDB    from 'mongodb';    // MongoDB driver for Node.js
-import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-const ObjectId = MongoDB.ObjectId;
+import { ObjectId } from 'mongodb';    // MongoDB driver for Node.js
+import dateFormat   from 'dateformat'; // Steven Levithan's dateFormat()
 
 import User   from '../models/user.js';
 import Report from '../models/report.js';

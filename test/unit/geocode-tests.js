@@ -1,10 +1,9 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Geocoder unit tests.                                                            C.Veness 2017  */
+/* Geocoder unit tests.                                                       C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import chai   from 'chai';   // BDD/TDD assertion library
-import dotenv from 'dotenv'; // load environment variables from a .env file into process.env
-const expect = chai.expect;
+import { expect } from 'chai';   // BDD/TDD assertion library
+import dotenv     from 'dotenv'; // load environment variables from a .env file into process.env
 dotenv.config();
 
 import Geocoder from '../../lib/geocode.js';

@@ -13,11 +13,10 @@
 /* notification is  only for the user dismissing the notification, this is equivalent to cancel.  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import MongoDB from 'mongodb'; // MongoDB driver for Node.js
-import Debug   from 'debug';   // small debugging utility
+import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js
+import Debug        from 'debug';   // small debugging utility
 
 const debug = Debug('app:db'); // db write ops
-const ObjectId = MongoDB.ObjectId;
 
 import Db from '../lib/db.js';
 

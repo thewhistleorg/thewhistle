@@ -2,9 +2,8 @@
 /* AWS S3 unit tests.                                                         C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import chai       from 'chai';       // BDD/TDD assertion library
+import { expect } from 'chai';       // BDD/TDD assertion library
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-const expect = chai.expect;
 
 
 import AwsS3 from '../../lib/aws-s3.js';

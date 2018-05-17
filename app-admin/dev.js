@@ -5,7 +5,7 @@
 import nodeinfo           from 'nodejs-info';         // node info
 import dateFormat         from 'dateformat';          // Steven Levithan's dateFormat()
 import json2csv           from 'json2csv';            // converts json into csv
-import jsdom              from 'jsdom';               // DOM Document interface in Node!
+import { JSDOM }          from 'jsdom';               // JavaScript implementation of DOM and HTML standards
 import { promises as fs } from 'fs';                  // nodejs.org/api/fs.html#fs_fs_promises_api
 import markdown           from 'markdown-it';         // markdown parser
 import mda                from 'markdown-it-anchor';  // header anchors for markdown-it
@@ -417,7 +417,7 @@ class Dev {
         try {
             const notesMarkdown = await fs.readFile(notesFile, 'utf8');
             const content = md.render(notesMarkdown);
-            const document = new jsdom.JSDOM(content).window.document;
+            const document = new JSDOM(content).window.document;
             await ctx.render('dev-notes', { content, title: document.querySelector('h1').textContent });
         } catch (e) {
             switch (e.code) {
@@ -441,7 +441,7 @@ class Dev {
                 case '.md':
                     const notesMarkdown = await fs.readFile(notesFile, 'utf8');
                     const content = md.render(notesMarkdown);
-                    const document = new jsdom.JSDOM(content).window.document;
+                    const document = new JSDOM(content).window.document;
                     const title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'The Whistle Development Notes';
                     await ctx.render('dev-notes', { content, title });
                     break;

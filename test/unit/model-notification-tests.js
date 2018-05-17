@@ -5,12 +5,9 @@
 /* These tests assume Test Meister will have no notifications current in the 'grn' test db.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import chai   from 'chai';   // BDD/TDD assertion library
-import dotenv from 'dotenv'; // load environment variables from a .env file into process.env
-import MongoDB from 'mongodb'; // MongoDB driver for Node.js
-
-const expect = chai.expect;
-const ObjectId = MongoDB.ObjectId;
+import { expect }   from 'chai';    // BDD/TDD assertion library
+import dotenv       from 'dotenv';  // load environment variables from a .env file into process.env
+import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js
 
 dotenv.config();
 

@@ -5,7 +5,7 @@
 /* global Cypress, cy, expect */
 
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
+import { JSDOM }  from 'jsdom';      // JavaScript implementation of DOM and HTML standards
 
 const org = 'grn';              // the test organisation for the live ‘test-grn‘ organisation
 const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
@@ -90,7 +90,7 @@ describe.skip(`Submit ${org}/${proj} incident report simply visiting each page`,
         cy.wait(200);
         cy.get('table.js-obj-to-html').then(($table) => {
             const html = `<table>${$table.html()}</table>`; // yucky kludge: how to get html with enclosing element?
-            const table = new jsdom.JSDOM(html).window.document;
+            const table = new JSDOM(html).window.document;
             const ths = table.querySelectorAll('th');
             const tds = table.querySelectorAll('td');
             expect(tds.length).to.equal(13);
@@ -119,7 +119,7 @@ describe.skip(`Submit ${org}/${proj} incident report simply visiting each page`,
             expect(ths[11].textContent).to.equal('Contact e-mail');
             expect(tds[11].textContent).to.equal('help@me.com');
             expect(ths[12].textContent).to.equal('Contact phone');
-            expect(tds[12].textContent).to.equal('01234 123456');
+            expect(tds[12].textContent).to.equal('01234 123456x');
         });
         cy.get('button[name=delete]').click();
         cy.url().should('include', '/reports');

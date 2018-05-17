@@ -1,11 +1,10 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Message model; SMS messages.                                                    C.Veness 2017  */
+/* Message model; SMS messages.                                               C.Veness 2017-2018  */
 /*                                                                                                */
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import MongoDB from 'mongodb'; // MongoDB driver for Node.js
-const ObjectId = MongoDB.ObjectId;
+import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js
 
 
 class Message {

@@ -1,13 +1,11 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* ValidationErrors unit tests.                                                    C.Veness 2017  */
+/* ValidationErrors unit tests.                                               C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 /* eslint no-shadow:off */
 
-import chai       from 'chai';       // BDD/TDD assertion library
+import { expect } from 'chai';       // BDD/TDD assertion library
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-
-const expect = chai.expect;
 
 import validationErrors from '../../lib/validation-errors.js';
 

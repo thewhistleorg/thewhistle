@@ -1,11 +1,11 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Weather data unit tests.                                                        C.Veness 2017  */
+/* Weather data unit tests.                                                   C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import chai from 'chai';            // BDD/TDD assertion library
-const expect = chai.expect;
+import { expect } from 'chai'; // BDD/TDD assertion library
 
 import weather from '../../lib/weather.js';
+
 
 describe('Weather data extraction tests', function() {
     /* eslint no-unreachable: off */

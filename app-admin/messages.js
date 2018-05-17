@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Messages handlers - manage direct SMS messaging functions.                      C.Veness 2017  */
+/* Messages handlers - manage direct SMS messaging functions.                 C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /*                                                                                                */
@@ -7,15 +7,13 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import libphonenumber from 'google-libphonenumber'; // wrapper for Google's libphonenumber
-import fetch          from 'node-fetch';            // window.fetch in node.js
-import xmldom         from 'xmldom';                // DOMParser in node.js
-const DOMParser = xmldom.DOMParser;
+import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'; // wrapper for Google's libphonenumber
+import fetch                                  from 'node-fetch';            // window.fetch in node.js
+import { DOMParser }                          from 'xmldom';                // DOMParser in node.js
+
+const phoneUtil = PhoneNumberUtil.getInstance();
 
 import Message from '../models/message.js';
-
-const phoneUtil         = libphonenumber.PhoneNumberUtil.getInstance();
-const PhoneNumberFormat = libphonenumber.PhoneNumberFormat;
 
 class MessagesHandlers {
 

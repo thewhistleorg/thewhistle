@@ -4,8 +4,7 @@
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import MongoDB from 'mongodb'; // MongoDB driver for Node.js
-const ObjectId = MongoDB.ObjectId;
+import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js
 
 /* eslint-disable no-unused-vars, key-spacing */
 const schema = {

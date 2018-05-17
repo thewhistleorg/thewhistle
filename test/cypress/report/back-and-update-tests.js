@@ -8,7 +8,7 @@
 /* global Cypress, cy, expect */
 
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-import jsdom      from 'jsdom';      // JavaScript implementation of DOM and HTML standards
+import { JSDOM }  from 'jsdom';      // JavaScript implementation of DOM and HTML standards
 
 const org = 'grn';              // the test organisation for the live ‘test-grn‘ organisation
 const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
@@ -363,7 +363,7 @@ describe.skip(`Submit ${org}/${proj} incident report covering various enter-next
         cy.wait(200);
         cy.get('table.js-obj-to-html').then(($table) => {
             const html = `<table>${$table.html()}</table>`; // yucky kludge: how to get html with enclosing element?
-            const table = new jsdom.JSDOM(html).window.document;
+            const table = new JSDOM(html).window.document;
             const ths = table.querySelectorAll('th');
             const tds = table.querySelectorAll('td');
             expect(tds.length).to.equal(13);

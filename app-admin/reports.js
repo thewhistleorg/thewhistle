@@ -8,18 +8,15 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import dateFormat         from 'dateformat';  // Steven Levithan's dateFormat()
-import MarkdownIt         from 'markdown-it'; // markdown parser
-import json2csv           from 'json2csv';    // converts json into csv
-import pdf                from 'html-pdf';    // HTML to PDF converter
-import { promises as fs } from 'fs';          // nodejs.org/api/fs.html#fs_fs_promises_api
-import handlebars         from 'handlebars';  // logicless templating language
-import moment             from 'moment';      // date library for manipulating dates
-import MongoDB            from 'mongodb';     // MongoDB driver for Node.js
-import geodesy            from 'geodesy';     // library of geodesy functions
-const ObjectId = MongoDB.ObjectId;
-const LatLon   = geodesy.LatLonSpherical;
-const Dms      = geodesy.Dms;
+import dateFormat                         from 'dateformat';  // Steven Levithan's dateFormat()
+import MarkdownIt                         from 'markdown-it'; // markdown parser
+import json2csv                           from 'json2csv';    // converts json into csv
+import pdf                                from 'html-pdf';    // HTML to PDF converter
+import { promises as fs }                 from 'fs';          // nodejs.org/api/fs.html#fs_fs_promises_api
+import handlebars                         from 'handlebars';  // logicless templating language
+import moment                             from 'moment';      // date library for manipulating dates
+import { ObjectId }                       from 'mongodb';     // MongoDB driver for Node.js
+import { LatLonSpherical as LatLon, Dms } from 'geodesy';     // library of geodesy functions
 
 import Report from '../models/report.js';
 import User   from '../models/user.js';

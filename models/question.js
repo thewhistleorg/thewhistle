@@ -3,8 +3,7 @@
 /* different 'myself/other' wordings for questions.                                C.Veness 2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import MongoDB from 'mongodb'; // MongoDB driver for Node.js
-const ObjectId = MongoDB.ObjectId;
+import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js
 
 import Db from '../lib/db.js';
 

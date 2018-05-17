@@ -1,12 +1,12 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Handlers for email verification test.                                           C.Veness 2017  */
+/* Handlers for email verification test.                                      C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import nodemailer         from 'nodemailer';   // sends e-mails from Node.js
 import handlebars         from 'handlebars';   // logicless templating language
-import jsdom              from 'jsdom';        // DOM Document interface in Node!
+import { JSDOM }          from 'jsdom';        // JavaScript implementation of DOM and HTML standards
 import htmlToText         from 'html-to-text'; // converts html to beautiful text
 import { promises as fs } from 'fs';           // nodejs.org/api/fs.html#fs_fs_promises_api
 import crypto             from 'crypto';       // nodejs.org/api/crypto.html
@@ -50,7 +50,7 @@ class Email {
         const html = templateHbs({ host: ctx.host, token: token });
 
         // get e-mail subject from <title> element
-        const document = new jsdom.JSDOM(html).window.document;
+        const document = new JSDOM(html).window.document;
         const subject = document.querySelector('title').textContent;
 
         // prepare e-mail message

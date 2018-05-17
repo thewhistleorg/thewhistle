@@ -6,11 +6,11 @@
 /* has been built, to confirm the app is not totally broken before promoting it to production.    */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import supertest from 'supertest'; // SuperAgent driven library for testing HTTP servers
-import chai      from 'chai';      // BDD/TDD assertion library
-import jsdom     from 'jsdom';     // JavaScript implementation of DOM and HTML standards
-import dotenv    from 'dotenv';    // load environment variables from a .env file into process.env
-const expect = chai.expect;
+import supertest  from 'supertest'; // SuperAgent driven library for testing HTTP servers
+import { expect } from 'chai';      // BDD/TDD assertion library
+import { JSDOM }  from 'jsdom';     // JavaScript implementation of DOM and HTML standards
+import dotenv     from 'dotenv';    // load environment variables from a .env file into process.env
+
 dotenv.config();
 
 const requestAdmin = supertest.agent('http://admin.staging.thewhistle.org');
@@ -42,7 +42,7 @@ describe('Admin app', function() {
     it('sees list of reports', async function() {
         const response = await requestAdmin.get('/reports');
         expect(response.status).to.equal(200);
-        const document = new jsdom.JSDOM(response.text).window.document;
+        const document = new JSDOM(response.text).window.document;
         expect(document.querySelector('title').textContent).to.equal('Reports list');
         expect(document.querySelectorAll('header nav > ul > li').length).to.equal(9);
     });
@@ -50,7 +50,7 @@ describe('Admin app', function() {
     it('sees list of users', async function() {
         const response = await requestAdmin.get('/users');
         expect(response.status).to.equal(200);
-        const document = new jsdom.JSDOM(response.text).window.document;
+        const document = new JSDOM(response.text).window.document;
         expect(document.querySelector('h1').textContent).to.equal('Users');
     });
 
@@ -67,7 +67,7 @@ describe('Report app', function() {
     it(`sees ${org}/${proj} home page`, async function() {
         const responseGet = await requestReport.get(`/${org}/${proj}`);
         expect(responseGet.status).to.equal(200);
-        const document = new jsdom.JSDOM(responseGet.text).window.document;
+        const document = new JSDOM(responseGet.text).window.document;
         expect(document.querySelector('title').textContent).to.equal('The Whistle / Global Rights Nigeria Incident Report');
         expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Get started');
     });

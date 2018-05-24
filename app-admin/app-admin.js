@@ -75,7 +75,7 @@ app.use(async function handleErrors(ctx, next) {
                 break;
             case 403: // Forbidden
             case 409: // Conflict
-                await ctx.render('400-bad-request',  { err });
+                await ctx.render('4xx-bad-request',  { err });
                 break;
             default:
             case 500: // Internal Server Error (for uncaught or programming errors)

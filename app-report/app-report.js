@@ -90,7 +90,7 @@ app.use(async function handleErrors(ctx, next) {
 
 // clean up post data - trim & convert blank fields to null
 app.use(async function cleanPost(ctx, next) {
-    if (ctx.request.method == 'POST') {
+    if (ctx.request.body !== undefined) {
         // koa-body puts multipart/form-data form fields in request.body.{fields,files}
         const multipart = 'fields' in ctx.request.body && 'files' in ctx.request.body;
         const body =  multipart ? ctx.request.body.fields : ctx.request.body;
@@ -100,6 +100,7 @@ app.use(async function cleanPost(ctx, next) {
                 if (body[key] == '') body[key] = null;
             }
         }
+        debug('cleanPost', body);
     }
     await next();
 });

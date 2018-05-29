@@ -99,8 +99,8 @@ router.get('/ajax/messages/latest-timestamp', messages.ajaxMessageLatestTimestam
 /*  Route for map marker (TODO: where should this go?)                                            */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import Jimp               from 'jimp'; // image processing library
-import { promises as fs } from 'fs';   // nodejs.org/api/fs.html#fs_fs_promises_api
+import Jimp from 'jimp';     // image processing library
+import fs   from 'fs-extra'; // fs with extra functions & promise interface
 
 /**
  * Render graduated map marker: 0 for transparent/monochrome -> 100 for opaque/red.
@@ -116,11 +116,9 @@ router.get('/map-marker/:colour/:percentage', async function getMapMarker(ctx) {
 
     const maxage = ctx.app.env=='production' ? 1000*60*60*24 : 1000;
 
-    try {
-        await fs.access(path);
-        await send(ctx, path, { maxage: maxage }); // already exists: just serve it
-    } catch (e) {
-        // doesn't already exist: build it then serve it
+    if (await fs.exists(path)) {
+        await send(ctx, path, { maxage: maxage });
+    } else {
         const marker = await Jimp.read('static/map/marker-'+colour+'.png');
         const outline = await Jimp.read('static/map/marker-'+colour+'-outline.png');
         marker.opacity(percentage/100);

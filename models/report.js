@@ -4,7 +4,7 @@
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import { promises as fs } from 'fs';                // nodejs.org/api/fs.html#fs_fs_promises_api
+import fs         from 'fs-extra';          // fs with extra functions & promise interface
 import slugify            from 'slugify';           // make strings url-safe
 import dateFormat         from 'dateformat';        // Steven Levithan's dateFormat()
 import exiftool           from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
@@ -381,8 +381,8 @@ class Report {
         const project = rpt.project;
 
         // store uploaded files in AWS S3
-        const src = formidableFile.path;                                          // path to uploaded file
-        const date = dateFormat(id.getTimestamp(), 'yyyy-mm');                    // S3 sub-folder
+        const src = formidableFile.path;                                       // path to uploaded file
+        const date = dateFormat(id.getTimestamp(), 'yyyy-mm');                 // S3 sub-folder
         const name = slugify(formidableFile.name, { lower: true, remove: null }); // slugified filename
 
         // upload /tmp file to S3
@@ -416,7 +416,7 @@ class Report {
         await reports.updateOne({ _id: id }, { $push: { 'analysis.files': fileAnalysis } });
 
         // delete uploaded file from /tmp
-        await fs.unlink(src);
+        await fs.remove(src);
     }
 
 
@@ -507,7 +507,7 @@ class Report {
                     await reports.updateOne({ _id: insertedId }, { $push: { 'analysis.files': file } });
 
                     // delete uploaded file from /tmp
-                    await fs.unlink(src);
+                    await fs.remove(src);
                 }
             }
         }

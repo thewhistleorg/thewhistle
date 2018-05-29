@@ -8,7 +8,7 @@ import nodemailer         from 'nodemailer';   // sends e-mails from Node.js
 import handlebars         from 'handlebars';   // logicless templating language
 import { JSDOM }          from 'jsdom';        // JavaScript implementation of DOM and HTML standards
 import htmlToText         from 'html-to-text'; // converts html to beautiful text
-import { promises as fs } from 'fs';           // nodejs.org/api/fs.html#fs_fs_promises_api
+import fs         from 'fs-extra';     // fs with extra functions & promise interface
 import crypto             from 'crypto';       // nodejs.org/api/crypto.html
 import dateFormat         from 'dateformat';   // Steven Levithan's dateFormat()
 

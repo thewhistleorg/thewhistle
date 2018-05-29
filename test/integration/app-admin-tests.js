@@ -14,7 +14,7 @@ import { JSDOM }          from 'jsdom';              // JavaScript implementatio
 import { ObjectId }       from 'mongodb';            // MongoDB driver for Node.js
 import dateFormat         from 'dateformat';         // Steven Levithan's dateFormat()
 import base64             from 'base-64';            // base64 encoder/decoder
-import { promises as fs } from 'fs';                 // nodejs.org/api/fs.html#fs_fs_promises_api
+import fs         from 'fs';         // nodejs.org/api/fs.html
 import csvParse           from 'csv-parse/lib/sync'; // full featured CSV parser
 
 import app      from '../../app.js';
@@ -509,7 +509,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         });
 
         it('gets map marker (newly built)', async function() {
-            try { await fs.unlink('./static/map/marker-red-80.png'); } catch (e) { /* ignore if not present */ } // force regeneration of marker
+            try { fs.unlinkSync('./static/map/marker-red-80.png'); } catch (e) { /* ignore if not present */} // force regeneration of marker
             const response = await appAdmin.get('/map-marker/red/80');
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('image/png');

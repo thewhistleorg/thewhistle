@@ -6,7 +6,7 @@ import nodeinfo           from 'nodejs-info';         // node info
 import dateFormat         from 'dateformat';          // Steven Levithan's dateFormat()
 import json2csv           from 'json2csv';            // converts json into csv
 import { JSDOM }          from 'jsdom';               // JavaScript implementation of DOM and HTML standards
-import { promises as fs } from 'fs';                  // nodejs.org/api/fs.html#fs_fs_promises_api
+import fs         from 'fs-extra';            // fs with extra functions & promise interface
 import markdown           from 'markdown-it';         // markdown parser
 import mda                from 'markdown-it-anchor';  // header anchors for markdown-it
 import mdi                from 'markdown-it-include'; // include markdown fragment files

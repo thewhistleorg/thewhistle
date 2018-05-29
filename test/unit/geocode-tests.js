@@ -42,8 +42,8 @@ describe('Geocode', function() {
     it('geocodes University of Lagos', async function() {
         const result = await Geocoder.geocode('University of Lagos', 'ng');
         expect(result).to.be.an('object');
-        expect(result.latitude).to.equal(6.5193063);
-        expect(result.longitude).to.equal(3.3993265);
+        expect(result.latitude).to.equal(6.519250299999999);
+        expect(result.longitude).to.equal(3.3992594);
         expect(result.country).to.equal('Nigeria');
         expect(result.administrativeLevels.level1long).to.equal('Lagos');
         expect(result.extra.neighborhood).to.equal('Akoka');

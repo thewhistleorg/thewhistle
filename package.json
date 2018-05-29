@@ -32,7 +32,7 @@
     "dateformat": "^3.0.3",
     "debug": "^3.1.0",
     "dotenv": "^5.0.1",
-    "esm": "^3.0.7",
+    "esm": "3.0.34",
     "exiftool-vendored": "^4.17.0",
     "forever": "^0.15.3",
     "fs-extra": "^5.0.0",

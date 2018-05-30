@@ -27,7 +27,6 @@ router.get('/dev/log-access/export-csv',    Dev.logAccessCsv);
 
 router.get('/dev/notes',                    Dev.notesIndex);
 router.get('/dev/notes/readme',             Dev.notesReadme);
-router.get('/dev/notes/form-wizard/:notes', Dev.notesFormWizard);
 router.get('/dev/notes/:notes',             Dev.notes);
 
 router.get('/dev/submissions',              Dev.submissions);

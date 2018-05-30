@@ -10,7 +10,6 @@ import jwt     from 'jsonwebtoken'; // JSON Web Token implementation
 import User     from '../models/user.js';
 import Report   from '../models/report.js';
 import Resource from '../models/resource.js';
-import Question from '../models/question.js';
 import Db       from '../lib/db.js';
 
 
@@ -132,7 +131,6 @@ class LoginHandlers {
         // init db in case this is first time db is used
         await Report.init(db);
         await Resource.init(db);
-        await Question.init(db);
 
         // submitted credentials validate: create JWT & record it in a cookie to 'log in' user
 

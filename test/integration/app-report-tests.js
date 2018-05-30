@@ -23,7 +23,6 @@ const appAdmin = supertest.agent(app.listen()).host('admin.thewhistle.local');
 const appReport = supertest.agent(app.listen()).host('report.thewhistle.local');
 
 describe(`Report app (${org}/${app.env})`, function() {
-    return;
     this.timeout(10e3); // 10 sec
     this.slow(250);
 
@@ -31,6 +30,7 @@ describe(`Report app (${org}/${app.env})`, function() {
     const imgFldr = 'test/img/';
     const imgFile = 's_gps.jpg';
     let notificationId = null;
+    let nNotifications = 0;
 
     before(async function() {
         // check testuser 'tester' exists and has access to ‘grn-test’ org (only)
@@ -117,7 +117,7 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(responseGet.status).to.equal(200);
             const document = new JSDOM(responseGet.text).window.document;
             expect(document.querySelector('title').textContent).to.equal('The Whistle / Global Rights Nigeria Incident Report');
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Get started');
+            expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Get started');
 
             const values = { 'nav-next': 'next' };
             const responsePost = await appReport.post(`/${org}/${proj}`).send(values);
@@ -143,13 +143,13 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[0].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(4);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
+            expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
-                'existing-alias':  '',
-                'used-before':     'n',
-                'generated-alias': 'testy terrain',
-                'nav-next':        'next',
+                'used-before-existing-alias':  '',
+                'used-before':                 'No',
+                'used-before-generated-alias': 'testy terrain',
+                'nav-next':                    'next',
             };
             const responsePost = await appReport.post(`/${org}/${proj}/1`).send(values);
             expect(responsePost.status).to.equal(302);
@@ -165,11 +165,11 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[1].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(6);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
+            expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
-                'on-behalf-of':    'myself',
-                'survivor-gender': 'f',
+                'on-behalf-of':    'Myself',
+                'survivor-gender': 'Female',
                 'survivor-age':    '20–24',
                 'nav-next':        'next',
             };
@@ -198,13 +198,17 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(document.querySelectorAll('table.progress td')[2].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(7);
             expect(document.querySelectorAll('select')).to.have.lengthOf(5);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
+            expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
 
+            const d = new Date(Date.now() - 1000*60*60*24); // yesterday in case of early-morning run affecting weather rpts
             const values = {
-                'when':            'date',
-                'date':            { day: dateFormat('d'), month: dateFormat('mmm'), year: dateFormat('yyyy'), hour: '', minute: '' },
+                'when':            'Yes, exactly when it happened',
+                'date.day':        dateFormat(d, 'd'),
+                'date.month':      dateFormat(d, 'mmm'),
+                'date.year':       dateFormat(d, 'yyyy'),
+                'date.time':       '',
                 'within-options':  '',
-                'still-happening': 'n',
+                'still-happening': 'No',
                 'nav-next':        'next',
             };
             const responsePost = await appReport.post(`/${org}/${proj}/3`).send(values);
@@ -218,14 +222,14 @@ describe(`Report app (${org}/${app.env})`, function() {
             const document = new JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[3].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(3);
+            expect(document.querySelectorAll('input')).to.have.lengthOf(2);
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
+            expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
-                where:        'at',
-                'at-address': 'University of Lagos',
-                'nav-next':   'next',
+                where:           'Yes',
+                'where-details': 'University of Lagos',
+                'nav-next':      'next',
             };
             const responsePost = await appReport.post(`/${org}/${proj}/4`).send(values);
             expect(responsePost.status).to.equal(302);
@@ -240,11 +244,11 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(document.querySelectorAll('table.progress td')[4].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(3);
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(2);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
+            expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
                 'who-relationship': '',
-                'who':              'n',
+                'who':              'Not known',
                 'who-description':  'Big fat guy',
                 'nav-next':         'next',
             };
@@ -259,9 +263,9 @@ describe(`Report app (${org}/${app.env})`, function() {
             const document = new JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
-            expect(document.querySelectorAll('input')).to.have.lengthOf(2); // desc, file selector
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
+            expect(document.querySelectorAll('textarea')).to.have.lengthOf(1); // description
+            expect(document.querySelectorAll('input')).to.have.lengthOf(13);   // file selector, skip, applicable × 11
+            expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
                 'description': 'erroneous description',
@@ -279,11 +283,16 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[6].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(11);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
+            expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
-                'action-taken-other-details': '',
-                'nav-next':                   'next',
+                'action-taken':                      [ 'Teacher/tutor/lecturer', 'Friends, family' ],
+                'action-taken-police-details':       '',
+                'action-taken-organisation-details': '',
+                'action-taken-teacher-details':      '',
+                'action-taken-friends-details':      '',
+                'action-taken-others-details':       '',
+                'nav-next':                          'next',
             };
             const responsePost = await appReport.post(`/${org}/${proj}/7`).send(values);
             expect(responsePost.status).to.equal(302);
@@ -297,7 +306,7 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[7].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue to Resources');
+            expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue to Resources');
 
             const values = {
                 'nav-prev': 'prev',
@@ -313,12 +322,12 @@ describe(`Report app (${org}/${app.env})`, function() {
             const document = new JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
-            expect(document.querySelectorAll('input')).to.have.lengthOf(2); // file selector
-            expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Submit and continue');
+            expect(document.querySelectorAll('textarea')).to.have.lengthOf(1); // description
+            expect(document.querySelectorAll('input')).to.have.lengthOf(13);   // file selector, skip, applicable × 11
+            expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
             expect(document.querySelector('textarea').textContent).to.equal('erroneous description');
             const values = {
-                'description': 'Test',
+                'description': 'Submission test',
                 'nav-next':    'next',
             };
             // superagent doesn't allow request.attach() to be used with request.send(), so instead use request.field()
@@ -346,13 +355,13 @@ describe(`Report app (${org}/${app.env})`, function() {
         it('ajax: geocodes address', async function() {
             const response = await appReport.get('/ajax/geocode?address=university+of+lagos,+nigeria');
             expect(response.status).to.equal(200);
-            expect(response.body.formattedAddress).to.equal('Akoka, Yaba, Nigeria');
+            expect(response.body.formattedAddress).to.equal('Akoka, Lagos, Nigeria');
         });
 
         it('ajax: geocodes address using CORS', async function() {
             const response = await appReport.get('/ajax/geocode?address=university+of+lagos,+nigeria').set('Origin', 'http://rapeisacrime.org');
             expect(response.status).to.equal(200);
-            expect(response.body.formattedAddress).to.equal('Akoka, Yaba, Nigeria');
+            expect(response.body.formattedAddress).to.equal('Akoka, Lagos, Nigeria');
             expect(response.headers['access-control-allow-origin']).to.equal('http://rapeisacrime.org');
         });
 
@@ -386,18 +395,20 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(response.body.events['new report submitted'].length).to.be.at.least(1);
             const notfcn = response.body.events['new report submitted'].filter(n => n.rId == reportId);
             notificationId = notfcn[0].nId;
+            nNotifications = response.body.events['new report submitted'].length;
         });
 
         it('dismisses notification', async function() {
             const response = await appAdmin.delete(`/ajax/notifications/${notificationId}`);
             expect(response.status).to.equal(200);
+            nNotifications--;
         });
 
         it('sees notification is gone', async function() {
             const response = await appAdmin.get('/ajax/notifications');
             expect(response.status).to.equal(200);
-            expect(response.body.events['new report submitted']).to.be.undefined;
-            // hopefully no other new submission lurking in test db!
+            if (nNotifications == 0) expect(response.body.events['new report submitted']).to.be.undefined;
+            if (nNotifications != 0) expect(response.body.events['new report submitted'].length).to.equal(nNotifications);
         });
 
         it('sees new report with nicely formatted information', async function() {
@@ -405,35 +416,30 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(200);
             const document = new JSDOM(response.text).window.document;
             const reportInfo = document.querySelector('table.js-obj-to-html');
-            const ths = reportInfo.querySelectorAll('th');
-            const tds = reportInfo.querySelectorAll('td');
-            expect(tds.length).to.equal(13);
-            expect(ths[0].textContent).to.equal('Alias');
-            expect(tds[0].textContent).to.equal('testy terrain');
-            expect(ths[1].textContent).to.equal('On behalf of');
-            expect(tds[1].textContent).to.equal('Myself');
-            expect(ths[2].textContent).to.equal('Survivor gender');
-            expect(tds[2].textContent).to.equal('female');
-            expect(ths[3].textContent).to.equal('Survivor age');
-            expect(tds[3].textContent).to.equal('20–24');
-            expect(ths[4].textContent).to.equal('Happened');
-            expect(tds[4].textContent).to.equal(dateFormat('d mmm yyyy'));
-            expect(ths[5].textContent).to.equal('Still happening?');
-            expect(tds[5].textContent).to.equal('no');
-            expect(ths[6].textContent).to.equal('Where');
-            expect(tds[6].textContent).to.equal('University of Lagos');
-            expect(ths[7].textContent).to.equal('Who');
-            expect(tds[7].textContent).to.equal('Not known: Big fat guy');
-            expect(ths[8].textContent).to.equal('Description');
-            expect(tds[8].textContent).to.equal('Test');
-            expect(ths[9].textContent).to.equal('Spoken to anybody?');
-            expect(tds[9].textContent).to.equal('—');
-            expect(ths[10].textContent).to.equal('Extra notes');
-            expect(tds[10].textContent).to.equal('—');
-            expect(ths[11].textContent).to.equal('Contact e-mail');
-            expect(tds[11].textContent).to.equal('—');
-            expect(ths[12].textContent).to.equal('Contact phone');
-            expect(tds[12].textContent).to.equal('—');
+            // convert NodeLists to arrays...
+            const ths = Array.from(reportInfo.querySelectorAll('th'));
+            const tds = Array.from(reportInfo.querySelectorAll('td'));
+            // ... so we can build an easy comparison object
+            const actual = {};
+            for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
+            const d = new Date(Date.now() - 1000*60*60*24);
+            const expected = {
+                'Alias':              'testy terrain',
+                'On behalf of':       'Myself',
+                'Survivor gender':    'Female',
+                'Survivor age':       '20–24',
+                'Happened':           dateFormat(d, 'd mmm yyyy'),
+                'Still happening?':   'No',
+                'Where':              'Yes (University of Lagos)',
+                'Who':                'Not known (Big fat guy)',
+                'Description':        'Submission test',
+                'Applicable':         '—',
+                'Spoken to anybody?': 'Teacher/tutor/lecturer; Friends, family',
+                'Extra notes':        '—',
+                'E-mail address':     '—', // TODO
+                'Phone number':       '—', // TODO
+            };
+            expect(actual).to.deep.equal(expected);
         });
 
         it('sees report in submissions page', async function() {
@@ -508,13 +514,13 @@ describe(`Report app (${org}/${app.env})`, function() {
         });
 
         it('sees ‘testy terrain’ alias is used (ajax)', async function() {
-            const response = await appAdmin.get(`/ajax/report/${org}/aliases/testy+terrain`);
+            const response = await appReport.get(`/ajax/${org}/aliases/testy+terrain`);
             expect(response.status).to.equal(200);
         });
 
         // TODO: can 'org' element of url be inferred from header credentials?
         it('sees unused alias is not used (ajax)', async function() {
-            const response = await appAdmin.get(`/ajax/report/${org}/aliases/no+way+this+should+be+a+used+alias`);
+            const response = await appReport.get(`/ajax/${org}/aliases/no+way+this+should+be+a+used+alias`);
             expect(response.status).to.equal(404);
         });
 
@@ -525,23 +531,17 @@ describe(`Report app (${org}/${app.env})`, function() {
         });
     });
 
-    describe('single page report submission', function() { // TODO: check overlap with admin tests
+    describe('single page report submission', function() {
+        // note app-admin-tests has same single-page report submission, but then does various admin functions
         const report = `/${org}/${proj}/*`;
 
-        it('logs in', async function() {
-            const values = { username: testuser, password: testpass };
-            const response = await appAdmin.post('/login/-'+report).send(values);
+        // supertest doesn't appear to be able to pass koa:jwt cookie between apps running on
+        // different ports, so log in explicitly to emulate browser behaviour
+        it('logs in to report app (supertest doesn’t share login)', async function() {
+            const values = { username: testuser, password: testpass, 'remember-me': 'on' };
+            const response = await appReport.post(`/${org}/${proj}/login`).send(values);
             expect(response.status).to.equal(302);
-            // note redirect has full url as it is changing subdomains
-            expect(response.headers.location.slice(-report.length)).to.equal(report);
-        });
-
-        it('shows logged in user on login page when logged-in', async function() {
-            const response = await appAdmin.get('/login');
-            expect(response.status).to.equal(200);
-            const document = new JSDOM(response.text).window.document;
-            expect(document.querySelector('#name').textContent).to.equal('tester');
-            expect(document.querySelector('#db').textContent).to.equal(`${org}`);
+            expect(response.headers.location).to.equal(`/${org}/${proj}`);
         });
 
         it('sees report submission page', async function() {
@@ -549,35 +549,38 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(200);
             const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('title').textContent).to.equal('The Whistle / Global Rights Nigeria Incident Report');
+            expect(document.querySelector('li.name').textContent).to.equal('tester');
         });
 
         it('posts report details', async function() {
+            const d = new Date(Date.now() - 1000*60*60*24); // yesterday in case of early-morning run affecting weather rpts
             const values = {
-                'used-before':      'n',
-                'generated-alias':  'testy terrain',
-                'existing-alias':   '',
-                'on-behalf-of':     'myself',
-                'survivor-gender':  'f',
-                'survivor-age':     '20–24',
-                'when':             'date',
-                'date.day':         dateFormat('d'),
-                'date.month':       dateFormat('mmm'),
-                'date.year':        dateFormat('yyyy'),
-                'date.hour':        '',
-                'date.minute':      '',
-                'within-options':   '',
-                'still-happening':  'n',
-                'where':            'at',
-                'at-address':       'University of Lagos',
-                'who-relationship': '',
-                'who':              'n',
-                'who-description':  'Big fat guy',
-                'description':      'Single-page submission test',
-                'action-taken':     'teacher',
-                'extra-notes':      '',
-                'contact-email':    'help@me.com',
-                'contact-phone':    '01234 123456',
-                'nav-next':         'next',
+                'used-before':                  'No',
+                'used-before-existing-alias':   '',
+                'used-before-generated-alias':  'testy terrain',
+                'on-behalf-of':                 'Myself',
+                'survivor-gender':              'Female',
+                'survivor-age':                 '20–24',
+                'when':                         'Yes, exactly when it happened',
+                'date.day':                     dateFormat(d, 'd'),
+                'date.month':                   dateFormat(d, 'mmm'),
+                'date.year':                    dateFormat(d, 'yyyy'),
+                'date.time':                    '',
+                'within-options':               '',
+                'still-happening':              'No',
+                'where':                        'Yes',
+                'where-details':                'University of Lagos',
+                'who':                          'Not known',
+                'who-relationship':             '',
+                'who-description':              'Big fat guy',
+                'description':                  'Single-page submission test',
+                'action-taken':                 [ 'Teacher/tutor/lecturer', 'Friends, family' ],
+                'action-taken-teacher-details': '',
+                'action-taken-friends-details': '', // skip other 'action-taken' details!
+                'extra-notes':                  '',
+                'contact-email':                'help@me.com',
+                'contact-phone':                '01234 123456',
+                'nav-next':                     'next',
             };
             const response = await appReport.post(report).send(values);
             expect(response.status).to.equal(302);
@@ -600,7 +603,6 @@ describe(`Report app (${org}/${app.env})`, function() {
             const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
         });
-
     });
 
     describe('single page report in admin app', function() {
@@ -609,37 +611,31 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(200);
             const document = new JSDOM(response.text).window.document;
             const reportInfo = document.querySelector('table.js-obj-to-html');
-            const ths = reportInfo.querySelectorAll('th');
-            const tds = reportInfo.querySelectorAll('td');
-            expect(tds.length).to.equal(13);
-            expect(ths[0].textContent).to.equal('Alias');
-            expect(tds[0].textContent).to.equal('testy terrain');
-            expect(ths[1].textContent).to.equal('On behalf of');
-            expect(tds[1].textContent).to.equal('Myself');
-            expect(ths[2].textContent).to.equal('Survivor gender');
-            expect(tds[2].textContent).to.equal('female');
-            expect(ths[3].textContent).to.equal('Survivor age');
-            expect(tds[3].textContent).to.equal('20–24');
-            expect(ths[4].textContent).to.equal('Happened');
-            expect(tds[4].textContent).to.equal(dateFormat('d mmm yyyy'));
-            expect(ths[5].textContent).to.equal('Still happening?');
-            expect(tds[5].textContent).to.equal('no');
-            expect(ths[6].textContent).to.equal('Where');
-            expect(tds[6].textContent).to.equal('University of Lagos');
-            expect(ths[7].textContent).to.equal('Who');
-            expect(tds[7].textContent).to.equal('Not known: Big fat guy');
-            expect(ths[8].textContent).to.equal('Description');
-            expect(tds[8].textContent).to.equal('Single-page submission test');
-            expect(ths[9].textContent).to.equal('Spoken to anybody?');
-            expect(tds[9].textContent).to.equal('Teacher/tutor/lecturer');
-            expect(ths[10].textContent).to.equal('Extra notes');
-            expect(tds[10].textContent).to.equal('—');
-            expect(ths[11].textContent).to.equal('Contact e-mail');
-            expect(tds[11].textContent).to.equal('help@me.com');
-            expect(ths[12].textContent).to.equal('Contact phone');
-            expect(tds[12].textContent).to.equal('01234 123456');
+            // convert NodeLists to arrays...
+            const ths = Array.from(reportInfo.querySelectorAll('th'));
+            const tds = Array.from(reportInfo.querySelectorAll('td'));
+            // ... so we can build an easy comparison object
+            const actual = {};
+            for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
+            const d = new Date(Date.now() - 1000*60*60*24);
+            const expected = {
+                'Alias':              'testy terrain',
+                'On behalf of':       'Myself',
+                'Survivor gender':    'Female',
+                'Survivor age':       '20–24',
+                'Happened':           dateFormat(d, 'd mmm yyyy'),
+                'Still happening?':   'No',
+                'Where':              'Yes (University of Lagos)',
+                'Who':                'Not known (Big fat guy)',
+                'Description':        'Single-page submission test',
+                'Applicable':         '—',
+                'Spoken to anybody?': 'Teacher/tutor/lecturer; Friends, family',
+                'Extra notes':        '—',
+                'E-mail address':     'help@me.com',
+                'Phone number':       '01234 123456',
+            };
+            expect(actual).to.deep.equal(expected);
         });
-
 
         it('deletes submitted incident report', async function() {
             const response = await appAdmin.post(`/reports/${reportId}/delete`).send();

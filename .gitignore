@@ -6,6 +6,7 @@ static/map/*
 !static/map/marker-blue-outline.png
 !static/map/marker-red.png
 !static/map/marker-red-outline.png
+.generated-reports/
 node_modules
 package-lock.json
 /cypress/

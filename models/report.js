@@ -291,10 +291,11 @@ class Report {
      * @param   {string}   db - Database to use.
      * @param   {string}   project - Project report is part of.
      * @param   {string}   alias - Alias to record for for submitter of report.
+     * @param   {number}   version - Version of form spec (to distinguish different format reports).
      * @param   {string}   userAgent - User agent from http request header.
      * @returns {ObjectId} New report id.
      */
-    static async submissionStart(db, project, alias, userAgent) {
+    static async submissionStart(db, project, alias, version, userAgent) {
         debug('Report.submissionStart', 'db:'+db, 'p:'+project, alias);
         if (!global.db[db]) await Db.connect(db);
         if (typeof alias != 'string' || alias.length == 0) throw new Error('Alias must be supplied');
@@ -302,19 +303,20 @@ class Report {
         const reports = global.db[db].collection('reports');
 
         const values = {
-            project:      project,
-            submitted:    { Alias: alias },
-            submittedRaw: {},
-            alias:        alias,
-            location:     { address: '', geocode: null, geojson: null },
-            analysis:     {},
-            // summary:   null,
-            assignedTo:   null,
-            status:       null,
-            tags:         [],
-            comments:     [],
-            views:        {},
-            archived:     false,
+            project:          project,
+            submitted:        { Alias: alias },
+            submittedRaw:     {},
+            submittedVersion: {},
+            alias:            alias,
+            location:         { address: '', geocode: null, geojson: null },
+            analysis:         {},
+            // summary:       null,
+            assignedTo:       null,
+            status:           null,
+            tags:             [],
+            comments:         [],
+            views:            {},
+            archived:         false,
         };
 
         // record user agent for potential later analyses

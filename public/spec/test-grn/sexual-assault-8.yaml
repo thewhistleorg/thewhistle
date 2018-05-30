@@ -1,0 +1,21 @@
+- text: |
+    # Is there any other information that might be useful to us?
+
+- input:
+    name: extra-notes
+    label: Extra notes
+    type: textbox
+
+- text: |
+    If you would like to be contacted about this incident, please give your e-mail and/or your phone
+    number.
+
+- input:
+    name: contact-email
+    type: text
+    placeholder: E-mail address
+
+- input:
+    name: contact-phone
+    type: text
+    placeholder: Phone number

@@ -39,7 +39,7 @@ describe(`Submit ${org}/${proj} incident report with long description`, function
 
         cy.url().should('include', `/${org}/${proj}/1`); // alias
         cy.wait(200); // wait for ajax alias to be returned TODO: include alias in returned page, not using ajax
-        cy.get('output[name=generated-alias]').then(($alias) => {
+        cy.get('output[name=used-before-generated-alias]').then(($alias) => {
             alias = $alias.text();
         });
         cy.contains('Submit and continue').click();

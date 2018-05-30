@@ -121,7 +121,7 @@ p {
     margin-top: 0;
 }
 
-.banner h1 {
+h1.banner { /* 'resources' page */
     color: #ffffff;
     font-weight: 500;
     font-size: 2em;

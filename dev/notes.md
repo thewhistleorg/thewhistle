@@ -36,10 +36,11 @@ MongoDB database backup procedures.
 
 Description of the operation of notifications.
 
-## [Form generation wizard](/dev/notes/form-wizard)
+## [Form generation](/dev/notes/form-generator)
 
-The long-term objective is that incident report submission forms should be created by NGO staff with
-potentially no technical expertise at all. These notes set out plans for this may be achieved.
+The long-term objective is to have an interactive tool for creating incident report submission 
+forms; the current mechanism to to create JSON or YAML form specs by hand. In the future, the form
+generation tool will generate the JSON form specs. 
 
 ## [Redgate down-tools week](/dev/notes/redgate-dtw)
 

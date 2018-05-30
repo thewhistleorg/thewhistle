@@ -90,7 +90,7 @@ app.use(async function handleErrors(ctx, next) {
 
 // clean up post data - trim & convert blank fields to null
 app.use(async function cleanPost(ctx, next) {
-    if (ctx.request.body !== undefined) {
+    if (ctx.request.body != undefined && Object.keys(ctx.request.body).length > 0) {
         // koa-body puts multipart/form-data form fields in request.body.{fields,files}
         const multipart = 'fields' in ctx.request.body && 'files' in ctx.request.body;
         const body =  multipart ? ctx.request.body.fields : ctx.request.body;
@@ -135,9 +135,10 @@ app.use(convert(lusca({ // note koa-lusca@2.2.0 is v1 middleware which generates
 })));
 
 
-// add the domain (host without subdomain) into koa ctx (used in index.html)
+// add the domain (host without subdomain) and hostReport (admin. replaced by report.) into koa ctx
 app.use(async function ctxAddDomain(ctx, next) {
     ctx.state.domain = ctx.host.replace('admin.', '');
+    ctx.state.hostReport = ctx.host.replace('admin.', 'report.');
     await next();
 });
 

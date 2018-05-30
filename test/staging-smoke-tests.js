@@ -69,7 +69,7 @@ describe('Report app', function() {
         expect(responseGet.status).to.equal(200);
         const document = new JSDOM(responseGet.text).window.document;
         expect(document.querySelector('title').textContent).to.equal('The Whistle / Global Rights Nigeria Incident Report');
-        expect(document.querySelector('button.nav-action-button').textContent.trim()).to.equal('Get started');
+        expect(document.querySelector('button').textContent.trim()).to.equal('Get started');
     });
 
     it('fails recaptcha check', async function() {

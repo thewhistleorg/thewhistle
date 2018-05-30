@@ -9,10 +9,8 @@ import { JSDOM }          from 'jsdom';               // JavaScript implementati
 import fs         from 'fs-extra';            // fs with extra functions & promise interface
 import markdown           from 'markdown-it';         // markdown parser
 import mda                from 'markdown-it-anchor';  // header anchors for markdown-it
-import mdi                from 'markdown-it-include'; // include markdown fragment files
 const md = markdown();
 md.use(mda);
-md.use(mdi, 'dev/form-wizard');
 
 import UserAgent  from '../models/user-agent.js';
 import Report     from '../models/report.js';
@@ -429,36 +427,6 @@ class Dev {
             const content = md.render(notesMarkdown);
             const document = new JSDOM(content).window.document;
             await ctx.render('dev-notes', { content, title: document.querySelector('h1').textContent });
-        } catch (e) {
-            switch (e.code) {
-                case 'ENOENT': ctx.throw(404, 'Notes not found'); break;
-                default:       throw e;
-            }
-        }
-    }
-
-
-    /**
-     * Development notes relating to plans about form wizards.
-     */
-    static async notesFormWizard(ctx) {
-        const notesFile = ctx.params.notes.match(/yaml$/)
-            ? `dev/form-wizard/${ctx.params.notes}`
-            : `dev/form-wizard/${ctx.params.notes}.md`;
-
-        try {
-            switch (notesFile.match(/\.[a-z]+$/)[0]) {
-                case '.md':
-                    const notesMarkdown = await fs.readFile(notesFile, 'utf8');
-                    const content = md.render(notesMarkdown);
-                    const document = new JSDOM(content).window.document;
-                    const title = document.querySelector('h1') ? document.querySelector('h1').textContent : 'The Whistle Development Notes';
-                    await ctx.render('dev-notes', { content, title });
-                    break;
-                case '.yaml':
-                    ctx.body = await fs.readFile(`dev/form-wizard/${ctx.params.notes}`, 'utf8');
-                    break;
-            }
         } catch (e) {
             switch (e.code) {
                 case 'ENOENT': ctx.throw(404, 'Notes not found'); break;

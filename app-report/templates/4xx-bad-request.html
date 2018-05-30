@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <title>Oops!</title>
+    <title>No can do!</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css">
     <link rel="stylesheet" href="/css/base.css">
-    <link rel="stylesheet" href="/css/report.css">
+    <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
 
@@ -23,14 +23,12 @@
 
 <h1>:(</h1>
 
-{{#if err.message}}
-<p>{{err.message}}.</p>
-{{else}}
-<p>Couldn’t find that one!...</p>
-{{/if}}
+<p>Sorry, can’t do that for you!...</p>
 
-{{#if e.stack}}
-<pre class="small grey">{{e.stack}}.</pre>
+<pre class="small grey">{{err.status}} {{err.message}}</pre>
+
+{{#if err.stack}}
+<pre class="small grey">{{err.stack}}.</pre>
 {{/if}}
 
 </main>

@@ -213,66 +213,14 @@ describe(`Admin app (${org}/${app.env})`, function() {
             // nav should be /, Reports, Users, Resources, Submit – feedback, user-name, notifications, Logout
             expect(document.querySelectorAll('header nav > ul > li').length).to.equal(9);
             // 'Submit' menu should have entry linking to /grn-test/rape-is-a-crime
-            expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('Rape Is A Crime Internal Form');
+            expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('Rape is a Crime – Internal Form');
             const regexp = new RegExp(`${org}\\/${proj}\\/\\*$`);
             expect(document.querySelector('header nav > ul > li ul li a').href).to.match(regexp);
         });
     });
 
-    describe('report self/other questions', function() {
-        let questionId = null;
-
-        it('adds question', async function() {
-            const values = {
-                question: '1a',
-                self:     'A question I’m answering for myself',
-                other:    'A question I’m answering for someone else',
-            };
-            const response = await appAdmin.post(`/ajax/questions/${proj}`).send(values);
-            expect(response.status).to.equal(201);
-            questionId = response.headers['x-insert-id'];
-        });
-
-        it('sees question in questions page', async function() {
-            const response = await appAdmin.get(`/questions/${proj}`);
-            expect(response.status).to.equal(200);
-            const document = new JSDOM(response.text).window.document;
-            expect(document.getElementById(questionId)).to.not.be.null;
-            expect(document.getElementById(questionId).querySelector('td').textContent).to.equal('1a');
-        });
-
-        it('updates question', async function() {
-            const values = {
-                question: '2b',
-                self:     'A question I’m answering for myself',
-                other:    'A question I’m answering for someone else',
-            };
-            const response = await appAdmin.put(`/ajax/questions/${questionId}`).send(values);
-            expect(response.status).to.equal(200);
-        });
-
-        it('sees updated question', async function() {
-            const response = await appAdmin.get(`/questions/${proj}`);
-            expect(response.status).to.equal(200);
-            const document = new JSDOM(response.text).window.document;
-            expect(document.getElementById(questionId)).to.not.be.null;
-            expect(document.getElementById(questionId).querySelector('td').textContent).to.equal('2b');
-        });
-
-        it('deletes question', async function() {
-            const response = await appAdmin.delete(`/ajax/questions/${questionId}`);
-            expect(response.status).to.equal(200);
-        });
-
-        it('no longer sees question in questions page', async function() {
-            const response = await appAdmin.get(`/questions/${proj}`);
-            expect(response.status).to.equal(200);
-            const document = new JSDOM(response.text).window.document;
-            expect(document.getElementById(questionId)).to.be.null;
-        });
-    });
-
-    describe('submit (internal single-page) incident report', function() { // TODO: check overlap with report tests
+    describe('submit (internal single-page) incident report', function() {
+        // note app-report-tests also does single-page submission, but this does various admin functions
         let reportId = null;
         let commentId = null;
         let notificationId = null;
@@ -308,50 +256,72 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const response = await appReport.get(`/${org}/no-such-project/*`);
             expect(response.status).to.equal(404);
             const document = new JSDOM(response.text).window.document;
-            expect(document.querySelector('p').textContent).to.equal('Couldn’t find that one!...');
+            expect(document.querySelector('p').textContent).to.match(/Form spec http:\/\/report.localhost:\d+\/spec\/grn\/no-such-project not found./);
         });
 
         it('enters incident report', async function() {
             const d = new Date(Date.now() - 1000*60*60*24); // yesterday in case of early-morning run
-            const values = { // eslint-disable-line no-unused-vars
-                'used-before':     'n',
-                'generated-alias': 'testy terrain',
-                'on-behalf-of':    'myself',
-                'survivor-gender': 'f',
+            const values = {
+                'used-before':                  'No',
+                'used-before-existing-alias':   '',
+                'used-before-generated-alias':  'testy terrain',
+                'on-behalf-of':                 'Myself',
+                'survivor-gender':              'Female',
                 'survivor-age':    '20–24',
-                'when':            'date',
-                'date':            { day: dateFormat(d, 'dd'),  month: dateFormat(d, 'mmm'), year: dateFormat(d, 'yyyy'), time: '' },
-                'still-happening': 'n',
-                'where':           'at',
-                'at-address':      'University of Lagos',
-                'who':             'n',
+                'when':                         'Yes, exactly when it happened',
+                'date.day':                     dateFormat(d, 'd'),
+                'date.month':                   dateFormat(d, 'mmm'),
+                'date.year':                    dateFormat(d, 'yyyy'),
+                'date.time':                    '',
+                'within-options':               '',
+                'still-happening':              'No',
+                'where':                        'Yes',
+                'where-details':                'University of Lagos',
+                'who':                          'Not known',
+                'who-relationship':             '',
                 'who-description': 'Big fat guy',
-                'description':     'Test',
-                'action-taken':    'teacher',
+                'description':                  'Admin submission test',
+                'action-taken':                 [ 'Teacher/tutor/lecturer', 'Friends, family' ],
+                'action-taken-teacher-details': '',
+                'action-taken-friends-details': '', // skip other 'action-taken' details!
                 'extra-notes':     '',
+                'contact-email':                'help@me.com',
+                'contact-phone':                '01234 123456',
+                'nav-next':                     'next',
             };
             // sadly, it seems that superagent doesn't allow request.attach() to be used with
             // request.send(), so instead we need to use request.field()
             const response = await appReport.post(`/${org}/${proj}/*`)
                 .field('used-before', values['used-before'])
-                .field('generated-alias', values['generated-alias'])
+                .field('used-before-existing-alias',   values['used-before-existing-alias'])
+                .field('used-before-generated-alias',  values['used-before-generated-alias'])
                 .field('on-behalf-of', values['on-behalf-of'])
                 .field('survivor-gender', values['survivor-gender'])
                 .field('survivor-age', values['survivor-age'])
                 .field('when', values['when'])
-                .field('date', JSON.stringify(values['date']))
+                .field('date.day',                     values['date.day'])
+                .field('date.month',                   values['date.month'])
+                .field('date.year',                    values['date.year'])
+                .field('date.time',                    values['date.time'])
+                .field('within-options',               values['within-options'])
                 .field('still-happening', values['still-happening'])
                 .field('where', values['where'])
-                .field('at-address', values['at-address'])
+                .field('where-details',                values['where-details'])
                 .field('who', values['who'])
+                .field('who-relationship',             values['who-relationship'])
                 .field('who-description', values['who-description'])
                 .field('description', values['description'])
                 .field('action-taken', values['action-taken'])
+                .field('action-taken-teacher-details', values['action-taken-teacher-details'])
                 .field('extra-notes', values['extra-notes'])
+                .field('contact-email',                values['contact-email'])
+                .field('contact-phone',                values['contact-phone'])
+                .field('nav-next',                     values['nav-next'])
                 .attach('documents', imgFldr+imgFile);
             expect(response.status).to.equal(302);
             const koaSession = base64.decode(response.headers['set-cookie'][0].match(/^koa:sess=([a-zA-Z0-9=.]+);.+/)[1]);
-            expect(response.headers.location).to.equal(`/${org}/${proj}/whatnext`, koaSession); // koaSession['koa-flash'] fails??
+            const flash = JSON.parse(koaSession)['koa-flash'];
+            expect(response.headers.location).to.equal(`/${org}/${proj}/whatnext`, 'Flash msg: '+flash.error);
             reportId = response.headers['x-insert-id'];
             console.info('\treport id', reportId);
         });
@@ -430,30 +400,30 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(200);
             const document = new JSDOM(response.text).window.document;
             const reportInfo = document.querySelector('table.js-obj-to-html');
-            const ths = reportInfo.querySelectorAll('th');
-            const tds = reportInfo.querySelectorAll('td');
-            expect(ths[0].textContent).to.equal('Alias');
-            expect(tds[0].textContent).to.equal('testy terrain');
-            expect(ths[1].textContent).to.equal('On behalf of');
-            expect(tds[1].textContent).to.equal('Myself');
-            expect(ths[2].textContent).to.equal('Survivor gender');
-            expect(tds[2].textContent).to.equal('female');
-            expect(ths[3].textContent).to.equal('Survivor age');
-            expect(tds[3].textContent).to.equal('20–24');
-            expect(ths[4].textContent).to.equal('Happened');
-            expect(tds[4].textContent).to.equal(dateFormat(Date.now()-1000*60*60*24, 'd mmm yyyy'));
-            expect(ths[5].textContent).to.equal('Still happening?');
-            expect(tds[5].textContent).to.equal('no');
-            expect(ths[6].textContent).to.equal('Where');
-            expect(tds[6].textContent).to.equal('University of Lagos');
-            expect(ths[7].textContent).to.equal('Who');
-            expect(tds[7].textContent).to.equal('Not known: Big fat guy');
-            expect(ths[8].textContent).to.equal('Description');
-            expect(tds[8].textContent).to.equal('Test');
-            expect(ths[9].textContent).to.equal('Spoken to anybody?');
-            expect(tds[9].textContent).to.equal('Teacher/tutor/lecturer');
-            expect(ths[10].textContent).to.equal('Extra notes');
-            expect(tds[10].textContent).to.equal('—');
+            // convert NodeLists to arrays...
+            const ths = Array.from(reportInfo.querySelectorAll('th'));
+            const tds = Array.from(reportInfo.querySelectorAll('td'));
+            // ... so we can build an easy comparison object
+            const actual = {};
+            for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
+            const d = new Date(Date.now() - 1000*60*60*24);
+            const expected = {
+                'Alias':              'testy terrain',
+                'On behalf of':       'Myself',
+                'Survivor gender':    'Female',
+                'Survivor age':       '20–24',
+                'Happened':           dateFormat(d, 'd mmm yyyy'),
+                'Still happening?':   'No',
+                'Where':              'Yes (University of Lagos)',
+                'Who':                'Not known (Big fat guy)',
+                'Description':        'Admin submission test',
+                'Applicable':         '—',
+                'Spoken to anybody?': 'Teacher/tutor/lecturer; Friends, family',
+                'Extra notes':        '—',
+                'E-mail address':     'help@me.com',
+                'Phone number':       '01234 123456',
+            };
+            expect(actual).to.deep.equal(expected);
         });
 
         it('sets location by geocoding address (ajax)', async function() {
@@ -1000,11 +970,6 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('returns 404 for non-existent dev/notes md page', async function() {
             const response = await appAdmin.get('/dev/notes/no-such-page');
             expect(response.status).to.equal(404);
-        });
-
-        it('sees questions page', async function() {
-            const response = await appAdmin.get('/questions');
-            expect(response.status).to.equal(200);
         });
 
         it('sees dev/submissions page', async function() {

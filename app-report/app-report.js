@@ -3,21 +3,19 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Koa        from 'koa';            // koa framework
-import compose    from 'koa-compose';    // middleware composer
-import Router     from 'koa-router';     // router middleware for koa
 import handlebars from 'koa-handlebars'; // handlebars templating
 import flash      from 'koa-flash';      // flash messages
 import lusca      from 'koa-lusca';      // security header middleware
 import serve      from 'koa-static';     // static file serving middleware
-import fetch      from 'node-fetch';     // window.fetch in node.js
 import convert    from 'koa-convert';    // tmp for koa-flash, koa-lusca
 import Debug      from 'debug';          // small debugging utility
 
 const debug  = Debug('app:req:r'); // debug each request
-const router = new Router();
 
 import Log        from '../lib/log.js';
 import Middleware from '../lib/middleware.js';
+import FormGenerator     from '../lib/form-generator.js';
+import HandlebarsHelpers from '../lib/handlebars-helpers';
 
 
 const app = new Koa(); // report app
@@ -52,6 +50,11 @@ app.use(handlebars({
     extension:   [ 'html' ],
     viewsDir:    'app-report/templates',
     partialsDir: 'app-report/templates/partials',
+    helpers:     {
+        selected: HandlebarsHelpers.selected,
+        checked:  HandlebarsHelpers.checked,
+        show:     HandlebarsHelpers.show,
+    },
 }));
 
 
@@ -67,19 +70,14 @@ app.use(async function handleErrors(ctx, next) {
         switch (ctx.status) {
             case 404: // Not Found
                 if (err.message == 'Not Found') err.message = null; // personalised 404
-                try {
                     await ctx.render('404-not-found', { err });                       // 404 from app-report
-                } catch (renderErr) {
-                    await ctx.render('../../../../templates/404-not-found', { err }); // 404 from composed sub-app
-                }
+                break;
+            case 410: // Gone
+                await ctx.render('4xx-bad-request', { err });       // 410 from form-generator
                 break;
             default:
             case 500: // Internal Server Error (for uncaught or programming errors)
-                try {
-                    await ctx.render('500-internal-server-error', { err });                       // error from app-report
-                } catch (renderErr) {
-                    await ctx.render('../../../../templates/500-internal-server-error', { err }); // error from composed sub-app
-                }
+                await ctx.render('500-internal-server-error', { err });
                 // ctx.app.emit('error', err, ctx); // github.com/koajs/koa/wiki/Error-Handling
                 break;
         }
@@ -90,7 +88,7 @@ app.use(async function handleErrors(ctx, next) {
 
 // clean up post data - trim & convert blank fields to null
 app.use(async function cleanPost(ctx, next) {
-    if (ctx.request.body !== undefined) {
+    if (ctx.request.body != undefined && Object.keys(ctx.request.body).length > 0) {
         // koa-body puts multipart/form-data form fields in request.body.{fields,files}
         const multipart = 'fields' in ctx.request.body && 'files' in ctx.request.body;
         const body =  multipart ? ctx.request.body.fields : ctx.request.body;
@@ -173,97 +171,59 @@ app.use(convert(lusca({ // note koa-lusca@2.2.0 is v1 middleware which generates
 })));
 
 
-// add the domain (host without subdomain) into koa ctx (used in navpartial template) TODO: check
+// add the domain (host without subdomain) and hostAdmin (report. replaced by admin.) into koa ctx
 app.use(async function ctxAddDomain(ctx, next) {
     ctx.state.domain = ctx.host.replace('report.', '');
+    ctx.state.hostAdmin = ctx.host.replace('report.', 'admin.');
     await next();
 });
 
 
-// ------------ routing
+// if this is the first reference to this form, run the form generation process before continuing
+global.built = {};
+app.use(async function generateForms(ctx, next) {
+    const org = ctx.url.split('/')[1];
+    const project = ctx.url.split('/')[2];
+
+    if (!global.built[org+project] && org && project && org!='spec' && org!='ajax') {
+        try {
+            // form specs may be hosted by organisations - if so, the location (which will get
+            // suffixed by '/<org>') will be taken from environment variable RPT_ORG_NAME; otherwise
+            // it will be e.g. report.thewhistle.org/spec
+            const rptLocation = process.env[`RPT_${org.toUpperCase().replace('-', '_')}`];
+            await FormGenerator.build(rptLocation || ctx.origin+'/spec', org, project);
+        } catch (e) {
+            if (e.status == 404) ctx.throw(404, e.message);
+            if (e.status == 410) ctx.throw(410, e.message); // form build failed
+            console.error(e); // TODO: handle JSON schema validation failure
+        }
+        global.built[org+project] = true;
+    }
+
+    await next();
+});
 
 
 // force use of SSL (redirect http protocol to https)
 app.use(Middleware.ssl({ trustProxy: true }));
 
 
-// compose appropriate sub-app for required database / project, in order to maximise modularity
+// check if user is signed in; leaves id in ctx.status.user.id if JWT verified;
+// this is used to show username & return to admin link in nav bar
+app.use(Middleware.verifyJwt());
 
-// TODO: any way to invoke project routes directly, rather than composing app?
 
+// ------------ routing
+
+
+// ajax routes are handled separately as they have different response structure
 import ajaxRoutes from './ajax-routes.js';
 app.use(ajaxRoutes);
 
+// routes for the incident submission reporting
+import reportRoutes from './report-routes.js';
+app.use(reportRoutes);
 
-// home page - list available reporting apps
-router.get('/', async function indexPage(ctx) {
-    // temporarily(?) redirect to /grn/rape-is-a-crime
-    return ctx.redirect('/grn/rape-is-a-crime');
-
-    const reportApps = { // eslint-disable-line no-unreachable
-        GB: [
-            { name: 'survivor-centred response', url: 'report.thewhistle.org/test-cam/scr' },
-            { name: 'what-where-when-who',       url: 'report.thewhistle.org/test-cam/wwww' },
-        ],
-        NG: [
-            { name: 'GRN Rape is a Crime',       url: 'report.thewhistle.org/grn/rape-is-a-crime' },
-        ],
-    };
-    ctx.app.proxy = true;
-    const ip = ctx.request.ip.replace('::ffff:', '');
-    const response = ip=='127.0.0.1' ? {} : await fetch(`https://ipinfo.io/${ip}/json`, { method: 'GET' });
-
-    let country = '';
-    let appsLocal = {};
-
-    if (response.ok) {
-        const ipinfo = await response.json();
-        country = ipinfo.country;
-        appsLocal = reportApps[country];
-        delete reportApps[country];
-    }
-
-    const context = { country: country, appsLocal: appsLocal, appsOther: reportApps };
-    await ctx.render('index', context);
-});
-
-
-// logout page - replicates admin logout, but simpler to have it here than to redirect to admin.
-router.get('/logout', function logout(ctx) {
-    const domain = ctx.request.hostname.replace('report.', '');
-
-    // delete the cookie holding the JSON Web Token
-    ctx.cookies.set('koa:jwt', null, { signed: true, domain: domain });
-    ctx.redirect('/');
-});
-
-
-// redirect /test-grn/sexual-assault to /grn/rape-is-a-crime; GRN launched /test-grn/sexual-assault
-// as the reporting URL, but this has now been corrected to /grn/rape-is-a-crime
-router.get('/test-grn/sexual-assault', ctx => ctx.redirect('/grn/rape-is-a-crime'));
-
-
-// TODO: why doesn't router.all('/:database/:project', '/:database/:project/:page', ...) work?
-router.all('/:database/:project', async function composeDbProject(ctx) {
-    try {
-        const appReport = await import(`./${ctx.params.database}/${ctx.params.project}/app.js`);
-        await compose(appReport.default.middleware)(ctx);
-    } catch (e) {
-        if (e.code == 'MODULE_NOT_FOUND') ctx.throw(404);
-        throw e;
-    }
-});
-router.all('/:database/:project/:page', async function composeDbProjectPage(ctx) {
-    try {
-        const appReport = await import(`./${ctx.params.database}/${ctx.params.project}/app.js`);
-        await compose(appReport.default.middleware)(ctx);
-    } catch (e) {
-        if (e.code == 'MODULE_NOT_FOUND') ctx.throw(404);
-        throw e;
-    }
-});
-
-app.use(router.routes());
 
 // end of the line: 404 status for any resource not found
 app.use(function notFound(ctx) { // note no 'next'

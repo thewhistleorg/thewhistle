@@ -1,0 +1,48 @@
+title: The Whistle / Global Rights Nigeria Incident Report
+
+version: 1
+
+pages:
+  index:    { $ref: 'sexual-assault-0.yaml' }
+  p1:       { $ref: 'sexual-assault-1.yaml' }
+  p2:       { $ref: 'sexual-assault-2.yaml' }
+  p3:       { $ref: 'sexual-assault-3.yaml' }
+  p4:       { $ref: 'sexual-assault-4.yaml' }
+  p5:       { $ref: 'sexual-assault-5.yaml' }
+  p6:       { $ref: 'sexual-assault-6.yaml' }
+  p7:       { $ref: 'sexual-assault-7.yaml' }
+  p8:       { $ref: 'sexual-assault-8.yaml' }
+  whatnext: { $ref: 'sexual-assault-whatnext.yaml' }
+
+options:
+  pages:
+    index:
+      prev: false
+      step: false
+      next: false
+    p1:
+      title: The Whistle / Global Rights Nigeria Incident Report | 1 – used before?
+      prev: false
+    p2:
+      title: The Whistle / Global Rights Nigeria Incident Report | 2 – on behalf of
+      prev: false
+    p3:
+      title: The Whistle / Global Rights Nigeria Incident Report | 3 – when
+    p4:
+      title: The Whistle / Global Rights Nigeria Incident Report | 4 – where
+    p5:
+      title: The Whistle / Global Rights Nigeria Incident Report | 5 – who
+    p6:
+      title: The Whistle / Global Rights Nigeria Incident Report | 6 – description
+      enctype: multipart/form-data
+    p7:
+      title: The Whistle / Global Rights Nigeria Incident Report | 7 – action taken
+    p8:
+      title: The Whistle / Global Rights Nigeria Incident Report | 8 – other info / contact
+      next: Submit and continue to Resources
+    whatnext:
+      handler: resources
+      method: get
+      prev: false
+      step: false
+      next: false

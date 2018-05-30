@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>{{page-title}}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/report.css">
+    <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-2" async></script>
+    {{#if recaptcha}}
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    {{/if}}
+    <script src="/js/report/ga.js" async></script>
+    <script src="/js/report/report.js" defer></script>
+</head>
+<body>
+
+<header>
+    <nav class="pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list {{#unless @koa.state.user}}block{{/unless}} text-center">
+            <li class="pure-menu-item"><h3>{{page-title}}</h3></li>
+            <!-- <li class="pure-menu-item"><img alt="powered by the Whistle" src="/img/powered-by-the-whistle-horiz-white-180x20.png" height="20" width="180"></li> -->
+        </ul>
+        {{#if @koa.state.user}}
+        <ul class="pure-menu-list float-right">
+            <li class="pure-menu-item name">{{@koa.state.user.name}}</li>
+            <li class="pure-menu-item">
+                <a href="//{{@koa.state.hostAdmin}}" class="pure-menu-link" title="Return to Admin Dashboard">
+                    <img src="/img/logo-32.png">
+                </a>
+            </li>
+        </ul>
+        {{/if}}</nav>
+</header>
+
+<main>
+
+    <form method="{{form-method}}" enctype="{{form-enctype}}" class="pure-form">
+        {{{@body}}}
+    </form>
+
+</main>
+
+</body>
+</html>

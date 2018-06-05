@@ -120,6 +120,10 @@ Controls
   - given the stateless nature of the internet, any login facility has to be managed using 
     client-side browser-based session tokens; JWT is the most secure method of achieving this
 
+- Signed cookies used (with rotated keys)
+  - [Keygrip](https://www.npmjs.com/package/keygrip) is used for signed cookies to prevent tampering,
+    using a rotating credential system.
+
 - Lusca application security library used to protect against a range of attacks
   - The Whistle gets ‘A’ grade from [Security Headers](https://securityheaders.com/?q=admin.thewhistle.org&followRedirects=on)
   - The Whistle gets ‘A+’ grade from [Qualys SSL Labs](https://www.ssllabs.com/ssltest/analyze.html?d=admin.thewhistle.org)

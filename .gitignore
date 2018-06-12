@@ -11,3 +11,4 @@ package-lock.json
 /cypress/
 /coverage/
 /.nyc_output/
+.vscode/

@@ -44,8 +44,8 @@
         </li>
         <li class="pure-control-group">
             <label for="username">Username</label>
-            <input type="text" name="username" id="username" value="{{username}}" required pattern="[a-zA-Z][a-zA-Z0-9-]*" class="w8">
-            <span class="pure-form-message">Username must comprise alphanumerics and hyphens</span>
+            <input type="text" name="username" id="username" value="{{username}}" required pattern="[a-z0-9-_.]+" class="w8">
+            <span class="pure-form-message">Username must comprise lowercase alphanumerics and hyphens, with the exception of underscores, hyphens and periods.</span>
         </li>
         <li class="pure-control-group">
             {{#checked roles}}

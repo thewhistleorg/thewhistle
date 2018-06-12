@@ -8,7 +8,7 @@
   "scripts": {
     "start": "forever --minUptime 1000 --spinSleepTime 1000 -c 'node -r esm' app.js",
     "start-dev": "nodemon -e js,json,html --ignore db/reports.json --ignore static/report-docs/ -r esm app.js",
-    "start-devtools": "nodemon --inspect -e js,json,html app.js",
+    "start-devtools": "nodemon --inspect -e js,json,html -r esm app.js",
     "test": "mocha --exit -r esm test/*/*.js && npm run test-frontend",
     "test-unit": "mocha --exit -r esm test/unit/*.js",
     "test-intgn": "mocha --exit -r esm test/integration/*.js",

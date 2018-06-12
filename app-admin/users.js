@@ -162,7 +162,7 @@ class UsersHandlers {
         try {
 
             // username must be alphanumeric
-            if (!body.username.match(/[a-zA-Z-][a-zA-Z0-9-]*/)) throw new Error(`Username (‘${body.username}’) must be alphanumeric`);
+            if (!body.username.match(/[a-z0-9-_.]+/)) throw new Error(`Username (‘${body.username}’) must comprise lowercase alphanumerics and hyphens, with the exception of underscores, hyphens and periods.`);
 
             // confirm valid e-mail (backing up browser input type validation)
             if (!body.email) throw new Error('E-mail address is required');

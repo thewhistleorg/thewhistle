@@ -32,6 +32,16 @@ class Dev {
 
 
     /**
+     * Heroku dyno metadata.
+     */
+    static async dyno(ctx) {
+        const herokuEnvKeyValArr = Object.entries(process.env).filter(v => v[0].slice(0, 7) == 'HEROKU_');
+        const vars = herokuEnvKeyValArr.reduce((acc, val) => { acc[val[0].slice(7).replace(/_/g, '-').toLowerCase()] = val[1]; return acc; }, {});
+        await ctx.render('dev-dyno', { vars, created: dateFormat(vars['release-created-at'], 'default') });
+    }
+
+
+    /**
      * Show access log.
      */
     static async logAccess(ctx) {

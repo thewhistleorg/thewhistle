@@ -17,4 +17,6 @@ These are intended for use by developers only, and no not have entries in the na
 [UserAgents](/dev/user-agents) - browser user agents 
   ([admin](/dev/user-agents/admin), [report](/dev/user-agents/report), [reports](/dev/user-agents/reports))
 
+[Dyno metadata](/dev/dyno) - Heroku dyno metadata
+
 [NodeInfo](/dev/nodeinfo) - config information

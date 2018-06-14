@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Twilio app integration/acceptance tests.                                   C.Veness 2017-2018  */
 /*                                                                                                */
-/* These tests require admin.localhost to be set in /etc/hosts.                                   */
+/* These tests require twilio.thewhistle.local & admin.thewhistle.local to be set in /etc/hosts.  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
@@ -27,7 +27,7 @@ describe('Twilio app'+' ('+app.env+')', function() {
     let replyId = null;
 
     describe('receive message (spoofing message delivered by Twilio webhook)', function() {
-        const headers = { Host: 'twilio.localhost:3000' }; // set host header for subapp selection
+        const headers = { Host: 'twilio.thewhistle.local:3000' }; // set host header for subapp selection
 
         let messageId = null;
         let accountId = null;
@@ -63,7 +63,7 @@ describe('Twilio app'+' ('+app.env+')', function() {
     });
 
     describe('view message in admin app', function() {
-        const requestAdmin = supertest.agent(app.listen()).host('admin.localhost');
+        const requestAdmin = supertest.agent(app.listen()).host('admin.thewhistle.local');
 
         it('logs in', async function() {
             const values = { username: testuser, password: testpass };

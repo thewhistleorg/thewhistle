@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Admin app integration/acceptance tests.                                    C.Veness 2017-2018  */
 /*                                                                                                */
-/* These tests require admin.localhost to be set in /etc/hosts.                                   */
+/* These tests require admin.thewhistle.local & report.thewhistle.local to be set in /etc/hosts.  */
 /*                                                                                                */
 /* Note that running this test will contribute to Weather Underground API invocation limits.      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -26,8 +26,8 @@ const org = 'grn';              // the test organisation for the live ‘test-gr
 const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
 
 
-const appAdmin = supertest.agent(app.listen()).host('admin.localhost');
-const appReport = supertest.agent(app.listen()).host('report.localhost');
+const appAdmin = supertest.agent(app.listen()).host('admin.thewhistle.local');
+const appReport = supertest.agent(app.listen()).host('report.thewhistle.local');
 
 // note that document.querySelector() works with CSS ids which are more restrictive than HTML5 ids,
 // so getElementById() has to be used to find ObjectId ids instead of querySelector()

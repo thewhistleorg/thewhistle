@@ -82,6 +82,15 @@ class LoginHandlers {
             user = null; // e.g. "data is not a valid scrypt-encrypted block"
         }
 
+        if (ctx.hostname.split('.').length < 3) {
+            // as JWT login tokens are held in the full domain (above admin. / report.) to
+            // facilitate common logins across admin & report apps, and cookies can not be set on
+            // top level domains, for logins to work the hostname must have three levels
+            ctx.flash = { _error: 'Domain name must include 3 levels' };
+            ctx.redirect(ctx.url);
+            return;
+        }
+
         if (!user || !passwordMatch) {
             // login failed: redisplay login page with login fail message
             const loginfailmsg = 'E-mail / password not recognised';

@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Report app integration/acceptance tests.                                   C.Veness 2017-2018  */
 /*                                                                                                */
-/* These tests require report.localhost to be set in /etc/hosts.                                  */
+/* These tests require report.thewhistle.local & admin.thewhistle.local to be set in /etc/hosts.  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import supertest    from 'supertest';  // SuperAgent driven library for testing HTTP servers
@@ -19,8 +19,8 @@ const org = 'grn';              // the test organisation for the live ‘test-gr
 const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
 
 
-const appAdmin = supertest.agent(app.listen()).host('admin.localhost');
-const appReport = supertest.agent(app.listen()).host('report.localhost');
+const appAdmin = supertest.agent(app.listen()).host('admin.thewhistle.local');
+const appReport = supertest.agent(app.listen()).host('report.thewhistle.local');
 
 describe(`Report app (${org}/${app.env})`, function() {
     return;
@@ -523,12 +523,6 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
         });
-
-        it('logs out', async function() {
-            const response = await appReport.host('report.localhost').get('/logout');
-            expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/');
-        });
     });
 
     describe('single page report submission', function() { // TODO: check overlap with admin tests
@@ -651,12 +645,6 @@ describe(`Report app (${org}/${app.env})`, function() {
             const response = await appAdmin.post(`/reports/${reportId}/delete`).send();
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
-        });
-
-        it('logs out', async function() {
-            const response = await appReport.host('report.localhost').get('/logout');
-            expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/');
         });
     });
 });

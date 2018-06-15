@@ -240,17 +240,17 @@ class UsersHandlers {
 
         const body = ctx.request.body;
 
+        const validation = {
+            username: 'pattern="[a-z0-9-_.]+"',
+            firstname: 'required',
+            email: 'type=email'
+        };        
+
         try {
 
-            // username must be alphanumeric
-            if (!body.username.match(/[a-zA-Z-][a-zA-Z0-9-]*/)) throw new Error(`Username (‘${body.username}’) must be alphanumeric`);
-
-            // confirm valid e-mail (backing up browser input type validation)
-            if (!body.email) throw new Error('E-mail address is required');
-            if (!isEmail.validate(body.email)) throw new Error(`Invalid e-mail ‘${body.email}’`);
-
-            // firstname is required
-            if (!body.firstname) throw new Error('First name is required');
+            if (validationErrors(ctx.request.body, validation)) {
+                throw new Error(validationErrors(ctx.request.body, validation));
+            }
 
             // ensure roles is array (koa-body will return single selection as string not array)
             if (!Array.isArray(body.roles)) {

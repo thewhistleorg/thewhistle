@@ -162,10 +162,10 @@ class UsersHandlers {
         const body = ctx.request.body;
 
         const validation = {
-            username: 'pattern="[a-z0-9-_.]+"',
+            username: 'required pattern="[a-z0-9-_.]+"',
             firstname: 'required',
-            email: 'type=email'
-        };        
+            email: 'required type=email'
+        };    
 
         try {
 
@@ -241,10 +241,10 @@ class UsersHandlers {
         const body = ctx.request.body;
 
         const validation = {
-            username: 'pattern="[a-z0-9-_.]+"',
+            username: 'required pattern="[a-z0-9-_.]+"',
             firstname: 'required',
-            email: 'type=email'
-        };        
+            email: 'required type=email'
+        };
 
         try {
 

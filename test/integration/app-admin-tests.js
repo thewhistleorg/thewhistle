@@ -26,14 +26,14 @@ const org = 'grn';              // the test organisation for the live ‘test-gr
 const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
 
 
-const appAdmin = supertest.agent(app.listen()).host('admin.localhost');
-const appReport = supertest.agent(app.listen()).host('report.localhost');
+const appAdmin = supertest.agent(app.listen()).host('admin.thewhistle.local');
+const appReport = supertest.agent(app.listen()).host('report.thewhistle.local');
 
 // note that document.querySelector() works with CSS ids which are more restrictive than HTML5 ids,
 // so getElementById() has to be used to find ObjectId ids instead of querySelector()
 
 describe(`Admin app (${org}/${app.env})`, function() {
-    this.timeout(20e3); // 10 sec
+    this.timeout(80e3); // 10 sec
     this.slow(250);
 
     before(async function() {
@@ -815,6 +815,21 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(response.headers.location).to.equal('/users');
             userId = response.headers['x-insert-id'];
             pwResetToken = response.headers['x-pw-reset-token'];
+        });
+
+        it('fails to add new new user with bad username - redirects back to same page', async function() {
+            const badValues = Object.assign({}, values);
+            badValues.username = 'this is a bad username';
+            const response = await appAdmin.post('/users/add').send(badValues);
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/users/add');
+        });
+
+        it('fails to add new new user with bad username - reports error', async function() {
+            const response = await appAdmin.get('/users/add');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('p.error-msg').textContent).to.equal('Error – “username” must match the pattern /[a-z0-9-_.]+/');
         });
 
         it('sees password reset page', async function() {

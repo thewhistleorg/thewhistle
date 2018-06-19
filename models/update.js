@@ -246,6 +246,7 @@ class Update {
         const val = update[op][fld];
         switch (op) {
             case 'set':
+                if (val == null) { description = `Set ${fld} to null`; break; } // eg wunderground fail
                 switch (fld) {
                     case 'assignedTo':       description = `Set ${fld} to ${val?'@'+names.get(val.toString()):'<none>'}`; break;
                     case 'location':         description = `Set ${fld} to ‘${val.address}’`; break;

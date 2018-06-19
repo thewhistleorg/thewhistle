@@ -1249,7 +1249,7 @@ class ReportsHandlers {
             const report = await Report.get(db, reportId);
             if (report.submitted.Happened && report.submitted.Happened.getTime()) {
                 const weather = await Weather.fetchWeatherConditions(geocoded.latitude, geocoded.longitude, report.submitted.Happened);
-                if (weather) Report.update(db, reportId, { 'analysis.weather': weather }, ctx.state.user.id);
+                Report.update(db, reportId, { 'analysis.weather': weather }, ctx.state.user.id);
             }
 
             ctx.status = 200; // Ok

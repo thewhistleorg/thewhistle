@@ -65,9 +65,4 @@ describe('Geocode', function() {
     //    expect(result.streetName).to.equal('Km 10 Airport Road');
     //    expect(result.formattedAddress).to.equal('Km 10 Airport Road, Galadimawa, Abuja F.C.T, Nigeria');
     //});
-
-    it('fails to geocode unrecognised address', async function() {
-        const result = await Geocoder.geocode('this is a place which I’ve certainly never come across', 'uk');
-        expect(result).to.be.null;
-    });
 });

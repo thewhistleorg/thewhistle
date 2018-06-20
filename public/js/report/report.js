@@ -223,6 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (document.querySelector('input[name=address]')) {
         document.querySelector('input[name=address]').oninput = function() {
+            var input = document.querySelector('input[name=address]').value;
             var button = document.querySelector('#get');
             var formatted = document.querySelector('#formatted-address');
             if (this.value == '') {
@@ -233,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
             delay(function() {
                 var request = new XMLHttpRequest();
                 request.responseType = 'json';
-                request.open('GET', '/ajax/geocode?address='+encodeURI(this.value).replace(/%20/g, '+'));
+                request.open('GET', '/ajax/geocode?address='+encodeURI(input).replace(/%20/g, '+'));
                 request.setRequestHeader('Accept', 'application/json');
                 request.onreadystatechange = function () {
                     if (request.readyState == 4) {

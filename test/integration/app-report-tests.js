@@ -12,11 +12,11 @@ import dateFormat   from 'dateformat'; // Steven Levithan's dateFormat()
 
 import app from '../../app.js';
 
-const testuser = process.env.TESTUSER; // note testuser must have access to ‘grn‘ organisation only
+const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn-test‘ organisation only
 const testpass = process.env.TESTPASS; // (for successful login & ‘rape-is-a-crime‘ report submission)
 
-const org = 'grn';              // the test organisation for the live ‘test-grn‘ organisation
-const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
+const org = 'grn-test';         // the test organisation for the live ‘grn‘ organisation
+const proj = 'rape-is-a-crime'; // GRN's only project
 
 
 const appAdmin = supertest.agent(app.listen()).host('admin.thewhistle.local');
@@ -33,12 +33,12 @@ describe(`Report app (${org}/${app.env})`, function() {
     let notificationId = null;
 
     before(async function() {
-        // check testuser 'tester' exists and has access to ‘grn’ org (only)
+        // check testuser 'tester' exists and has access to ‘grn-test’ org (only)
         const responseUsr = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
         if (responseUsr.body.databases.length != 1) throw new Error(`${testuser} must have access to ‘${org}’ org (only)`);
         if (responseUsr.body.databases[0] != org) throw new Error(`${testuser} must have access to ‘${org}’ org (only)`);
 
-        // force db connection to ‘grn‘ db (ajax calls don't)
+        // force db connection to ‘grn-test‘ db (ajax calls don't)
         const responseGrnRpt = await appReport.get(`/${org}/${proj}`);
         if (responseGrnRpt.status != 200) throw new Error(`${org}/${proj} not found`);
 
@@ -47,11 +47,11 @@ describe(`Report app (${org}/${app.env})`, function() {
         if (responseTestRpt.status != 404) throw new Error('Previous test report was not deleted');
     });
 
-    describe('report app home page redirects to /test-grn/sexual-assault', function() {
+    describe('report app home page redirects to /grn-test/rape-is-a-crime', function() {
         it('sees home page', async function() {
             const response = await appReport.get('/');
             expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/test-grn/sexual-assault');
+            expect(response.headers.location).to.equal('/grn-test/rape-is-a-crime');
         });
     });
 

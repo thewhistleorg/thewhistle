@@ -10,8 +10,8 @@
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 import { JSDOM }  from 'jsdom';      // JavaScript implementation of DOM and HTML standards
 
-const org = 'grn';              // the test organisation for the live ‘test-grn‘ organisation
-const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
+const org = 'grn-test';         // the test organisation for the live ‘grn‘ organisation
+const proj = 'rape-is-a-crime'; // GRN's only project
 
 
 describe.skip(`Submit ${org}/${proj} incident report covering various enter-next-back-alter combinations`, function () {

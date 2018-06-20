@@ -15,7 +15,7 @@ before(async function() {
     try {
         global.db = {};
         await Db.connect('users');
-        await Db.connect('grn');
+        await Db.connect('grn-test');
     } catch (e) {
         console.error(e.message);
         process.exit(1);

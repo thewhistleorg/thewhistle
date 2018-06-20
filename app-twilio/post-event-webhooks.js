@@ -24,7 +24,7 @@ class MessagesHandlers {
      * @apiError   403/Forbidden             Admin auth required.
      */
     static async postMessages(ctx) {
-        const db = 'test-grn'; // TODO: for now!
+        const db = 'grn-test'; // TODO: for now!
 
         const msgId = await Message.insert(db, Object.assign({ direction: 'incoming', timestamp: new Date() }, ctx.request.body));
 

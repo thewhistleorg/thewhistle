@@ -2,7 +2,8 @@ Database backup procedures
 ==========================
 
 Currently MongoDB database backups are run on Chris’s machine, and stored on Amazon AWS S3.
-The current test databases *test-cam* and *test-grn*, and the common *users* database are backed up.
+At the moment, only *grn* (heroku_mcrhn6zz) and the common *users* database (heroku_t43cmrsg) are 
+backed up.
 
 Backups are made using [`mongodump`](https://docs.mongodb.com/manual/tutorial/backup-and-restore-tools/),
 using `--archive` and `--gzip` options (this requires mongo to be installed on the machine making
@@ -16,11 +17,9 @@ The script to run the backup is
 
     backupdir="/home/.../thewhistle/db/"
     mongodump -h <host>:<port> -d <database> -u <username> -p <password> --gzip --archive="$backupdir`date +%Y-%m-%d`-users.ar.gz"
-    mongodump -h <host>:<port> -d <database> -u <username> -p <password> --gzip --archive="$backupdir`date +%Y-%m-%d`-test-grn.ar.gz"
-    mongodump -h <host>:<port> -d <database> -u <username> -p <password> --gzip --archive="$backupdir`date +%Y-%m-%d`-test-cam.ar.gz"
-    aws s3 cp "$backupdir`date +%Y-%m-%d`-users.ar.gz"    "s3://thewhistle.mongodump/`date +%Y`/`date +%m`/"
-    aws s3 cp "$backupdir`date +%Y-%m-%d`-test-grn.ar.gz" "s3://thewhistle.mongodump/`date +%Y`/`date +%m`/"
-    aws s3 cp "$backupdir`date +%Y-%m-%d`-test-cam.ar.gz" "s3://thewhistle.mongodump/`date +%Y`/`date +%m`/"
+    mongodump -h <host>:<port> -d <database> -u <username> -p <password> --gzip --archive="$backupdir`date +%Y-%m-%d`-grn.ar.gz"
+    aws s3 cp "$backupdir`date +%Y-%m-%d`-users.ar.gz" "s3://thewhistle.mongodump/`date +%Y`/`date +%m`/"
+    aws s3 cp "$backupdir`date +%Y-%m-%d`-grn.ar.gz"   "s3://thewhistle.mongodump/`date +%Y`/`date +%m`/"
 
 This is run as a daily cron job.
 
@@ -31,7 +30,7 @@ Verify
 
 A backup can be verifed with a command such as
 
-    mongorestore --dryRun --verbose --gzip --archive="$backupdir`date +%Y-%m-%d`-test-grn.ar.gz"
+    mongorestore --dryRun --verbose --gzip --archive="$backupdir`date +%Y-%m-%d`-grn.ar.gz"
 
 Note that the archive format is [not standard `ar` format](https://stackoverflow.com/questions/37994743).
 

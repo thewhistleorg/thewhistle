@@ -16,10 +16,10 @@ to immediate development. These will be tidied up in time, but for the moment th
 are:
 
 - Global Rights Nigeria public incident report submission:
-  [report.thewhistle.org/grn](http://report.thewhistle.org/grn)
+  [report.thewhistle.org/grn-test/rape-is-a-crime](http://report.thewhistle.org/grn-test/rape-is-a-crime)
 - Dashboard for admin/management: [admin.thewhistle.org](http://admin.thewhistle.org)
 - Single-page incident report submission form (for GRN staff / paralegals):
-  [admin.thewhistle.org/report/sexual-assault](http://admin.thewhistle.org/report/sexual-assault)
+  [report.thewhistle.org/grn-test/rape-is-a-crime/*](http://report.thewhistle.org/grn-test/rape-is-a-crime/*)
 
 
 Architecture

@@ -197,8 +197,8 @@ app.use(ajaxRoutes);
 
 // home page - list available reporting apps
 router.get('/', async function indexPage(ctx) {
-    // temporarily(?) redirect to /test-grn/sexual-assault
-    return ctx.redirect('/test-grn/sexual-assault');
+    // temporarily(?) redirect to /grn/rape-is-a-crime
+    return ctx.redirect('/grn/rape-is-a-crime');
 
     const reportApps = { // eslint-disable-line no-unreachable
         GB: [
@@ -206,7 +206,7 @@ router.get('/', async function indexPage(ctx) {
             { name: 'what-where-when-who',       url: 'report.thewhistle.org/test-cam/wwww' },
         ],
         NG: [
-            { name: 'GRN sexual assault',        url: 'report.thewhistle.org/test-grn/sexual-assault' },
+            { name: 'GRN Rape is a Crime',       url: 'report.thewhistle.org/grn/rape-is-a-crime' },
         ],
     };
     ctx.app.proxy = true;
@@ -236,6 +236,11 @@ router.get('/logout', function logout(ctx) {
     ctx.cookies.set('koa:jwt', null, { signed: true, domain: domain });
     ctx.redirect('/');
 });
+
+
+// redirect /test-grn/sexual-assault to /grn/rape-is-a-crime; GRN launched /test-grn/sexual-assault
+// as the reporting URL, but this has now been corrected to /grn/rape-is-a-crime
+router.get('/test-grn/sexual-assault', ctx => ctx.redirect('/grn/rape-is-a-crime'));
 
 
 // TODO: why doesn't router.all('/:database/:project', '/:database/:project/:page', ...) work?

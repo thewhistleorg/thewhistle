@@ -19,11 +19,11 @@ import csvParse           from 'csv-parse/lib/sync'; // full featured CSV parser
 
 import app      from '../../app.js';
 
-const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn‘ organisation only
+const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn-test‘ organisation only
 const testpass = process.env.TESTPASS; // (for successful login & ‘rape-is-a-crime‘ report submission)
 
-const org = 'grn';              // the test organisation for the live ‘test-grn‘ organisation
-const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
+const org = 'grn-test';         // the test organisation for the live ‘grn‘ organisation
+const proj = 'rape-is-a-crime'; // GRN's only project
 
 
 const appAdmin = supertest.agent(app.listen()).host('admin.thewhistle.local');
@@ -37,7 +37,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
     this.slow(250);
 
     before(async function() {
-        // check testuser 'tester' exists and has access to ‘grn’ org (only)
+        // check testuser 'tester' exists and has access to ‘grn-test’ org (only)
         const responseUsr = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
         if (responseUsr.body.databases.length != 1) throw new Error(`${testuser} must have access to ‘${org}’ org (only)`);
         if (responseUsr.body.databases[0] != org) throw new Error(`${testuser} must have access to ‘${org}’ org (only)`);
@@ -46,7 +46,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         const responseTestUsr = await appAdmin.get('/ajax/login/databases?user=test@user.com');
         if (responseTestUsr.body.databases.length != 0) throw new Error('Previous test user was not deleted');
 
-        // login to set up db connection to ‘grn’ db
+        // login to set up db connection to ‘grn-test’ db
         const values = { username: testuser, password: testpass, 'remember-me': 'on' };
         await appAdmin.post('/login').send(values);
 
@@ -212,7 +212,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(document.querySelector('title').textContent).to.equal('Reports list');
             // nav should be /, Reports, Users, Resources, Submit – feedback, user-name, notifications, Logout
             expect(document.querySelectorAll('header nav > ul > li').length).to.equal(9);
-            // 'Submit' menu should have entry linking to /grn/rape-is-a-crime
+            // 'Submit' menu should have entry linking to /grn-test/rape-is-a-crime
             expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('Rape Is A Crime Internal Form');
             const regexp = new RegExp(`${org}\\/${proj}\\/\\*$`);
             expect(document.querySelector('header nav > ul > li ul li a').href).to.match(regexp);
@@ -416,6 +416,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         });
 
         it('sees notification remains for other users but is gone for tester', async function() {
+            // note this test expects other users than just Test Meister to have access to this db!
             const response = await appAdmin.get('/ajax/notifications/debug');
             expect(response.status).to.equal(200);
             const notfcnsForRpt = JSON.parse(response.text).filter(notfcns => notfcns.report == reportId);

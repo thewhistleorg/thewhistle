@@ -98,11 +98,11 @@ app.use(async function handleErrors(ctx, next) {
 
 // set up database connection: relationship between Twilio and organisation/project would have to be
 // considered if we were to use this app; perhaps it will be consumed into the textit app or
-// something... for now we'll just hardwire the test-grn organisation
+// something... for now we'll just hardwire the grn-test db
 app.use(async function(ctx, next) {
-    if (!global.db['test-grn']) {
+    if (!global.db['grn-test']) {
         try {
-            await Db.connect('test-grn');
+            await Db.connect('grn-test');
         } catch (e) {
             console.error(e.message);
             process.exit(1);

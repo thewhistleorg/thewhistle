@@ -10,13 +10,13 @@ import AwsS3 from '../../lib/aws-s3.js';
 
 const test = it; // just an alias
 
-const org = 'grn'; // the test organisation for the live ‘test-grn‘ organisation
+const org = 'grn-test'; // the test organisation for the live ‘grn‘ organisation
+
 
 // fake ObjectId: stackoverflow.com/questions/10593337
 const ObjectId = (rnd = r16 => Math.floor(r16).toString(16)) =>
     rnd(Date.now()/1000) + ' '.repeat(16).replace(/./g, () => rnd(Math.random()*16));
 
-import './before.js'; // set up database connections
 
 describe('AWS S3', function() {
     if (!process.env.CIRCLECI) return; // AWS Free Tier is just 2,000 put requests per month, so limit to CI tests
@@ -28,23 +28,23 @@ describe('AWS S3', function() {
     console.info('\treport id', id);
 
     test('upload file', async function() {
-        const ok = await AwsS3.put(org, 'sexual-assault', date, id, 's_gps.jpg', 'test/img/s_gps.jpg');
+        const ok = await AwsS3.put(org, 'rape-is-a-crime', date, id, 's_gps.jpg', 'test/img/s_gps.jpg');
         expect(ok).to.be.true;
     });
 
     test('get file', async function() {
-        const file = await AwsS3.getBuffer(org, 'sexual-assault', date, id, 's_gps.jpg');
+        const file = await AwsS3.getBuffer(org, 'rape-is-a-crime', date, id, 's_gps.jpg');
         expect(file).to.be.instanceof(Buffer);
         expect(file.length).to.equal(44606);
     });
 
     test('delete file', async function() {
-        const ok = await AwsS3.deleteReportObjects(org, 'sexual-assault', date, id);
+        const ok = await AwsS3.deleteReportObjects(org, 'rape-is-a-crime', date, id);
         expect(ok).to.be.true;
     });
 
     test('file is removed', async function() {
-        await AwsS3.getBuffer(org, 'sexual-assault', date, id, 's_gps.jpg').catch(error => expect(error).to.be.an('error')); // (404)
+        await AwsS3.getBuffer(org, 'rape-is-a-crime', date, id, 's_gps.jpg').catch(error => expect(error).to.be.an('error')); // (404)
     });
 
     // these are just to boost coverage stats

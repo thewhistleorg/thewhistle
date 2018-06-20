@@ -1,8 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Notification model unit tests.                                                  C.Veness 2018  */
 /*                                                                                                */
-/* Note these tests do not mock out database components, but operate on the live 'grn' test db.   */
-/* These tests assume Test Meister will have no notifications current in the 'grn' test db.       */
+/* Note these tests do not mock out database components, but operate on the live 'grn-test' db.   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { expect }   from 'chai';    // BDD/TDD assertion library
@@ -16,7 +15,7 @@ import User         from '../../models/user.js';
 
 const testuser = process.env.TESTUSER;
 
-const db = 'grn'; // the test organisation for the live ‘test-grn‘ organisation
+const db = 'grn-test'; // the test organisation for the live ‘grn‘ organisation
 
 // fake/dummy ObjectId: stackoverflow.com/questions/10593337
 const pseudoObjectId = (rnd = r16 => Math.floor(r16).toString(16)) =>

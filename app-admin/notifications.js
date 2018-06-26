@@ -111,7 +111,7 @@ class NotificationsHandlers {
     /**
      * GET /ajax/notifications/debug - List all notifications, for debugging
      *
-     * Note this returns texgt/plain, not application/json, for legible response: to treat as JS
+     * Note this returns text/plain, not application/json, for legible response: to treat as JS
      * object, use JSON.parse(response.text).
      */
     static async ajaxListDebug(ctx) {
@@ -125,6 +125,7 @@ class NotificationsHandlers {
 
             for (const notifcn of notifications) {
                 for (let u=0; u<notifcn.users.length; u++) {
+                    if (!users[notifcn.users[u]]) continue; // e.g. outstanding notifications for deleted user? (!!)
                     notifcn.users[u] = {
                         id:   notifcn.users[u],
                         name: users[notifcn.users[u]].username,

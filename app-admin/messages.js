@@ -88,7 +88,7 @@ class MessagesHandlers {
                 From:      toNumber,
                 Body:      ctx.request.body.message,
             };
-            const insertId = await Message.insert('test-grn', msg);
+            const insertId = await Message.insert('grn-test', msg); // TODO: fix hardwired 'grn-test' db
 
             ctx.set('X-Insert-Id', insertId); // for testing
 
@@ -111,7 +111,7 @@ class MessagesHandlers {
 
         try {
 
-            await Message.delete('test-grn', ctx.params.id);
+            await Message.delete('grn-test', ctx.params.id); // TODO: fix hardwired 'grn-test' db
 
             // return to list of messages
             ctx.redirect('/messages');

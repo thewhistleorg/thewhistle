@@ -16,11 +16,11 @@ dotenv.config();
 const requestAdmin = supertest.agent('http://admin.staging.thewhistle.org');
 const requestReport = supertest.agent('http://report.staging.thewhistle.org');
 
-const testuser = process.env.TESTUSER; // note testuser must have access to ‘grn‘ organisation only
+const testuser = process.env.TESTUSER; // note testuser must have access to ‘grn-test‘ organisation only
 const testpass = process.env.TESTPASS; // (for successful login)
 
-const org = 'grn';              // the test organisation for the live ‘test-grn‘ organisation
-const proj = 'rape-is-a-crime'; // the test project for the live ‘sexual-assault‘ project
+const org = 'grn-test';         // the test organisation for the live ‘grn‘ organisation
+const proj = 'rape-is-a-crime'; // GRN's only project
 
 
 describe('Admin app', function() {

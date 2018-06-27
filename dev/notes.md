@@ -16,6 +16,10 @@ notes set out in detail the developer workflow used in the project, in order tha
 successfully collaborate on development. The notes also explain the use of continuous integration
 tests, and review apps.
 
+## [2018 Work Packages](/dev/notes/2018-work-packages)
+
+Overview of work packages we have in view, for planning division of work among development team.
+
 ## [Information Security Risk Assessment](/dev/notes/information-security)
 
 Assessment of controls in place to mitigate InfoSec threats relevant to The Whistle.

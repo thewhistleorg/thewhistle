@@ -48,20 +48,15 @@ Project folders will be created automatically.
 Test environment
 ----------------
 
-In our current configuration, we have a separate organisation for testing purposes, so that tests
-can be run which create & delete reports etc without impacting an organisation’s live environment.
+Each organisation can have a test equivalent by setting up an environment variable `DB_NEWORG_TEST` 
+referencing a database to be used for testing (this may be dedicated to the organisation, or common
+to several organisations depending on requirements).
 
-MongoDB: for an organisation `neworg`, set up a `DB_NEWORG_TEST` database as described above (this 
-one *can* be on a *Sandbox plan*!).
+Access to the test organisation is then available by suffixing ‘-test’ to the organisation name in
+the reporting app URLs, and the enabling access to the ‘-test’ organisation in the admin app.
 
-CircleCI will also require the `DB_NEWORG_TEST` environment variable. In `Builds` | `thewhistle` |
-settings, go to `Environment Variables` and add the variable.
+If tests are set up for the new organisation, CircleCI will also require the `DB_NEWORG_TEST` 
+environment variable. In `Builds` | `thewhistle` | settings, go to `Environment Variables` and add 
+the variable.
 
 AWS S3: create a new bucket `thewhistle.neworg-test`.
-
-Then create a symbolic link which will make the submission reports available under a test 
-organisation url:
-
-    $ cd app-report && ln -s ../neworg neworg-test
-
-If parameterised questions are used, they will have to be replicated from *neworg* to *neworg-test*.

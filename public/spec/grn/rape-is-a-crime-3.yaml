@@ -1,1 +1,48 @@
-../test-grn/sexual-assault-3.yaml
+- text:
+    wrap: h1
+    on-behalf-of:Myself:       To start, do you remember when this happened or when it began?
+    on-behalf-of:Someone else: To start, does your friend remember when this happened or when it began?
+
+- text: We understand this can be difficult. Please take your time and tell us as much as you are able.
+
+- input:
+    name: when
+    label: Happened
+    type: radio
+    options:
+      date:
+        label: Yes, exactly when it happened
+        subsidiary:
+          - text: Please select the date and approximate time
+          - input:
+              name: date
+              type: library-date
+          - input:
+              name: time
+              type: library-24hours
+      within:
+        label: Yes, about when it happened
+        subsidiary:
+          - text: For example, last month, a couple of years ago, …
+          - input:
+              name: within-options
+              type: select
+              options:
+                -
+                - last week
+                - last month
+                - last year
+                - more than a year ago
+      dont-remember: I do not remember
+      skip: Skip
+
+- text: '# Is it still happening?'
+
+- input:
+    name: still-happening
+    label: Still happening?
+    type: radio
+    options:
+      y: Yes
+      n: No
+      skip: Skip

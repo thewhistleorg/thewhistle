@@ -185,7 +185,7 @@ app.use(async function generateForms(ctx, next) {
     const org = ctx.url.split('/')[1];
     const project = ctx.url.split('/')[2];
 
-    if (!global.built[org+project] && org && project && org!='spec' && org!='ajax') {
+    if (!global.built[org+project] && org && project && org!='spec' && org!='ajax' && org!='test-grn') {
         try {
             // form specs may be hosted by organisations - if so, the location (which will get
             // suffixed by '/<org>') will be taken from environment variable RPT_ORG_NAME; otherwise

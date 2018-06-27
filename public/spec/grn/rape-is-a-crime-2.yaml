@@ -1,1 +1,63 @@
-../test-grn/sexual-assault-2.yaml
+- text: |
+    Your alias for this session is *{{alias}}*. Please keep this alias in a safe place so you can
+    check back in with us if necessary.
+
+- text: '# Are you reporting on behalf of yourself or someone else?'
+
+- input:
+    name: on-behalf-of
+    label: On behalf of
+    type: radio
+    options:
+        self:
+            label: Myself
+            attributes: checked
+        other: Someone else
+
+- text: |
+     If you are able, please provide your age and gender (or if reporting for someone else, their
+     age and gender).
+
+- text: '### Gender'
+
+- input:
+    name: survivor-gender
+    label: Survivor gender
+    type: radio
+    options:
+      m:    Male
+      f:    Female
+      skip: Skip
+
+- text: '### Age'
+
+- input:
+    name: survivor-age
+    label: Survivor age
+    type: select
+    options:
+      -
+      - 0–4
+      - 5–9
+      - 10–14
+      - 15–19
+      - 20–24
+      - 25–29
+      - 30–34
+      - 35–39
+      - 40–44
+      - 45–49
+      - 50–54
+      - 55–59
+      - 60–64
+      - 65–69
+      - 70–74
+      - 75–79
+      - 80+
+
+- input: # note skip radio button has same name as select list
+    name: survivor-age
+    label: Survivor age
+    type: radio
+    options:
+      skip: Skip

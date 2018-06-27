@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Handlers: test-grn/sexual-assault.                                         C.Veness 2017-2018  */
+/* Handlers for reporting app.                                                C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -27,8 +27,8 @@ class Handlers {
      * GET / - (home page) list available reporting apps
      */
     static async getHomePage(ctx) {
-        // temporarily(?) redirect to /test-grn/sexual-assault
-        return ctx.redirect('/test-grn/sexual-assault');
+        // temporarily(?) redirect to /grn/rape-is-a-crime
+        return ctx.redirect('/grn/rape-is-a-crime');
 
         const reportApps = { // eslint-disable-line no-unreachable
             GB: [
@@ -36,7 +36,7 @@ class Handlers {
                 { name: 'what-where-when-who',       url: 'report.thewhistle.org/test-cam/wwww' },
             ],
             NG: [
-                { name: 'GRN sexual assault',        url: 'report.thewhistle.org/test-grn/sexual-assault' },
+                { name: 'GRN sexual assault',        url: 'report.thewhistle.org/grn/rape-is-a-crime' },
             ],
         };
         ctx.app.proxy = true;

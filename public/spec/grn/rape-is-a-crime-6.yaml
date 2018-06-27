@@ -1,1 +1,77 @@
-../test-grn/sexual-assault-6.yaml
+- text: |
+    # This is an anonymous service. Any information you provide will be seen only by staff and volunteers of Global Rights Nigeria.
+
+- text:
+    on-behalf-of:Myself: |
+      Try to describe as much of what has happened as you can. You may wish  to include what led up
+      to the event, if there were any witnesses, or  any sights/sounds you remember from the event.
+    on-behalf-of:Someone else: |
+      Try to describe as much of what you know happened as you can. You may  wish to include what
+      led up to the event, if there were any witnesses,  or  any sights/sounds you remember from the
+      event.
+
+- input:
+    name: description
+    label: Description
+    type: textbox
+    required: true
+
+- input:
+    name: document
+    type: library-file
+    label: |
+      **Please upload any evidence that could help.** This can be photos, videos or any other
+      documents.
+
+- input: # note skip radio button has same name as textbox
+    name: description
+    label: Description
+    type: radio
+    options:
+      skip: Skip
+
+- text: |
+    # Select any of the following which apply to this case.
+
+- input:
+    name: applicable
+    label: Applicable # required for submitted report label even though not displayed on form!
+    type: checkbox
+    options:
+      multiple-people:
+        label: More than one person
+        subsidiary:
+          - input:
+              name: multiple-people-details
+              type: text
+      objects:
+        label: Objects
+        subsidiary:
+          - input:
+              name: objects-details
+              type: text
+      penetration:
+        label: Penetration
+        subsidiary:
+          - input:
+              name: penetration-details
+              type: text
+      foreplay:
+        label: Foreplay
+        subsidiary:
+          - input:
+              name: foreplay-details
+              type: text
+      blackmail:
+        label: Blackmail
+        subsidiary:
+          - input:
+              name: blackmail-details
+              type: text
+
+- input: # note skip radio button has same name as checkbox
+    name: applicable
+    label: Applicable # required for submitted report label even though not displayed on form!
+    type: radio
+    options:
+      skip: Skip

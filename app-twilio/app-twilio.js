@@ -1,30 +1,33 @@
-const http = require('http');
-const express = require('express');
-const session = require('express-session');
+const Koa = require('koa');
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 
-const app = express();
+import Router from 'koa-router'; // router middleware for koa
 
-app.use(session({secret: 'anything-you-want-but-keep-secret'}));
+const app = new Koa();
+const router = new Router();
 
-app.post('/sms', (req, res) => {
-    const smsCount = req.session.counter || 0;
+router
+.get('/sms', ctx => {
+    console.log('!!!')
+    ctx.body = 'Yea!';
+    let smsCount = ctx.session.counter || 0;
   
-    const message = 'Hello, thanks for the new message.';
+    let message = 'Hello, thanks for the new message.';
   
     if(smsCount > 0) {
       message = 'Hello, thanks for message number ' + (smsCount + 1);
     }
   
-    req.session.counter = smsCount + 1;
+    ctx.session.counter = smsCount + 1;
   
     const twiml = new MessagingResponse();
     twiml.message(message);
   
-    res.writeHead(200, {'Content-Type': 'text/xml'});
-    res.end(twiml.toString());
-  });
-  
-  http.createServer(app).listen(1337, () => {
-    console.log('Express server listening on port 1337');
-  });
+    ctx.body = twiml.toString();
+});
+
+app
+  .use(router.routes())
+  .use(router.allowedMethods());
+
+export default app;

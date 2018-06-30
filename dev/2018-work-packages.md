@@ -40,6 +40,17 @@ Humans for Rights Network
 - implement groups mechanism, together with test suite (integration tests & front-end tests)
 
 
+Cambridge University Everyday Racism
+------------------------------------
+
+- check possible questions to be asked (Ella / Monica)
+- check university membership requirements (e-mail? Raven?)
+- plan best way to incorporate membership requirements into reporting (incl report specs)
+- implement membership requirements
+- look into geolocation requirements / issues
+- implement provisional/trial report, evaluate with Ella / Monica
+
+
 Mirror Group
 ------------
 

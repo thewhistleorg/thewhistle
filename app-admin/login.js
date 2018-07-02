@@ -4,8 +4,8 @@
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import scrypt  from 'scrypt';       // scrypt library
-import jwt     from 'jsonwebtoken'; // JSON Web Token implementation
+import Scrypt from 'scrypt-kdf';   // scrypt key derivation function
+import jwt    from 'jsonwebtoken'; // JSON Web Token implementation
 
 import User     from '../models/user.js';
 import Report   from '../models/report.js';
@@ -73,13 +73,13 @@ class LoginHandlers {
 
         let [ user ] = await User.getBy('email', body.username); // lookup user
 
-        // always invoke verifyKdf (whether email found or not) to mitigate against timing attacks on login function
-        const userPassword = user ? user.password : Math.random().toString();
+        // always invoke verify() (whether email found or not) to mitigate against timing attacks on login function
+        const passwordHash = user ? user.password : '0123456789abcdef'.repeat(8);
         let passwordMatch = null;
         try {
-            passwordMatch = await scrypt.verifyKdf(Buffer.from(userPassword, 'base64'), body.password);
+            passwordMatch = await Scrypt.verify(passwordHash, body.password);
         } catch (e) {
-            user = null; // e.g. "data is not a valid scrypt-encrypted block"
+            user = null; // e.g. "Invalid key"
         }
 
         if (ctx.hostname.split('.').length < 3) {

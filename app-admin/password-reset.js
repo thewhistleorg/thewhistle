@@ -4,8 +4,8 @@
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import crypto     from 'crypto';       // nodejs.org/api/crypto.html
-import scrypt     from 'scrypt';       // scrypt library
+import crypto from 'crypto';     // nodejs.org/api/crypto.html
+import Scrypt from 'scrypt-kdf'; // scrypt key derivation function
 
 import User from '../models/user.js';
 import Mail from '../lib/mail.js';
@@ -118,8 +118,8 @@ class PasswordResetHandlers {
         }
 
         // set the password and clear the password reset token
-        const password = await scrypt.kdf(ctx.request.body.password, await scrypt.params(0.5));
-        await User.update(user._id, { password: password.toString('base64'), passwordResetRequest: null });
+        const password = await Scrypt.kdf(ctx.request.body.password, { logN: 15 });
+        await User.update(user._id, { password: password, passwordResetRequest: null });
 
         ctx.redirect('/password/reset/confirm');
     }

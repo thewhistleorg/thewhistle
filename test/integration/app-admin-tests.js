@@ -267,7 +267,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
                 'used-before-generated-alias':  'testy terrain',
                 'on-behalf-of':                 'Myself',
                 'survivor-gender':              'Female',
-                'survivor-age':    '20–24',
+                'survivor-age':                 '20–24',
                 'when':                         'Yes, exactly when it happened',
                 'date.day':                     dateFormat(d, 'd'),
                 'date.month':                   dateFormat(d, 'mmm'),
@@ -275,16 +275,16 @@ describe(`Admin app (${org}/${app.env})`, function() {
                 'date.time':                    '',
                 'within-options':               '',
                 'still-happening':              'No',
-                'where':                        'Yes',
-                'where-details':                'University of Lagos',
+                'where':                        'Neighbourhood',
+                'where-details':                'Around the corner',
                 'who':                          'Not known',
                 'who-relationship':             '',
-                'who-description': 'Big fat guy',
+                'who-description':              'Big fat guy',
                 'description':                  'Admin submission test',
                 'action-taken':                 [ 'Teacher/tutor/lecturer', 'Friends, family' ],
                 'action-taken-teacher-details': '',
                 'action-taken-friends-details': '', // skip other 'action-taken' details!
-                'extra-notes':     '',
+                'extra-notes':                  '',
                 'contact-email':                'help@me.com',
                 'contact-phone':                '01234 123456',
                 'nav-next':                     'next',
@@ -292,28 +292,28 @@ describe(`Admin app (${org}/${app.env})`, function() {
             // sadly, it seems that superagent doesn't allow request.attach() to be used with
             // request.send(), so instead we need to use request.field()
             const response = await appReport.post(`/${org}/${proj}/*`)
-                .field('used-before', values['used-before'])
+                .field('used-before',                  values['used-before'])
                 .field('used-before-existing-alias',   values['used-before-existing-alias'])
                 .field('used-before-generated-alias',  values['used-before-generated-alias'])
-                .field('on-behalf-of', values['on-behalf-of'])
-                .field('survivor-gender', values['survivor-gender'])
-                .field('survivor-age', values['survivor-age'])
-                .field('when', values['when'])
+                .field('on-behalf-of',                 values['on-behalf-of'])
+                .field('survivor-gender',              values['survivor-gender'])
+                .field('survivor-age',                 values['survivor-age'])
+                .field('when',                         values['when'])
                 .field('date.day',                     values['date.day'])
                 .field('date.month',                   values['date.month'])
                 .field('date.year',                    values['date.year'])
                 .field('date.time',                    values['date.time'])
                 .field('within-options',               values['within-options'])
-                .field('still-happening', values['still-happening'])
-                .field('where', values['where'])
+                .field('still-happening',              values['still-happening'])
+                .field('where',                        values['where'])
                 .field('where-details',                values['where-details'])
-                .field('who', values['who'])
+                .field('who',                          values['who'])
                 .field('who-relationship',             values['who-relationship'])
-                .field('who-description', values['who-description'])
-                .field('description', values['description'])
-                .field('action-taken', values['action-taken'])
+                .field('who-description',              values['who-description'])
+                .field('description',                  values['description'])
+                .field('action-taken',                 values['action-taken'])
                 .field('action-taken-teacher-details', values['action-taken-teacher-details'])
-                .field('extra-notes', values['extra-notes'])
+                .field('extra-notes',                  values['extra-notes'])
                 .field('contact-email',                values['contact-email'])
                 .field('contact-phone',                values['contact-phone'])
                 .field('nav-next',                     values['nav-next'])
@@ -414,7 +414,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
                 'Survivor age':       '20–24',
                 'Happened':           dateFormat(d, 'd mmm yyyy'),
                 'Still happening?':   'No',
-                'Where':              'Yes (University of Lagos)',
+                'Where':              'Neighbourhood (Around the corner)',
                 'Who':                'Not known (Big fat guy)',
                 'Description':        'Admin submission test',
                 'Applicable':         '—',

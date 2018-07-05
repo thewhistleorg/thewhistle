@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // set up listeners to manage visibility of subsidiary details and selection of associated inputs
     var questions = document.querySelectorAll('[class^=question], [class*=" question"]');
     for (var q=0; q<questions.length; q++) {
-        const [ qustionInputName ] = [ ...questions[q].classList ].filter(c => c.match(/^question/)); // TODO: convert to ES5
-        manageVisibility(qustionInputName.replace('question-', ''));
+        const [ questionInputName ] = [ ...questions[q].classList ].filter(c => c.match(/^question/)); // TODO: convert to ES5
+        manageVisibility(questionInputName.replace('question-', ''));
     }
 
 
@@ -43,17 +43,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // set up listeners to show current subsidiary and hide others
         for (i=0; i<inputs.length; i++) {
             inputs[i].onchange = function() {
-                var sub = this.parentElement.querySelector('.subsidiary');
+                // 'this' is changed element
+                var sub = this.parentElement.querySelector('.subsidiary'); // subsidiary within same <li>
                 // show current input's subsidiary, if any - unless it's a checked checkbox, in
                 // which case hide it TODO: ??
                 // also disable hidden inputs, so that they will not get submitted in POST data
                 if (sub) {
-                    if (this.type != 'checkbox' || this.checked) {
+                    var showSubsidiary = this.type=='radio'
+                        || (this.type=='checkbox' && this.checked)
+                        || (this.type=='select-one' && this.value!=''); // note front-end DOM gives 'select-one' rather than 'select'
+
+                    if (showSubsidiary) {  // show && re-enable element
                         sub.classList.remove('hide');
                         sub.querySelectorAll('input,textarea,select').forEach(j => j.disabled = false);
                         sub.querySelector('input,textarea,select').focus();
-                    } else {
-                        sub.classList.add('hide');
+                    } else {               // hide & disable element
+                        sub.classList.add('hide'); // hide element
                         sub.querySelectorAll('input,textarea,select').forEach(j => j.disabled = true);
                     }
                 }
@@ -86,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 for (var j=0; j<subInputs.length; j++) {
                     subInputs[j].onfocus = function() {
                         var parentInput = this.closest('.subsidiary').parentElement.querySelector('input');
-                        parentInput.checked = true;
+                        if (parentInput) parentInput.checked = true;
                     };
                 }
             }
@@ -102,13 +107,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // set visibility defaults for previously answered questions
         for (i=0; i<inputs.length; i++) {
-            if (inputs[i].checked) inputs[i].onchange();
+            if (inputs[i].type=='select-one') inputs[i].onchange(); // show/hide select subsidiary (note 'select-one')
+            if (inputs[i].checked) inputs[i].onchange();            // show radio/checkbox subsidiary
         }
     }
 
 
     /*
-     * 'used-before' page
+     * 'used-before' page: this page requires special handling for anonymous alias
      */
 
     if (document.querySelector('input[name=used-before]')) {

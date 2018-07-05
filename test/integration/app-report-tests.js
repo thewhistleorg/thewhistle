@@ -222,13 +222,14 @@ describe(`Report app (${org}/${app.env})`, function() {
             const document = new JSDOM(responseGet.text).window.document;
             expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
             expect(document.querySelectorAll('table.progress td')[3].classList.contains('current')).to.be.true;
-            expect(document.querySelectorAll('input')).to.have.lengthOf(2);
-            expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
+            expect(document.querySelectorAll('select')).to.have.lengthOf(1);
+            expect(document.querySelectorAll('textarea')).to.have.lengthOf(1); // subsidiary
+            expect(document.querySelectorAll('input')).to.have.lengthOf(1);    // skip
             expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
-                where:           'Yes',
-                'where-details': 'University of Lagos',
+                'where':         'Neighbourhood',
+                'where-details': 'Around the corner',
                 'nav-next':      'next',
             };
             const responsePost = await appReport.post(`/${org}/${proj}/4`).send(values);
@@ -430,7 +431,7 @@ describe(`Report app (${org}/${app.env})`, function() {
                 'Survivor age':       '20–24',
                 'Happened':           dateFormat(d, 'd mmm yyyy'),
                 'Still happening?':   'No',
-                'Where':              'Yes (University of Lagos)',
+                'Where':              'Neighbourhood (Around the corner)',
                 'Who':                'Not known (Big fat guy)',
                 'Description':        'Submission test',
                 'Applicable':         '—',
@@ -568,8 +569,8 @@ describe(`Report app (${org}/${app.env})`, function() {
                 'date.time':                    '',
                 'within-options':               '',
                 'still-happening':              'No',
-                'where':                        'Yes',
-                'where-details':                'University of Lagos',
+                'where':                        'Neighbourhood',
+                'where-details':                'Around the corner',
                 'who':                          'Not known',
                 'who-relationship':             '',
                 'who-description':              'Big fat guy',
@@ -625,7 +626,7 @@ describe(`Report app (${org}/${app.env})`, function() {
                 'Survivor age':       '20–24',
                 'Happened':           dateFormat(d, 'd mmm yyyy'),
                 'Still happening?':   'No',
-                'Where':              'Yes (University of Lagos)',
+                'Where':              'Neighbourhood (Around the corner)',
                 'Who':                'Not known (Big fat guy)',
                 'Description':        'Single-page submission test',
                 'Applicable':         '—',

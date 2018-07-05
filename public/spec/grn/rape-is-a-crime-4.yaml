@@ -1,33 +1,30 @@
 - text: |
-    # Can you indicate where it happened?
+    # If you are able, please select where it happened
+
+- input:
+    name: where
+    type: select
+    label: Where
+    options:
+      -
+      - School
+      - Place of work
+      - Neighbourhood
+      - Survivor’s home
+      - Perpetrator’s home
+      - Other
+      - I don’t remember / don’t know
+    subsidiary:
+      - text: |
+          Please provide as much detail as you are able – this could be an address, restaurant
+          name, or neighborhood or sights and landmarks you recall.
+      - input:
+          name: details
+          type: textbox
 
 - input:
     name: where
     label: Where
     type: radio
     options:
-      at:
-        label: Yes
-        todo: record subsidiary address!
-        subsidiary:
-          - option: show
-          - class: hint-text
-          - input:
-              name: where-options
-              type: select
-              options:
-                -
-                - School
-                - Place of work
-                - Neighbourhood
-                - Survivor’s home
-                - Perpetrator’s home
-                - Other
-                - I don’t remember / don’t know
-          - text: |
-              Please provide as much detail as you are able – this could be an address, restaurant
-              name, or neighborhood or sights and landmarks you recall.
-          - input:
-              name: details
-              type: textbox
       skip: Skip

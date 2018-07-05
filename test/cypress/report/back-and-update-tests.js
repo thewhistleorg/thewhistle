@@ -193,31 +193,19 @@ describe(`Submit ${org}/${proj} incident report covering various enter-next-back
         cy.visit(`${report}/${org}/${proj}/4`);
 
         // check parameterised question
-        cy.get('h1').contains('Can you indicate where it happened?');
+        cy.get('h1').contains('If you are able, please select where it happened');
 
-        cy.get('#where-details').should('be.visible'); // TODO: TBC
-        // select 'where-at' by clicking within textarea
-        cy.get('#where-details').click();
-        cy.get('#where-at').should('be.checked');
-        cy.get('#where-details').type('Here and there');
+        cy.get('#where-details').should('not.be.visible');
+        cy.get('select[name=where').select('Neighbourhood');
+        cy.get('#where-details').should('be.visible');
+        cy.get('#where-details').type('Around the corner');
         cy.contains('Submit and continue').click(); // next
         cy.get('#nav-prev').click();                // and back
 
         // check 'where-at' is selected
-        cy.get('#where-at').should('be.checked');
+        cy.get('#where').should('have.value', 'Neighbourhood');
         cy.get('#where-details').should('be.visible');
-        cy.get('#where-details').should('have.value', 'Here and there');
-        // select 'where-dont-know'
-        // TODO: FAILS!! cy.get('label').contains('I don’t know').click();
-        // cy.get('#where-dont-know').click({ force: true }); // circumvent input#where-dont-know not visible / being covered by label
-        // cy.get('#where-details').should('not.be.visible');
-        // cy.contains('Submit and continue').click(); // next
-        // cy.get('#nav-prev').click();                // and back
-        //
-        // // check 'where-dont-know' is selected
-        // cy.get('#where-dont-know').should('be.checked');
-        // cy.get('#where-details').should('not.be.visible');
-        // select 'where-skip' and we're done
+        cy.get('#where-details').should('have.value', 'Around the corner');
         cy.get('label').contains('Skip').click();
         cy.contains('Submit and continue').click(); // next
         cy.url().should('include', `/${org}/${proj}/5`);

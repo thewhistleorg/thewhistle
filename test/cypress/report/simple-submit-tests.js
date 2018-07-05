@@ -44,7 +44,8 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
 
         cy.url().should('include', `/${org}/${proj}/4`); // where
         // cy.get('#where label').contains('Location').click();
-        cy.get('textarea[name=where-details]').type('University of Lagos');
+        cy.get('select[name=where]').select('Neighbourhood');
+        cy.get('textarea[name=where-details]').type('Around the corner');
         cy.contains('Submit and continue').click();
 
         cy.url().should('include', `/${org}/${proj}/5`); // who
@@ -106,7 +107,7 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
                 'Survivor age':       '20–24',
                 'Happened':           dateFormat('d mmm yyyy'),
                 'Still happening?':   'Yes',
-                'Where':              'Yes (University of Lagos)',
+                'Where':              'Neighbourhood (Around the corner)',
                 'Who':                'Not known (Big fat guy)',
                 'Description':        'Cypress test '+date,
                 'Applicable':         '—',

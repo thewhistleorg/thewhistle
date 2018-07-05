@@ -32,24 +32,6 @@ router.get(   '/ajax/notifications/debug',         notifications.ajaxListDebug);
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/*  Incident report submission routes                                                             */
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-
-import report from './report.js';
-
-router.get( '/report/:project',               report.getReportEntry);      // render incident report entry page
-router.post('/report/:project',               report.processReportEntry);  // process incident report entry
-router.get( '/report/:project/submit',        report.getReportSubmit);     // render incident report review+submit page
-router.post('/report/:project/submit',        report.processReportSubmit); // process incident report review+submit
-router.get( '/report/:project/:id/confirm',   report.getReportConfirm);    // render incident report confirm page
-
-// ---- ajax routes
-
-router.get('/ajax/report/:db/aliases/new',    report.getNewAlias);         // get newly generated alias
-router.get('/ajax/report/:db/aliases/:alias', report.getAlias);            // get alias details (to check previously used alias does exist)
-
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /*  Reports routes                                                                                */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
@@ -176,19 +158,6 @@ router.get('/resources/:id/edit',    resources.edit);          // render edit re
 router.post('/resources/add',        resources.processAdd);    // process add resource
 router.post('/resources/:id/edit',   resources.processEdit);   // process edit resource
 router.post('/resources/:id/delete', resources.processDelete); // process delete resource
-
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/*  Questions routes (for parameterised report questions)                                         */
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-
-import questions from './questions.js';
-
-router.get(   '/questions',               questions.projects);   // render list of projects
-router.get(   '/questions/:project',      questions.list);       // render questions for given project
-router.post(  '/ajax/questions/:project', questions.ajaxPost);   // add new question
-router.put(   '/ajax/questions/:id',      questions.ajaxPut);    // update question
-router.delete('/ajax/questions/:id',      questions.ajaxDelete); // delete question
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

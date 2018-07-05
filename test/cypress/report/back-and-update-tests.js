@@ -14,7 +14,7 @@ const org = 'grn-test';         // the test organisation for the live ‘grn‘ 
 const proj = 'rape-is-a-crime'; // GRN's only project
 
 
-describe.skip(`Submit ${org}/${proj} incident report covering various enter-next-back-alter combinations`, function () {
+describe(`Submit ${org}/${proj} incident report covering various enter-next-back-alter combinations`, function () {
     const report = 'http://report.thewhistle.local:3000';
     const admin = 'http://admin.thewhistle.local:3000';
 
@@ -41,8 +41,8 @@ describe.skip(`Submit ${org}/${proj} incident report covering various enter-next
 
         // record generated alias
         cy.url().should('include', `/${org}/${proj}/1`);
-        cy.get('output[name=generated-alias]').should('not.be.empty');
-        cy.get('output[name=generated-alias]').then(($alias) => {
+        cy.get('output[name=used-before-generated-alias]').should('not.be.empty');
+        cy.get('output[name=used-before-generated-alias]').then(($alias) => {
             alias = $alias.text(); // record alias to delete report later
             cy.log('alias', alias);
         });
@@ -55,20 +55,20 @@ describe.skip(`Submit ${org}/${proj} incident report covering various enter-next
     it('tests 2: on-behalf-of, survivor-gender/age', function() {
         cy.visit(`${report}/${org}/${proj}/2`);
 
-        // select 'on-behalf-of-myself'
+        // select 'on-behalf-of-self'
         cy.get('label').contains('Myself').click();
         cy.contains('Submit and continue').click(); // next
         cy.get('#nav-prev').click();                // and back
 
-        // check 'on-behalf-of-myself' is selected
-        cy.get('#on-behalf-of-myself').should('be.checked');
+        // check 'on-behalf-of-self' is selected
+        cy.get('#on-behalf-of-self').should('be.checked');
         // select 'someone-else'
         cy.get('label').contains('Someone else').click();
         cy.contains('Submit and continue').click(); // next
         cy.get('#nav-prev').click();                // and back
 
         // check 'someone else' is selected
-        cy.get('#on-behalf-of-someone-else').should('be.checked');
+        cy.get('#on-behalf-of-other').should('be.checked');
 
         // select 'survivor-gender-m'
         cy.get('label').contains('Male').click();
@@ -121,7 +121,7 @@ describe.skip(`Submit ${org}/${proj} incident report covering various enter-next
         // check parameterised question
         cy.get('h1').contains('To start, does your friend remember when this happened or when it began?');
         cy.get('#date\\.day').should('not.be.visible');
-        cy.get('#within-options').should('not.be.visible');
+        cy.get('#when-within-options').should('not.be.visible');
 
         // select 'date'
         cy.get('label').contains('Yes, exactly when it happened').click();
@@ -136,21 +136,21 @@ describe.skip(`Submit ${org}/${proj} incident report covering various enter-next
         cy.get('#date\\.day').should('be.visible');
         cy.get('#date\\.time').should('have.value', '01:00');
         // select 'when-within' = last month
-        cy.get('#within-options').should('not.be.visible');
+        cy.get('#when-within-options').should('not.be.visible');
         cy.get('label').contains('Yes, about when it happened').click();
-        cy.get('#within-options').should('be.visible');
+        cy.get('#when-within-options').should('be.visible');
         cy.get('#date\\.day').should('not.be.visible');
-        cy.get('#within-options').select('last month');
+        cy.get('#when-within-options').select('last month');
         cy.contains('Submit and continue').click(); // next
         cy.get('#nav-prev').click();                // and back
 
-        // check 'when-within' is selected and within-options is 'last month'
+        // check 'when-within' is selected and when-within-options is 'last month'
         cy.get('#when-within').should('be.checked');
-        cy.get('#within-options').should('be.visible');
-        cy.get('#within-options').should('have.value', 'within last month');
+        cy.get('#when-within-options').should('be.visible');
+        cy.get('#when-within-options').should('have.value', 'last month');
         // select 'when-within' = do not remember
         cy.get('label').contains('I do not remember').click();
-        cy.get('#within-options').should('not.be.visible');
+        cy.get('#when-within-options').should('not.be.visible');
         cy.contains('Submit and continue').click(); // next
         cy.get('#nav-prev').click();                // and back
 
@@ -193,31 +193,19 @@ describe.skip(`Submit ${org}/${proj} incident report covering various enter-next
         cy.visit(`${report}/${org}/${proj}/4`);
 
         // check parameterised question
-        cy.get('h1').contains('Do you know anything about where this happened?');
+        cy.get('h1').contains('If you are able, please select where it happened');
 
-        cy.get('#at-address').should('be.visible'); // TODO: TBC
-        // select 'where-at' by clicking within textarea
-        cy.get('#at-address').click();
-        cy.get('#where-at').should('be.checked');
-        cy.get('#at-address').type('Here and there');
+        cy.get('#where-details').should('not.be.visible');
+        cy.get('select[name=where').select('Neighbourhood');
+        cy.get('#where-details').should('be.visible');
+        cy.get('#where-details').type('Around the corner');
         cy.contains('Submit and continue').click(); // next
         cy.get('#nav-prev').click();                // and back
 
         // check 'where-at' is selected
-        cy.get('#where-at').should('be.checked');
-        cy.get('#at-address').should('be.visible');
-        cy.get('#at-address').contains('Here and there');
-        // select 'where-dont-know'
-        // TODO: FAILS!! cy.get('label').contains('I don’t know').click();
-        cy.get('#where-dont-know').click({ force: true }); // circumvent input#where-dont-know not visible / being covered by label
-        cy.get('#at-address').should('not.be.visible');
-        cy.contains('Submit and continue').click(); // next
-        cy.get('#nav-prev').click();                // and back
-
-        // check 'where-dont-know' is selected
-        cy.get('#where-dont-know').should('be.checked');
-        cy.get('#at-address').should('not.be.visible');
-        // select 'where-skip' and we're done
+        cy.get('#where').should('have.value', 'Neighbourhood');
+        cy.get('#where-details').should('be.visible');
+        cy.get('#where-details').should('have.value', 'Around the corner');
         cy.get('label').contains('Skip').click();
         cy.contains('Submit and continue').click(); // next
         cy.url().should('include', `/${org}/${proj}/5`);
@@ -229,7 +217,7 @@ describe.skip(`Submit ${org}/${proj} incident report covering various enter-next
 
         cy.get('#who-relationship').should('not.be.visible');
         // select 'who-y'
-        cy.get('label').contains('Yes').click();
+        cy.get('label').contains('Known').click();
         cy.get('#who-relationship').should('be.visible');
         cy.get('#who-relationship').type('My ex');
         cy.contains('Submit and continue').click(); // next
@@ -266,7 +254,7 @@ describe.skip(`Submit ${org}/${proj} incident report covering various enter-next
         cy.visit(`${report}/${org}/${proj}/6`);
 
         // check parameterised question
-        cy.get('p.hint-text').contains('Try to describe as much of what you know happened as you can.');
+        cy.get('p').contains('Try to describe as much of what you know happened as you can.');
 
         cy.get('#description').should('be.visible');
         cy.get('#description').type('Cypress test '+date);
@@ -332,7 +320,7 @@ describe.skip(`Submit ${org}/${proj} incident report covering various enter-next
         cy.get('input[name=contact-email]').type('help@me.com');
         cy.get('input[name=contact-phone]').type('01234 123456');
 
-        cy.contains('Submit and continue').click(); // next
+        cy.contains('Submit and continue to Resources').click(); // next
         cy.url().should('include', `/${org}/${proj}/whatnext`);
     });
 
@@ -364,35 +352,29 @@ describe.skip(`Submit ${org}/${proj} incident report covering various enter-next
         cy.get('table.js-obj-to-html').then(($table) => {
             const html = `<table>${$table.html()}</table>`; // yucky kludge: how to get html with enclosing element?
             const table = new JSDOM(html).window.document;
-            const ths = table.querySelectorAll('th');
-            const tds = table.querySelectorAll('td');
-            expect(tds.length).to.equal(13);
-            expect(ths[0].textContent).to.equal('Alias');
-            expect(tds[0].textContent).to.equal(alias);
-            expect(ths[1].textContent).to.equal('On behalf of');
-            expect(tds[1].textContent).to.equal('Someone else');
-            expect(ths[2].textContent).to.equal('Survivor gender');
-            expect(tds[2].textContent).to.equal('Skipped');
-            expect(ths[3].textContent).to.equal('Survivor age');
-            expect(tds[3].textContent).to.equal('Skipped');
-            expect(ths[4].textContent).to.equal('Happened');
-            expect(tds[4].textContent).to.equal('Skipped');
-            expect(ths[5].textContent).to.equal('Still happening?');
-            expect(tds[5].textContent).to.equal('Skipped');
-            expect(ths[6].textContent).to.equal('Where');
-            expect(tds[6].textContent).to.equal('Skipped');
-            expect(ths[7].textContent).to.equal('Who');
-            expect(tds[7].textContent).to.equal('Skipped');
-            expect(ths[8].textContent).to.equal('Description');
-            expect(tds[8].textContent).to.equal('Cypress test '+date+',skip'); // TODO: note buggy behaviour! see 2f67a8
-            expect(ths[9].textContent).to.equal('Spoken to anybody?');
-            expect(tds[9].textContent).to.equal('Skipped');
-            expect(ths[10].textContent).to.equal('Extra notes');
-            expect(tds[10].textContent).to.equal('—'); // TODO: broken functionality: no skip
-            expect(ths[11].textContent).to.equal('Contact e-mail');
-            expect(tds[11].textContent).to.equal('help@me.com');
-            expect(ths[12].textContent).to.equal('Contact phone');
-            expect(tds[12].textContent).to.equal('01234 123456');
+            // convert NodeLists to arrays...
+            const ths = Array.from(table.querySelectorAll('th'));
+            const tds = Array.from(table.querySelectorAll('td'));
+            // ... so we can build an easy comparison object
+            const actual = {};
+            for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
+            const expected = {
+                'Alias':              alias,
+                'On behalf of':       'Someone else',
+                'Survivor gender':    'Skip',
+                'Survivor age':       'Skip',
+                'Happened':           'Skip',
+                'Still happening?':   'Skip',
+                'Where':              'Skip',
+                'Who':                'Skip',
+                'Description':        'Cypress test '+date+',Skip', // TODO: note buggy behaviour! see 2f67a8
+                'Applicable':         '—',
+                'Spoken to anybody?': 'Skip',
+                'Extra notes':        '—',                          // TODO: broken functionality: no skip
+                'E-mail address':     'help@me.com',
+                'Phone number':       '01234 123456',
+            };
+            expect(actual).to.deep.equal(expected);
         });
         cy.get('button[name=delete]').click();
         cy.url().should('include', '/reports');

@@ -99,7 +99,8 @@
   "eslintConfig": {
     "env": {
       "es6": true,
-      "mocha": true
+      "mocha": true,
+      "node": true
     },
     "plugins": [
       "promise"

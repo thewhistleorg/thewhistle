@@ -1,113 +1,23 @@
-title: The Whistle / Humans for Rights Network Incident Report
+title: The Whistle / ... Incident Report
 
 version: 1
 
 pages:
-  index:    { $ref: '#/index' }
-  p1:       { $ref: '#/p1' }
-  p2:       { $ref: '#/p2' }
-  whatnext: { $ref: '#/whatnext' }
-
-options:
-  pages:
-    index:
-      prev: false
-      step: false
-      next: false
-    p1:
-      title: The Whistle / Humans for Rights Network Incident Report | 1 – used before?
-      prev: false
-    p2:
-      title: The Whistle / Humans for Rights Network Incident Report | 2 – on behalf of
-      prev: false
-      next: Submit and continue to Resources
-    whatnext:
-      handler: resources
-      method: get
-      prev: false
-      step: false
-      next: false
-
-# --------------------------------------------------------------------------------------------------
+  index: { $ref: '#/index' }
+  p1:    { $ref: '#/p1' }
 
 index:
-
-  - flash:
-      type: standard
-
   - text: |
-      # Before you start...
-
-      This is a safe and anonymous way to report something that has happened to you or someone you
-      know.
-      - You are free to tell us as little or as much as you are comfortable with.
-      - Your report will only be seen by staff and volunteers of Humans for Rights Network assessing
-        the report.
-
-  - input:
-      name: nav-next
-      label: false
-      type: button
-      value: next
-      text: Get started
-      class: g-recaptcha pure-button pure-button-primary
-      data:
-        sitekey: 6LcGDEoUAAAAAJncM3PrcxHU3Whz5TjWpMPVbu--
-        callback: reCaptchaSubmitCallback
-      accesskey: g
-
-# --------------------------------------------------------------------------------------------------
+      # ...
+  - sms-text:
 
 p1:
-
-  - text: |
-      # Have you used this anonymous reporting service before?
-
-  - input:
-      name: used-before
-      label: Used before?
-      type: radio
-      options:
-        y:
-          label: Yes
-          subsidiary:
-            - input:
-                name: existing-alias
-                type: text
-                label: Enter your anonymous alias
-            - html: |
-                <span id="alias-ok" title="alias available" class="alias-available hide">✓</span>
-                <span id="alias-nok" title="alias not available" class="alias-available hide">✗</span>
-        n:
-          label: No
-          attributes: checked
-          subsidiary:
-            - option: show
-            - text: |
-                We make sure that your report is anonymous by creating a random identification alias.
-                If you want to follow up, use the anonymous alias below so we can access any relevant
-                information.
-            - html: |
-                <p>This report will use
-                  <b><output name="used-before-generated-alias">{{generated-alias}}</output></b></p>
-            - input:
-                type: hidden
-                name: generated-alias
-                value: {{generated-alias}}
-            - input:
-                type: button
-                name: get-alt-alias
-                class: inline-link
-                text: Generate another random alias
-
-p2:
-
   - text: |
       # Please ask the interviewee if they consent to audio recording the interview, was consent given?
 
   - input:
       name: audio-consent
-      label: Consent to record?
+      label: Alias
       type: radio
       options:
           y: Yes
@@ -120,8 +30,7 @@ p2:
       name: name-author
       type: text
       required: true
-      placeholder: Name of person filling out form
-      label: Name of person filling out form
+      placeholder: Name
 
   - text: |
       # Organisation
@@ -130,7 +39,6 @@ p2:
       name: organisation
       type: text
       placeholder: Organisation
-      label: Organisation
 
   - text: |
       # Group/Organisation Reference
@@ -138,8 +46,7 @@ p2:
   - input:
       name: organisation-reference
       type: text
-      placeholder: Organisation reference
-      label: Organisation reference
+      placeholder: Organisation
 
   - text: |
       # Contact Details (Interviewer - phone, email etc)
@@ -147,8 +54,7 @@ p2:
   - input:
       name: contact-details
       type: text
-      placeholder: Contact details
-      label: Contact details
+      placeholder: Organisation
 
   - text: |
       # Name of person giving statement - Please enter "anon" if they do not want to give their name
@@ -156,8 +62,7 @@ p2:
   - input:
       name: name-statement
       type: text
-      placeholder: Name of person giving statement
-      label: Name of person giving statement
+      placeholder: Organisation
 
   - text: |
       # What date did the incident occur?
@@ -166,7 +71,6 @@ p2:
       name: date-incident
       type: library-date
       required: true
-      label: Incident date
 
   - text: |
       # Time of incident (Approximate if you are unsure)
@@ -175,14 +79,12 @@ p2:
       name: time-incident
       type: library-24hours
       required: true
-      label: Incident time
 
   - text: |
       # Where did the event occur? If possible please include address/gps coordinates or dropped pin.
 
   - input:
       name: location-incident
-      label: Location
       type: text
 
   - text: |
@@ -202,7 +104,6 @@ p2:
 
   - input:
       name: detailed-statement
-      label: Description
       type: textbox
       required: true
 
@@ -268,7 +169,7 @@ p2:
 
   - input:
       name: incident-reported
-      label: Reported?
+      label: Alias
       type: radio
       required: true
       options:
@@ -280,7 +181,7 @@ p2:
 
   - input:
       name: medical-attention
-      label: Medical attention required?
+      label: Alias
       type: radio
       required: true
       options:
@@ -305,7 +206,7 @@ p2:
 
   - input:
       name: contact-consent
-      label: Consent to being contacted?
+      label: Alias
       type: radio
       required: true
       options:
@@ -317,7 +218,7 @@ p2:
 
   - input:
       name: testimony-consent
-      label: Consent to media testimony?
+      label: Alias
       type: radio
       required: true
       options:
@@ -329,17 +230,8 @@ p2:
 
   - input:
       name: dpa-consent
-      label: Consent to information?
+      label: Alias
       type: radio
       required: true
       options:
           y: Yes
-
-# --------------------------------------------------------------------------------------------------
-
-whatnext:
-
-  - text:
-      wrap: h1
-      class: banner
-      text: ✔ We’ve received your report

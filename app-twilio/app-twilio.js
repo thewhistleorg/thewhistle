@@ -5,14 +5,17 @@ import serve          from 'koa-static';
 import dotProp        from 'dot-prop';
 import Report         from '../models/report.js';
 import autoIdentifier from '../lib/auto-identifier.js';
-
+import Db             from '../lib/db.js';
+import { ObjectId }   from 'mongodb';
 
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 const app = new Koa();
 const router = new Router();
+const yamlFile = 'public/spec/hfrn/hfrn-en.yaml';
+const db = 'hfrn-test'; //TODO: Make class and use value from the class?
 const spec = async () => {
     //Set spec to object containing yaml specifications
-    return await $RefParser.dereference('http://e1a5f067.ngrok.io/spec/grn/rape-is-a-crime.yaml'); //TODO: change this to relative URL?
+    return await $RefParser.dereference(yamlFile);
 };
 
 
@@ -26,7 +29,21 @@ const spec = async () => {
  * @returns {string}   Field name as it appears in the database
  */
 function getField(questions, questionNo) {
-    return ''; //TODO: Implement this
+    console.log('NONO', questionNo, questions);
+    return questions[questionNo].label;
+}
+
+
+/**
+ * Gets the initial SMS to send from the YAML specification file
+ *
+ * @returns {string} - Initial SMS to send
+ */
+async function getInitialSms() {
+    const specifications = await spec(); //TODO: Get initial SMS from YAML
+    const initialSms = 'Welcome to The Whistle SMS Reporting. Reply HELP at any time';
+    global.initialSms = initialSms;
+    return initialSms;
 }
 
 
@@ -40,17 +57,34 @@ function getField(questions, questionNo) {
  * @returns {string}   Randomly generated alias
  */
 async function initiateSmsReport(ctx, twiml) {
-    const org = 'grn'; //TODO: Make class and use value from the class?
-    const project = 'rape-is-a-crime'; //TODO: Make class and use value from the class?
+    const org = 'hfrn-test'; //TODO: Make class and use value from the class?
+    const project = 'hfrn'; //TODO: Make class and use value from the class?
     const alias = await autoIdentifier();
     const version = 0; // TODO: Work out what this should be - undefined in web form
     //Adds skeleton report to the database
     const sessionID = await Report.submissionStart(org, project, alias, version, ctx.headers['user-agent']);
     ctx.cookies.set('sessionID', sessionID, { httpOnly: false });
-    ctx.cookies.set('nextQuestion', 1, { httpOnly: false });
+    console.log('ID', sessionID);
+    //ctx.cookies.set('nextQuestion', 1, { httpOnly: false });
+    //Get initial SMS text
+    const initialSms = global.initialSms ? global.initialSms : await getInitialSms();
     //Send user initial SMS
-    twiml.message('START REPORT. Reply HELP at any time.'); //TODO: Improve initial SMS
+    console.log(initialSms);
+    twiml.message(alias + '---' + initialSms); //TODO: Improve initial SMS
     return alias;
+}
+
+
+async function setupDatabase() {
+    // set up database connection: relationship between Twilio and organisation/project would have to be
+    // considered if we were to use this app; perhaps it will be consumed into the textit app or
+    // something... for now we'll just hardwire the grn-test db
+    console.log('Connecting...');
+    try {
+        await Db.connect(db);
+    } catch (e) {
+        console.error(e.message);
+    }
 }
 
 
@@ -63,11 +97,26 @@ async function initiateSmsReport(ctx, twiml) {
  * @param   {string}   input - User's response to the relevant question
  */
 async function updateResponse(ctx, questions, questionNo, input) {
-    const db = 'grn'; //TODO: Make class and use value from the class?
+    if (!global.db[db]) {
+        await setupDatabase();
+    }
     const reports = global.db[db].collection('reports');
     const sessionID = ctx.cookies.get('sessionID');
-    const field = getField(questions, questionNo - 1);
-    await reports.updateOne({ _id: sessionID }, { $set: { [`submitted.${field}`]: input } });
+    const field = getField(questions, questionNo);
+    console.log('id', sessionID, field, input);
+    try {
+        await reports.updateOne(
+            { _id: ObjectId(sessionID) },
+            { $set: { [`submitted.${field}`]: input } }
+        );
+        console.log(
+            { _id: ObjectId(sessionID) },
+            { $set: { [`submitted.${field}`]: input } }
+        );
+    } catch (e) {
+        console.log(e);
+    }
+    console.log('UPDATED');
 }
 
 /**
@@ -78,14 +127,15 @@ async function updateResponse(ctx, questions, questionNo, input) {
 async function generateSmsQuestions() {
     //TODO: Edit this to work with generic yaml specifications (at least for hfrn)
     const specifications = await spec();
-    let t = '';
     const questions = [];
-    for (const p in specifications.pages) {
-        for (const i in dotProp.get(specifications, `pages.${p}`)) {
-            t = dotProp.get(specifications, `pages.${p}`)[i].text;
-            if (t != undefined && typeof t === 'string' && t.startsWith('#') && !t.startsWith('##')) {
-                questions.push(t);
-            }
+    const re = new RegExp('^p[0-9]+$');
+    const pages = Object.keys(specifications.pages).filter(key => re.test(key));
+    for (let p = 0; p < pages.length; p++) {
+        for (let i = 0; i < specifications[pages[p]].length; i += 2) {
+            questions.push({
+                'question': specifications[pages[p]][i].text.substr(2), 
+                'label':    specifications[pages[p]][i + 1].input.label, //TODO: Make this label
+            });
         }
     }
     global.smsQuestions = questions;
@@ -102,8 +152,9 @@ async function generateSmsQuestions() {
  * @param   {number}   questionNo - Index of the relevant question
  */
 function sendNextQuestion(ctx, twiml, questions, nextQuestion) {
-    const message = questions[nextQuestion];
-    ctx.cookies.set('nextQuestion', nextQuestion + 1, { httpOnly: false });
+    console.log('Next', nextQuestion);
+    const message = questions[nextQuestion].question;
+    ctx.cookies.set('nextQuestion', Number(nextQuestion) + 1, { httpOnly: false });
     twiml.message(message);
 }
 
@@ -111,12 +162,13 @@ function sendNextQuestion(ctx, twiml, questions, nextQuestion) {
 app.use(serve('public', { maxage: 1000*60*60*24 }));
 
 
-router.get('/sms', async (ctx) => {
+router.post('/sms', async (ctx) => {
     //Get user's text
     const incomingSms = ctx.request.body.Body;
     const twiml = new MessagingResponse();
     //Load questions from memory if they exist, else generate them and store in memory
-    const questions = global.smsQuestions ? global.smsQuestions : await generateSmsQuestions();
+    //const questions = global.smsQuestions ? global.smsQuestions : await generateSmsQuestions();
+    const questions = await generateSmsQuestions();
     //TODO: Get alias properly
     let alias = '';
     switch (incomingSms) {
@@ -125,20 +177,23 @@ router.get('/sms', async (ctx) => {
             twiml.message('HELP text');
             break;
         default:
-            let nextQuestion = 1;
+            console.log('default');
+            let nextQuestion = 0;
             if (!ctx.cookies.get('nextQuestion')) {
+                console.log('cook');
                 //If this is the first SMS in a new report
                 //Initiate the report
                 //TODO: Should we use the user's text in their first message for anything?
                 alias = await initiateSmsReport(ctx, twiml);
             } else {
+                console.log('coooook');
                 //If the report has already been started
                 //Establish the stage of the report
                 nextQuestion = ctx.cookies.get('nextQuestion');
                 //Update database with the user's response
                 await updateResponse(ctx, questions, nextQuestion - 1, incomingSms);
             }
-            sendNextQuestion();
+            sendNextQuestion(ctx, twiml, questions, nextQuestion);
     }
     
     ctx.status = 200;

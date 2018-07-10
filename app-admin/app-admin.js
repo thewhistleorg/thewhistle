@@ -47,7 +47,7 @@ app.use(serve('public', { maxage: maxage }));
 
 // log requests (excluding static files, into capped collection)
 app.use(async function logAccess(ctx, next) {
-    debug(ctx.method.padEnd(4) + ' ' + ctx.url);
+    if (ctx.url != '/ajax/notifications/last-update') debug(ctx.method.padEnd(4) + ' ' + ctx.url);
     const t1 = Date.now();
     await next();
     const t2 = Date.now();

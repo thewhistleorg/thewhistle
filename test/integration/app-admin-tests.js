@@ -256,7 +256,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const response = await appReport.get(`/${org}/no-such-project/*`);
             expect(response.status).to.equal(404);
             const document = new JSDOM(response.text).window.document;
-            expect(document.querySelector('p').textContent).to.match(/Form spec http:\/\/report.thewhistle.local:\d+\/spec\/grn-test\/no-such-project not found./);
+            expect(document.querySelector('p').textContent).to.match(/Form spec grn-test\/no-such-project not found./);
         });
 
         it('enters incident report', async function() {

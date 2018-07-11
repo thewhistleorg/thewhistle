@@ -2,6 +2,7 @@ import $RefParser     from 'json-schema-ref-parser';
 import Report         from '../models/report.js';
 import autoIdentifier from '../lib/auto-identifier.js';
 import Db             from '../lib/db.js';
+import { ObjectId }   from 'mongodb';
 
 class SmsApp {
     
@@ -61,7 +62,7 @@ class SmsApp {
     getInitialSms() {
         //TODO: Get initial SMS from this.spec
         const initialSms = 'Welcome to The Whistle SMS Reporting. Reply HELP at any time';
-        this.initialSms = initialSms;
+        this.initialSms = initialSms; //TODO: sort use of globals
     }
 
     /**
@@ -75,15 +76,13 @@ class SmsApp {
      */
     async initiateSmsReport(ctx, twiml) {
         const alias = await autoIdentifier();
-        const version = this.spec.version;
+        const version = 0; // TODO: Get this from yaml
         //Adds skeleton report to the database
         const sessionId = await Report.submissionStart(this.org, this.project, alias, version, ctx.headers['user-agent']);
         ctx.cookies.set('sessionId', sessionId, { httpOnly: false });
+        //Get initial SMS text
         //Send user initial SMS
-        twiml.message({
-            action: '/delete-outbound',
-            method: 'POST',
-        }, alias + '---' + this.initialSms);
+        twiml.message(alias + '---' + this.initialSms); //TODO: Improve initial SMS
         return alias;
     }
 
@@ -109,10 +108,14 @@ class SmsApp {
      */
     async updateResponse(ctx, questionNo, input) {
         await this.setupDatabase();
+        const reports = global.db[this.db].collection('reports');
         const sessionId = ctx.cookies.get('sessionId');
         const field = this.getField(questionNo);
         try {
-            Report.updateField(this.db, sessionId, field, input);
+            await reports.updateOne(
+                { _id: ObjectId(sessionId) },
+                { $set: { [`submitted.${field}`]: input } }
+            );
         } catch (e) {
             console.error(e);
         }
@@ -124,10 +127,8 @@ class SmsApp {
     generateSmsQuestions() {
         this.questions = [];
         const re = new RegExp('^p[0-9]+$');
-        //Set pages list to all pages given in the .yaml specifications
         const pages = Object.keys(this.spec.pages).filter(key => re.test(key));
         for (let p = 0; p < pages.length; p++) {
-            //For each text/input combination on a page
             for (let i = 0; i < this.spec[pages[p]].length; i += 2) {
                 this.questions.push({
                     'question': this.spec[pages[p]][i].text.substr(2), 
@@ -147,28 +148,8 @@ class SmsApp {
      */
     sendNextQuestion(ctx, twiml, nextQuestion) {
         const message = this.questions[nextQuestion].question;
-        let next = 0;
-        if (Number(nextQuestion) + 1 < Number(this.questions.length)) {
-            next = Number(nextQuestion) + 1;
-        }
-        ctx.cookies.set('nextQuestion', next, { httpOnly: false });
-        twiml.message({
-            action: '/delete-outbound',
-            method: 'POST',
-        }, message);
-    }
-
-
-    static deleteMessage(messageId) {
-        const accountId = 'AC5da0166da2047a8e4d3b3709982ebaae';
-        const authToken = '0c34505d5eff527a6b67038b9b7f4a11';
-        const client = require('twilio')(accountId, authToken);
-        client.messages(messageId)
-            .remove()
-            .catch(() => {
-                setTimeout(() => SmsApp.deleteMessage(messageId), 1000);
-            })
-            .done();
+        ctx.cookies.set('nextQuestion', Number(nextQuestion) + 1, { httpOnly: false });
+        twiml.message(message);
     }
 
     /**
@@ -182,23 +163,17 @@ class SmsApp {
         const twiml = new this.MessagingResponse();
         //TODO: Get alias properly
         let alias = '';
-        let nextQuestion = 0;
-        switch (incomingSms.toLowerCase()) {
-            case 'help':
+        switch (incomingSms) {
+            case 'HELP':
                 //TODO: Handle action texts properly
-                twiml.message({
-                    action: '/delete-outbound',
-                    method: 'POST',
-                }, 'HELP text');
-                break;
-            case 'start':
-                alias = await this.initiateSmsReport(ctx, twiml);
-                this.sendNextQuestion(ctx, twiml, nextQuestion);
+                twiml.message('HELP text');
                 break;
             default:
+                let nextQuestion = 0;
                 if (!ctx.cookies.get('nextQuestion')) {
                     //If this is the first SMS in a new report
                     //Initiate the report
+                    //TODO: Should we use the user's text in their first message for anything?
                     alias = await this.initiateSmsReport(ctx, twiml); //TODO: Make sure texts are sent in order
                 } else {
                     //If the report has already been started
@@ -213,7 +188,6 @@ class SmsApp {
         ctx.status = 200;
         ctx.headers['Content-Type'] = 'text/xml';
         ctx.body = twiml.toString();
-        SmsApp.deleteMessage(ctx.request.body.MessageSid);
     }
 }
 

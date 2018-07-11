@@ -62,7 +62,7 @@ class SmsApp {
     getInitialSms() {
         //TODO: Get initial SMS from this.spec
         const initialSms = 'Welcome to The Whistle SMS Reporting. Reply HELP at any time';
-        this.initialSms = initialSms; //TODO: sort use of globals
+        this.initialSms = initialSms;
     }
 
     /**
@@ -76,13 +76,12 @@ class SmsApp {
      */
     async initiateSmsReport(ctx, twiml) {
         const alias = await autoIdentifier();
-        const version = 0; // TODO: Get this from yaml
+        const version = this.spec.version;
         //Adds skeleton report to the database
         const sessionId = await Report.submissionStart(this.org, this.project, alias, version, ctx.headers['user-agent']);
         ctx.cookies.set('sessionId', sessionId, { httpOnly: false });
-        //Get initial SMS text
         //Send user initial SMS
-        twiml.message(alias + '---' + this.initialSms); //TODO: Improve initial SMS
+        twiml.message(alias + '---' + this.initialSms);
         return alias;
     }
 
@@ -127,8 +126,10 @@ class SmsApp {
     generateSmsQuestions() {
         this.questions = [];
         const re = new RegExp('^p[0-9]+$');
+        //Set pages list to all pages given in the .yaml specifications
         const pages = Object.keys(this.spec.pages).filter(key => re.test(key));
         for (let p = 0; p < pages.length; p++) {
+            //For each text/input combination on a page
             for (let i = 0; i < this.spec[pages[p]].length; i += 2) {
                 this.questions.push({
                     'question': this.spec[pages[p]][i].text.substr(2), 
@@ -148,7 +149,11 @@ class SmsApp {
      */
     sendNextQuestion(ctx, twiml, nextQuestion) {
         const message = this.questions[nextQuestion].question;
-        ctx.cookies.set('nextQuestion', Number(nextQuestion) + 1, { httpOnly: false });
+        const date = new Date();
+        if (Number(nextQuestion) + 1 < Number(this.questions.length)) {
+            date.setSeconds(date.getSeconds() + 60 * 60 * 24 * 7);
+        }
+        ctx.cookies.set('nextQuestion', Number(nextQuestion) + 1, { httpOnly: false, expires: date });
         twiml.message(message);
     }
 
@@ -163,17 +168,20 @@ class SmsApp {
         const twiml = new this.MessagingResponse();
         //TODO: Get alias properly
         let alias = '';
-        switch (incomingSms) {
-            case 'HELP':
+        let nextQuestion = 0;
+        switch (incomingSms.toLowerCase()) {
+            case 'help':
                 //TODO: Handle action texts properly
                 twiml.message('HELP text');
                 break;
+            case 'start':
+                alias = await this.initiateSmsReport(ctx, twiml);
+                this.sendNextQuestion(ctx, twiml, nextQuestion);
+                break;
             default:
-                let nextQuestion = 0;
                 if (!ctx.cookies.get('nextQuestion')) {
                     //If this is the first SMS in a new report
                     //Initiate the report
-                    //TODO: Should we use the user's text in their first message for anything?
                     alias = await this.initiateSmsReport(ctx, twiml); //TODO: Make sure texts are sent in order
                 } else {
                     //If the report has already been started

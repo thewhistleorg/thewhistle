@@ -360,6 +360,7 @@ class Dev {
         for (const month in counts) {
             for (const project in counts[month]) {
                 const completionTimes = counts[month][project].completionTimes;
+                if (completionTimes.length == 0) continue; // TODO: why is it possible to get an empty array?
                 const times = {
                     min: dateFormat(completionTimes.reduce((prev, curr) => Math.min(prev, curr)), 'HH:MM:ss'),
                     max: dateFormat(completionTimes.reduce((prev, curr) => Math.max(prev, curr)), 'HH:MM:ss'),

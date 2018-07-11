@@ -187,11 +187,7 @@ app.use(async function generateForms(ctx, next) {
 
     if (!global.built[org+project] && org && project && org!='spec' && org!='ajax' && org!='test-grn') {
         try {
-            // form specs may be hosted by organisations - if so, the location (which will get
-            // suffixed by '/<org>') will be taken from environment variable RPT_ORG_NAME; otherwise
-            // it will be e.g. report.thewhistle.org/spec
-            const rptLocation = process.env[`RPT_${org.toUpperCase().replace('-', '_')}`];
-            await FormGenerator.build(rptLocation || ctx.origin+'/spec', org, project);
+            await FormGenerator.build(org, project);
         } catch (e) {
             if (e.status == 404) ctx.throw(404, e.message);
             if (e.status == 410) ctx.throw(410, e.message); // form build failed

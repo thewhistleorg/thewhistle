@@ -1,0 +1,195 @@
+import $RefParser     from 'json-schema-ref-parser';
+import Report         from '../models/report.js';
+import autoIdentifier from '../lib/auto-identifier.js';
+import Db             from '../lib/db.js';
+import { ObjectId }   from 'mongodb';
+
+class SmsApp {
+    
+    
+    /**
+     * Sets up SMS app for a given organisation/project combination
+     *
+     * @param   {string}   org - Organisation name
+     * @param   {string}   project - Project name
+     * @returns {Object}   SMS app object
+     */    
+    constructor(org, project) {
+        this.MessagingResponse = require('twilio').twiml.MessagingResponse;
+        this.db = org;
+        this.yamlFile = 'public/spec/' + org.replace('-test', '') + '/' + project + '.yaml';
+        this.org = org;
+        this.project = project;
+    }
+
+
+    /**
+     * Sets this.spec by parsing the .yaml file
+     */
+    async getSpecifications() {
+        //Set this.spec to object containing yaml specifications
+        this.spec = await $RefParser.dereference(this.yamlFile);
+    }
+
+
+    /**
+     * Parses the .yaml specifications, then sets this.spec, this.initialSms
+     * and this.questions using the specifications.
+     */
+    async parseSpecifications() {
+        await this.getSpecifications();
+        this.getInitialSms();
+        this.generateSmsQuestions();
+    }
+
+
+    /**
+     * Returns the name of a particular field in the database.
+     *
+     * Uses the form's given questions and the given questionNo to return field
+     *
+     * @param   {number}   questionNo - Question number to return
+     * @returns {string}   Field name as it appears in the database
+     */
+    getField(questionNo) {
+        return this.questions[questionNo].label;
+    }
+
+
+    /**
+     * Gets the initial SMS to send from the YAML specification file
+     */
+    getInitialSms() {
+        //TODO: Get initial SMS from this.spec
+        const initialSms = 'Welcome to The Whistle SMS Reporting. Reply HELP at any time';
+        this.initialSms = initialSms; //TODO: sort use of globals
+    }
+
+    /**
+     * Carries out the necessary steps to start an SMS report
+     *
+     * Generates alias, sets cookies, and sends initial text
+     *
+     * @param   {Object}   ctx
+     * @param   {number}   twiml
+     * @returns {string}   Randomly generated alias
+     */
+    async initiateSmsReport(ctx, twiml) {
+        const alias = await autoIdentifier();
+        const version = 0; // TODO: Get this from yaml
+        //Adds skeleton report to the database
+        const sessionId = await Report.submissionStart(this.org, this.project, alias, version, ctx.headers['user-agent']);
+        ctx.cookies.set('sessionId', sessionId, { httpOnly: false });
+        //Get initial SMS text
+        //Send user initial SMS
+        twiml.message(alias + '---' + this.initialSms); //TODO: Improve initial SMS
+        return alias;
+    }
+
+
+    /**
+     * Setup the database connection
+     */
+    async setupDatabase() {
+        try {
+            await Db.connect(this.db);
+        } catch (e) {
+            console.error(e.message);
+        }
+    }
+
+
+    /**
+     * Updates the appropriate database with a user's response
+     *
+     * @param   {Object}   ctx
+     * @param   {number}   questionNo - Index of the relevant question
+     * @param   {string}   input - User's response to the relevant question
+     */
+    async updateResponse(ctx, questionNo, input) {
+        await this.setupDatabase();
+        const reports = global.db[this.db].collection('reports');
+        const sessionId = ctx.cookies.get('sessionId');
+        const field = this.getField(questionNo);
+        try {
+            await reports.updateOne(
+                { _id: ObjectId(sessionId) },
+                { $set: { [`submitted.${field}`]: input } }
+            );
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    /**
+     * Gets the questions from the yaml specifications
+     */
+    generateSmsQuestions() {
+        this.questions = [];
+        const re = new RegExp('^p[0-9]+$');
+        const pages = Object.keys(this.spec.pages).filter(key => re.test(key));
+        for (let p = 0; p < pages.length; p++) {
+            for (let i = 0; i < this.spec[pages[p]].length; i += 2) {
+                this.questions.push({
+                    'question': this.spec[pages[p]][i].text.substr(2), 
+                    'label':    this.spec[pages[p]][i + 1].input.label,
+                });
+            }
+        }
+    }
+
+
+    /**
+     * Sends the user a text with the next question
+     * 
+     * @param   {Object}   ctx
+     * @param   {Object}   twiml
+     * @param   {number}   questionNo - Index of the relevant question
+     */
+    sendNextQuestion(ctx, twiml, nextQuestion) {
+        const message = this.questions[nextQuestion].question;
+        ctx.cookies.set('nextQuestion', Number(nextQuestion) + 1, { httpOnly: false });
+        twiml.message(message);
+    }
+
+    /**
+     * Runs when a user sends an SMS
+     * 
+     * @param   {Object}   ctx
+     */
+    async receiveText(ctx) {
+        //Get user's text
+        const incomingSms = ctx.request.body.Body;
+        const twiml = new this.MessagingResponse();
+        //TODO: Get alias properly
+        let alias = '';
+        switch (incomingSms) {
+            case 'HELP':
+                //TODO: Handle action texts properly
+                twiml.message('HELP text');
+                break;
+            default:
+                let nextQuestion = 0;
+                if (!ctx.cookies.get('nextQuestion')) {
+                    //If this is the first SMS in a new report
+                    //Initiate the report
+                    //TODO: Should we use the user's text in their first message for anything?
+                    alias = await this.initiateSmsReport(ctx, twiml); //TODO: Make sure texts are sent in order
+                } else {
+                    //If the report has already been started
+                    //Establish the stage of the report
+                    nextQuestion = ctx.cookies.get('nextQuestion');
+                    //Update database with the user's response
+                    await this.updateResponse(ctx, nextQuestion - 1, incomingSms);
+                }
+                this.sendNextQuestion(ctx, twiml, nextQuestion);
+        }
+        
+        ctx.status = 200;
+        ctx.headers['Content-Type'] = 'text/xml';
+        ctx.body = twiml.toString();
+    }
+}
+
+
+export default SmsApp;

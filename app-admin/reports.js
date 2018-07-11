@@ -62,8 +62,6 @@ class ReportsHandlers {
 
         const reports = [];
         for (const rpt of rpts) {
-            console.log(rpt._id, rpt.alias);
-            console.log(rpt.submitted);
             const lastUpdate = await Update.lastForReport(db, rpt._id);
             const lastViewed = rpt.views[ctx.state.user.id];
 

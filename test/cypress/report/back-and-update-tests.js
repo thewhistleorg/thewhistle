@@ -55,19 +55,17 @@ describe(`Submit ${org}/${proj} incident report covering various enter-next-back
     it('tests 2: on-behalf-of, survivor-gender/age', function() {
         cy.visit(`${report}/${org}/${proj}/2`);
 
-        // select 'on-behalf-of-self'
-        cy.get('label').contains('Myself').click();
-        cy.contains('Submit and continue').click(); // next
-        cy.get('#nav-prev').click();                // and back
-
-        // check 'on-behalf-of-self' is selected
+        // check 'on-behalf-of-self' is default
         cy.get('#on-behalf-of-self').should('be.checked');
-        // select 'someone-else'
+        cy.get('[data-on-behalf-of]').contains('If you are able, please provide your age and gender.');
+
+        // select 'on-behalf-of-other' and check text is updated
         cy.get('label').contains('Someone else').click();
+        cy.get('[data-on-behalf-of]').contains('If you are able, please enter your friend’s age and gender.');
         cy.contains('Submit and continue').click(); // next
         cy.get('#nav-prev').click();                // and back
 
-        // check 'someone else' is selected
+        // check 'on-behalf-of-other' is selected
         cy.get('#on-behalf-of-other').should('be.checked');
 
         // select 'survivor-gender-m'

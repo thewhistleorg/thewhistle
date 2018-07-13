@@ -14,9 +14,9 @@
             attributes: checked
         other: Someone else
 
-- text: |
-     If you are able, please provide your age and gender (or if reporting for someone else, their
-     age and gender).
+- text:
+    on-behalf-of:Myself:       If you are able, please provide your age and gender.
+    on-behalf-of:Someone else: If you are able, please enter your friend’s age and gender.
 
 - text: '### Gender'
 

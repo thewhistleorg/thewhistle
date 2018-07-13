@@ -203,11 +203,14 @@ class Handlers {
             hours:  Array(24).fill(null).map((d, i) => i.toString().padStart(2, '0')+':00'),
         };
 
-        // progress indicator
+        // record 'steps' for progress indicator
         const steps = global.forms[`${org}/${project}`].steps;
         if (page != '+') steps[page].class = 'current'; // to highlight current page
 
-        const context = Object.assign({ steps: steps }, submitted, { incidentDate: incidentDate });
+        // record 'defaults' for default selections (for alternate texts)
+        const defaults = global.forms[`${org}/${project}`].defaults;
+
+        const context = Object.assign({ steps: steps }, defaults, submitted, { incidentDate: incidentDate });
 
         // users are not allowed to go 'back' to 'used-before' page
         if (page==1 && ctx.session.saved) { ctx.flash = { error: 'Please continue with your current alias' }; return ctx.redirect(`/${org}/${project}/2`); }

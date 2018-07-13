@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // set up listeners to show current subsidiary and hide others
         for (i=0; i<inputs.length; i++) {
-            inputs[i].onchange = function() {
+            inputs[i].addEventListener('change', function() { // note cannot simply assign to .onchange due to alternate texts listener
                 // 'this' is changed element
                 var sub = this.parentElement.querySelector('.subsidiary'); // subsidiary within same <li>
                 // show current input's subsidiary, if any - unless it's a checked checkbox, in
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     var otherSelects = document.querySelectorAll('select[name='+inputName+']');
                     otherSelects.forEach(function(s) { s.value = ''; });
                 }
-            };
+            });
 
             // if a subsidiary is initially displayed, setting focus to an input within that
             // subsidiary should select the option the subsidiary belongs to (eg 'where')
@@ -107,10 +107,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // set visibility defaults for previously answered questions
         for (i=0; i<inputs.length; i++) {
-            if (inputs[i].type=='select-one') inputs[i].onchange(); // show/hide select subsidiary (note 'select-one')
-            if (inputs[i].checked) inputs[i].onchange();            // show radio/checkbox subsidiary
+            // note cannot simply invoke onchange() as listeners were set up with addEventListener()
+            if (inputs[i].type=='select-one') inputs[i].dispatchEvent(new Event('change')); // show/hide select subsidiary (note 'select-one')
+            if (inputs[i].checked) inputs[i].dispatchEvent(new Event('change'));            // show radio/checkbox subsidiary
         }
     }
+
+
+    // handle radio buttons which might be determining alternate texts
+    document.querySelectorAll('input[type=radio]').forEach(function(input) {
+        input.addEventListener('change', function() { // note cannot simply assign to .onchange due to visibility listener
+            const altTexts = document.querySelectorAll(`[data-${this.name}]`);
+            const altTextsShow = document.querySelectorAll(`[data-${this.name}][data-${this.name}="${this.value}"]`);
+            const altTextsHide = document.querySelectorAll(`[data-${this.name}]:not([data-${this.name}="${this.value}"])`);
+            altTextsShow.forEach(function (el) { el.classList.remove('hide'); el.classList.add('show'); });
+            altTextsHide.forEach(function (el) { el.classList.remove('show'); el.classList.add('hide'); });
+        });
+    });
 
 
     /*
@@ -169,10 +182,10 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         // listener to check #used-before-y if existing-alias entered
-        document.querySelector('input[name=used-before-existing-alias]').onchange = function() {
+        document.querySelector('input[name=used-before-existing-alias]').addEventListener('change', function() {
             document.querySelector('#used-before-y').checked = this.value != '';
             document.querySelector('#use-generated').classList.add('hide');
-        };
+        });
 
         // check entered existing alias letter-by-letter
         document.querySelector('input[name=used-before-existing-alias]').oninput = function() {

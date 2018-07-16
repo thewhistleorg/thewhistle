@@ -17,7 +17,7 @@ router.post('/:database/:project/login', adminLogin.postLogin);
 
 // redirect /test-grn/sexual-assault to /grn/rape-is-a-crime; GRN launched /test-grn/sexual-assault
 // as the reporting URL, but this has now been corrected to /grn/rape-is-a-crime
-router.get( '/test-grn/sexual-assault', ctx => ctx.redirect('/grn/rape-is-a-crime'));
+router.get( '/test-grn/sexual-assault', ctx => ctx.response.redirect('/grn/rape-is-a-crime'));
 
 router.get( '/',                           handlers.getHomePage);   // home page
 router.get( '/:database/:project/rebuild', handlers.rebuild);       // rebuild report from spec

@@ -27,15 +27,15 @@ class NotificationsHandlers {
 
         try {
             const timestamp = await Notification.lastUpdate(db);
-            ctx.status = 200; // Ok
-            ctx.body = { timestamp: timestamp };
+            ctx.response.status = 200; // Ok
+            ctx.response.body = { timestamp: timestamp };
         } catch (e) {
-            ctx.status = 500; // Internal Server Error
-            ctx.body = e;
+            ctx.response.status = 500; // Internal Server Error
+            ctx.response.body = e;
             await Log.error(ctx, e);
         }
-        ctx.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-        ctx.body.root = 'notifications';
+        ctx.response.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        ctx.response.body.root = 'notifications';
     }
 
 
@@ -75,15 +75,15 @@ class NotificationsHandlers {
                 notifications.events[event] = eventNotifications.map(notificn => notificn.report);
                 notifications.count += notifications.events[event].length;
             }
-            ctx.status = 200; // Ok
-            ctx.body = notifications;
+            ctx.response.status = 200; // Ok
+            ctx.response.body = notifications;
         } catch (e) {
-            ctx.status = 500; // Internal Server Error
-            ctx.body = e;
+            ctx.response.status = 500; // Internal Server Error
+            ctx.response.body = e;
             await Log.error(ctx, e);
         }
-        ctx.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-        ctx.body.root = 'notifications';
+        ctx.response.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        ctx.response.body.root = 'notifications';
     }
 
 
@@ -97,14 +97,14 @@ class NotificationsHandlers {
 
         try {
             await Notification.dismiss(db, notificationId, userId);
-            ctx.status = 200;
-            ctx.body = {};
+            ctx.response.status = 200;
+            ctx.response.body = {};
         } catch (e) {
-            ctx.status = 500; // Internal Server Error
-            ctx.body = e;
+            ctx.response.status = 500; // Internal Server Error
+            ctx.response.body = e;
             await Log.error(ctx, e);
         }
-        ctx.body.root = 'notifications';
+        ctx.response.body.root = 'notifications';
     }
 
 
@@ -133,14 +133,14 @@ class NotificationsHandlers {
                 }
                 notifcn.timestamp = notifcn._id.getTimestamp();
             }
-            ctx.status = 200;
-            ctx.body = JSON.stringify(notifications, null, 2);
+            ctx.response.status = 200;
+            ctx.response.body = JSON.stringify(notifications, null, 2);
         } catch (e) {
-            ctx.status = 500; // Internal Server Error
-            ctx.body = e;
+            ctx.response.status = 500; // Internal Server Error
+            ctx.response.body = e;
             await Log.error(ctx, e);
         }
-        // ctx.body.root = 'notifications';
+        // ctx.response.body.root = 'notifications';
     }
 
 }

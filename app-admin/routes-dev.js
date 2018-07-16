@@ -34,10 +34,10 @@ router.get('/dev/submissions',              Dev.submissions);
 router.get('/dev/throw',                    Dev.throw);
 
 router.get('/dev/ip-cache', function(ctx) { // for debug
-    ctx.body = `countries (${global.ipsCountry.size})\n`;
-    for (const [ key, val ] of global.ipsCountry) ctx.body += ` ${key} => ${val}\n`;
-    ctx.body += `domains (${global.ipsDomain.size})\n`;
-    for (const [ key, val ] of global.ipsDomain) ctx.body += ` ${key} => ${val}\n`;
+    ctx.response.body = `countries (${global.ipsCountry.size})\n`;
+    for (const [ key, val ] of global.ipsCountry) ctx.response.body += ` ${key} => ${val}\n`;
+    ctx.response.body += `domains (${global.ipsDomain.size})\n`;
+    for (const [ key, val ] of global.ipsDomain) ctx.response.body += ` ${key} => ${val}\n`;
 });
 
 

@@ -173,12 +173,12 @@ router.get('/uploaded/:project/:date/:id/:file', async function getUploadedFile(
         const db = ctx.state.user.db;
         const { project, date, id, file } = ctx.params;
 
-        ctx.body = await AwsS3.getBuffer(db, project, date, id, file);
+        ctx.response.body = await AwsS3.getBuffer(db, project, date, id, file);
 
-        ctx.type = file.lastIndexOf('.') > 0
+        ctx.response.type = file.lastIndexOf('.') > 0
             ? file.slice(file.lastIndexOf('.')) // kosher extension
             : 'application/octet-stream';       // no extension or initial dot
-        ctx.set('Cache-Control', 'public, max-age=' + (ctx.app.env=='production' ? 60*60*24 : 1));
+        ctx.response.set('Cache-Control', 'public, max-age=' + (ctx.app.env=='production' ? 60*60*24 : 1));
         // TODO: Last-Modified?
     } catch (e) {
         ctx.throw(e.statusCode, e.message);
@@ -203,18 +203,18 @@ import Geocoder from '../lib/geocode';
  * Mirrors similar function in report app.
  */
 router.get('/ajax/geocode', async function getGeocode(ctx) {
-    const region = ctx.request.query.region ? ctx.request.query.region : await Ip.getCountry(ctx.ip);
+    const region = ctx.request.query.region ? ctx.request.query.region : await Ip.getCountry(ctx.request.ip);
     const geocoded = await Geocoder.geocode(ctx.request.query.address, region);
 
     if (geocoded) {
         // if region is specified, treat it as a requirement not just as bias as Google does
-        if (ctx.request.query.region && ctx.request.query.region.toUpperCase()!=geocoded.countryCode) { ctx.status = 404; return; }
+        if (ctx.request.query.region && ctx.request.query.region.toUpperCase()!=geocoded.countryCode) { ctx.response.status = 404; return; }
 
-        ctx.body = { formattedAddress: geocoded.formattedAddress };
-        ctx.body.root = 'geocode';
-        ctx.status = 200; // Ok
+        ctx.response.body = { formattedAddress: geocoded.formattedAddress };
+        ctx.response.body.root = 'geocode';
+        ctx.response.status = 200; // Ok
     } else {
-        ctx.status = 404; // Not Found
+        ctx.response.status = 404; // Not Found
     }
 });
 

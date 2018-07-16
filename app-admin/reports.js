@@ -282,7 +282,7 @@ class ReportsHandlers {
                 'updated on':    lastUpdate.on ? dateFormat(lastUpdate.on, 'd mmm yyyy HH:MM') : '',
                 'updated by':    lastUpdate.by,
                 'active?':       rpt.archived ? 'archived' : 'active',
-                'url':           ctx.origin + '/reports/'+rpt._id,
+                'url':           ctx.request.origin + '/reports/'+rpt._id,
             };
             if (singleProject) {
                 // we have homogeneous submitted fields, append them to the CSV
@@ -298,10 +298,10 @@ class ReportsHandlers {
         const filenameFilter = filterDesc.size>0 ? `(filtered by ${[ ...filterDesc ].join(', ')}) ` : '';
         const timestamp = dateFormat('yyyy-mm-dd HH:MM');
         const filename = `the whistle incident reports ${filenameFilter}${timestamp.replace(':', '.')}.csv`;
-        ctx.status = 200;
-        ctx.body = csv;
-        ctx.set('X-Timestamp', timestamp); // for integration tests
-        ctx.attachment(filename);
+        ctx.response.status = 200;
+        ctx.response.body = csv;
+        ctx.response.set('X-Timestamp', timestamp); // for integration tests
+        ctx.response.attachment(filename);
 
         // check whether current list of reports is for a single project, with homogeneous submitted details
         // incomplete submissions are considered homogeneous: hence [ { a: 'x' }, {  a: 'x', b: 'y' } ] is ok,
@@ -382,7 +382,7 @@ class ReportsHandlers {
                 alias:         rpt.alias,
                 comments:      rpt.comments,
                 geocode:       rpt.location.geocode,
-                url:           ctx.origin + '/reports/'+rpt._id,
+                url:           ctx.request.origin + '/reports/'+rpt._id,
             };
             reports.push(fields);
         }
@@ -446,10 +446,10 @@ class ReportsHandlers {
         const filenameFilter = filterDesc.size>0 ? ` (filtered by ${[ ...filterDesc ].join(', ')}) ` : '';
         const timestamp = dateFormat('yyyy-mm-dd HH:MM');
         const filename = `the whistle incident reports ${filenameFilter}${timestamp.replace(':', '.')}.pdf`;
-        ctx.status = 200;
-        ctx.body = await reportsPdf.toBufferPromise();
-        ctx.set('X-Timestamp', timestamp); // for integration tests
-        ctx.attachment(filename);
+        ctx.response.status = 200;
+        ctx.response.body = await reportsPdf.toBufferPromise();
+        ctx.response.set('X-Timestamp', timestamp); // for integration tests
+        ctx.response.attachment(filename);
     }
 
 
@@ -530,10 +530,10 @@ class ReportsHandlers {
         // return PDF as attachment
         const timestamp = dateFormat('yyyy-mm-dd HH:MM');
         const filename = `the whistle incident report ${timestamp.replace(':', '.')}.pdf`;
-        ctx.status = 200;
-        ctx.body = await reportsPdf.toBufferPromise();
-        ctx.set('X-Timestamp', timestamp); // for integration tests
-        ctx.attachment(filename);
+        ctx.response.status = 200;
+        ctx.response.body = await reportsPdf.toBufferPromise();
+        ctx.response.set('X-Timestamp', timestamp); // for integration tests
+        ctx.response.attachment(filename);
     }
 
 
@@ -866,7 +866,7 @@ class ReportsHandlers {
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
             submittedDesc:    truncate(desc, 70) || `<i title="submitted description" class="grey">No Description</i>`, // eslint-disable-line quotes
             showDeleteButton: ctx.app.env != 'production',
-            referrer:         ctx.headers.referer || '/reports', // for 'back' button
+            referrer:         ctx.request.headers.referer || '/reports', // for 'back' button
         };
         extra.reportDescription = report.summary
             ? `Report: ‘${report.summary}’, ${extra.reportedOnDay}`
@@ -925,7 +925,7 @@ class ReportsHandlers {
      * POST /reports/:id - Process report update summary / assigned-to / status / etc
      */
     static async processView(ctx) {
-        if (!ctx.state.user.roles.includes('admin')) return ctx.redirect('/login'+ctx.url);
+        if (!ctx.state.user.roles.includes('admin')) return ctx.response.redirect('/login'+ctx.request.url);
         const db = ctx.state.user.db;
         const reportId = ctx.params.id;
 
@@ -964,12 +964,12 @@ class ReportsHandlers {
             }
 
             // remain on same page
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
 
         } catch (e) {
             // stay on same page to report error (with current filled fields)
             ctx.flash = { formdata: ctx.request.body, _error: e.message };
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
         }
     }
 
@@ -978,7 +978,7 @@ class ReportsHandlers {
      * POST /reports/:id/delete - Process delete report
      */
     static async processDelete(ctx) {
-        if (!ctx.state.user.roles.includes('admin')) return ctx.redirect('/login'+ctx.url);
+        if (!ctx.state.user.roles.includes('admin')) return ctx.response.redirect('/login'+ctx.request.url);
         const db = ctx.state.user.db;
         const reportId = ctx.params.id;
 
@@ -990,12 +990,12 @@ class ReportsHandlers {
             await Notification.cancelForReport(db, reportId);
 
             // return to list of reports
-            ctx.redirect('/reports');
+            ctx.response.redirect('/reports');
 
         } catch (e) {
             // go to reports list to report error (there is no GET /reports/:id/delete)
             ctx.flash = { _error: e.message };
-            ctx.redirect('/reports');
+            ctx.response.redirect('/reports');
         }
     }
 
@@ -1014,14 +1014,14 @@ class ReportsHandlers {
 
         try {
             const latest = await Report.getLatestTimestamp(db);
-            ctx.status = 200;
-            ctx.body = { latest: { timestamp: latest } };
+            ctx.response.status = 200;
+            ctx.response.body = { latest: { timestamp: latest } };
         } catch (e) {
             await Log.error(ctx, e);
-            ctx.status = 500; // Internal Server Error
-            ctx.body = e;
+            ctx.response.status = 500; // Internal Server Error
+            ctx.response.body = e;
         }
-        ctx.body.root = 'reports';
+        ctx.response.body.root = 'reports';
     }
 
 
@@ -1050,14 +1050,14 @@ class ReportsHandlers {
                 report.highlight = Math.round(100 * (report._id.getTimestamp() - new Date() + y) / y);
                 report.assignedToText = assignedToText; // note equivalent logic in list()
             }
-            ctx.status = 200;
-            ctx.body = { reports };
+            ctx.response.status = 200;
+            ctx.response.body = { reports };
         } catch (e) {
             await Log.error(ctx, e);
-            ctx.status = 500; // Internal Server Error
-            ctx.body = e;
+            ctx.response.status = 500; // Internal Server Error
+            ctx.response.body = e;
         }
-        ctx.body.root = 'reports';
+        ctx.response.body.root = 'reports';
 
         // format date according to how far it is in the past: time, weekday, day/month, month/year
         function reported(date) {
@@ -1077,14 +1077,14 @@ class ReportsHandlers {
 
         try {
             await Report.insertTag(db, ctx.params.id, ctx.request.body.tag, ctx.state.user.id);
-            ctx.status = 201;
-            ctx.body = {};
+            ctx.response.status = 201;
+            ctx.response.body = {};
         } catch (e) {
             await Log.error(ctx, e);
-            ctx.status = 500; // Internal Server Error
-            ctx.body = e;
+            ctx.response.status = 500; // Internal Server Error
+            ctx.response.body = e;
         }
-        ctx.body.root = 'reports';
+        ctx.response.body.root = 'reports';
     }
 
 
@@ -1096,14 +1096,14 @@ class ReportsHandlers {
 
         try {
             await Report.deleteTag(db, ctx.params.id, ctx.params.tag, ctx.state.user.id);
-            ctx.status = 200;
-            ctx.body = {};
+            ctx.response.status = 200;
+            ctx.response.body = {};
         } catch (e) {
             await Log.error(ctx, e);
-            ctx.status = 500; // Internal Server Error
-            ctx.body = e;
+            ctx.response.status = 500; // Internal Server Error
+            ctx.response.body = e;
         }
-        ctx.body.root = 'reports';
+        ctx.response.body.root = 'reports';
     }
 
 
@@ -1115,7 +1115,7 @@ class ReportsHandlers {
         const db = ctx.state.user.db;
         const reportId = ctx.params.id;
 
-        if (!ctx.request.body.comment) { ctx.status = 403; return; } // Forbidden
+        if (!ctx.request.body.comment) { ctx.response.status = 403; return; } // Forbidden
 
         // record the comment
         const comment = await Report.insertComment(db, reportId, ctx.request.body.comment, ctx.state.user.id);
@@ -1154,10 +1154,10 @@ class ReportsHandlers {
             onFull:   dateFormat(comment.on, 'd mmm yyyy, HH:MM Z'),
             comment:  MarkdownIt().render(comment.comment), // render any markdown formatting
         };
-        ctx.status = 201;
-        ctx.body = body;
+        ctx.response.status = 201;
+        ctx.response.body = body;
 
-        ctx.body.root = 'reports';
+        ctx.response.body.root = 'reports';
     }
 
 
@@ -1169,13 +1169,13 @@ class ReportsHandlers {
         const [ by, onBase36 ] = ctx.params.comment.split('-');
         const on = new Date(parseInt(onBase36, 36));
 
-        if (!ctx.request.body.comment) { ctx.status = 403; return; } // Forbidden
+        if (!ctx.request.body.comment) { ctx.response.status = 403; return; } // Forbidden
 
         await Report.updateComment(db, ctx.params.id, ObjectId(by), on, ctx.request.body.comment, ctx.state.user.id);
 
-        ctx.status = 200;
-        ctx.body = { comment: ctx.request.body.comment };
-        ctx.body.root = 'reports';
+        ctx.response.status = 200;
+        ctx.response.body = { comment: ctx.request.body.comment };
+        ctx.response.body.root = 'reports';
     }
 
 
@@ -1191,9 +1191,9 @@ class ReportsHandlers {
 
         await Report.deleteComment(db, ctx.params.id, ObjectId(by), on, ctx.state.user.id);
 
-        ctx.status = 200;
-        ctx.body = {};
-        ctx.body.root = 'reports';
+        ctx.response.status = 200;
+        ctx.response.body = {};
+        ctx.response.body.root = 'reports';
     }
 
 
@@ -1207,14 +1207,14 @@ class ReportsHandlers {
 
         try {
             const updates = await Update.getByReport(db, ctx.params.id);
-            ctx.status = 200;
-            ctx.body = { updates: updates };
+            ctx.response.status = 200;
+            ctx.response.body = { updates: updates };
         } catch (e) {
             await Log.error(ctx, e);
-            ctx.status = 500; // Internal Server Error
-            ctx.body = { message: e.message };
+            ctx.response.status = 500; // Internal Server Error
+            ctx.response.body = { message: e.message };
         }
-        ctx.body.root = 'reports';
+        ctx.response.body.root = 'reports';
     }
 
 
@@ -1252,11 +1252,11 @@ class ReportsHandlers {
                 Report.update(db, reportId, { 'analysis.weather': weather }, ctx.state.user.id);
             }
 
-            ctx.status = 200; // Ok
-            ctx.body = { formattedAddress: geocoded.formattedAddress };
-            ctx.body.root = 'reports';
+            ctx.response.status = 200; // Ok
+            ctx.response.body = { formattedAddress: geocoded.formattedAddress };
+            ctx.response.body.root = 'reports';
         } else {
-            ctx.status = 404; // Not Found
+            ctx.response.status = 404; // Not Found
         }
     }
 
@@ -1289,13 +1289,13 @@ class ReportsHandlers {
 
             // note: don't bother re-fetching weather, most likely location won't have changed enough to matter
 
-            ctx.status = 200; // Ok
-            ctx.body = { lat, lon };
-            ctx.body.root = 'reports';
+            ctx.response.status = 200; // Ok
+            ctx.response.body = { lat, lon };
+            ctx.response.body.root = 'reports';
         } catch (e) {
             await Log.error(ctx, e);
-            ctx.status = 500; // Internal Server Error
-            ctx.body = { message: e.message };
+            ctx.response.status = 500; // Internal Server Error
+            ctx.response.body = { message: e.message };
         }
     }
 

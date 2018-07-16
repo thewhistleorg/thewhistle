@@ -15,15 +15,15 @@ const router = new Router();
 
 router.get('/', function getIndexPage(ctx) {
     // if user logged in, redirect to user's home page
-    //if (ctx.state.user) return ctx.redirect('/dashboard/'+ctx.state.user.name);
+    //if (ctx.state.user) return ctx.response.redirect('/dashboard/'+ctx.state.user.name);
     // for the moment, we will redirect to the list of reports, as user's home page dashboard is not ready
-    if (ctx.state.user) return ctx.redirect('/reports');
+    if (ctx.state.user) return ctx.response.redirect('/reports');
 
     // otherwise render index page
     // suspended 9 Feb 2018: await ctx.render('index');
 
     // otherwise (temporarily?) redirect to login page (per decision 9 Feb 2018)
-    return ctx.redirect('/login');
+    return ctx.response.redirect('/login');
 });
 
 

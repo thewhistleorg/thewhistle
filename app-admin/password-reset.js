@@ -55,22 +55,22 @@ class PasswordResetHandlers {
         const token = now+'-'+rndHash; // note use timestamp first so it is easier to identify old tokens in db
 
         // note: do createHash() before checking if user exists to mitigate against timing attacks
-        if (!user) { ctx.redirect('/password/reset-request-confirm'); return; }
+        if (!user) { ctx.response.redirect('/password/reset-request-confirm'); return; }
 
         // record reset request in db
         await User.update(user._id, { passwordResetRequest: token });
 
         // send e-mail with generated token
         try {
-            const context = { firstname: user.firstname, host: ctx.host, token: token };
+            const context = { firstname: user.firstname, host: ctx.request.host, token: token };
             if (ctx.app.env != 'development') await Mail.send(email, 'password-reset.email', context);
         } catch (e) {
             await Log.error(ctx, e);
         }
 
-        ctx.set('X-Reset-Token', token); // for testing
+        ctx.response.set('X-Reset-Token', token); // for testing
 
-        ctx.redirect('/password/reset-request-confirm');
+        ctx.response.redirect('/password/reset-request-confirm');
     }
 
 
@@ -78,7 +78,7 @@ class PasswordResetHandlers {
      * GET /password/reset-request-confirm - render request password reset confirmation page
      */
     static async requestConfirm(ctx) {
-        await ctx.render('password-reset-request-confirm', { host: ctx.host });
+        await ctx.render('password-reset-request-confirm', { host: ctx.request.host });
     }
 
 
@@ -106,14 +106,14 @@ class PasswordResetHandlers {
         // check token is good
         const user = await userForResetToken(token);
         if (!user) {
-            ctx.redirect('/password/reset/'+token); // use existing notification mechanism!
+            ctx.response.redirect('/password/reset/'+token); // use existing notification mechanism!
             return;
         }
 
         // passwords match?
         if (ctx.request.body.password != ctx.request.body.passwordConfirm) {
             ctx.flash = { _error: 'Passwords don’t match' };
-            ctx.redirect('/password/reset/'+token);
+            ctx.response.redirect('/password/reset/'+token);
             return;
         }
 
@@ -121,7 +121,7 @@ class PasswordResetHandlers {
         const password = await Scrypt.kdf(ctx.request.body.password, { logN: 15 });
         await User.update(user._id, { password: password, passwordResetRequest: null });
 
-        ctx.redirect('/password/reset/confirm');
+        ctx.response.redirect('/password/reset/confirm');
     }
 
 

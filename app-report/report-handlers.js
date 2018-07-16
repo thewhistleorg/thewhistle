@@ -29,7 +29,7 @@ class Handlers {
      */
     static async getHomePage(ctx) {
         // temporarily(?) redirect to /grn/rape-is-a-crime
-        return ctx.redirect('/grn/rape-is-a-crime');
+        return ctx.response.redirect('/grn/rape-is-a-crime');
 
         const reportApps = { // eslint-disable-line no-unreachable
             GB: [
@@ -72,7 +72,7 @@ class Handlers {
 
         FormGenerator.build(org, project);
 
-        ctx.redirect(`/${org}/${project}`);
+        ctx.response.redirect(`/${org}/${project}`);
     }
 
 
@@ -95,8 +95,8 @@ class Handlers {
         };
 
         // record new submission has been started
-        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
-            ctx.session.submissionId = await Submission.insert(ctx.params.database, ctx.params.project, ctx.headers['user-agent']);
+        if (ctx.app.env == 'production' || ctx.request.headers['user-agent'].slice(0, 15)=='node-superagent') {
+            ctx.session.submissionId = await Submission.insert(ctx.params.database, ctx.params.project, ctx.request.headers['user-agent']);
         }
 
         await ctx.render(`../../.generated-reports/${org}/${project}-index`, { recaptcha: ctx.app.env!='development' });
@@ -124,21 +124,21 @@ class Handlers {
                 const responseJs = await response.json();
                 if (responseJs.success == false) {
                     ctx.flash = { error: `reCAPTCHA verification failed: ${responseJs['error-codes']} – are you a bot?` };
-                    ctx.set('X-Redirect-Reason', 'reCAPTCHA verification failed'); // for smoke tests
-                    return ctx.redirect(ctx.url);
+                    ctx.response.set('X-Redirect-Reason', 'reCAPTCHA verification failed'); // for smoke tests
+                    return ctx.response.redirect(ctx.request.url);
                 }
             } else {
                 ctx.flash = { error: `reCAPTCHA verification failed: ${response.status} / ${response.statusText}` };
-                ctx.set('X-Redirect-Reason', 'reCAPTCHA verification failed'); // for smoke tests
-                return ctx.redirect(ctx.url);
+                ctx.response.set('X-Redirect-Reason', 'reCAPTCHA verification failed'); // for smoke tests
+                return ctx.response.redirect(ctx.request.url);
             }
         }
 
         // record user-agent
-        await UserAgent.log(org, ctx.ip, ctx.headers);
+        await UserAgent.log(org, ctx.request.ip, ctx.request.headers);
 
         // redirect to page 1 of the submission
-        ctx.redirect(`/${org}/${project}/1`);
+        ctx.response.redirect(`/${org}/${project}/1`);
     }
 
 
@@ -171,10 +171,10 @@ class Handlers {
             return;
         }
 
-        if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${org}/${project}`); }
+        if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.response.redirect(`/${org}/${project}`); }
 
         const page = ctx.params.page=='*' ? '+' : Number(ctx.params.page); // note '+' is allowed in windows filenames, '*' is not
-        if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
+        if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.response.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
 
         // fetch already entered information to fill in defaults for this page if it is being revisited
         const report = await Report.get(org, ctx.session.id);
@@ -212,7 +212,7 @@ class Handlers {
         const context = Object.assign({ steps: steps }, defaults, submitted, { incidentDate: incidentDate });
 
         // users are not allowed to go 'back' to 'used-before' page
-        if (page==1 && ctx.session.saved) { ctx.flash = { error: 'Please continue with your current alias' }; return ctx.redirect(`/${org}/${project}/2`); }
+        if (page==1 && ctx.session.saved) { ctx.flash = { error: 'Please continue with your current alias' }; return ctx.response.redirect(`/${org}/${project}/2`); }
 
         await ctx.render(`../../.generated-reports/${org}/${project}-${page}`, context);
 
@@ -233,13 +233,13 @@ class Handlers {
         const version = global.forms[`${org}/${project}`].version;
         const nPages = Object.keys(global.forms[`${org}/${project}`].steps).length;
 
-        if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.redirect(`/${org}/${project}`); }
+        if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.response.redirect(`/${org}/${project}`); }
 
         // page number, or '+' for single-page submission
         const page = ctx.params.page=='*' ? '+' : Number(ctx.params.page);
 
         // don't allow jumping further forward than 'next' page
-        if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
+        if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.response.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
 
         const body = ctx.request.body;
 
@@ -257,7 +257,7 @@ class Handlers {
             for (let f=0; f<body.files.length; f++) if (body.files[f].size == 0) body.files.splice(f, 1);
         }
 
-        if (page==1 & ctx.session.id) { ctx.flash = { error: 'Trying to save already saved report!' }; return ctx.redirect(ctx.url); }
+        if (page==1 & ctx.session.id) { ctx.flash = { error: 'Trying to save already saved report!' }; return ctx.response.redirect(ctx.request.url); }
 
         if (page==1 || page=='+') { // create the skeleton report (with alias)
             let alias = null;
@@ -270,31 +270,31 @@ class Handlers {
                     const reportsYExclCurr = reportsY.filter(r => r._id != ctx.session.id); // exclude current report
                     const errorY = `Used-before anonymous alias ‘${alias}’ not found`;
                     const flashY = Object.assign({ error: errorY }, { formdata: body }); // include formdata for single-page report
-                    if (reportsYExclCurr.length == 0) { ctx.flash = flashY; return ctx.redirect(ctx.url); }
+                    if (reportsYExclCurr.length == 0) { ctx.flash = flashY; return ctx.response.redirect(ctx.request.url); }
                     break;
                 case 'No':
                     // verify generated alias does not exist
-                    if (body['used-before-generated-alias'] == null) { ctx.flash = { error: 'Not-used-before generated alias not given' }; return ctx.redirect(ctx.url); }
+                    if (body['used-before-generated-alias'] == null) { ctx.flash = { error: 'Not-used-before generated alias not given' }; return ctx.response.redirect(ctx.request.url); }
                     alias = body['used-before-generated-alias'];
                     const reportsN = await Report.getBy(org, 'alias', alias);
                     const reportsNExclCurr = reportsN.filter(r => r._id != ctx.session.id); // exclude current report
                     const errorN = `Generated alias ‘${alias}’ not available: please select another`;
                     const flashN = Object.assign({ error: errorN }, { formdata: body }); // include formdata for single-page report
-                    if (reportsNExclCurr.length > 0) { ctx.flash = flashN; return ctx.redirect(ctx.url); }
+                    if (reportsNExclCurr.length > 0) { ctx.flash = flashN; return ctx.response.redirect(ctx.request.url); }
                     break;
                 default:
-                    ctx.flash = { error: 'used-before must be Yes or No' }; return ctx.redirect(ctx.url);
+                    ctx.flash = { error: 'used-before must be Yes or No' }; return ctx.response.redirect(ctx.request.url);
             }
 
             // save the skeleton report
-            ctx.session.id = await Report.submissionStart(org, project, alias, version, ctx.headers['user-agent']);
+            ctx.session.id = await Report.submissionStart(org, project, alias, version, ctx.request.headers['user-agent']);
             // TODO: ?? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.id, 'incomplete', null);
 
             // notify users of 'new report submitted'
             const users = await User.getForDb(org);
             await Notification.notifyMultiple(org, 'new report submitted', users.map(u => u._id), ctx.session.id);
 
-            ctx.set('X-Insert-Id', ctx.session.id); // for integration tests
+            ctx.response.set('X-Insert-Id', ctx.session.id); // for integration tests
             debug('submissionStart', org, project, page, ctx.session.id);
         }
 
@@ -312,8 +312,8 @@ class Handlers {
             const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
             // const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, d.hour, d.minute);
             const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
-            if (isNaN(date.getTime())) { ctx.flash = { validation: [ 'Invalid date' ] }; return ctx.redirect(ctx.url); } // TODO: formdata
-            if (date.getTime() > Date.now()) { ctx.flash = { validation: [ 'Date is in the future' ] }; return ctx.redirect(ctx.url); }
+            if (isNaN(date.getTime())) { ctx.flash = { validation: [ 'Invalid date' ] }; return ctx.response.redirect(ctx.request.url); } // TODO: formdata
+            if (date.getTime() > Date.now()) { ctx.flash = { validation: [ 'Date is in the future' ] }; return ctx.response.redirect(ctx.request.url); }
         }
 
         const formattedReport = formatReport(org, project, page, body);
@@ -332,16 +332,16 @@ class Handlers {
         }
 
         // record user-agent
-        await UserAgent.log(org, ctx.ip, ctx.headers);
+        await UserAgent.log(org, ctx.request.ip, ctx.request.headers);
 
         if (page != '+') ctx.session.completed = page;
 
         // record submission progress
-        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
+        if (ctx.app.env == 'production' || ctx.request.headers['user-agent'].slice(0, 15)=='node-superagent') {
             await Submission.progress(org, ctx.session.submissionId, page);
         }
 
-        ctx.redirect(`/${org}/${project}/${go}`);
+        ctx.response.redirect(`/${org}/${project}/${go}`);
     }
 
 }
@@ -365,7 +365,7 @@ async function whatnext(ctx) {
         // suspend complete/incomplete tags await Report.insertTag(org, ctx.session.id, 'complete', null);
 
         // record submission complete
-        if (ctx.app.env == 'production' || ctx.headers['user-agent'].slice(0, 15)=='node-superagent') {
+        if (ctx.app.env == 'production' || ctx.request.headers['user-agent'].slice(0, 15)=='node-superagent') {
             await Submission.complete(org, ctx.session.submissionId, ctx.session.id);
         }
 
@@ -373,10 +373,10 @@ async function whatnext(ctx) {
         ctx.session = null; // note on next request, ctx.session will be {} not null, but session.isNew will be true
 
     }
-    const context = { address: ctx.query.address };
+    const context = { address: ctx.request.query.address };
 
     // if we have a geocode result on the incident location, list local resources
-    const geocoded = ctx.query.address ? await Geocoder.geocode(ctx.query.address, 'ng') : null;
+    const geocoded = ctx.request.query.address ? await Geocoder.geocode(ctx.request.query.address, 'ng') : null;
 
     if (geocoded) {
         // get all resources within 20km of geocoded location

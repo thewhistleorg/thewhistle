@@ -41,7 +41,7 @@ class Handlers {
         const db = ctx.state.user.db;
 
         // get resources matching querystring filter
-        const query = ctx.query.category ? { category: ctx.query.category } : {};
+        const query = ctx.request.query.category ? { category: ctx.request.query.category } : {};
         const resources = await Resource.find(db, query);
 
         resources.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1);
@@ -67,7 +67,7 @@ class Handlers {
             name: r.name,
         }));
 
-        const filter = { category: ctx.query.category }; // current filter criteria
+        const filter = { category: ctx.request.query.category }; // current filter criteria
         const context = { resources, resourceLocns, categories, filter };
         await ctx.render('resources-list', context);
     }
@@ -102,7 +102,7 @@ class Handlers {
 
         if (validationErrors(ctx.request.body, validation)) {
             ctx.flash = { validation: validationErrors(ctx.request.body, validation) };
-            ctx.redirect(ctx.url); return;
+            ctx.response.redirect(ctx.request.url); return;
         }
 
         const country = 'NG';  // TODO: derive country code from database
@@ -126,15 +126,15 @@ class Handlers {
         try {
 
             const id = await Resource.insert(db, ctx.request.body, location);
-            ctx.set('X-Insert-Id', id); // for integration tests
+            ctx.response.set('X-Insert-Id', id); // for integration tests
 
             // return to list of resources
-            ctx.redirect('/resources');
+            ctx.response.redirect('/resources');
 
         } catch (e) {
             // stay on same page to report error (with current filled fields)
             ctx.flash = { formdata: ctx.request.body, _error: e.message };
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
         }
 
         function formatPhone(num) {
@@ -151,7 +151,7 @@ class Handlers {
 
         if (validationErrors(ctx.request.body, validation)) {
             ctx.flash = { validation: validationErrors(ctx.request.body, validation) };
-            ctx.redirect(ctx.url); return;
+            ctx.response.redirect(ctx.request.url); return;
         }
 
         const country = 'NG';  // TODO: derive country code from database
@@ -177,12 +177,12 @@ class Handlers {
             await Resource.update(db, ctx.params.id, ctx.request.body, location);
 
             // return to list of resources
-            ctx.redirect('/resources');
+            ctx.response.redirect('/resources');
 
         } catch (e) {
             // stay on current page to report error
             ctx.flash = { _error: e.message };
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
         }
 
         function formatPhone(num) {
@@ -202,12 +202,12 @@ class Handlers {
             await Resource.delete(db, ctx.params.id);
 
             // return to list of resources
-            ctx.redirect('/resources');
+            ctx.response.redirect('/resources');
 
         } catch (e) {
             // stay on current page to report error
             ctx.flash = { _error: e.message };
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
         }
     }
 

@@ -50,7 +50,7 @@ class LoginHandlers {
         const options = { signed: true, domain: domain };
         ctx.cookies.set('koa:jwt', null, options);
         ctx.cookies.set('koa:jwt', null, { signed: true }); // TODO: tmp for transition period
-        ctx.redirect('/');
+        ctx.response.redirect('/');
     }
 
 
@@ -81,12 +81,12 @@ class LoginHandlers {
             user = null; // e.g. "Invalid key"
         }
 
-        if (ctx.hostname.split('.').length < 3) {
+        if (ctx.request.hostname.split('.').length < 3) {
             // as JWT login tokens are held in the full domain (above admin. / report.) to
             // facilitate common logins across admin & report apps, and cookies can not be set on
             // top level domains, for logins to work the hostname must have three levels
             ctx.flash = { _error: 'Domain name must include 3 levels' };
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
             return;
         }
 
@@ -94,7 +94,7 @@ class LoginHandlers {
             // login failed: redisplay login page with login fail message
             const loginfailmsg = 'E-mail / password not recognised';
             ctx.flash = { formdata: body, loginfailmsg: loginfailmsg };
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
             return;
         }
 
@@ -102,13 +102,13 @@ class LoginHandlers {
             // user has no rights to any databases???
             const loginfailmsg = 'No databases authorised';
             ctx.flash = { formdata: body, loginfailmsg: loginfailmsg };
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
             return;
         }
 
         if (user.databases.length > 1 && !body.database) {
             // login submitted without having selected database - re-present with databases listed (not relying on ajax)
-            ctx.redirect(ctx.url + `?user=${body.username}`);
+            ctx.response.redirect(ctx.request.url + `?user=${body.username}`);
             return;
         }
 
@@ -123,7 +123,7 @@ class LoginHandlers {
                 await Db.connect(db);
             } catch (e) {
                 ctx.flash = { formdata: body, loginfailmsg: e.message };
-                ctx.redirect(ctx.url);
+                ctx.response.redirect(ctx.request.url);
                 return;
             }
         }
@@ -153,14 +153,14 @@ class LoginHandlers {
         ctx.cookies.set('koa:jwt', token, options);
 
         // if we were provided with a redirect URL after the /login, redirect there, otherwise to /
-        const href = ctx.url=='/login' ? '/' : ctx.url.replace('/login', '');
+        const href = ctx.request.url=='/login' ? '/' : ctx.request.url.replace('/login', '');
         if (href.match(/^\/-\//)) {
             // kludgy trick for paralegal single-page reporting login: if href starts /-/, redir to report. subdomain
             const hrefReport = `${ctx.request.protocol}://${ctx.request.host.replace('admin', 'report')}${href.replace('/-', '')}`;
-            ctx.redirect(hrefReport);
+            ctx.response.redirect(hrefReport);
             return;
         }
-        ctx.redirect(href);
+        ctx.response.redirect(href);
     }
 
 
@@ -175,8 +175,8 @@ class LoginHandlers {
     static async getUserDatabases(ctx) {
         const [ user ] = await User.getBy('email', ctx.request.query.user); // lookup user
 
-        ctx.body = { databases: user ? user.databases : [] };
-        ctx.status = 200; // Ok
+        ctx.response.body = { databases: user ? user.databases : [] };
+        ctx.response.status = 200; // Ok
     }
 
 }

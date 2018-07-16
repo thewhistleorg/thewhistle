@@ -25,7 +25,7 @@ class Dev {
      * Information about current Node versions.
      */
     static nodeinfo(ctx) {
-        ctx.body = nodeinfo(ctx.req);
+        ctx.response.body = nodeinfo(ctx.req);
     }
 
 
@@ -55,22 +55,22 @@ class Dev {
         // 'from' defaults to later of first entry or 1 month ago
         const oldest = entriesAll.reduce((old, e) => e._id.getTimestamp()<old ? e._id.getTimestamp() : old, new Date());
         const monthAgo = new Date(); monthAgo.setMonth(new Date().getMonth() - 1);
-        ctx.query.from = ctx.query.from || dateFormat(oldest<monthAgo ? monthAgo : oldest, 'yyyy-mm-dd');
+        ctx.request.query.from = ctx.request.query.from || dateFormat(oldest<monthAgo ? monthAgo : oldest, 'yyyy-mm-dd');
 
         // 'to' defaults to today
-        ctx.query.to = ctx.query.to || dateFormat('yyyy-mm-dd');
+        ctx.request.query.to = ctx.request.query.to || dateFormat('yyyy-mm-dd');
         // filter needs 1 day added to 'to' to made it end of the day
-        const toFilter = new Date(ctx.query.to); toFilter.setDate(toFilter.getDate() + 1);
+        const toFilter = new Date(ctx.request.query.to); toFilter.setDate(toFilter.getDate() + 1);
 
         // filter results according to query string
         const entriesFiltered = entriesAll
-            .filter(e => ctx.query.from ? e._id.getTimestamp() >= new Date(ctx.query.from) : true)
-            .filter(e => ctx.query.to ? e._id.getTimestamp() <= toFilter : true)
-            .filter(e => ctx.query.app ? RegExp('^'+ctx.query.app).test(e.host) : true)
-            .filter(e => ctx.query.organisation ? ctx.query.organisation=='-' ? e.db==undefined : e.db==ctx.query.organisation : true)
-            .filter(e => ctx.query.user ? ctx.query.user=='-' ? e.user==undefined : e.user==ctx.query.user : true)
-            .filter(e => ctx.query.time ? e.ms > ctx.query.time : true)
-            .filter(e => ctx.query.status ? e.status==ctx.query.status : true);
+            .filter(e => ctx.request.query.from ? e._id.getTimestamp() >= new Date(ctx.request.query.from) : true)
+            .filter(e => ctx.request.query.to ? e._id.getTimestamp() <= toFilter : true)
+            .filter(e => ctx.request.query.app ? RegExp('^'+ctx.request.query.app).test(e.host) : true)
+            .filter(e => ctx.request.query.organisation ? ctx.request.query.organisation=='-' ? e.db==undefined : e.db==ctx.request.query.organisation : true)
+            .filter(e => ctx.request.query.user ? ctx.request.query.user=='-' ? e.user==undefined : e.user==ctx.request.query.user : true)
+            .filter(e => ctx.request.query.time ? e.ms > ctx.request.query.time : true)
+            .filter(e => ctx.request.query.status ? e.status==ctx.request.query.status : true);
 
         // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
         entriesFiltered.forEach(e => e.ua.os = e.ua.os || e.ua.platform);
@@ -100,14 +100,14 @@ class Dev {
         }
 
         // for display, time defaults to 0
-        ctx.query.time = ctx.query.time || '0';
+        ctx.request.query.time = ctx.request.query.time || '0';
 
         const context = {
             entries:   entries,
             dbs:       dbs,
             users:     users,
             statuses:  statuses,
-            filter:    ctx.query,
+            filter:    ctx.request.query,
             filterMin: dateFormat(oldest, 'yyyy-mm-dd'),
             filterMax: dateFormat('yyyy-mm-dd'),
         };
@@ -144,9 +144,9 @@ class Dev {
 
         const csv = json2csv.parse(entries);
         const filename = 'the whistle access log ' + dateFormat('yyyy-mm-dd HH.MM') + '.csv';
-        ctx.status = 200;
-        ctx.body = csv;
-        ctx.attachment(filename);
+        ctx.response.status = 200;
+        ctx.response.body = csv;
+        ctx.response.attachment(filename);
     }
 
 
@@ -166,20 +166,20 @@ class Dev {
         // 'from' defaults to later of first entry or 1 month ago
         const oldest = entriesAll.reduce((old, e) => e._id.getTimestamp()<old ? e._id.getTimestamp() : old, new Date());
         const monthAgo = new Date(); monthAgo.setMonth(new Date().getMonth() - 1);
-        ctx.query.from = ctx.query.from || dateFormat(oldest<monthAgo ? monthAgo : oldest, 'yyyy-mm-dd');
+        ctx.request.query.from = ctx.request.query.from || dateFormat(oldest<monthAgo ? monthAgo : oldest, 'yyyy-mm-dd');
 
         // 'to' defaults to today
-        ctx.query.to = ctx.query.to || dateFormat('yyyy-mm-dd');
+        ctx.request.query.to = ctx.request.query.to || dateFormat('yyyy-mm-dd');
         // filter needs 1 day added to 'to' to made it end of the day
-        const toFilter = new Date(ctx.query.to); toFilter.setDate(toFilter.getDate() + 1);
+        const toFilter = new Date(ctx.request.query.to); toFilter.setDate(toFilter.getDate() + 1);
 
         // filter results according to query string
         const entriesFiltered = entriesAll
-            .filter(e => ctx.query.from ? e._id.getTimestamp() >= new Date(ctx.query.from) : true)
-            .filter(e => ctx.query.to ? e._id.getTimestamp() <= toFilter : true)
-            .filter(e => ctx.query.organisation ? ctx.query.organisation=='-' ? e.db==undefined : e.db==ctx.query.organisation : true)
-            .filter(e => ctx.query.user ? ctx.query.user=='-' ? e.user==undefined : e.user==ctx.query.user : true)
-            .filter(e => ctx.query.status ? e.status==ctx.query.status : true);
+            .filter(e => ctx.request.query.from ? e._id.getTimestamp() >= new Date(ctx.request.query.from) : true)
+            .filter(e => ctx.request.query.to ? e._id.getTimestamp() <= toFilter : true)
+            .filter(e => ctx.request.query.organisation ? ctx.request.query.organisation=='-' ? e.db==undefined : e.db==ctx.request.query.organisation : true)
+            .filter(e => ctx.request.query.user ? ctx.request.query.user=='-' ? e.user==undefined : e.user==ctx.request.query.user : true)
+            .filter(e => ctx.request.query.status ? e.status==ctx.request.query.status : true);
 
         // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
         entriesFiltered.forEach(e => e.ua.os = e.ua.os || e.ua.platform);
@@ -209,14 +209,14 @@ class Dev {
         }
 
         // for display, time defaults to 0
-        ctx.query.time = ctx.query.time || '0';
+        ctx.request.query.time = ctx.request.query.time || '0';
 
         const context = {
             entries:   entries,
             dbs:       dbs,
             users:     users,
             statuses:  statuses,
-            filter:    ctx.query,
+            filter:    ctx.request.query,
             filterMin: dateFormat(oldest, 'yyyy-mm-dd'),
             filterMax: dateFormat('yyyy-mm-dd'),
         };
@@ -232,7 +232,7 @@ class Dev {
      * potentially redundant following the more recent access/error logging.
      */
     static async userAgentsV1(ctx) {
-        const context = await UserAgent.counts(ctx.state.user.db, ctx.query.since);
+        const context = await UserAgent.counts(ctx.state.user.db, ctx.request.query.since);
         context.sinceDate = context.since ? dateFormat(context.since, 'd mmm yyyy') : '–';
 
         await ctx.render('dev-user-agents', context);
@@ -266,7 +266,7 @@ class Dev {
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
         const entries = entriesAll
             .filter(e => e.host.split('.')[0] == app)
-            .filter(e => ctx.query.organisation ? e.db==ctx.query.organisation : true);
+            .filter(e => ctx.request.query.organisation ? e.db==ctx.request.query.organisation : true);
 
         // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
         entries.forEach(e => e.ua.os = e.ua.os || e.ua.platform);
@@ -441,7 +441,7 @@ class Dev {
      * Invoke exception (for testing).
      */
     static throw(ctx) {
-        const status = ctx.query.status || 500;
+        const status = ctx.request.query.status || 500;
         ctx.throw(Number(status), 'This is a test error!');
     }
 

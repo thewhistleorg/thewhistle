@@ -70,7 +70,7 @@ app.use(async function handleErrors(ctx, next) {
         switch (ctx.status) {
             case 404: // Not Found
                 if (err.message == 'Not Found') err.message = null; // personalised 404
-                    await ctx.render('404-not-found', { err });                       // 404 from app-report
+                await ctx.render('404-not-found', { err });         // 404 from app-report
                 break;
             case 410: // Gone
                 await ctx.render('4xx-bad-request', { err });       // 410 from form-generator

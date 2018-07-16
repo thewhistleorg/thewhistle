@@ -117,7 +117,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // handle radio buttons which might be determining alternate texts
     document.querySelectorAll('input[type=radio]').forEach(function(input) {
         input.addEventListener('change', function() { // note cannot simply assign to .onchange due to visibility listener
-            const altTexts = document.querySelectorAll(`[data-${this.name}]`);
             const altTextsShow = document.querySelectorAll(`[data-${this.name}][data-${this.name}="${this.value}"]`);
             const altTextsHide = document.querySelectorAll(`[data-${this.name}]:not([data-${this.name}="${this.value}"])`);
             altTextsShow.forEach(function (el) { el.classList.remove('hide'); el.classList.add('show'); });

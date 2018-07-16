@@ -9,7 +9,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
-import isEmail    from 'isemail';    // email address validation library
 import crypto     from 'crypto';     // nodejs.org/api/crypto.html
 
 import User   from '../models/user.js';
@@ -162,10 +161,10 @@ class UsersHandlers {
         const body = ctx.request.body;
 
         const validation = {
-            username: 'required pattern="[a-z0-9-_.]+"',
+            username:  'required pattern="[a-z0-9-_.]+"',
             firstname: 'required',
-            email: 'required type=email'
-        };    
+            email:     'required type=email',
+        };
 
         try {
 
@@ -241,9 +240,9 @@ class UsersHandlers {
         const body = ctx.request.body;
 
         const validation = {
-            username: 'required pattern="[a-z0-9-_.]+"',
+            username:  'required pattern="[a-z0-9-_.]+"',
             firstname: 'required',
-            email: 'required type=email'
+            email:     'required type=email',
         };
 
         try {

@@ -180,12 +180,11 @@ app.use(async function ctxAddDomain(ctx, next) {
 
 
 // if this is the first reference to this form, run the form generation process before continuing
-global.built = {};
 app.use(async function generateForms(ctx, next) {
     const org = ctx.url.split('/')[1];
     const project = ctx.url.split('/')[2];
 
-    if (!global.built[org+project] && org && project && org!='spec' && org!='ajax' && org!='test-grn') {
+    if (!FormGenerator.built(org, project) && org && project && org!='spec' && org!='ajax' && org!='test-grn') {
         try {
             await FormGenerator.build(org, project);
         } catch (e) {
@@ -193,7 +192,6 @@ app.use(async function generateForms(ctx, next) {
             if (e.status == 410) ctx.throw(410, e.message); // form build failed
             console.error(e); // TODO: handle JSON schema validation failure
         }
-        global.built[org+project] = true;
     }
 
     await next();

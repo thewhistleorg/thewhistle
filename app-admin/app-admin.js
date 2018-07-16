@@ -33,7 +33,7 @@ app.use(handlebars({
 // koa-static will throw 400 Malicious Path (from resolve-path) on URL starting with '//', so trap that
 // case before using serve() middleware and return 404 instead (as with '//' anywhere else in url)
 app.use(async function trapMaliciousPath(ctx, next) {
-    if (ctx.url.slice(0, 2) == '//') { await ctx.render('404-not-found'); return; }
+    if (ctx.request.url.slice(0, 2) == '//') { await ctx.render('404-not-found'); return; }
     await next();
 });
 
@@ -47,7 +47,7 @@ app.use(serve('public', { maxage: maxage }));
 
 // log requests (excluding static files, into capped collection)
 app.use(async function logAccess(ctx, next) {
-    if (ctx.url != '/ajax/notifications/last-update') debug(ctx.method.padEnd(4) + ' ' + ctx.url);
+    if (ctx.request.url != '/ajax/notifications/last-update') debug(ctx.request.method.padEnd(4) + ' ' + ctx.request.url);
     const t1 = Date.now();
     await next();
     const t2 = Date.now();
@@ -63,11 +63,11 @@ app.use(async function handleErrors(ctx, next) {
         await next();
 
     } catch (err) {
-        ctx.status = err.status || 500;
+        ctx.response.status = err.status || 500;
         if (app.env == 'production') delete err.stack; // don't leak sensitive info!
-        switch (ctx.status) {
+        switch (ctx.response.status) {
             case 401: // Unauthorised (eg invalid JWT auth token)
-                ctx.redirect('/login'+ctx.url);
+                ctx.response.redirect('/login'+ctx.request.url);
                 break;
             case 404: // Not Found
                 if (err.message == 'Not Found') err.message = null; // personalised 404
@@ -137,8 +137,8 @@ app.use(convert(lusca({ // note koa-lusca@2.2.0 is v1 middleware which generates
 
 // add the domain (host without subdomain) and hostReport (admin. replaced by report.) into koa ctx
 app.use(async function ctxAddDomain(ctx, next) {
-    ctx.state.domain = ctx.host.replace('admin.', '');
-    ctx.state.hostReport = ctx.host.replace('admin.', 'report.');
+    ctx.state.domain = ctx.request.host.replace('admin.', '');
+    ctx.state.hostReport = ctx.request.host.replace('admin.', 'report.');
     await next();
 });
 
@@ -150,7 +150,7 @@ app.use(async function ctxAddDomain(ctx, next) {
 app.use(Middleware.ssl({ trustProxy: true }));
 
 
-// check if user is signed in; leaves id in ctx.status.user.id if JWT verified
+// check if user is signed in; leaves id in ctx.response.status.user.id if JWT verified
 // (do this before login routes, as login page indicates if user is already logged in)
 app.use(Middleware.verifyJwt());
 
@@ -169,7 +169,7 @@ app.use(async function isSignedIn(ctx, next) {
     } else {
         // authentication failed: redirect to login page
         ctx.flash = { loginfailmsg: 'Please sign in again after logout / session expiry' };
-        ctx.redirect('/login'+ctx.url);
+        ctx.response.redirect('/login'+ctx.request.url);
     }
 });
 
@@ -188,9 +188,9 @@ app.use(routesDev);
 
 // 404 status for any unrecognised ajax requests (don't throw as don't want to return html page)
 router.all(/^\/ajax\/(.*)/, function(ctx) {
-    ctx.body = { message: 'Not Found' };
-    ctx.body.root = 'error';
-    ctx.status = 404; // Not Found
+    ctx.response.body = { message: 'Not Found' };
+    ctx.response.body.root = 'error';
+    ctx.response.status = 404; // Not Found
 });
 app.use(router.routes());
 

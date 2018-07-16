@@ -35,8 +35,8 @@ class MessagesHandlers {
         }
         messages.sort((a, b) => a.timestamp < b.timestamp ? 1 : -1);
         const latest = messages.reduce((prevVal, currVal) => Math.max(prevVal, currVal.timestamp), 0);
-        const filtered = ctx.query.number ? true : false;
-        const number = ctx.query.number ? ctx.query.number.replace('~', '+') : '';
+        const filtered = ctx.request.query.number ? true : false;
+        const number = ctx.request.query.number ? ctx.request.query.number.replace('~', '+') : '';
         const forNumber = number ? phoneUtil.format(phoneUtil.parse(number, 'GB'), PhoneNumberFormat.NATIONAL) : '';
         const h1 = number ? ' with '+forNumber : '';
         await ctx.render('messages-list', { messages: messages, latest, filtered, h1 });
@@ -54,7 +54,7 @@ class MessagesHandlers {
     static async processSend(ctx) {
 
         try {
-            const toNumber = ctx.query.number.replace('~', '+');
+            const toNumber = ctx.request.query.number.replace('~', '+');
 
             // TODO: move to env vars
             const account = {
@@ -71,7 +71,7 @@ class MessagesHandlers {
             };
             const hdrs = {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                //'Accept':        ctx.header.accept || '*/*',
+                //'Accept':        ctx.request.header.accept || '*/*',
                 //'Authorization': 'Basic ' + new Buffer(account.sid+':'+account.authToken).toString('base64'), // doesn't work!
             };
             const params = Object.keys(body).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(body[k])}`).join('&');
@@ -90,15 +90,15 @@ class MessagesHandlers {
             };
             const insertId = await Message.insert('grn-test', msg); // TODO: fix hardwired 'grn-test' db
 
-            ctx.set('X-Insert-Id', insertId); // for testing
+            ctx.response.set('X-Insert-Id', insertId); // for testing
 
             // stay on same page, but with new message displayed
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
 
         } catch (e) {
             // stay on same page to report error (with current filled fields)
             ctx.flash = { formdata: ctx.request.body, _error: e.message };
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
         }
     }
 
@@ -107,19 +107,19 @@ class MessagesHandlers {
      * POST /messages/:id/delete - process delete message
      */
     static async processDelete(ctx) {
-        if (!ctx.state.user.roles.includes('admin')) return ctx.redirect('/login'+ctx.url);
+        if (!ctx.state.user.roles.includes('admin')) return ctx.response.redirect('/login'+ctx.request.url);
 
         try {
 
             await Message.delete('grn-test', ctx.params.id); // TODO: fix hardwired 'grn-test' db
 
             // return to list of messages
-            ctx.redirect('/messages');
+            ctx.response.redirect('/messages');
 
         } catch (e) {
             // stay on same page to report error
             ctx.flash = { _error: e.message };
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
         }
     }
 
@@ -139,9 +139,9 @@ class MessagesHandlers {
         const messages = await Message.getAll(db); // TODO: just get latest! (this is hangover code!)
         const latest = messages.reduce((prevVal, currVal) => Math.max(prevVal, currVal.timestamp), 0);
 
-        ctx.status = 200;
-        ctx.body = { latest: { timestamp: new Date(latest).valueOf() } };
-        ctx.body.root = 'messages';
+        ctx.response.status = 200;
+        ctx.response.body = { latest: { timestamp: new Date(latest).valueOf() } };
+        ctx.response.body.root = 'messages';
     }
 
 }

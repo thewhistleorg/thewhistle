@@ -19,14 +19,14 @@ class Handlers {
     }
 
     static postPage(ctx) {
-        if (!ctx.session.report) { ctx.redirect('/scr/1'); return; }
+        if (!ctx.session.report) { ctx.response.redirect('/scr/1'); return; }
         const go = ctx.request.body['nav-next'] ? Number(ctx.params.num) + 1 : Number(ctx.params.num) - 1;
 
         delete ctx.request.body['nav-prev'];
         delete ctx.request.body['nav-next'];
 
         ctx.session.report = Object.assign(ctx.session.report, ctx.request.body);
-        ctx.redirect('/test-cam/scr/'+(go<=7 ? go : 'submit'));
+        ctx.response.redirect('/test-cam/scr/'+(go<=7 ? go : 'submit'));
     }
 
     // ---- submit
@@ -40,9 +40,9 @@ class Handlers {
         delete ctx.request.body['submit'];
         const files = ctx.session.files;
         delete ctx.session.files;
-        await Report.insert(ctx.params.database, undefined, '—', ctx.session.report, 'scr', files, ctx.headers['user-agent']);
+        await Report.insert(ctx.params.database, undefined, '—', ctx.session.report, 'scr', files, ctx.request.headers['user-agent']);
         ctx.session = null;
-        ctx.redirect('/test-cam/scr');
+        ctx.response.redirect('/test-cam/scr');
     }
 
 }

@@ -29,13 +29,13 @@ app.use(serve('public', { maxage: maxage }));
 // don't cache, so that flash messages will get displayed correctly
 app.use(async function noCache(ctx, next) {
     await next();
-    ctx.set('Cache-Control', 'no-cache');
+    ctx.response.set('Cache-Control', 'no-cache');
 });
 
 
 // log requests (excluding static files, into capped collection)
 app.use(async function logAccess(ctx, next) {
-    debug(ctx.method.padEnd(4) + ' ' + ctx.url);
+    debug(ctx.request.method.padEnd(4) + ' ' + ctx.request.url);
     const t1 = Date.now();
     await next();
     const t2 = Date.now();
@@ -65,9 +65,9 @@ app.use(async function handleErrors(ctx, next) {
         await next();
 
     } catch (err) {
-        ctx.status = err.status || 500;
+        ctx.response.status = err.status || 500;
         if (app.env == 'production') delete err.stack; // don't leak sensitive info!
-        switch (ctx.status) {
+        switch (ctx.response.status) {
             case 404: // Not Found
                 if (err.message == 'Not Found') err.message = null; // personalised 404
                 await ctx.render('404-not-found', { err });         // 404 from app-report
@@ -173,16 +173,16 @@ app.use(convert(lusca({ // note koa-lusca@2.2.0 is v1 middleware which generates
 
 // add the domain (host without subdomain) and hostAdmin (report. replaced by admin.) into koa ctx
 app.use(async function ctxAddDomain(ctx, next) {
-    ctx.state.domain = ctx.host.replace('report.', '');
-    ctx.state.hostAdmin = ctx.host.replace('report.', 'admin.');
+    ctx.state.domain = ctx.request.host.replace('report.', '');
+    ctx.state.hostAdmin = ctx.request.host.replace('report.', 'admin.');
     await next();
 });
 
 
 // if this is the first reference to this form, run the form generation process before continuing
 app.use(async function generateForms(ctx, next) {
-    const org = ctx.url.split('/')[1];
-    const project = ctx.url.split('/')[2];
+    const org = ctx.request.url.split('/')[1];
+    const project = ctx.request.url.split('/')[2];
 
     if (!FormGenerator.built(org, project) && org && project && org!='spec' && org!='ajax' && org!='test-grn') {
         try {
@@ -202,7 +202,7 @@ app.use(async function generateForms(ctx, next) {
 app.use(Middleware.ssl({ trustProxy: true }));
 
 
-// check if user is signed in; leaves id in ctx.status.user.id if JWT verified;
+// check if user is signed in; leaves id in ctx.state.user.id if JWT verified;
 // this is used to show username & return to admin link in nav bar
 app.use(Middleware.verifyJwt());
 

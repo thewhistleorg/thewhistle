@@ -35,7 +35,7 @@ class UsersHandlers {
     static async add(ctx) {
         if (!ctx.state.user.roles.includes('admin')) {
             ctx.flash = { _error: 'User management requires admin privileges' };
-            return ctx.redirect('/login'+ctx.url);
+            return ctx.response.redirect('/login'+ctx.request.url);
         }
 
         const isSuUser = ctx.state.user.roles.includes('su') ? 'show' : 'hide';
@@ -58,7 +58,7 @@ class UsersHandlers {
     static async list(ctx) {
         if (!ctx.state.user.roles.includes('admin')) {
             ctx.flash = { _error: 'User management requires admin privileges' };
-            return ctx.redirect('/login'+ctx.url);
+            return ctx.response.redirect('/login'+ctx.request.url);
         }
 
         const isSuUser = ctx.state.user.roles.includes('su') ? 'show' : 'hide';
@@ -81,7 +81,7 @@ class UsersHandlers {
     static async edit(ctx) {
         if (!ctx.state.user.roles.includes('admin')) {
             ctx.flash = { _error: 'User management requires admin privileges' };
-            return ctx.redirect('/login'+ctx.url);
+            return ctx.response.redirect('/login'+ctx.request.url);
         }
 
         if (!ctx.params.id.match(/^[0-9a-f]{24}$/i)) ctx.throw(404, 'User not found');
@@ -155,7 +155,7 @@ class UsersHandlers {
     static async processAdd(ctx) {
         if (!ctx.state.user.roles.includes('admin')) {
             ctx.flash = { _error: 'User management requires admin privileges' };
-            return ctx.redirect('/login'+ctx.url);
+            return ctx.response.redirect('/login'+ctx.request.url);
         }
 
         const body = ctx.request.body;
@@ -187,7 +187,7 @@ class UsersHandlers {
             }
 
             const id = await User.insert(body);
-            ctx.set('X-Insert-Id', id); // for integration tests
+            ctx.response.set('X-Insert-Id', id); // for integration tests
 
             // send notification e-mail to new user
 
@@ -198,14 +198,14 @@ class UsersHandlers {
             const hash = crypto.createHash('sha256').update(Math.random().toString());
             const rndHash = parseInt(hash.digest('hex'), 16).toString(36).slice(0, 8);
             const token = now+'-'+rndHash; // note use timestamp first so it is easier to identify old tokens in db
-            if (ctx.app.env != 'production') ctx.set('X-Pw-Reset-Token', token); // for integration tests
+            if (ctx.app.env != 'production') ctx.response.set('X-Pw-Reset-Token', token); // for integration tests
 
             // record reset request in db
             await User.update(id, { passwordResetRequest: token });
 
             // send e-mail
             try {
-                const context = { firstname: body.firstname, host: ctx.host, token: token };
+                const context = { firstname: body.firstname, host: ctx.request.host, token: token };
                 if (ctx.app.env != 'development') await Mail.send(body.email, 'users-add.email', context);
                 ctx.flash = { notification: `Notification e-mail sent to ${body.email}` };
             } catch (e) {
@@ -214,12 +214,12 @@ class UsersHandlers {
             }
 
             // return to list of users
-            ctx.redirect('/users');
+            ctx.response.redirect('/users');
 
         } catch (e) {
             // stay on same page to report error (with current filled fields)
             ctx.flash = { formdata: body, _error: e.message };
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
         }
 
     }
@@ -234,7 +234,7 @@ class UsersHandlers {
     static async processEdit(ctx) {
         if (!ctx.state.user.roles.includes('admin')) {
             ctx.flash = { _error: 'User management requires admin privileges' };
-            return ctx.redirect('/login'+ctx.url);
+            return ctx.response.redirect('/login'+ctx.request.url);
         }
 
         const body = ctx.request.body;
@@ -270,12 +270,12 @@ class UsersHandlers {
             // TODO: if roles/organisations changed for current user, need to reset ctx.state
 
             // return to list of users
-            ctx.redirect('/users');
+            ctx.response.redirect('/users');
 
         } catch (e) {
             // stay on current page to report error
             ctx.flash = { _error: e.message };
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
         }
     }
 
@@ -287,7 +287,7 @@ class UsersHandlers {
     static async processDelete(ctx) {
         if (!ctx.state.user.roles.includes('admin')) {
             ctx.flash = { _error: 'User management requires admin privileges' };
-            return ctx.redirect('/login'+ctx.url);
+            return ctx.response.redirect('/login'+ctx.request.url);
         }
 
         try {
@@ -296,12 +296,12 @@ class UsersHandlers {
             await User.delete(ctx.params.id);
 
             // return to list of users
-            ctx.redirect('/users');
+            ctx.response.redirect('/users');
 
         } catch (e) {
             // stay on current page to report error
             ctx.flash = { _error: e.message };
-            ctx.redirect(ctx.url);
+            ctx.response.redirect(ctx.request.url);
         }
     }
 
@@ -317,23 +317,23 @@ class UsersHandlers {
      * eg /ajax/users?email=test@thewhistle.org
      */
     static async ajaxUserDetails(ctx) {
-        if (Object.keys(ctx.request.query).length == 0) { ctx.status = 403; ctx.body = {}; return; }
+        if (Object.keys(ctx.request.query).length == 0) { ctx.response.status = 403; ctx.response.body = {}; return; }
 
         const fld = Object.keys(ctx.request.query)[0];
         const val = ctx.request.query[fld];
 
         try {
             const users = await User.getBy(fld, val);
-            if (users.length == 0) { ctx.status = 404; ctx.body = {}; return; }
+            if (users.length == 0) { ctx.response.status = 404; ctx.response.body = {}; return; }
             const usrsNoPw = users.map(u => { delete u.password; return u; }); // no need to show p/w, even encrypted!
-            ctx.status = 200;
-            ctx.body = { users: usrsNoPw };
+            ctx.response.status = 200;
+            ctx.response.body = { users: usrsNoPw };
         } catch (e) {
             await Log.error(ctx, e);
-            ctx.status = 500; // Internal Server Error
-            ctx.body = e;
+            ctx.response.status = 500; // Internal Server Error
+            ctx.response.body = e;
         }
-        ctx.body.root = 'reports';
+        ctx.response.body.root = 'reports';
     }
 }
 

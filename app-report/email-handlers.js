@@ -47,7 +47,7 @@ class Email {
         // get e-mail template, completed with generated token
         const templateHtml = await fs.readFile('app-report/templates/email/verify.email.html', 'utf8');
         const templateHbs = handlebars.compile(templateHtml);
-        const html = templateHbs({ host: ctx.host, token: token });
+        const html = templateHbs({ host: ctx.request.host, token: token });
 
         // get e-mail subject from <title> element
         const document = new JSDOM(html).window.document;

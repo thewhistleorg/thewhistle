@@ -28,10 +28,10 @@ class AjaxHandlers {
         do {
             alias = await autoIdentifier(12);
         } while (alias.length > 12); // avoid excessively long aliases
-        ctx.body = { alias: alias };
-        ctx.body.root = 'generateAlias';
-        ctx.status = 200; // Ok
-        ctx.set('Cache-Control', 'no-cache'); // stop IE caching generated aliases.
+        ctx.response.body = { alias: alias };
+        ctx.response.body.root = 'generateAlias';
+        ctx.response.status = 200; // Ok
+        ctx.response.set('Cache-Control', 'no-cache'); // stop IE caching generated aliases.
     }
 
 
@@ -42,9 +42,9 @@ class AjaxHandlers {
         const db = ctx.params.db;
         const id = ctx.params.alias.replace('+', ' ');
         const reports = await Report.getBy(db, 'alias', id);
-        ctx.body = {};
-        ctx.body.root = 'alias';
-        ctx.status = reports.length==0 && ctx.params.id!='' ? 404 : 200; // Not Found / Ok
+        ctx.response.body = {};
+        ctx.response.body.root = 'alias';
+        ctx.response.status = reports.length==0 && ctx.params.id!='' ? 404 : 200; // Not Found / Ok
     }
 
 
@@ -59,22 +59,22 @@ class AjaxHandlers {
      */
     static async geocode(ctx) {
         const corsAllow = [ 'http://rapeisacrime.org', 'http://www.rapeisacrime.org', 'http://www.movable-type.co.uk', 'http://mtl.local' ];
-        const region = ctx.query.region ? ctx.query.region : await Ip.getCountry(ctx.ip);
-        const geocoded = await Geocoder.geocode(ctx.query.address, region);
+        const region = ctx.request.query.region ? ctx.request.query.region : await Ip.getCountry(ctx.request.ip);
+        const geocoded = await Geocoder.geocode(ctx.request.query.address, region);
 
         if (geocoded) {
-            ctx.body = { formattedAddress: geocoded.formattedAddress };
-            ctx.body.root = 'geocode';
+            ctx.response.body = { formattedAddress: geocoded.formattedAddress };
+            ctx.response.body.root = 'geocode';
             // if this is a CORS request, check it comes from acceptable source
             if (corsAllow.includes(ctx.request.get('Origin'))) {
                 ctx.response.set('Vary', 'Origin');
                 ctx.response.set('Access-Control-Allow-Origin', ctx.request.get('Origin'));
             }
             // if region is specified, treat it as a requirement not just as bias as Google does (after CORS check!)
-            if (ctx.query.region && ctx.query.region.toUpperCase()!=geocoded.countryCode) { ctx.status = 404; return; }
-            ctx.status = 200; // Ok
+            if (ctx.request.query.region && ctx.request.query.region.toUpperCase()!=geocoded.countryCode) { ctx.response.status = 404; return; }
+            ctx.response.status = 200; // Ok
         } else {
-            ctx.status = 404; // Not Found
+            ctx.response.status = 404; // Not Found
         }
     }
 
@@ -83,9 +83,9 @@ class AjaxHandlers {
      * 404 Not Found.
      */
     static ajax404(ctx) {
-        ctx.body = { message: 'Not Found' };
-        ctx.body.root = 'error';
-        ctx.status = 404; // Not Found
+        ctx.response.body = { message: 'Not Found' };
+        ctx.response.body.root = 'error';
+        ctx.response.status = 404; // Not Found
     }
 
 }

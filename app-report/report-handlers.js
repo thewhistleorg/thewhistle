@@ -12,14 +12,15 @@ import Debug                         from 'debug';       // small debugging util
 
 const debug = Debug('app:report'); // submission process
 
-import Report       from '../models/report.js';
-import Resource     from '../models/resource.js';
-import Submission   from '../models/submission.js';
-import UserAgent    from '../models/user-agent.js';
-import Notification from '../models/notification';
-import User         from '../models/user';
-import Geocoder     from '../lib/geocode.js';
-import Log          from '../lib/log';
+import Report        from '../models/report.js';
+import Resource      from '../models/resource.js';
+import Submission    from '../models/submission.js';
+import UserAgent     from '../models/user-agent.js';
+import Notification  from '../models/notification';
+import User          from '../models/user';
+import FormGenerator from '../lib/form-generator.js';
+import Geocoder      from '../lib/geocode.js';
+import Log           from '../lib/log';
 
 class Handlers {
 
@@ -64,14 +65,12 @@ class Handlers {
      * This is not useful for specs hosted by The Whistle, as any spec change will trigger an app
      * rebuild, but once organisations are hosting their own specs, this can be used to trigger
      * regeneration of a report after a spec change.
-     *
-     * TODO: page does not update: need to force handlebars re-compilation?
      */
     static rebuild(ctx) {
         const org = ctx.params.database;
         const project = ctx.params.project;
 
-        delete global.built[org+project];
+        FormGenerator.build(org, project);
 
         ctx.redirect(`/${org}/${project}`);
     }

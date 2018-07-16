@@ -1,0 +1,30 @@
+$schema: http://json-schema.org/draft-06/schema#
+
+description: The Whistle Form specification Schema
+
+# top-level object must contain 'pages' object, with optional title, version, and options
+type: object
+required: [ pages ]
+properties:
+  title:   { type: string }
+  version: { type: number }
+  pages:   { $ref: '#/pages' }
+  options: { type: object }
+
+pages:
+  type: object                                                  # associative array indexed by 'page'
+  required: [ index ]                                           # must have an index page
+  properties:        { index:              { $ref: '#/page' } } # ... as defined by 'page'
+  patternProperties: { '^[a-z][a-z0-9]+$': { $ref: '#/page' } } # other pages must have alphanumeric keys
+  additionalProperties: false
+
+page:
+  type: array                    # a page comprises an array of texts and inputs
+  items:
+    type: object
+    properties:
+      flash:      { type: object }             # TODO
+      text:       { type: [ string, object ] } # TODO
+      input:      { type: object }             # TODO
+      notworking: { type: [ object, null ] }   # TODO
+    additionalProperties: false

@@ -327,11 +327,9 @@ class Report {
         id = objectId(id);  // allow id as string
 
         const reports = await Db.collection(db, 'reports');
-        console.log('DB', db);
+
         for (const field in details) {
-            console.log('FEYALD ', field, details[field], id);
             await reports.updateOne({ _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
-            console.log('REP', { _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
         }
 
         for (const field in detailsRaw) {

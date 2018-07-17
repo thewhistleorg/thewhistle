@@ -2,7 +2,6 @@ import $RefParser     from 'json-schema-ref-parser';
 import Report         from '../models/report.js';
 import autoIdentifier from '../lib/auto-identifier.js';
 import Db             from '../lib/db.js';
-import { ObjectId }   from 'mongodb';
 
 class SmsApp {
     
@@ -81,7 +80,10 @@ class SmsApp {
         const sessionId = await Report.submissionStart(this.org, this.project, alias, version, ctx.headers['user-agent']);
         ctx.cookies.set('sessionId', sessionId, { httpOnly: false });
         //Send user initial SMS
-        twiml.message(alias + '---' + this.initialSms);
+        twiml.message({
+            action: '/delete-outbound',
+            method: 'POST',
+        }, alias + '---' + this.initialSms);
         return alias;
     }
 
@@ -107,14 +109,10 @@ class SmsApp {
      */
     async updateResponse(ctx, questionNo, input) {
         await this.setupDatabase();
-        const reports = global.db[this.db].collection('reports');
         const sessionId = ctx.cookies.get('sessionId');
         const field = this.getField(questionNo);
         try {
-            await reports.updateOne(
-                { _id: ObjectId(sessionId) },
-                { $set: { [`submitted.${field}`]: input } }
-            );
+            Report.updateField(this.db, sessionId, field, input);
         } catch (e) {
             console.error(e);
         }
@@ -149,12 +147,28 @@ class SmsApp {
      */
     sendNextQuestion(ctx, twiml, nextQuestion) {
         const message = this.questions[nextQuestion].question;
-        const date = new Date();
+        let next = 0;
         if (Number(nextQuestion) + 1 < Number(this.questions.length)) {
-            date.setSeconds(date.getSeconds() + 60 * 60 * 24 * 7);
+            next = Number(nextQuestion) + 1;
         }
-        ctx.cookies.set('nextQuestion', Number(nextQuestion) + 1, { httpOnly: false, expires: date });
-        twiml.message(message);
+        ctx.cookies.set('nextQuestion', next, { httpOnly: false });
+        twiml.message({
+            action: '/delete-outbound',
+            method: 'POST',
+        }, message);
+    }
+
+
+    static deleteMessage(messageId) {
+        const accountId = 'AC5da0166da2047a8e4d3b3709982ebaae';
+        const authToken = '0c34505d5eff527a6b67038b9b7f4a11';
+        const client = require('twilio')(accountId, authToken);
+        client.messages(messageId)
+            .remove()
+            .catch(() => {
+                setTimeout(() => SmsApp.deleteMessage(messageId), 1000);
+            })
+            .done();
     }
 
     /**
@@ -172,7 +186,10 @@ class SmsApp {
         switch (incomingSms.toLowerCase()) {
             case 'help':
                 //TODO: Handle action texts properly
-                twiml.message('HELP text');
+                twiml.message({
+                    action: '/delete-outbound',
+                    method: 'POST',
+                }, 'HELP text');
                 break;
             case 'start':
                 alias = await this.initiateSmsReport(ctx, twiml);
@@ -196,6 +213,7 @@ class SmsApp {
         ctx.status = 200;
         ctx.headers['Content-Type'] = 'text/xml';
         ctx.body = twiml.toString();
+        SmsApp.deleteMessage(ctx.request.body.MessageSid);
     }
 }
 

@@ -342,6 +342,24 @@ class Report {
 
 
     /**
+     * Sets (or updates) a report field.
+     *
+     * @param {string}   db - Database to use.
+     * @param {ObjectId} id - Report Id.
+     * @param {Object}   key - Field name to update
+     * @param {Object}   value - User's response to given field
+     */
+    static async updateField(db, id, key, value) {
+        if (!global.db[db]) await Db.connect(db);
+        const reports = global.db[db].collection('reports');
+        await reports.updateOne(
+            { _id: ObjectId(id) },
+            { $set: { [`submitted.${key}`]: value } }
+        );
+    }
+
+
+    /**
      * Stores uploaded file.
      *
      * This uploads the file to AWS S3, records the file metadata, and records analysis such as EXIF

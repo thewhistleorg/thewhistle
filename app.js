@@ -68,22 +68,6 @@ app.keys = [ 0, 1, 2 ].map(x => process.env.COOKIE_KEY + dateFormat(new Date(dat
 app.use(session(app));
 
 
-// get database connection to 'users' database if not already available (only done on first request
-// after app startup)
-global.db = {}; // initialise global.db to empty object on app startup
-app.use(async function(ctx, next) {
-    if (!global.db.users) {
-        try {
-            await Db.connect('users');
-        } catch (e) {
-            console.error(e.message);
-            process.exit(1);
-        }
-    }
-    await next();
-});
-
-
 // select sub-app (admin/api) according to host subdomain (could also be by analysing request.url);
 // separate sub-apps can be used for modularisation of a large system, for different login/access
 // rights for public/protected elements, and also for different functionality between api & web

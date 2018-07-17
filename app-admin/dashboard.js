@@ -99,7 +99,7 @@ class DashboardHandlers {
 
         // most recently viewed reports
         const filterRecentlyViewed = { ['views.'+user._id]: { '$exists': true } }; // TODO: remove .toArray from .find()
-        const recentlyViewed = await global.db[db].collection('reports').find(filterRecentlyViewed).sort({ ['views.'+user._id]: -1 }).limit(6).toArray();
+        const recentlyViewed = await Db.collection(db, 'reports').find(filterRecentlyViewed).sort({ ['views.'+user._id]: -1 }).limit(6).toArray();
         for (const report of recentlyViewed) {
             report.viewedOn = report.views[user._id].toISOString();
             report.viewedAgo = ago(report.views[user._id]);

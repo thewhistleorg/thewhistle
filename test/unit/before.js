@@ -11,15 +11,6 @@ import Db from '../../lib/db.js';
 
 before(async function() {
     this.timeout(10e3); // 10 sec
-
-    try {
-        global.db = {};
-        await Db.connect('users');
-        await Db.connect('grn-test');
-    } catch (e) {
-        console.error(e.message);
-        process.exit(1);
-    }
 });
 
 export default before;

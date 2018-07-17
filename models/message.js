@@ -6,6 +6,8 @@
 
 import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js
 
+import Db from '../lib/db.js';
+
 
 class Message {
 
@@ -16,7 +18,7 @@ class Message {
      * @returns {Object}   Message details.
      */
     static async get(db, id) {
-        const messages = global.db[db].collection('messages');
+        const messages = await Db.collection(db, 'messages');
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
         const message = await messages.findOne(id);
         return message;
@@ -29,7 +31,7 @@ class Message {
      * @returns {Object[]} Messages details.
      */
     static async getAll(db) {
-        const messages = global.db[db].collection('messages');
+        const messages = await Db.collection(db, 'messages');
         const msgs = await messages.find({}).toArray();
         return msgs;
     }
@@ -44,7 +46,7 @@ class Message {
      */
     static async getBy(db, field, value) {
         if (typeof field != 'string') throw new Error('Message.getBy: field must be a string');
-        const messages = global.db[db].collection('messages');
+        const messages = await Db.collection(db, 'messages');
         const msgs = await messages.find({ [field]: value }).toArray();
         return msgs;
     }
@@ -58,7 +60,7 @@ class Message {
      * @throws  Error on validation or referential integrity errors.
      */
     static async insert(db, values) {
-        const messages = global.db[db].collection('messages');
+        const messages = await Db.collection(db, 'messages');
         try {
             const { insertedId } = await messages.insertOne(values);
             return insertedId;
@@ -76,7 +78,7 @@ class Message {
      * @throws Error on referential integrity errors.
      */
     static async update(db, id, values) {
-        const messages = global.db[db].collection('messages');
+        const messages = await Db.collection(db, 'messages');
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
         await messages.updateOne({ _id: id }, { $set: values });
     }
@@ -89,7 +91,7 @@ class Message {
      * @returns {boolean}  True if a record was deleted.
      */
     static async delete(db, id) {
-        const messages = global.db[db].collection('messages');
+        const messages = await Db.collection(db, 'messages');
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
         const result = await messages.deleteOne({ _id: id });
         return result.deletedCount == 1;

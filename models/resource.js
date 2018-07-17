@@ -41,19 +41,17 @@ class Resource {
      * @param {string} db - Database to use.
      */
     static async init(db) {
-        if (!global.db[db]) await Db.connect(db);
-
         // if no 'resources' collection, create it
-        const collections = await global.db[db].collections();
+        const collections = await Db.collections(db);
         if (!collections.map(c => c.s.name).includes('resources')) {
-            await global.db[db].createCollection('resources');
+            await Db.createCollection(db, 'resources');
         }
 
-        const resources = global.db[db].collection('resources');
+        const resources = await Db.collection(db, 'resources');
 
         // TODO: if 'resources' collection doesn't have validation, add it
         //const infos = await resources.infos();
-        //await global.db[db].command({ collMod: 'resources' , validator: validator }); TODO: sort out validation!
+        //await Db.command(db, { collMod: 'resources' , validator: validator }); TODO: sort out validation!
 
         // if 'resources' collection doesn't have correct indexes, add them
         const indexes = (await resources.indexes()).map(i => i.key);
@@ -70,9 +68,7 @@ class Resource {
      * @returns {Object[]} Resources details.
      */
     static async find(db, query) {
-        if (!global.db[db]) await Db.connect(db);
-
-        const resources = global.db[db].collection('resources');
+        const resources = await Db.collection(db, 'resources');
         const rpts = await resources.find(query).toArray();
         return rpts;
     }
@@ -86,11 +82,9 @@ class Resource {
      * @returns {Object}   Resource details.
      */
     static async get(db, id) {
-        if (!global.db[db]) await Db.connect(db);
-
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
-        const resources = global.db[db].collection('resources');
+        const resources = await Db.collection(db, 'resources');
 
         const resource = await resources.findOne(id);
 
@@ -105,9 +99,7 @@ class Resource {
      * @returns {Object[]} Resources details.
      */
     static async getAll(db) {
-        if (!global.db[db]) await Db.connect(db);
-
-        const resources = global.db[db].collection('resources');
+        const resources = await Db.collection(db, 'resources');
 
         const cntrs = await resources.find({}).toArray();
 
@@ -124,9 +116,7 @@ class Resource {
      * @returns {Object[]}      Resources details.
      */
     static async getBy(db, field, value) {
-        if (!global.db[db]) await Db.connect(db);
-
-        const resources = global.db[db].collection('resources');
+        const resources = await Db.collection(db, 'resources');
         const cntrs = await resources.find({ [field]: value }).toArray();
 
         return cntrs;
@@ -143,9 +133,7 @@ class Resource {
      * @returns {Object[]} Resources details.
      */
     static async getNear(db, lat, lon, distance) {
-        if (!global.db[db]) await Db.connect(db);
-
-        const resources = global.db[db].collection('resources');
+        const resources = await Db.collection(db, 'resources');
 
         const point = { type: 'Point', coordinates: [ lon, lat ] };
         const query = { location: { $near: { $geometry: point, $maxDistance: distance } } };
@@ -165,9 +153,7 @@ class Resource {
      * @throws  Error on validation or referential integrity errors.
      */
     static async insert(db, values, geocode) {
-        if (!global.db[db]) await Db.connect(db);
-
-        const resources = global.db[db].collection('resources');
+        const resources = await Db.collection(db, 'resources');
 
         if (geocode) { // record (geoJSON) location for (indexed) geospatial queries
             values.location = {
@@ -191,11 +177,9 @@ class Resource {
      * @throws Error on referential integrity errors.
      */
     static async update(db, id, values, geocode) {
-        if (!global.db[db]) await Db.connect(db);
-
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
-        const resources = global.db[db].collection('resources');
+        const resources = await Db.collection(db, 'resources');
 
         if (geocode) { // record (geoJSON) location for (indexed) geospatial queries
             values.location = {
@@ -218,11 +202,9 @@ class Resource {
      * @throws Error
      */
     static async delete(db, id) {
-        if (!global.db[db]) await Db.connect(db);
-
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
-        const resources = global.db[db].collection('resources');
+        const resources = await Db.collection(db, 'resources');
         await resources.deleteOne({ _id: id });
     }
 

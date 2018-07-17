@@ -6,6 +6,8 @@
 
 import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js
 
+import Db from '../lib/db.js';
+
 /* eslint-disable no-unused-vars, key-spacing */
 const schema = {
     type: 'object',
@@ -35,7 +37,7 @@ class User {
      * @returns {Object}   User details.
      */
     static async get(id) {
-        const users = global.db.users.collection('users');
+        const users = await Db.collection('users', 'users');
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
         const user = await users.findOne(id);
         return user;
@@ -48,7 +50,7 @@ class User {
      * @returns {Object[]} Users details.
      */
     static async getAll() {
-        const users = global.db.users.collection('users');
+        const users = await Db.collection('users', 'users');
         const usrs = await users.find({}).toArray();
         return usrs;
     }
@@ -63,7 +65,7 @@ class User {
      */
     static async getBy(field, value) {
         if (typeof field != 'string') throw new Error('User.getBy: field must be a string');
-        const users = global.db.users.collection('users');
+        const users = await Db.collection('users', 'users');
         const usrs = await users.find({ [field]: value }).toArray();
         return usrs;
     }
@@ -77,7 +79,7 @@ class User {
      */
     static async getForDb(db) {
         if (typeof db != 'string') throw new Error('User.getForDb: db must be a string');
-        const users = global.db.users.collection('users');
+        const users = await Db.collection('users', 'users');
         const usrs = await users.find({ databases: db }).toArray();
         return usrs;
     }
@@ -91,7 +93,7 @@ class User {
      * @throws  Error on validation or referential integrity errors.
      */
     static async insert(values) {
-        const users = global.db.users.collection('users');
+        const users = await Db.collection('users', 'users');
         try {
             const { insertedId } = await users.insertOne(values);
             return insertedId;
@@ -113,7 +115,7 @@ class User {
      * @throws Error on referential integrity errors.
      */
     static async update(id, values) {
-        const users = global.db.users.collection('users');
+        const users = await Db.collection('users', 'users');
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
         await users.updateOne({ _id: id }, { $set: values });
     }
@@ -126,7 +128,7 @@ class User {
      * @returns {boolean}  True if a record was deleted.
      */
     static async delete(id) {
-        const users = global.db.users.collection('users');
+        const users = await Db.collection('users', 'users');
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
         const result = await users.deleteOne({ _id: id });
         return result.deletedCount == 1;
@@ -139,7 +141,7 @@ class User {
      * @returns {Map} User details indexed by id.
      */
     static async details() {
-        const users = global.db.users.collection('users');
+        const users = await Db.collection('users', 'users');
         const usrs = await users.find({}).toArray();
         const map = new Map;
         usrs.forEach(u => map.set(u._id.toString(), u));
@@ -153,7 +155,7 @@ class User {
      * @returns {Map} User names indexed by id.
      */
     static async names() {
-        const users = global.db.users.collection('users');
+        const users = await Db.collection('users', 'users');
         const usrs = await users.find({}).toArray();
         const map = new Map;
         usrs.forEach(u => map.set(u._id.toString(), u.username));

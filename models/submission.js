@@ -31,9 +31,7 @@ class Submission {
      * Return all submission records.
      */
     static async getAll(db) {
-        if (!global.db[db]) await Db.connect(db);
-
-        const submissions = global.db[db].collection('submissions');
+        const submissions = await Db.collection(db, 'submissions');
         return await submissions.find({}).toArray();
     }
 
@@ -47,9 +45,7 @@ class Submission {
      * @returns {ObjectId} Id of submission document.
      */
     static async insert(db, project, hdrUserAgent) {
-        if (!global.db[db]) await Db.connect(db);
-
-        const submissions = global.db[db].collection('submissions');
+        const submissions = await Db.collection(db, 'submissions');
 
         const ua = useragent.parse(hdrUserAgent);
         ua.agent = { os: ua.os, device: ua.device }; // os, device are only parsed on demand
@@ -69,11 +65,9 @@ class Submission {
      * @param {number} page - Page being submitted ('0' for post of report home page).
      */
     static async progress(db, submissionId, page) {
-        if (!global.db[db]) await Db.connect(db);
-
         if (!(submissionId instanceof ObjectId)) submissionId = new ObjectId(submissionId); // allow id as string
 
-        const submissions = global.db[db].collection('submissions');
+        const submissions = await Db.collection(db, 'submissions');
 
         const values = { ['progress.'+page]: new Date() };
         await submissions.updateOne({ _id: submissionId }, { $set: values });
@@ -88,12 +82,10 @@ class Submission {
      * @param {ObjectId} reportId - Id of submitted report document.
      */
     static async complete(db, submissionId, reportId) {
-        if (!global.db[db]) await Db.connect(db);
-
         if (!(submissionId instanceof ObjectId)) submissionId = new ObjectId(submissionId); // allow id as string
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId);             // allow id as string
 
-        const submissions = global.db[db].collection('submissions');
+        const submissions = await Db.collection(db, 'submissions');
 
         const values = { 'progress.complete': new Date(),  reportId: reportId };
         await submissions.updateOne({ _id: submissionId }, { $set: values });

@@ -5,6 +5,8 @@
 /* also cleared out manually. In time we will have to devise some notification system.            */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+import Db from '../lib/db.js';
+
 
 class Error {
 
@@ -18,7 +20,7 @@ class Error {
      */
     static async insert(error, source=null, ctx=null) {
         // log errors in common users database rather than in organisation-specific databases
-        const errors = global.db.users.collection('errors');
+        const errors = await Db.collection('users', 'errors');
 
         if (typeof error != 'object') error = { error: error };
 

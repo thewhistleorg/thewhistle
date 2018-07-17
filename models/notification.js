@@ -56,9 +56,7 @@ class Notification {
      */
     static async notify(db, event, userId, reportId) {
         debug('Notification.notify', 'db:'+db, 'u:'+userId, 'r:'+reportId, event);
-        if (!global.db[db]) await Db.connect(db);
-
-        const notifications = global.db[db].collection('notifications');
+        const notifications = await Db.collection(db, 'notifications');
 
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId);       // allow userId as string
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow reportId as string
@@ -92,13 +90,12 @@ class Notification {
      */
     static async notifyMultiple(db, event, userIds, reportId) {
         debug('Notification.notifyMultiple', 'db:'+db, 'r:'+reportId, event);
-        if (!global.db[db]) await Db.connect(db);
 
         for (let id=0; id<userIds.length; id++) if (!(userIds[id] instanceof ObjectId)) userIds[id] = new ObjectId(userIds[id]); // allow userId as string
         // userIds.forEach(id => { if (!(id instanceof ObjectId)) id = new ObjectId(id); }); // allow userId as string
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow reportId as string
 
-        const notifications = global.db[db].collection('notifications');
+        const notifications = await Db.collection(db, 'notifications');
 
         const values = {
             event:  event,
@@ -123,11 +120,9 @@ class Notification {
      * @returns {Object[]} Notifications.
      */
     static async listForReport(db, event, reportId) {
-        if (!global.db[db]) await Db.connect(db);
-
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow reportId as string
 
-        const notifications = global.db[db].collection('notifications');
+        const notifications = await Db.collection(db, 'notifications');
 
         const notificns = await notifications.find({ event: event, report: reportId }).sort({ _id: -1 }).toArray();
 
@@ -144,11 +139,9 @@ class Notification {
      * @returns {Object[]} Notifications.
      */
     static async listForUser(db, userId, event) {
-        if (!global.db[db]) await Db.connect(db);
-
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow userId as string
 
-        const notifications = global.db[db].collection('notifications');
+        const notifications = await Db.collection(db, 'notifications');
 
         const notificns = await notifications.find({ users: userId, event: event }).sort({ _id: -1 }).toArray();
 
@@ -163,9 +156,7 @@ class Notification {
      * @returns {Object[]} Notifications.
      */
     static async listDebug(db) {
-        if (!global.db[db]) await Db.connect(db);
-
-        const notifications = global.db[db].collection('notifications');
+        const notifications = await Db.collection(db, 'notifications');
 
         const notificns = await notifications.find({}).sort({ _id: -1 }).toArray();
 
@@ -183,12 +174,11 @@ class Notification {
      */
     static async dismiss(db, notificationId, userId) {
         debug('Notification.dismiss', 'db:'+db, 'n:'+notificationId, 'u:'+userId);
-        if (!global.db[db]) await Db.connect(db);
 
         if (!(notificationId instanceof ObjectId)) notificationId = new ObjectId(notificationId); // allow notificationId as string
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow userId as string
 
-        const notifications = global.db[db].collection('notifications');
+        const notifications = await Db.collection(db, 'notifications');
 
         await notifications.update({ _id: notificationId }, { $pull: { users: userId } });
 
@@ -209,12 +199,11 @@ class Notification {
      */
     static async dismissForUserReport(db, userId, reportId) {
         debug('Notification.dismissForUserReport', 'db:'+db, 'u:'+userId, 'r:'+reportId);
-        if (!global.db[db]) await Db.connect(db);
 
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId);       // allow userId as string
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow reportId as string
 
-        const notifications = global.db[db].collection('notifications');
+        const notifications = await Db.collection(db, 'notifications');
 
         await notifications.update({ report: reportId }, { $pull: { users: userId } });
 
@@ -237,11 +226,10 @@ class Notification {
      */
     static async cancel(db, notificationId) {
         debug('Notification.cancel', 'db:'+db, 'n:'+notificationId);
-        if (!global.db[db]) await Db.connect(db);
 
         if (!(notificationId instanceof ObjectId)) notificationId = new ObjectId(notificationId); // allow notificationId as string
 
-        const notifications = global.db[db].collection('notifications');
+        const notifications = await Db.collection(db, 'notifications');
 
         await notifications.deleteOne({ _id: notificationId });
 
@@ -259,11 +247,10 @@ class Notification {
      */
     static async cancelForReport(db, reportId) {
         debug('Notification.cancelForReport', 'db:'+db, 'r:'+reportId);
-        if (!global.db[db]) await Db.connect(db);
 
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow reportId as string
 
-        const notifications = global.db[db].collection('notifications');
+        const notifications = await Db.collection(db, 'notifications');
 
         await notifications.deleteMany({ report: reportId });
 
@@ -278,9 +265,7 @@ class Notification {
      * @returns {string[]} List of events.
      */
     static async events(db) {
-        if (!global.db[db]) await Db.connect(db);
-
-        const notifications = global.db[db].collection('notifications');
+        const notifications = await Db.collection(db, 'notifications');
 
         const notificns = await notifications.find({}).toArray();
 

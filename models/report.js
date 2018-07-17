@@ -96,19 +96,17 @@ class Report {
      * @param {string} db - Database to use.
      */
     static async init(db) {
-        if (!global.db[db]) await Db.connect(db);
-
         // if no 'reports' collection, create it
-        const collections = await global.db[db].collections();
+        const collections = await Db.collections(db);
         if (!collections.map(c => c.s.name).includes('reports')) {
-            await global.db[db].createCollection('reports');
+            await Db.createCollection(db, 'reports');
         }
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
 
         // TODO: if 'reports' collection doesn't have validation, add it
         //const infos = await reports.infos();
-        //await global.db[db].command({ collMod: 'reports' , validator: validator }); TODO: sort out validation!
+        //await Db.command(db, { collMod: 'reports' , validator: validator }); TODO: sort out validation!
 
         // ---- indexing
 
@@ -156,9 +154,7 @@ class Report {
      * @returns {Object[]} Reports details.
      */
     static async find(db, query) {
-        if (!global.db[db]) await Db.connect(db);
-
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
         const rpts = await reports.find(query).toArray();
         return rpts;
     }
@@ -172,12 +168,10 @@ class Report {
      * @returns {Object}   Report details or null if not found.
      */
     static async get(db, id) {
-        if (!global.db[db]) await Db.connect(db);
-
         id = objectId(id); // allow id as string
         if (!id) return null;
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
         const rpt = await reports.findOne(id);
         return rpt;
     }
@@ -190,9 +184,7 @@ class Report {
      * @returns {Object[]} Reports details.
      */
     static async getAll(db, active='active') {
-        if (!global.db[db]) await Db.connect(db);
-
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
         const query = active=='active'
             ? { archived: false }
             : active=='archived' ? { archived: true } : {};
@@ -215,9 +207,7 @@ class Report {
      * @returns {Object[]}             Reports details.
      */
     static async getBy(db, field, value) {
-        if (!global.db[db]) await Db.connect(db);
-
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
         const rpts = await reports.find({ [field]: value }).toArray();
         return rpts;
     }
@@ -233,9 +223,7 @@ class Report {
      * @returns {Object[]} Reports details.
      */
     static async getByTag(db, tag) {
-        if (!global.db[db]) await Db.connect(db);
-
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
         const rpts = await reports.find({ ['tags']: tag }).toArray();
         return rpts;
     }
@@ -249,9 +237,7 @@ class Report {
      * @returns {string} Timestamp as ISO8601 string (or empty string if no reports of given category). TODO: return as Date?
      */
     static async getLatestTimestamp(db, active='all') {
-        if (!global.db[db]) await Db.connect(db);
-
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
         const query = active=='active'
             ? { archived: false }
             : active=='archived' ? { archived: true } : {};
@@ -271,9 +257,7 @@ class Report {
      * @returns {string} Timestamp as ISO8601 string (or empty string if no reports of given category). TODO: return as Date?
      */
     static async getOldestTimestamp(db, active='all') {
-        if (!global.db[db]) await Db.connect(db);
-
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
         const query = active=='active'
             ? { archived: false }
             : active=='archived' ? { archived: true } : {};
@@ -297,10 +281,10 @@ class Report {
      */
     static async submissionStart(db, project, alias, version, userAgent) {
         debug('Report.submissionStart', 'db:'+db, 'p:'+project, alias);
-        if (!global.db[db]) await Db.connect(db);
+
         if (typeof alias != 'string' || alias.length == 0) throw new Error('Alias must be supplied');
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
 
         const values = {
             project:          project,
@@ -339,11 +323,10 @@ class Report {
      */
     static async submissionDetails(db, id, details, detailsRaw) {
         debug('Report.submissionDetails', 'db:'+db, 'r:'+id, details);
-        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);  // allow id as string
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
 
         for (const field in details) {
             await reports.updateOne({ _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
@@ -371,11 +354,10 @@ class Report {
      */
     static async submissionFile(db, id, formidableFile) {
         debug('Report.submissionFile', 'db:'+db, 'r:'+id, formidableFile.path, formidableFile.name);
-        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id); // allow id as string
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
 
         if (formidableFile.size == 0) return;
 
@@ -442,11 +424,10 @@ class Report {
     static async insert(db, by, alias, submitted, project, files, userAgent) {
         throw new Error('Report.insert: this function has been superceded by submissionStart / submissionDetails');
         debug('Report.insert', 'db:'+db, alias, submitted, 'p:'+project); // eslint-disable-line no-unreachable
-        if (!global.db[db]) await Db.connect(db);
 
         by = objectId(by); // allow id as string
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
 
         // record report first, so that any file move issues don't cause us to lose it
 
@@ -529,14 +510,13 @@ class Report {
      */
     static async update(db, id, values, userId) {
         debug('Report.update', 'db:'+db, 'r:'+id, values);
-        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow id as string
 
         if (values.submitted != undefined) throw new Error('Cannot update submitted report');
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
 
         await reports.updateOne({ _id: id }, { $set: values });
 
@@ -553,7 +533,6 @@ class Report {
      */
     static async delete(db, id) {
         debug('Report.delete', 'db:'+db, 'r:'+id);
-        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id); // allow id as string
 
@@ -567,7 +546,7 @@ class Report {
         await Notification.cancelForReport(db, id);
 
         // delete report
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
         await reports.deleteOne({ _id: id });
 
         // delete any uploaded files
@@ -585,8 +564,6 @@ class Report {
      * @returns {string[]} Array of statuses currently in use (unsorted).
      */
     static async statuses(db) {
-        if (!global.db[db]) await Db.connect(db);
-
         // TODO: more efficient way to do this?
         const reports = await Report.getAll(db);
 
@@ -618,8 +595,6 @@ class Report {
      * @returns {string[]} Array of tags currently in use.
      */
     static async tags(db) {
-        if (!global.db[db]) await Db.connect(db);
-
         // TODO: more efficient way to do this?
         const reports = await Report.getAll(db);
 
@@ -642,12 +617,11 @@ class Report {
      */
     static async insertTag(db, id, tag, userId) {
         debug('Report.insertTag', 'db:'+db, 'r:'+id, 't:'+tag, userId);
-        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow userId as string
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
         await reports.updateOne({ _id: id }, { $addToSet: { tags: tag } });
 
         if (userId) await Update.insert(db, id, userId, { addToSet: { tags: tag } }); // audit trail
@@ -664,12 +638,11 @@ class Report {
      */
     static async deleteTag(db, id, tag, userId) {
         debug('Report.deleteTag', 'db:'+db, 'r:'+id, 't:'+tag, userId);
-        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow id as string
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
         await reports.updateOne({ _id: id }, { $pull: { tags: tag } });
 
         if (userId) await Update.insert(db, id, userId, { pull: { tags: tag } }); // audit trail
@@ -691,7 +664,6 @@ class Report {
      */
     static async insertComment(db, id, comment, userId) {
         debug('Report.insertComment', 'db:'+db, 'r:'+id);
-        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow userId as string
@@ -702,7 +674,7 @@ class Report {
             comment = comment.replace('@'+user.username, `[@${user.username}](${user._id})`);
         }
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
 
         const user = await User.get(userId);
         const values = { byId: userId, byName: user.username, on: new Date(), comment };
@@ -732,7 +704,6 @@ class Report {
      */
     static async updateComment(db, id, by, on, comment, userId) {
         debug('Report.updateComment', 'db:'+db, 'r:'+id);
-        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);                            // allow id as string
         by = objectId(by);                            // allow id as string
@@ -748,7 +719,7 @@ class Report {
             commentMd = commentMd.replace('@'+user.username, `[@${user.username}](${user._id})`);
         }
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
 
         await reports.updateOne({ _id: id, 'comments.byId': by, 'comments.on': on }, { $set: { 'comments.$.comment': commentMd } });
 
@@ -770,7 +741,6 @@ class Report {
      */
     static async deleteComment(db, id, by, on, userId) {
         debug('Report.deleteComment', 'db:'+db, 'r:'+id);
-        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);                            // allow id as string
         by = objectId(by);                            // allow id as string
@@ -778,7 +748,7 @@ class Report {
         if (!(on instanceof Date)) on = new Date(on); // allow timestamp as string
         if (isNaN(on.getTime())) throw new Error('invalid ‘on’ date');
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
         await reports.updateOne({ _id: id }, { $pull: { comments: { byId: by, on: on } } });
 
         await Update.insert(db, id, userId, { pull: { comments: { byId: by, on: on } } }); // audit trail
@@ -794,12 +764,11 @@ class Report {
      */
     static async flagView(db, id, userId) {
         debug('Report.flagView', 'db:'+db, 'r:'+id, 'u:'+userId);
-        if (!global.db[db]) await Db.connect(db);
 
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow id as string
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
         const report = await reports.findOne(id);
 
         const views = report.views || {};
@@ -821,12 +790,10 @@ class Report {
      * @returns {Date} Timestamp this user last viewed this report.
      */
     static async lastViewed(db, id, userId) {
-        if (!global.db[db]) await Db.connect(db);
-
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow id as string
 
-        const reports = global.db[db].collection('reports');
+        const reports = await Db.collection(db, 'reports');
 
         const report = await reports.findOne(id);
 

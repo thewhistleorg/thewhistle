@@ -11,8 +11,7 @@ import Db from '../lib/db.js';
 class UserAgent {
 
     static async log(db, ip, headers) {
-        if (!global.db[db]) await Db.connect(db);
-        const useragents = global.db[db].collection('useragents');
+        const useragents = await Db.collection(db, 'useragents');
 
         const ignore = [
             '::ffff:127.0.0.1', // localhost
@@ -30,8 +29,7 @@ class UserAgent {
 
 
     static async counts(db, since=null) {
-        if (!global.db[db]) await Db.connect(db);
-        const useragents = global.db[db].collection('useragents');
+        const useragents = await Db.collection(db, 'useragents');
 
         const sinceSecs = Math.floor(new Date(since)/1000).toString(16);
         const query = since ? { _id: { $gt: ObjectId(sinceSecs.toString(16)+'0000000000000000') } } : {};

@@ -15,8 +15,8 @@ md.use(mda);
 import UserAgent  from '../models/user-agent.js';
 import Report     from '../models/report.js';
 import Submission from '../models/submission.js';
-
-import Ip from '../lib/ip.js';
+import Db         from '../lib/db.js';
+import Ip         from '../lib/ip.js';
 
 
 class Dev {
@@ -44,7 +44,7 @@ class Dev {
      */
     static async logAccess(ctx) {
         // access logging uses capped collection log-access (size: 1000×1e3, max: 1000)
-        const log = global.db.users.collection('log-access');
+        const log = await Db.collection('users', 'log-access');
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 
@@ -117,7 +117,7 @@ class Dev {
 
 
     static async logAccessCsv(ctx) {
-        const log = global.db.users.collection('log-access');
+        const log = await Db.collection('users', 'log-access');
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 
         // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
@@ -155,7 +155,7 @@ class Dev {
      */
     static async logError(ctx) {
         // error logging uses capped collection log-error (size: 1000×4e3, max: 1000)
-        const log = global.db.users.collection('log-error');
+        const log = await Db.collection('users', 'log-error');
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 
@@ -261,7 +261,7 @@ class Dev {
      * This works from the (capped) log-access collection.
      */
     static async userAgents(ctx, app) {
-        const log = global.db.users.collection('log-access');
+        const log = await Db.collection('users', 'log-access');
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
         const entries = entriesAll

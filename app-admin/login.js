@@ -116,18 +116,6 @@ class LoginHandlers {
         // have been supplied in the post data
         const db = user.databases.length>1 ? body.database : user.databases[0];
 
-        // if we don't have db connection for this user's (current) db, get it now (qv app.admin.js)
-        // (these will remain in global for entire app, this doesn't happen per request)
-        if (!global.db[db]) {
-            try {
-                await Db.connect(db);
-            } catch (e) {
-                ctx.flash = { formdata: body, loginfailmsg: e.message };
-                ctx.response.redirect(ctx.request.url);
-                return;
-            }
-        }
-
         // init db in case this is first time db is used
         await Report.init(db);
         await Resource.init(db);

@@ -41,7 +41,7 @@ class Email {
         const token = now+'-'+emailHash; // note use timestamp first so it is easier to identify old tokens in db
 
         // record email hash in db
-        const emailAuth = global.db[ctx.params.database].collection('emailAuth');
+        const emailAuth = await Db.collection(ctx.params.database, 'emailAuth');
         await emailAuth.insertOne({ token });
 
         // get e-mail template, completed with generated token
@@ -89,7 +89,7 @@ class Email {
         }
 
         // check token has been recorded
-        const emailAuth = global.db[ctx.params.database].collection('emailAuth');
+        const emailAuth = await Db.collection(ctx.params.database, 'emailAuth');
         const auth = await emailAuth.findOne({ token });
         if (auth) {
             // check it hasn't already been used

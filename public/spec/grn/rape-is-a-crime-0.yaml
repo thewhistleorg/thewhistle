@@ -16,13 +16,10 @@
 - input:
     name: nav-next
     label: false
-    type: button
+    type: recaptcha-button
     value: next
     text: Get started
-    class: g-recaptcha pure-button pure-button-primary
-    data:
-      sitekey: 6LcGDEoUAAAAAJncM3PrcxHU3Whz5TjWpMPVbu--
-      callback: reCaptchaSubmitCallback
+    class: pure-button pure-button-primary
     accesskey: g
 
 - text: |

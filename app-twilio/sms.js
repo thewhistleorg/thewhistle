@@ -65,6 +65,7 @@ class SmsApp {
 
 
     sendSms(twiml, message) {
+        console.log('Sending', message);
         twiml.message({
             action: '/delete-outbound',
             method: 'POST',
@@ -352,9 +353,11 @@ class SmsApp {
 
     
     async receiveText(ctx) {
+        console.log('receive text');
         //this.clearAllCookies(ctx);
         //Get user's text
         const incomingSms = ctx.request.body.Body;
+        console.log('Beach', ctx.request.body);
         const twiml = new this.MessagingResponse();
         switch (this.resolveKeyWords(incomingSms)) { //TODO: Ignore spaces, punctuation and case
             case 'help':

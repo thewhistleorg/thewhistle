@@ -30,6 +30,8 @@ router.post('/delete-outbound', function (ctx) {
     if (ctx.request.body.SmsStatus === 'delivered') {
         SmsApp.deleteMessage(ctx.request.body.MessageSid);
     }
+    ctx.status = 200;
+    ctx.headers['Content-Type'] = 'text/xml';
 });
 
 app

@@ -1,0 +1,42 @@
+* {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+.sent {
+    width: 200px;
+    background-color: darkgrey;
+    margin-left: 240px;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.received {
+    width: 200px;
+    background-color: limegreen;
+    margin-left: 10px;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+#phone {
+    width: 470px;
+    background-color: lightgray;
+    border: 20px solid black;
+    border-radius: 10px;
+    margin: auto;
+    padding: 10px;
+}
+
+#input {
+    margin-left: 10px;
+}
+
+#btn {
+    vertical-align: middle;
+    cursor: default;
+}
+
+input {
+    width: 83%;
+    border-radius: 10px;
+    padding: 10px;
+}

@@ -1,3 +1,8 @@
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/* Backend code for SMS API. Handles receiving and sending texts.              Louis Slater 2018  */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+
 import $RefParser     from 'json-schema-ref-parser';
 import Report         from '../models/report.js';
 import autoIdentifier from '../lib/auto-identifier.js';
@@ -25,6 +30,7 @@ const constants = {
 };
 
 
+//One instance for each project/organisation combination
 class SmsApp {
 
 
@@ -64,8 +70,13 @@ class SmsApp {
     }
 
 
+    /**
+     * Sends the user an SMS by sending a POST request to Twilio.
+     *
+     * @param   {Object}   twiml
+     * @param   {string}   message - Text of the message to the user
+     */
     sendSms(twiml, message) {
-        console.log('Sending', message);
         twiml.message({
             action: '/delete-outbound',
             method: 'POST',
@@ -73,6 +84,12 @@ class SmsApp {
     }
 
 
+    /**
+     * Determines whether there is an existing report for a given alias.
+     *
+     * @param   {string}   alias - Alias to check
+     * @returns {boolean}  False if there are no reports in the database with the given alias. True otherwise.
+     */
     async aliasExists(alias) {
         const reports = await Report.getBy(this.db, 'alias', alias);
         const ret = reports.length != 0;
@@ -80,6 +97,11 @@ class SmsApp {
     }
 
 
+    /**
+     * Generates an alias for which there is no existing report
+     *
+     * @returns {string}  Unique alias
+     */
     async generateUniqueAlias() {
         let alias = '';
 
@@ -92,31 +114,44 @@ class SmsApp {
     }
 
 
+    /**
+     * Sets a cookie with a given key to a given value
+     *
+     * @param   {Object}   ctx
+     * @param   {string}   key - Cookie key
+     * @param   {Object}   value - Value to set cookie to
+     */
     setCookie(ctx, key, value) {
         ctx.cookies.set(key, value, { httpOnly: false });
     }
 
 
-    clearCookie(ctx, key) {
-        //TODO: Make this work or remove it
-        ctx.cookies.set(key, '', { httpOnly: false });
-    }
-
-
-    clearAllCookies(ctx) {
-        for (let i = 0; i < Object.keys(constants.cookies).length; i++) {
-            this.clearCookie(ctx, Object.keys(constants.cookies)[i]);
-        }
-    }
-
-
-    sendInitialSms(ctx, twiml, incomingSms) {
+    /**
+     * Sends the user the first SMS and sets the appropriate cookies
+     *
+     * @param   {Object}   ctx
+     * @param   {Object}   twiml
+     * @param   {string}   incomingSms - SMS text sent by user
+     */
+    askUsedBefore(ctx, twiml, incomingSms, firstSms) {
         this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_USED_BEFORE);
+        //Done now, so that we can store this in the database when the user has an alias
         this.setCookie(ctx, constants.cookies.FIRST_TEXT, incomingSms);
-        this.sendSms(twiml, this.initialSms);
+        const message = firstSms ? this.initialSms : 'Sorry, we didn\'t understand that response. Have you used this service before?';
+        this.sendSms(twiml, message);
     }
 
 
+    /**
+     * Sends the user an SMS asking them to enter their alias
+     * 
+     * Only runs if the user has said they have an existing alias
+     *
+     * @param   {Object}   ctx
+     * @param   {Object}   twiml
+     * @param   {string}   opening - String to be prepended to the SMS.
+     *                               Used when the user has just entered an invalid alias
+     */
     askForAlias(ctx, twiml, opening) {
         let message = opening ? opening + ' ': '';
         message += 'Please enter your anonymous alias. To use a new alias, please reply \'NEW\'';
@@ -125,6 +160,12 @@ class SmsApp {
     }
 
 
+    /**
+     * Generates the user a new unique alias, sets up the database entry and sends the user the first question
+     *
+     * @param   {Object}   ctx
+     * @param   {Object}   twiml
+     */
     async generateAliasAndStart(ctx, twiml) {
         const alias = await this.generateUniqueAlias();
         await this.initiateSmsReport(ctx, alias);
@@ -133,12 +174,20 @@ class SmsApp {
     }
 
 
+    /**
+     * Processes a user's manually inputted alias.
+     * Starts the report if the alias is valid.
+     * Prompts the user to re-enter their alias if it isn't.
+     *
+     * @param   {Object}   ctx
+     * @param   {Object}   twiml
+     * @param   {string}   alias - Manually inputted user alias
+     */
     async processAlias(ctx, twiml, alias) {
         alias = this.cleanResponse(alias);
         if (alias === 'new') {
             await this.generateAliasAndStart(ctx, twiml);
         } else {
-            //Does alias need correct capitalisation? shown as lower case on web form
             if (await this.aliasExists(alias)) {
                 await this.initiateSmsReport(ctx, alias);
                 this.sendSms(twiml, this.getNextQuestion(ctx, 0));
@@ -149,6 +198,13 @@ class SmsApp {
     }
 
 
+    /**
+     * Processes the user's response to a question
+     *
+     * @param   {Object}   ctx
+     * @param   {Object}   twiml
+     * @param   {string}   incomingSms - SMS text sent by user
+     */
     async receiveResponse(ctx, twiml, incomingSms) {
         const nextQuestion = ctx.cookies.get(constants.cookies.NEXT_QUESTION);
         //Update database with the user's response
@@ -158,17 +214,31 @@ class SmsApp {
     }
 
 
+    /**
+     * Append information to the supplimentary information field.
+     *
+     * @param   {Object}   ctx
+     * @param   {Object}   twiml
+     * @param   {string}   incomingSms - SMS text sent by user
+     */
     async addAmendments(ctx, twiml, incomingSms) {
         const sessionId = ctx.cookies.get(constants.cookies.SESSION_ID);
         const report = await Report.get(this.db, sessionId);
+
         let info = report.submitted['Supplimentary information'] ? report.submitted['Supplimentary information'] : '';
         info = info ==='' ? incomingSms : info + ' | ' + incomingSms;
+
         Report.updateField(this.db, sessionId, 'Supplimentary information', info);
+
         this.sendSms(twiml, 'Thank you for this extra information. You can send more if you wish. To start a new report, reply \'RESTART\'');
     }
 
 
-
+    /**
+     * Takes a user's input, makes it all lower case, removes leading and trailing spaces and removes punctuation
+     *
+     * @param   {string}   message - SMS text sent by user
+     */
     cleanResponse(message) {
         message = message.toLowerCase();
         message = message.trim();
@@ -177,6 +247,13 @@ class SmsApp {
     }
 
 
+    /**
+     * Determines whether a given message starts with an element in a given list
+     *
+     * @param   {string}   message - SMS text sent by user
+     * @param   {string[]} starts - List of potential message prefixes
+     * @returns {boolean}  True if an element of starts is a prefix to message. False otherwise.
+     */
     startsWithElement(message, starts) {
         for (let i = 0; i < starts.length; i++) {
             if (message.startsWith(starts[i])) {
@@ -186,18 +263,36 @@ class SmsApp {
     }
 
 
+    /**
+     * Processes the user's response to a yes/no question to determine if it can be interpreted as a no
+     *
+     * @param   {string}   message - SMS text sent by user
+     * @returns {boolean}  True if message can be interpreted as a no. False otherwise.
+     */
     isNo(message) {
         const starts = [ 'no', 'na', 'i have not', 'i havent' ];
         return this.startsWithElement(message, starts) || message === 'n';
     }
 
 
+    /**
+     * Processes the user's response to a yes/no question to determine if it can be interpreted as a yes
+     *
+     * @param   {string}   message - SMS text sent by user
+     * @returns {boolean}  True if message can be interpreted as a yes. False otherwise.
+     */
     isYes(message) {
         const starts = [ 'ye', 'i have' ];
         return this.startsWithElement(message, starts) || message === 'y';
     }
 
 
+    /**
+     * Processes the user's response to a yes/no question
+     *
+     * @param   {string}   message - SMS text sent by user
+     * @returns {string}   'yes', 'no' or 'unknown'
+     */
     toYesOrNo(message) {
         message = this.cleanResponse(message);
         if (this.isNo(message)) {
@@ -209,12 +304,27 @@ class SmsApp {
     }
 
 
-    resolveKeyWords(message) {
-        return message;
+    /**
+     * Processes the user's response to determine whether it can be interpreted as a keyword.
+     * 
+     * Keywords are 'help' and 'stop'
+     *
+     * @param   {string}   message - SMS text sent by user
+     * @returns {string}   'help' if the user's response can be interpreted as that.
+     *                     'stop' if the user's response can be interpreted as that
+     */
+    resolveKeywords(message) {
+        return this.cleanResponse(message);
         //TODO: Implement properly
     }
 
 
+    /**
+     * Processes the user's response to determine whether it can be interpreted as 'restart'
+     *
+     * @param   {string}   message - SMS text sent by user
+     * @returns {string}   True if message can be interpreted as 'restart'. False otherwise.
+     */
     isRestart(message) {
         message = this.cleanResponse(message);
         return message === 'restart';
@@ -230,7 +340,7 @@ class SmsApp {
      * @returns {string}   Field name as it appears in the database
      */
     getField(questionNo) {
-        return questionNo == -1 ? 'Initial SMS' : this.questions[questionNo].label;
+        return this.questions[questionNo].label;
     }
 
 
@@ -243,15 +353,12 @@ class SmsApp {
         this.initialSms = initialSms;
     }
 
+
     /**
-     * Carries out the necessary steps to start an SMS report
-     *
-     * Generates alias, sets cookies, and sends initial text
+     * Updates the database and sets cookies to start the SMS report
      *
      * @param   {Object}   ctx
-     * @param   {number}   twiml
-     * 
-     * @returns {string}   Randomly generated alias
+     * @param   {number}   alias - User's unique anonymous alias
      */
     async initiateSmsReport(ctx, alias) {
         const version = this.spec.version;
@@ -264,11 +371,11 @@ class SmsApp {
 
 
     /**
-     * Setup the database connection
+     * Sets-up the database connection
      */
     async setupDatabase() {
         try {
-            await Db.connect(this.db);
+            await Db.connect(this.db, { useNewUrlParser: true });
         } catch (e) {
             console.error(e.message);
         }
@@ -293,11 +400,13 @@ class SmsApp {
         }
     }
 
+
     /**
      * Gets the questions from the yaml specifications
      */
     generateSmsQuestions() {
         this.questions = [];
+        //Matches 'p' followed by a number
         const re = new RegExp('^p[0-9]+$');
         //Set pages list to all pages given in the .yaml specifications
         const pages = Object.keys(this.spec.pages).filter(key => re.test(key));
@@ -310,24 +419,25 @@ class SmsApp {
                 });
             }
         }
-        this.questions = this.questions.slice(0, 3);
+        //this.questions = this.questions.slice(0, 3);
     }
 
 
     /**
-     * Sends the user a text with the next question
+     * Returns the next question to send to the user
      * 
      * @param   {Object}   ctx
-     * @param   {Object}   twiml
      * @param   {number}   questionNo - Index of the relevant question
+     * 
+     * @returns {string}   Text of the next question
      */
     getNextQuestion(ctx, nextQuestion) {
         let message = '';
 
-        if (Number(nextQuestion) < this.questions.length) {
+        if (nextQuestion < this.questions.length) {
             this.setCookie(ctx, constants.cookies.NEXT_QUESTION, Number(nextQuestion) + 1);
             this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_RESPONSE);
-            message = (Number(nextQuestion) + 1) + '. ' + this.questions[nextQuestion].question;
+            message = 'Question ' + (Number(nextQuestion) + 1) + ': ' + this.questions[nextQuestion].question;
         } else {
             this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_FINAL);
             //TODO: Get this from YAML
@@ -338,8 +448,14 @@ class SmsApp {
         
     }
 
-
+    
+    /**
+     * Deletes a message from the Twilio message logs
+     * 
+     * @param   {string}   messageId - ID of the message to be deleted
+     */
     static deleteMessage(messageId) {
+        //TODO: Get tokens from .env
         const accountId = 'AC5da0166da2047a8e4d3b3709982ebaae';
         const authToken = '0c34505d5eff527a6b67038b9b7f4a11';
         const client = require('twilio')(accountId, authToken);
@@ -352,14 +468,16 @@ class SmsApp {
     }
 
     
+    /**
+     * Processes and responds to a user's SMS
+     * 
+     * @param   {Object}   ctx
+     */
     async receiveText(ctx) {
-        console.log('receive text');
-        //this.clearAllCookies(ctx);
         //Get user's text
         const incomingSms = ctx.request.body.Body;
-        console.log('Beach', ctx.request.body);
         const twiml = new this.MessagingResponse();
-        switch (this.resolveKeyWords(incomingSms)) { //TODO: Ignore spaces, punctuation and case
+        switch (this.resolveKeywords(incomingSms)) {
             case 'help':
                 //TODO: Implement this
                 break;
@@ -368,12 +486,11 @@ class SmsApp {
                 break;
             default:
                 const nextSmsType = ctx.cookies.get(constants.cookies.NEXT_SMS_TYPE);
-                //const nextSmsType = constants.SMS_NEW_REPORT;
                 switch (nextSmsType) {
                     case undefined:
                     case constants.SMS_NEW_REPORT:
                         //Start new report
-                        this.sendInitialSms(ctx, twiml, incomingSms);
+                        this.askUsedBefore(ctx, twiml, incomingSms, true);
                         break;
                     case constants.SMS_USED_BEFORE:
                         //Determine if the user has an existing alias
@@ -391,6 +508,7 @@ class SmsApp {
                             case constants.UNKNOWN:
                                 //Can't interpret user's response.
                                 //TODO: Re-ask user whether they have used the reporting service before
+                                this.askUsedBefore(ctx, twiml, incomingSms, false);
                                 break;
                             default:
                                 //Throw error?
@@ -404,7 +522,7 @@ class SmsApp {
                         //Process the user's post-report information
                         if (this.isRestart(incomingSms)) {
                             //TODO: Start a new report
-                            this.sendInitialSms(ctx, twiml, incomingSms);
+                            this.askUsedBefore(ctx, twiml, incomingSms, true);
                         } else {
                             //TODO: Add amendments
                             //TODO: Allow for MMS

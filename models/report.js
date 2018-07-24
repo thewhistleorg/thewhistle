@@ -327,9 +327,7 @@ class Report {
         id = objectId(id);  // allow id as string
 
         const reports = await Db.collection(db, 'reports');
-        console.log('DB', db);
         for (const field in details) {
-            console.log('FEYALD ', field, details[field], id);
             await reports.updateOne({ _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
         }
 
@@ -349,7 +347,7 @@ class Report {
      * @param {Object}   value - User's response to given field
      */
     static async updateField(db, id, key, value) {
-        if (!global.db[db]) await Db.connect(db);
+        if (!global.db[db]) await Db.connect(db, { useNewUrlParser: true });
         const reports = global.db[db].collection('reports');
         await reports.updateOne(
             { _id: ObjectId(id) },

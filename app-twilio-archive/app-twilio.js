@@ -102,7 +102,7 @@ app.use(async function handleErrors(ctx, next) {
 app.use(async function(ctx, next) {
     if (!global.db['grn-test']) {
         try {
-            await Db.connect('grn-test');
+            await Db.connect('grn-test', { useNewUrlParser: true });
         } catch (e) {
             console.error(e.message);
             process.exit(1);

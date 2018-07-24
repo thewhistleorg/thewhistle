@@ -1,3 +1,8 @@
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/* Twilio app - Pages and API for running and testing SMS reporting.           Louis Slater 2018  */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+
 import Koa            from 'koa';
 import Router         from 'koa-router';
 import handlebars     from 'koa-handlebars'; 
@@ -9,6 +14,7 @@ import FormGenerator  from '../lib/form-generator.js';
 const app = new Koa();
 const router = new Router();
 
+
 app.use(serve('public', { maxage: 1000*60*60*24 }));
 
 // handlebars templating
@@ -19,13 +25,16 @@ app.use(handlebars({
 
 const routes = {};
 
+//Serve SMS test web app
 router.get('/test', async function(ctx) {
     await ctx.render('test-chat');
 });
 
+//On receiving a text
 router.post('/:org/:project', async function (ctx) {
-    console.log('app-twilio');
+    //If the organisation/project combination is valid
     if (FormGenerator.exists(ctx.params.org, ctx.params.project)) {
+        //If this is the first request for the organisation/project combination (since server start)
         if (!routes[ctx.url]) {
             routes[ctx.url] = new SmsApp(ctx.params.org, ctx.params.project);
             await routes[ctx.url].parseSpecifications();
@@ -37,7 +46,7 @@ router.post('/:org/:project', async function (ctx) {
     
 });
 
-
+//Delete a message sent by the system
 router.post('/delete-outbound', function (ctx) {
     if (ctx.request.body.SmsStatus === 'delivered') {
         SmsApp.deleteMessage(ctx.request.body.MessageSid);

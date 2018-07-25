@@ -15,6 +15,8 @@ const constants = {
     SMS_ALIAS:       'alias',
     SMS_FINAL:       'final',
     SMS_RESPONSE:    'response',
+    SMS_CONTINUE:    'continue',
+    SMS_STORE:       'store',
 
     YES:     'yes',
     NO:      'no',
@@ -133,7 +135,7 @@ class SmsApp {
      * @param   {Object}   twiml
      * @param   {string}   incomingSms - SMS text sent by user
      */
-    askUsedBefore(ctx, twiml, incomingSms, firstSms) {
+    askIfUsedBefore(ctx, twiml, incomingSms, firstSms) {
         this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_USED_BEFORE);
         //Done now, so that we can store this in the database when the user has an alias
         this.setCookie(ctx, constants.cookies.FIRST_TEXT, incomingSms);
@@ -199,6 +201,17 @@ class SmsApp {
 
 
     /**
+     * 
+     * @param   {Object}   ctx 
+     * @param   {Object}   twiml 
+     */
+    sendQuestion(ctx, twiml, nextQuestion) {
+        const question = this.getNextQuestion(ctx, nextQuestion);
+        this.sendSms(twiml, question);
+    }
+
+
+    /**
      * Processes the user's response to a question
      *
      * @param   {Object}   ctx
@@ -207,10 +220,9 @@ class SmsApp {
      */
     async receiveResponse(ctx, twiml, incomingSms) {
         const nextQuestion = ctx.cookies.get(constants.cookies.NEXT_QUESTION);
+        this.sendQuestion(ctx, twiml, nextQuestion);
         //Update database with the user's response
         await this.updateResponse(ctx, nextQuestion - 1, incomingSms);
-        const question = this.getNextQuestion(ctx, nextQuestion);
-        this.sendSms(twiml, question);
     }
 
 
@@ -231,6 +243,70 @@ class SmsApp {
         Report.updateField(this.db, sessionId, 'Supplimentary information', info);
 
         this.sendSms(twiml, 'Thank you for this extra information. You can send more if you wish. To start a new report, reply \'RESTART\'');
+    }
+
+
+    /**
+     * Ask the user if they want to continue with the report
+     * 
+     * @param   {Object}   ctx 
+     * @param   {Object}   twiml 
+     * @param   {string}   opening - Text to prepend to SMS
+     */
+    askIfContinue(ctx, twiml, opening) {
+        const message = 'Would you like to continue with this report?';
+        this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_CONTINUE);
+        this.sendSms(twiml, opening + ' ' + message);
+    }
+
+
+    /**
+     * Sends the user the help text
+     * 
+     * @param   {Object}   ctx
+     * @param   {Object}   twiml
+     * @param   {boolean}  reportStarted - True if the user is currently submitting answers. False otherwise.
+     */
+    sendHelpText(ctx, twiml, reportStarted) {
+        //TODO: Get text from YAML
+        const callMessage = 'If you would like to speak to someone, please call XXXXX.';
+        if (reportStarted) {
+            this.askIfContinue(ctx, twiml, callMessage);
+        } else {
+            this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_NEW_REPORT);
+            this.sendSms(twiml, callMessage + ' ' + 'Reply \'START\' to start submitting a report');
+        }
+    }
+
+
+    /**
+     * 
+     * @param   {Object}   ctx 
+     * @param   {Object}   twiml 
+     */
+    askIfStore(ctx, twiml, opening) {
+        let message = opening ? opening + ' ': '';
+        message += 'Would you like to store your report? Please note that if you have amendments to your responses, you can give them after the last question.';
+        this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_STORE);
+        this.sendSms(twiml, message);
+    }
+
+
+    async deleteResponse(ctx) {
+        const reportId = ctx.cookies.get(constants.cookies.SESSION_ID);
+        const reports = await Report.get(this.db, reportId);
+        Report.delete(this.db, reports._id);
+    }
+
+
+    /**
+     * Send user final text after they have chosen to stop a report
+     * 
+     * @param   {Object}   twiml
+     * @param   {string}   opening - text to prepend to SMS
+     */
+    sendFinalSms(twiml, opening) {
+        this.sendSms(twiml, opening + ' Thank you for using this reporting service. If you want to submit a new report, please send another text to this number. If you have any questions, please call XXXXXX');
     }
 
 
@@ -305,17 +381,13 @@ class SmsApp {
 
 
     /**
-     * Processes the user's response to determine whether it can be interpreted as a keyword.
-     * 
-     * Keywords are 'help' and 'stop'
+     * Processes the user's response to determine whether it can be interpreted as 'help'
      *
      * @param   {string}   message - SMS text sent by user
-     * @returns {string}   'help' if the user's response can be interpreted as that.
-     *                     'stop' if the user's response can be interpreted as that
+     * @returns {string}   True if message can be interpreted as 'help'. False otherwise.
      */
-    resolveKeywords(message) {
-        return this.cleanResponse(message);
-        //TODO: Implement properly
+    isHelp(message) {
+        return this.cleanResponse(message) === 'help';
     }
 
 
@@ -326,8 +398,7 @@ class SmsApp {
      * @returns {string}   True if message can be interpreted as 'restart'. False otherwise.
      */
     isRestart(message) {
-        message = this.cleanResponse(message);
-        return message === 'restart';
+        return this.cleanResponse(message) === 'restart';
     }
 
 
@@ -477,67 +548,110 @@ class SmsApp {
         //Get user's text
         const incomingSms = ctx.request.body.Body;
         const twiml = new this.MessagingResponse();
-        switch (this.resolveKeywords(incomingSms)) {
-            case 'help':
-                //TODO: Implement this
-                break;
-            case 'stop':
-                //TODO: Implement this
-                break;
-            default:
-                const nextSmsType = ctx.cookies.get(constants.cookies.NEXT_SMS_TYPE);
-                switch (nextSmsType) {
-                    case undefined:
-                    case constants.SMS_NEW_REPORT:
-                        //Start new report
-                        this.askUsedBefore(ctx, twiml, incomingSms, true);
-                        break;
-                    case constants.SMS_USED_BEFORE:
-                        //Determine if the user has an existing alias
-                        switch (this.toYesOrNo(incomingSms)) {
-                            case constants.YES:
-                                this.askForAlias(ctx, twiml);
-                                //User has used reporting service before
-                                //TODO: Ask user for alias
-                                break;
-                            case constants.NO:
-                                await this.generateAliasAndStart(ctx, twiml);
-                                //User hasn't used reporting service before
-                                //TODO: Generate alias and send it to user with first question
-                                break;
-                            case constants.UNKNOWN:
-                                //Can't interpret user's response.
-                                //TODO: Re-ask user whether they have used the reporting service before
-                                this.askUsedBefore(ctx, twiml, incomingSms, false);
-                                break;
-                            default:
-                                //Throw error?
-                        }
-                        break;
-                    case constants.SMS_ALIAS:
-                        //TODO: Process the user's alias
-                        await this.processAlias(ctx, twiml, incomingSms);
-                        break;
-                    case constants.SMS_FINAL:
-                        //Process the user's post-report information
-                        if (this.isRestart(incomingSms)) {
-                            //TODO: Start a new report
-                            this.askUsedBefore(ctx, twiml, incomingSms, true);
-                        } else {
-                            //TODO: Add amendments
-                            //TODO: Allow for MMS
-                            await this.addAmendments(ctx, twiml, incomingSms);
-                        }
-                        //TODO: Also cover MMS evidence (will this come here or not?)
-                        break;
-                    case constants.SMS_RESPONSE:
-                        //Process the user's question response
-                        //Establish the stage of the report
-                        await this.receiveResponse(ctx, twiml, incomingSms);
-                        break;
-                    default:
-                        //Throw error?
-                }
+        const nextSmsType = ctx.cookies.get(constants.cookies.NEXT_SMS_TYPE);
+        if (this.isHelp(incomingSms)) {
+            switch (nextSmsType) {
+                case undefined:
+                case constants.SMS_NEW_REPORT:
+                    //Start new report
+                    this.askIfUsedBefore(ctx, twiml, incomingSms, true);
+                    break;
+                case constants.SMS_USED_BEFORE:
+                case constants.SMS_ALIAS:
+                    //Give help number, but no option to continue/store report
+                    this.sendHelpText(ctx, twiml, false);
+                    break;
+                default:
+                    this.sendHelpText(ctx, twiml, true);
+            }
+        } else {
+            switch (nextSmsType) {
+                case undefined:
+                case constants.SMS_NEW_REPORT:
+                    //Start new report
+                    this.askIfUsedBefore(ctx, twiml, incomingSms, true);
+                    break;
+                case constants.SMS_USED_BEFORE:
+                    //Determine if the user has an existing alias
+                    switch (this.toYesOrNo(incomingSms)) {
+                        case constants.YES:
+                            this.askForAlias(ctx, twiml);
+                            //User has used reporting service before
+                            //TODO: Ask user for alias
+                            break;
+                        case constants.NO:
+                            await this.generateAliasAndStart(ctx, twiml);
+                            //User hasn't used reporting service before
+                            //TODO: Generate alias and send it to user with first question
+                            break;
+                        case constants.UNKNOWN:
+                            //Can't interpret user's response.
+                            //TODO: Re-ask user whether they have used the reporting service before
+                            this.askIfUsedBefore(ctx, twiml, incomingSms, false);
+                            break;
+                        default:
+                            //Throw error?
+                    }
+                    break;
+                case constants.SMS_ALIAS:
+                    //TODO: Process the user's alias
+                    await this.processAlias(ctx, twiml, incomingSms);
+                    break;
+                case constants.SMS_FINAL:
+                    //Process the user's post-report information
+                    if (this.isRestart(incomingSms)) {
+                        //TODO: Start a new report
+                        this.askIfUsedBefore(ctx, twiml, incomingSms, true);
+                    } else {
+                        //TODO: Add amendments
+                        //TODO: Allow for MMS
+                        await this.addAmendments(ctx, twiml, incomingSms);
+                    }
+                    //TODO: Also cover MMS evidence (will this come here or not?)
+                    break;
+                case constants.SMS_RESPONSE:
+                    //Process the user's question response
+                    //Establish the stage of the report
+                    await this.receiveResponse(ctx, twiml, incomingSms);
+                    break;
+                case constants.SMS_CONTINUE:
+                    //Establish whether the user wants to continue with the report
+                    switch (this.toYesOrNo(incomingSms)) {
+                        case constants.YES:
+                            const nextQuestion = ctx.cookies.get(constants.cookies.NEXT_QUESTION) - 1;
+                            this.sendQuestion(ctx, twiml, nextQuestion);
+                            break;
+                        case constants.NO:
+                            this.askIfStore(ctx, twiml);
+                            break;
+                        case constants.UNKNOWN:
+                            this.askIfContinue(ctx, twiml, 'Sorry, we didn\'t understand your response.');
+                            break;
+                        default:
+                            //TODO: Throw error?
+                    }
+                    break;
+                case constants.SMS_STORE:
+                    //Establish whether the user wants to store their report so far
+                    switch (this.toYesOrNo(incomingSms)) {
+                        case constants.YES:
+                            this.sendFinalSms(twiml, 'Your responses have been stored.');
+                            break;
+                        case constants.NO:
+                            await this.deleteResponse(ctx);
+                            this.sendFinalSms(twiml, 'Your responses have been deleted.');
+                            break;
+                        case constants.UNKNOWN:
+                            this.askIfStore(ctx, twiml, 'Sorry, we didn\'t understand your response.');
+                            break;
+                        default:
+                            //TODO: Throw error?
+
+                    }
+                    break;
+                default:
+                    //Throw error?
+            }
         }
         ctx.status = 200;
         ctx.headers['Content-Type'] = 'text/xml';

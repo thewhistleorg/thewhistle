@@ -1,5 +1,5 @@
 {
-    "integrationFolder": "test/cypress",
+    "integrationFolder": "test/cypress/report",
     "pluginsFile": "test/cypress/plugins.js",
     "video": false
 }

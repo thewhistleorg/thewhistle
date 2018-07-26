@@ -251,7 +251,7 @@ class Handlers {
             ctx.request.files = ctx.request.files.map(f => f.documents);
 
             // strip out any 0-size files
-            ctx.request.files = ctx.request.files.filter(f => f.size > 0)
+            ctx.request.files = ctx.request.files.filter(f => f.size > 0);
             debug('... files', ctx.request.files.map(f => f.name));
         }
 

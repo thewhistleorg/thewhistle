@@ -243,18 +243,16 @@ class Handlers {
 
         const body = ctx.request.body;
 
-        if (body.fields) {
-            // multipart/form-data: move body.fields.* to body.* to match
-            // x-www-form-urlencoded forms (note cannot use field named 'files'!)
-            for (const field in body.fields) body[field] = body.fields[field];
-            delete body.fields;
+        if (ctx.request.files) {
+            // normalise files to be array of File objects (koa-body does not provide array if just 1 file uploaded)
+            if (!Array.isArray(ctx.request.files)) ctx.request.files = [ ctx.request.files ];
 
             // file input fields are named 'documents'; move File objects up to be immediately under 'files'
-            body.files = body.files['documents'];
-            // normalise files to be array of File objects (koa-body does not provide array if just 1 file uploaded)
-            if (!Array.isArray(body.files)) body.files = [ body.files ];
+            ctx.request.files = ctx.request.files.map(f => f.documents);
+
             // strip out any 0-size files
-            for (let f=0; f<body.files.length; f++) if (body.files[f].size == 0) body.files.splice(f, 1);
+            ctx.request.files = ctx.request.files.filter(f => f.size > 0)
+            debug('... files', ctx.request.files.map(f => f.name));
         }
 
         if (page==1 & ctx.session.id) { ctx.flash = { error: 'Trying to save already saved report!' }; return ctx.response.redirect(ctx.request.url); }
@@ -320,8 +318,8 @@ class Handlers {
 
         if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.id, formattedReport, body);
 
-        if (body.files) {
-            for (const file of body.files) {
+        if (ctx.request.files) {
+            for (const file of ctx.request.files) {
                 try {
                     await Report.submissionFile(org, ctx.session.id, file);
                 } catch (e) {

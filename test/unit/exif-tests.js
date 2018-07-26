@@ -2,13 +2,13 @@
 /* EXIF header extraction unit tests.                                         C.Veness 2017-2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import { expect } from 'chai';              // BDD/TDD assertion library
-import exiftool   from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
+import { expect }   from 'chai';              // BDD/TDD assertion library
+import { exiftool } from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
 
 describe('EXIF', function() {
     describe('extract EXIF metadata', function() {
         it('returns location & date', async function() {
-            const exif = await exiftool.exiftool.read('test/img/s_gps.jpg');
+            const exif = await exiftool.read('test/img/s_gps.jpg');
             expect(exif.GPSLatitude).to.equal(54.98966667);
             expect(exif.GPSLongitude).to.equal(-1.91416667);
             expect(exif.CreateDate).to.deep.include({

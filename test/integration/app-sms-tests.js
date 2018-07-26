@@ -89,7 +89,13 @@ describe('SMS app'+' ('+app.env+')', function() {
     describe('User Flow', function() {
         const re = /Your new anonymous alias is [a-z]+ [a-z]+.\nQuestion 1: Please ask the interviewee if they consent to audio recording the interview, was consent given?/;
         it('Start report', async function() {
-            const responseMessage = await getResponseMessage('Hello');
+            const responseMessage = await getResponseMessage('help');
+            expect(responseMessage).to.equal('By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP, HELP and STOP at any point.\nHave you used this reporting service before?');
+        });
+        it('Get help before starting report', async function() {
+            let responseMessage = await getResponseMessage('help');
+            expect(responseMessage).to.equal('If you would like to speak to someone, please call XXXXX. Reply \'START\' to start submitting a report');
+            responseMessage = await getResponseMessage('START');
             expect(responseMessage).to.equal('By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP, HELP and STOP at any point.\nHave you used this reporting service before?');
         });
         it('Input invalid used before', async function() {
@@ -107,20 +113,37 @@ describe('SMS app'+' ('+app.env+')', function() {
             const responseMessage = await getResponseMessage('it was');
             expect(responseMessage).to.equal('Question 2: Name of person filling out form\n');
         });
-        it('Respond to all questions', async function() {
-            let responseMessage = '';
-            for (let i = 0; i < 19; i++) {
-                responseMessage = await getResponseMessage('YES');
-            }
-            expect(responseMessage).to.equal('Thank you for completing the questions. If you have any supplimentary information, please send it now. You can use MMS or a URL to provide picture, audio or video files. If you would like to amend any of responses, please reply explaining the changes. If you would like to start a new report, please reply \'RESTART\'');
+        it('Get help during report', async function() {
+            const responseMessage = await getResponseMessage('HELP');
+            expect(responseMessage).to.equal('If you would like to speak to someone, please call XXXXX. Would you like to continue with this report?');
         });
-        it('Provide supplimentary information', async function() {
-            const responseMessage = await getResponseMessage('Extra info 1');
-            expect(responseMessage).to.equal('Thank you for this extra information. You can send more if you wish. To start a new report, reply \'RESTART\'');
+        it('Input invalid for continue response', async function() {
+            const responseMessage = await getResponseMessage('!"£"£$');
+            expect(responseMessage).to.equal('Sorry, we didn\'t understand your response. Would you like to continue with this report?');
         });
-        it('Restart report', async function() {
-            let responseMessage = await getResponseMessage('Extra info 2');
-            responseMessage = await getResponseMessage('ReStart ');
+        it('Continue with report after help', async function() {
+            const responseMessage = await getResponseMessage('yeee');
+            expect(responseMessage).to.equal('Question 2: Name of person filling out form\n');
+        });
+        it('Don\'t continue with report', async function() {
+            let responseMessage = await getResponseMessage('Me');
+            expect(responseMessage).to.equal('Question 3: Organisation\n');
+            responseMessage = await getResponseMessage(' Help! ');
+            expect(responseMessage).to.equal('If you would like to speak to someone, please call XXXXX. Would you like to continue with this report?');
+            responseMessage = await getResponseMessage('No');
+            expect(responseMessage).to.equal('Would you like to store your report? Please note that if you have amendments to your responses, you can give them after the last question.');
+
+        });
+        it('Input invalid for store response', async function() {
+            const responseMessage = await getResponseMessage('123');
+            expect(responseMessage).to.equal('Sorry, we didn\'t understand your response. Would you like to store your report? Please note that if you have amendments to your responses, you can give them after the last question.');
+        });
+        it('Stop and store report', async function() {
+            const responseMessage = await getResponseMessage('Yep');
+            expect(responseMessage).to.equal('Your responses have been stored. Thank you for using this reporting service. If you want to submit a new report, please send another text to this number. If you have any questions, please call XXXXXX');
+        });
+        it('Start report after stopping', async function() {
+            const responseMessage = await getResponseMessage('sTart ');
             expect(responseMessage).to.equal('By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP, HELP and STOP at any point.\nHave you used this reporting service before?');
         });
         it('Input used before', async function() {
@@ -134,22 +157,42 @@ describe('SMS app'+' ('+app.env+')', function() {
             expect(responseMessage).to.match(re);
             aliasTwo = responseMessage.substring(28, responseMessage.indexOf('.'));
         });
-        it('Input invalid alias', async function() {
+        it('Provide supplimentary information', async function() {
             let responseMessage = '';
             for (let i = 0; i < 20; i++) {
                 responseMessage = await getResponseMessage('no');
             }
-            await getResponseMessage('restart');
-            await getResponseMessage('yes');
-            responseMessage = await getResponseMessage('invalid alias');
+            responseMessage = await getResponseMessage('Extra info 1');
+            expect(responseMessage).to.equal('Thank you for this extra information. You can send more if you wish. To start a new report, reply \'RESTART\'');
+            responseMessage = await getResponseMessage('Extra info 2');
+            expect(responseMessage).to.equal('Thank you for this extra information. You can send more if you wish. To start a new report, reply \'RESTART\'');
+
+        });
+        it('Restart report', async function() {
+            const responseMessage = await getResponseMessage('ReStart ');
+            expect(responseMessage).to.equal('By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP, HELP and STOP at any point.\nHave you used this reporting service before?');
+        });
+        it('Input used before', async function() {
+            const responseMessage = await getResponseMessage('Ye.');
+            expect(responseMessage).to.equal('Please enter your anonymous alias. To use a new alias, please reply \'NEW\'');
+        });
+        it('Input invalid alias', async function() {
+            const responseMessage = await getResponseMessage('invalid alias');
             expect(responseMessage).to.equal('Sorry, that alias hasn\'t been used before. Please enter your anonymous alias. To use a new alias, please reply \'NEW\'');
         });
         it('Input valid alias', async function() {
             const messageAndId = await getResponseMessageAndReportId(aliasOne.toUpperCase());
-            const responseMessage = messageAndId.message;
+            let responseMessage = messageAndId.message;
             reportIdThree = messageAndId.id;
             expect(responseMessage).to.equal('Question 1: Please ask the interviewee if they consent to audio recording the interview, was consent given?\n');
-            await getResponseMessage('100%');
+            responseMessage = await getResponseMessage('100%');
+            expect(responseMessage).to.equal('Question 2: Name of person filling out form\n');
+        });
+        it('Do not store report', async function() {
+            await getResponseMessage('help');
+            await getResponseMessage('no');
+            const responseMessage = await getResponseMessage('no');
+            expect(responseMessage).to.equal('Your responses have been deleted. Thank you for using this reporting service. If you want to submit a new report, please send another text to this number. If you have any questions, please call XXXXXX');
         });
     });
     describe('Database checks', function() {
@@ -157,29 +200,10 @@ describe('SMS app'+' ('+app.env+')', function() {
         it('First report', async function() {
             const reportOne = await Report.get(org, reportIdOne);
             const expected = {
-                'Alias':                                            aliasOne,
-                'First Text':                                       'I do not know',
-                'Consent to record?':                               'it was',
-                'Name of person filling out form':                  'YES',
-                'Organisation':                                     'YES',
-                'Organisation reference':                           'YES',
-                'Contact details':                                  'YES',
-                'Name of person giving statement':                  'YES',
-                'Incident date':                                    'YES',
-                'Incident time':                                    'YES',
-                'Location':                                         'YES',
-                'Did this incident happen to you?':                 'YES',
-                'Description':                                      'YES',
-                'Type of incident':                                 'YES',
-                'Who is the perpetrator?':                          'YES',
-                'Form of violence':                                 'YES',
-                'Reported?':                                        'YES',
-                'Medical attention required?':                      'YES',
-                'Did the incident involve an unaccompanied minor?': 'YES',
-                'Consent to being contacted?':                      'YES',
-                'Consent to media testimony?':                      'YES',
-                'Consent to information?':                          'YES',
-                'Supplimentary information':                        'Extra info 1 | Extra info 2',
+                'Alias':                           aliasOne,
+                'First Text':                      'I do not know',
+                'Consent to record?':              'it was',
+                'Name of person filling out form': 'Me',
             };
             expect(reportOne.submitted).to.deep.equal(expected);
         });
@@ -187,7 +211,7 @@ describe('SMS app'+' ('+app.env+')', function() {
             const reportOne = await Report.get(org, reportIdTwo);
             const expected = {
                 'Alias':                                            aliasTwo,
-                'First Text':                                       'ReStart ',
+                'First Text':                                       'sTart ',
                 'Consent to record?':                               'no',
                 'Name of person filling out form':                  'no',
                 'Organisation':                                     'no',
@@ -208,17 +232,13 @@ describe('SMS app'+' ('+app.env+')', function() {
                 'Consent to being contacted?':                      'no',
                 'Consent to media testimony?':                      'no',
                 'Consent to information?':                          'no',
+                'Supplimentary information':                        'Extra info 1 | Extra info 2',
             };
             expect(reportOne.submitted).to.deep.equal(expected);
         });
-        it('Third report', async function() {
+        it('Third report deleted', async function() {
             const reportThree = await Report.get(org, reportIdThree);
-            const expected = {
-                'Alias':              aliasOne,
-                'First Text':         'restart',
-                'Consent to record?': '100%',
-            };
-            expect(reportThree.submitted).to.deep.equal(expected);
+            expect(reportThree).to.equal(null);
         });
     });
 });

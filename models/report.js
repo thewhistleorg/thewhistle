@@ -7,7 +7,7 @@
 import fs         from 'fs-extra';          // fs with extra functions & promise interface
 import slugify            from 'slugify';           // make strings url-safe
 import dateFormat         from 'dateformat';        // Steven Levithan's dateFormat()
-import exiftool           from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
+import { exiftool }       from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
 import useragent          from 'useragent';         // parse browser user agent string
 import { ObjectId }       from 'mongodb';           // MongoDB driver for Node.js
 import Debug              from 'debug';             // small debugging utility
@@ -387,7 +387,7 @@ class Report {
         await reports.updateOne({ _id: id }, { $push: { files: file } });
 
         // extract EXIF metadata from files & save it in analysis
-        const exifData = await exiftool.exiftool.read(src);
+        const exifData = await exiftool.read(src);
         const fileAnalysis = {
             exif: {
                 name:         file.name,
@@ -480,7 +480,7 @@ class Report {
                     file.name = dst;  // slugified name
 
                     // extract EXIF metadata from files
-                    const exif = await exiftool.exiftool.read(src);
+                    const exif = await exiftool.read(src);
                     file.exif = {
                         GPSLatitude:  exif.GPSLatitude,
                         GPSLongitude: exif.GPSLongitude,

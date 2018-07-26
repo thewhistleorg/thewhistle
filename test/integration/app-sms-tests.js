@@ -206,6 +206,7 @@ describe('SMS app'+' ('+app.env+')', function() {
                 'Name of person filling out form': 'Me',
             };
             expect(reportOne.submitted).to.deep.equal(expected);
+            await Report.delete(org, reportIdOne);
         });
         it('Second report', async function() {
             const reportOne = await Report.get(org, reportIdTwo);
@@ -235,10 +236,12 @@ describe('SMS app'+' ('+app.env+')', function() {
                 'Supplimentary information':                        'Extra info 1 | Extra info 2',
             };
             expect(reportOne.submitted).to.deep.equal(expected);
+            await Report.delete(org, reportIdTwo);
         });
         it('Third report deleted', async function() {
             const reportThree = await Report.get(org, reportIdThree);
             expect(reportThree).to.equal(null);
+
         });
     });
 });

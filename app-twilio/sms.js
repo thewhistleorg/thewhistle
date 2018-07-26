@@ -240,7 +240,7 @@ class SmsApp {
         let info = report.submitted['Supplimentary information'] ? report.submitted['Supplimentary information'] : '';
         info = info ==='' ? incomingSms : info + ' | ' + incomingSms;
 
-        Report.updateField(this.db, sessionId, 'Supplimentary information', info);
+        await Report.updateField(this.db, sessionId, 'Supplimentary information', info);
 
         this.sendSms(twiml, 'Thank you for this extra information. You can send more if you wish. To start a new report, reply \'RESTART\'');
     }
@@ -295,7 +295,7 @@ class SmsApp {
     async deleteResponse(ctx) {
         const reportId = ctx.cookies.get(constants.cookies.SESSION_ID);
         const reports = await Report.get(this.db, reportId);
-        Report.delete(this.db, reports._id);
+        await Report.delete(this.db, reports._id);
     }
 
 
@@ -305,7 +305,8 @@ class SmsApp {
      * @param   {Object}   twiml
      * @param   {string}   opening - text to prepend to SMS
      */
-    sendFinalSms(twiml, opening) {
+    sendFinalSms(ctx, twiml, opening) {
+        this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_NEW_REPORT);
         this.sendSms(twiml, opening + ' Thank you for using this reporting service. If you want to submit a new report, please send another text to this number. If you have any questions, please call XXXXXX');
     }
 
@@ -435,7 +436,7 @@ class SmsApp {
         const version = this.spec.version;
         //Adds skeleton report to the database
         const sessionId = await Report.submissionStart(this.org, this.project, alias, version, ctx.headers['user-agent']);
-        Report.updateField(this.db, sessionId, 'First Text', ctx.cookies.get(constants.cookies.FIRST_TEXT));
+        await Report.updateField(this.db, sessionId, 'First Text', ctx.cookies.get(constants.cookies.FIRST_TEXT));
         ctx.cookies.set(constants.cookies.SESSION_ID, sessionId, { httpOnly: false });
         ctx.cookies.set(constants.cookies.ALIAS, alias, { httpOnly: false });
     }
@@ -465,7 +466,7 @@ class SmsApp {
         const sessionId = ctx.cookies.get(constants.cookies.SESSION_ID);
         const field = this.getField(questionNo);
         try {
-            Report.updateField(this.db, sessionId, field, input);
+            await Report.updateField(this.db, sessionId, field, input);
         } catch (e) {
             console.error(e);
         }
@@ -635,11 +636,11 @@ class SmsApp {
                     //Establish whether the user wants to store their report so far
                     switch (this.toYesOrNo(incomingSms)) {
                         case constants.YES:
-                            this.sendFinalSms(twiml, 'Your responses have been stored.');
+                            this.sendFinalSms(ctx, twiml, 'Your responses have been stored.');
                             break;
                         case constants.NO:
                             await this.deleteResponse(ctx);
-                            this.sendFinalSms(twiml, 'Your responses have been deleted.');
+                            this.sendFinalSms(ctx, twiml, 'Your responses have been deleted.');
                             break;
                         case constants.UNKNOWN:
                             this.askIfStore(ctx, twiml, 'Sorry, we didn\'t understand your response.');

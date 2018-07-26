@@ -2,6 +2,7 @@
 /* Cypress front-end integration tests - simple report submission.                 C.Veness 2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+/* eslint promise/catch-or-return: off, promise/always-return: off */
 /* global Cypress, cy, expect */
 
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()

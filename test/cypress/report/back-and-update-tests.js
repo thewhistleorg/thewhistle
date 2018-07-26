@@ -5,6 +5,7 @@
 /* the reporting process.                                                                         */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+/* eslint promise/catch-or-return: off, promise/always-return: off */
 /* global Cypress, cy, expect */
 
 import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()

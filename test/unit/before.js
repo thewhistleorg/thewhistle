@@ -7,7 +7,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
-before(async function() {
+before(function() {
     this.timeout(10e3); // 10 sec
 });
 

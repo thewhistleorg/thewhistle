@@ -912,7 +912,7 @@ class ReportsHandlers {
         await Notification.dismissForUserReport(db, ctx.state.user.id, reportId);
 
         await ctx.render('reports-view', Object.assign(report, extra));
-        Report.flagView(db, reportId, ctx.state.user.id);
+        await Report.flagView(db, reportId, ctx.state.user.id);
     }
 
 
@@ -1249,7 +1249,7 @@ class ReportsHandlers {
             const report = await Report.get(db, reportId);
             if (report.submitted.Happened && report.submitted.Happened.getTime()) {
                 const weather = await Weather.fetchWeatherConditions(geocoded.latitude, geocoded.longitude, report.submitted.Happened);
-                Report.update(db, reportId, { 'analysis.weather': weather }, ctx.state.user.id);
+                await Report.update(db, reportId, { 'analysis.weather': weather }, ctx.state.user.id);
             }
 
             ctx.response.status = 200; // Ok

@@ -2,8 +2,8 @@
 /* Cypress front-end integration tests - long description.                         C.Veness 2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+/* eslint promise/catch-or-return: off, promise/always-return: off, no-unreachable: off */
 /* global Cypress, cy */
-/* eslint no-unreachable: off */
 
 const org = 'grn-test';         // the test organisation for the live ‘grn‘ organisation
 const proj = 'rape-is-a-crime'; // GRN's only project

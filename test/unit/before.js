@@ -6,8 +6,6 @@
 /* 'mocha test/unit/*.js'!                                                                        */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import Db from '../../lib/db.js';
-
 
 before(async function() {
     this.timeout(10e3); // 10 sec

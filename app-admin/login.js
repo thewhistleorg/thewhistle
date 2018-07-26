@@ -10,7 +10,6 @@ import jwt    from 'jsonwebtoken'; // JSON Web Token implementation
 import User     from '../models/user.js';
 import Report   from '../models/report.js';
 import Resource from '../models/resource.js';
-import Db       from '../lib/db.js';
 
 
 class LoginHandlers {

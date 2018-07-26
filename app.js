@@ -19,8 +19,6 @@ import dateFormat      from 'dateformat';     // Steven Levithan's dateFormat()
 import dotenv from 'dotenv';
 dotenv.config(); // loads environment variables from .env file (if available - eg dev env)
 
-import Db from './lib/db';
-
 const app = new Koa();
 
 

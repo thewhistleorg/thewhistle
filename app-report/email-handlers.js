@@ -12,6 +12,8 @@ import fs         from 'fs-extra';     // fs with extra functions & promise inte
 import crypto             from 'crypto';       // nodejs.org/api/crypto.html
 import dateFormat         from 'dateformat';   // Steven Levithan's dateFormat()
 
+import Db from '../lib/db.js';
+
 
 // nodemailer transporter config
 const transporter = nodemailer.createTransport({

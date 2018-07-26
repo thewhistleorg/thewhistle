@@ -13,7 +13,7 @@ import dateFormat   from 'dateformat'; // Steven Levithan's dateFormat()
 import User   from '../models/user.js';
 import Report from '../models/report.js';
 import Update from '../models/update.js';
-
+import Db     from '../lib/db.js';
 
 class DashboardHandlers {
 

@@ -439,82 +439,82 @@ class Report {
      * @returns {ObjectId} New report id.
      * @throws  Error on validation or referential integrity errors.
      */
-    static async insert(db, by, alias, submitted, project, files, userAgent) {
-        throw new Error('Report.insert: this function has been superceded by submissionStart / submissionDetails');
-        debug('Report.insert', 'db:'+db, alias, submitted, 'p:'+project); // eslint-disable-line no-unreachable
-
-        by = objectId(by); // allow id as string
-
-        const reports = await Db.collection(db, 'reports');
-
-        // record report first, so that any file move issues don't cause us to lose it
-
-        const values = {
-            project:    project,
-            submitted:  submitted,
-            by:         by,
-            alias:      alias,
-            location:   { address: '', geocode: null, geojson: null },
-            analysis:   {},
-            // summary: undefined,
-            assignedTo: undefined,
-            status:     undefined,
-            tags:       [],
-            comments:   [],
-            views:      {},
-            archived:   false,
-        };
-
-        // record uploaded files within the submitted report object
-        values.submitted.files = files || [];
-
-        // record user agent for potential later analyses
-        const ua = useragent.parse(userAgent);
-        values.ua = Object.assign({}, ua, { os: ua.os }); // trigger on-demand parsing of os
-
-        //values._id = ObjectId(Math.floor(Date.now()/1000 - Math.random()*60*60*24*365).toString(16)+(Math.random()*2**64).toString(16)); // random date in past year
-        const { insertedId } = await reports.insertOne(values);
-
-        if (files) {
-            // store uploaded files in AWS S3
-            const date = dateFormat(insertedId.getTimestamp(), 'yyyy-mm');
-            const fldr = `${project}/${date}/${insertedId}/`;
-            for (const file of files) {
-                if (file.size > 0) {
-                    const src = file.path;
-                    const dst = slugify(file.name, { lower: true, remove: null });
-
-                    // upload /tmp file to S3
-                    await AwsS3.put(db, project, date, insertedId, dst, src);
-
-                    // replace submitted.files.name with slug & .path with S3 folder
-                    const filter = { _id: insertedId, 'submitted.files.path': src };
-                    const path = { 'submitted.files.$.name': dst, 'submitted.files.$.path': fldr };
-                    await reports.updateOne(filter, { $set: path });
-
-                    // augment files object with EXIF metadata & save in analysis
-
-                    file.path = fldr; // S3 folder
-                    file.name = dst;  // slugified name
-
-                    // extract EXIF metadata from files
-                    const exif = await exiftool.read(src);
-                    file.exif = {
-                        GPSLatitude:  exif.GPSLatitude,
-                        GPSLongitude: exif.GPSLongitude,
-                        CreateDate:   exif.CreateDate, // TODO: JS Date object?
-                    };
-
-                    await reports.updateOne({ _id: insertedId }, { $push: { 'analysis.files': file } });
-
-                    // delete uploaded file from /tmp
-                    await fs.remove(src);
-                }
-            }
-        }
-
-        return insertedId; // TODO: toString()? entire document?
-    }
+    // static async insert(db, by, alias, submitted, project, files, userAgent) {
+    //     throw new Error('Report.insert: this function has been superceded by submissionStart / submissionDetails');
+    //     debug('Report.insert', 'db:'+db, alias, submitted, 'p:'+project); // eslint-disable-line no-unreachable
+    //
+    //     by = objectId(by); // allow id as string
+    //
+    //     const reports = await Db.collection(db, 'reports');
+    //
+    //     // record report first, so that any file move issues don't cause us to lose it
+    //
+    //     const values = {
+    //         project:    project,
+    //         submitted:  submitted,
+    //         by:         by,
+    //         alias:      alias,
+    //         location:   { address: '', geocode: null, geojson: null },
+    //         analysis:   {},
+    //         // summary: undefined,
+    //         assignedTo: undefined,
+    //         status:     undefined,
+    //         tags:       [],
+    //         comments:   [],
+    //         views:      {},
+    //         archived:   false,
+    //     };
+    //
+    //     // record uploaded files within the submitted report object
+    //     values.submitted.files = files || [];
+    //
+    //     // record user agent for potential later analyses
+    //     const ua = useragent.parse(userAgent);
+    //     values.ua = Object.assign({}, ua, { os: ua.os }); // trigger on-demand parsing of os
+    //
+    //     //values._id = ObjectId(Math.floor(Date.now()/1000 - Math.random()*60*60*24*365).toString(16)+(Math.random()*2**64).toString(16)); // random date in past year
+    //     const { insertedId } = await reports.insertOne(values);
+    //
+    //     if (files) {
+    //         // store uploaded files in AWS S3
+    //         const date = dateFormat(insertedId.getTimestamp(), 'yyyy-mm');
+    //         const fldr = `${project}/${date}/${insertedId}/`;
+    //         for (const file of files) {
+    //             if (file.size > 0) {
+    //                 const src = file.path;
+    //                 const dst = slugify(file.name, { lower: true, remove: null });
+    //
+    //                 // upload /tmp file to S3
+    //                 await AwsS3.put(db, project, date, insertedId, dst, src);
+    //
+    //                 // replace submitted.files.name with slug & .path with S3 folder
+    //                 const filter = { _id: insertedId, 'submitted.files.path': src };
+    //                 const path = { 'submitted.files.$.name': dst, 'submitted.files.$.path': fldr };
+    //                 await reports.updateOne(filter, { $set: path });
+    //
+    //                 // augment files object with EXIF metadata & save in analysis
+    //
+    //                 file.path = fldr; // S3 folder
+    //                 file.name = dst;  // slugified name
+    //
+    //                 // extract EXIF metadata from files
+    //                 const exif = await exiftool.read(src);
+    //                 file.exif = {
+    //                     GPSLatitude:  exif.GPSLatitude,
+    //                     GPSLongitude: exif.GPSLongitude,
+    //                     CreateDate:   exif.CreateDate, // TODO: JS Date object?
+    //                 };
+    //
+    //                 await reports.updateOne({ _id: insertedId }, { $push: { 'analysis.files': file } });
+    //
+    //                 // delete uploaded file from /tmp
+    //                 await fs.remove(src);
+    //             }
+    //         }
+    //     }
+    //
+    //     return insertedId; // TODO: toString()? entire document?
+    // }
 
 
     /**

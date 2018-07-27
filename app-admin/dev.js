@@ -79,7 +79,7 @@ class Dev {
         const entries = [];
         for (const e of entriesFiltered) {
             const fields = {
-                time:   dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM:ss'),
+                time:   dateFormat(e._id.getTimestamp(), 'UTC:yyyy-mm-dd HH:MM:ss'),
                 path:   e.url.split('?')[0] + (e.url.split('?').length>1 ? '?…' : ''),
                 qs:     e.url.split('?')[1],
                 env:    e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env),
@@ -127,7 +127,7 @@ class Dev {
         for (const e of entriesAll) {
             const fields = {
                 env:       e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env),
-                timestamp: dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM:ss'),
+                timestamp: dateFormat(e._id.getTimestamp(), 'UTC:yyyy-mm-dd HH:MM:ss'),
                 host:      e.host,
                 url:       e.url,
                 org:       e.db,
@@ -143,7 +143,7 @@ class Dev {
         }
 
         const csv = json2csv.parse(entries);
-        const filename = 'the whistle access log ' + dateFormat('yyyy-mm-dd HH.MM') + '.csv';
+        const filename = 'the whistle access log ' + dateFormat('UTC:yyyy-mm-dd HH.MM') + '.csv';
         ctx.response.status = 200;
         ctx.response.body = csv;
         ctx.response.attachment(filename);
@@ -188,7 +188,7 @@ class Dev {
         const entries = [];
         for (const e of entriesFiltered) {
             const fields = {
-                time:            dateFormat(e._id.getTimestamp(), 'yyyy-mm-dd HH:MM:ss'),
+                time:            dateFormat(e._id.getTimestamp(), 'UTC:yyyy-mm-dd HH:MM:ss'),
                 path:            e.url.split('?')[0] + (e.url.split('?').length>1 ? '?…' : ''),
                 qs:              e.url.split('?')[1],
                 env:             e.env=='production' ? '' : (e.env=='development' ? 'dev' : e.env),
@@ -347,7 +347,7 @@ class Dev {
                 if (!counts[month][project].pages[page]) counts[month][project].pages[page] = { count: 0 };
                 counts[month][project].pages[page].count++;
                 if (p=='complete') {
-                    // record time to complete report
+                    // record time to complete report (in ms)
                     counts[month][project].completionTimes.push(submissions[s].progress[p] - submissions[s]._id.getTimestamp());
                     // and report id (purely for testing)
                     counts[month][project].completedReports.push(submissions[s].reportId.toString());
@@ -362,9 +362,9 @@ class Dev {
                 const completionTimes = counts[month][project].completionTimes;
                 if (completionTimes.length == 0) continue; // TODO: why is it possible to get an empty array?
                 const times = {
-                    min: dateFormat(completionTimes.reduce((prev, curr) => Math.min(prev, curr)), 'HH:MM:ss'),
-                    max: dateFormat(completionTimes.reduce((prev, curr) => Math.max(prev, curr)), 'HH:MM:ss'),
-                    avg: dateFormat(completionTimes.reduce((prev, curr) => prev + curr) / completionTimes.length, 'HH:MM:ss'),
+                    min: dateFormat(completionTimes.reduce((prev, curr) => Math.min(prev, curr)), 'UTC:HH:MM:ss'),
+                    max: dateFormat(completionTimes.reduce((prev, curr) => Math.max(prev, curr)), 'UTC:HH:MM:ss'),
+                    avg: dateFormat(completionTimes.reduce((prev, curr) => prev + curr) / completionTimes.length, 'UTC:HH:MM:ss'),
                 };
                 counts[month][project].times = times;
                 delete counts[month][project].completionTimes;

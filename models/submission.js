@@ -1,11 +1,15 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* User model; users allowed to access the system.                                 C.Veness 2018  */
+/* Submission tracking model; track how far through the submission process users get.             */
+/*                                                                                 C.Veness 2018  */
 /*                                                                                                */
 /* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import useragent    from 'useragent'; // parse browser user agent string
 import { ObjectId } from 'mongodb';   // MongoDB driver for Node.js
+import Debug        from 'debug';     // small debugging utility
+
+const debug = Debug('app:db'); // db write ops
 
 import Db from '../lib/db.js';
 
@@ -28,7 +32,27 @@ const schema = {
 class Submission {
 
     /**
+     * Return submission record.
+     *
+     * @param   {string}   db - Database to use.
+     * @param   {ObjectId} submissionId - Submission id.
+     * @returns {Object}   Submission details or null if not found.
+     */
+    static async get(db, submissionId) {
+        if (!(submissionId instanceof ObjectId)) submissionId = new ObjectId(submissionId); // allow id as string
+        if (!submissionId) return null;
+
+        const submissions = await Db.collection(db, 'submissions');
+        const submission = await submissions.findOne(submissionId);
+        return submission;
+    }
+
+
+    /**
      * Return all submission records.
+     *
+     * @param   {string} db - Database to use.
+     * @returns {Object[]}   Submission records.
      */
     static async getAll(db) {
         const submissions = await Db.collection(db, 'submissions');
@@ -45,6 +69,8 @@ class Submission {
      * @returns {ObjectId} Id of submission document.
      */
     static async insert(db, project, hdrUserAgent) {
+        debug('Submission.insert', 'db:'+db, 'p:'+project);
+
         const submissions = await Db.collection(db, 'submissions');
 
         const ua = useragent.parse(hdrUserAgent);
@@ -58,13 +84,15 @@ class Submission {
 
 
     /**
-     * Record progress in incident report submission (e.g. on POST).
+     * Record progress in incident report submission (e.g. on POST). TODO: could this take (optional) reportId?
      *
-     * @param {string} db - Database to use.
+     * @param {string}   db - Database to use.
      * @param {ObjectId} submissionId - Id of submission document.
-     * @param {number} page - Page being submitted ('0' for post of report home page).
+     * @param {number}   page - Page being submitted ('0' for post of report home page).
      */
     static async progress(db, submissionId, page) {
+        debug('Submission.progress', 'db:'+db, 's:'+submissionId, page);
+
         if (!(submissionId instanceof ObjectId)) submissionId = new ObjectId(submissionId); // allow id as string
 
         const submissions = await Db.collection(db, 'submissions');
@@ -75,20 +103,58 @@ class Submission {
 
 
     /**
-     * Record completion of incident report submission.
+     * Record completion of incident report submission. This is invoked when the 'whatnext' page is
+     * requested (being the only clear indication an incident report submission has been completed).
      *
-     * @param {string} db - Database to use.
+     * @param {string}   db - Database to use.
      * @param {ObjectId} submissionId - Id of submission document.
      * @param {ObjectId} reportId - Id of submitted report document.
      */
     static async complete(db, submissionId, reportId) {
+        debug('Submission.complete', 'db:'+db, 's:'+submissionId, 'r:'+reportId);
+
         if (!(submissionId instanceof ObjectId)) submissionId = new ObjectId(submissionId); // allow id as string
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId);             // allow id as string
 
         const submissions = await Db.collection(db, 'submissions');
 
-        const values = { 'progress.complete': new Date(),  reportId: reportId };
+        const values = { 'progress.complete': new Date(), reportId: reportId };
         await submissions.updateOne({ _id: submissionId }, { $set: values });
+    }
+
+
+    /**
+     * Delete progress record for given submission. This is purely for testing purposes, to avoid
+     * the submissions collection growing unreasonably.
+     *
+     * @param {string}   db - Database to use.
+     * @param {ObjectId} submissionId - Id of submission document to be deleted.
+     */
+    static async delete(db, submissionId) {
+        debug('Submission.delete', 'db:'+db, 's:'+submissionId);
+
+        if (!(submissionId instanceof ObjectId)) submissionId = new ObjectId(submissionId); // allow id as string
+
+        const submissions = await Db.collection(db, 'submissions');
+
+        await submissions.deleteOne({ _id: submissionId });
+    }
+
+
+    /**
+     * Delete progress record for given report.
+     *
+     * @param {string}   db - Database to use.
+     * @param {ObjectId} reportId - Id of submitted report document.
+     */
+    static async deleteForReport(db, reportId) {
+        debug('Submission.deleteForReport', 'db:'+db, 'r:'+reportId);
+
+        if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow id as string
+
+        const submissions = await Db.collection(db, 'submissions');
+
+        await submissions.deleteOne({ reportId: reportId });
     }
 
 }

@@ -16,6 +16,7 @@ const debug = Debug('app:db'); // db write ops
 
 import User         from '../models/user.js';
 import Notification from '../models/notification.js';
+import Submission   from '../models/submission.js';
 import AwsS3        from '../lib/aws-s3.js';
 import Db           from '../lib/db.js';
 import Update       from './update.js';
@@ -561,6 +562,9 @@ class Report {
 
         // delete any notifications
         await Notification.cancelForReport(db, id);
+
+        // delete submission progress tracking (note this will only delete progress for completed submissions - TODO!)
+        await Submission.deleteForReport(db, id);
 
         // delete report
         const reports = await Db.collection(db, 'reports');

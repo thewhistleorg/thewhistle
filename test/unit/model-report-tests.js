@@ -50,7 +50,6 @@ describe(`Report model (${db})`, function() {
         it('throws on unset - getByTag', () => Report.getByTag().catch(error => expect(error).to.be.an('error')));
         it('throws on unset - getLatestIimestamp', () => Report.getLatestTimestamp().catch(error => expect(error).to.be.an('error')));
         it('throws on unset - getOldestIimestamp', () => Report.getOldestTimestamp().catch(error => expect(error).to.be.an('error')));
-        it('throws on unset - insert', () => Report.insert().catch(error => expect(error).to.be.an('error')));
         it('throws on unset - update', () => Report.update().catch(error => expect(error).to.be.an('error')));
         it('throws on unset - delete', () => Report.delete().catch(error => expect(error).to.be.an('error')));
         it('throws on unset - statuses', () => Report.statuses().catch(error => expect(error).to.be.an('error')));

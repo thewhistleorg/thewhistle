@@ -89,13 +89,13 @@ describe('SMS app'+' ('+app.env+')', function() {
         const re = /Your new anonymous alias is [a-z]+ [a-z]+.\nQuestion 1: Please ask the interviewee if they consent to audio recording the interview, was consent given?/;
         it('Start report', async function() {
             const responseMessage = await getResponseMessage('help');
-            expect(responseMessage).to.equal('By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP, HELP and STOP at any point.\nHave you used this reporting service before?');
+            expect(responseMessage).to.equal('By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP or HELP at any point.\nHave you used this reporting service before?');
         });
         it('Get help before starting report', async function() {
             let responseMessage = await getResponseMessage('help');
             expect(responseMessage).to.equal('If you would like to speak to someone, please call XXXXX. Reply \'START\' to start submitting a report');
             responseMessage = await getResponseMessage('START');
-            expect(responseMessage).to.equal('By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP, HELP and STOP at any point.\nHave you used this reporting service before?');
+            expect(responseMessage).to.equal('By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP or HELP at any point.\nHave you used this reporting service before?');
         });
         it('Input invalid used before', async function() {
             const responseMessage = await getResponseMessage('I do not know');
@@ -143,7 +143,7 @@ describe('SMS app'+' ('+app.env+')', function() {
         });
         it('Start report after stopping', async function() {
             const responseMessage = await getResponseMessage('sTart ');
-            expect(responseMessage).to.equal('By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP, HELP and STOP at any point.\nHave you used this reporting service before?');
+            expect(responseMessage).to.equal('By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP or HELP at any point.\nHave you used this reporting service before?');
         });
         it('Input used before', async function() {
             const responseMessage = await getResponseMessage('Ye.');
@@ -169,7 +169,7 @@ describe('SMS app'+' ('+app.env+')', function() {
         });
         it('Restart report', async function() {
             const responseMessage = await getResponseMessage('ReStart ');
-            expect(responseMessage).to.equal('By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP, HELP and STOP at any point.\nHave you used this reporting service before?');
+            expect(responseMessage).to.equal('By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP or HELP at any point.\nHave you used this reporting service before?');
         });
         it('Input used before', async function() {
             const responseMessage = await getResponseMessage('Ye.');

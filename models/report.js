@@ -327,7 +327,6 @@ class Report {
         id = objectId(id);  // allow id as string
 
         const reports = await Db.collection(db, 'reports');
-
         for (const field in details) {
             await reports.updateOne({ _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
         }
@@ -336,6 +335,24 @@ class Report {
             await reports.updateOne({ _id: id }, { $set: { [`submittedRaw.${field}`]: detailsRaw[field] } });
         }
 
+    }
+
+
+    /**
+     * Sets (or updates) a report field.
+     *
+     * @param {string}   db - Database to use.
+     * @param {ObjectId} id - Report Id.
+     * @param {Object}   key - Field name to update
+     * @param {Object}   value - User's response to given field
+     */
+    static async updateField(db, id, key, value) {
+        if (!global.db[db]) await Db.connect(db, { useNewUrlParser: true });
+        const reports = global.db[db].collection('reports');
+        await reports.updateOne(
+            { _id: ObjectId(id) },
+            { $set: { [`submitted.${key}`]: value } }
+        );
     }
 
 

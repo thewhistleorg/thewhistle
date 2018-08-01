@@ -421,7 +421,7 @@ class SmsApp {
      */
     getInitialSms() {
         //TODO: Get initial SMS from this.spec
-        const initialSms = 'By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP, HELP and STOP at any point.\nHave you used this reporting service before?';
+        const initialSms = 'By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP or HELP at any point.\nHave you used this reporting service before?';
         this.initialSms = initialSms;
     }
 
@@ -437,8 +437,8 @@ class SmsApp {
         //Adds skeleton report to the database
         const sessionId = await Report.submissionStart(this.org, this.project, alias, version, ctx.headers['user-agent']);
         await Report.updateField(this.db, sessionId, 'First Text', ctx.cookies.get(constants.cookies.FIRST_TEXT));
-        ctx.cookies.set(constants.cookies.SESSION_ID, sessionId, { httpOnly: false });
-        ctx.cookies.set(constants.cookies.ALIAS, alias, { httpOnly: false });
+        this.setCookie(ctx, constants.cookies.SESSION_ID, sessionId);
+        this.setCookie(ctx, constants.cookies.ALIAS, alias);
     }
 
 
@@ -528,8 +528,8 @@ class SmsApp {
      */
     static deleteMessage(messageId) {
         //TODO: Get tokens from .env
-        const accountId = 'AC5da0166da2047a8e4d3b3709982ebaae';
-        const authToken = '0c34505d5eff527a6b67038b9b7f4a11';
+        const accountId = process.env.TWILIO_ACCOUNT_ID;
+        const authToken = process.env.TWILIO_AUTH_TOKEN;
         const client = require('twilio')(accountId, authToken);
         client.messages(messageId)
             .remove()

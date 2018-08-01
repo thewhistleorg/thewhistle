@@ -26,8 +26,12 @@ app.use(handlebars({
 const routes = {};
 
 //Serve SMS test web app
-router.get('/test', async function(ctx) {
-    await ctx.render('test-chat');
+router.get('/sms-emulator', async function(ctx) {
+    if (ctx.app.env === 'production') {
+        ctx.status = 404;
+    } else {
+        await ctx.render('test-chat');
+    }
 });
 
 //On receiving a text

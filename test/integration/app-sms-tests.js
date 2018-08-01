@@ -59,8 +59,7 @@ function parseReportId(response) {
             return response.headers['set-cookie'][i].substr(response.headers['set-cookie'][i].indexOf('=') + 1, 24);
         }
     }
-    return 'a';
-    //TODO: Throw error
+    throw new Error('No existing session');
 }
 
 

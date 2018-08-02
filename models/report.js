@@ -41,6 +41,7 @@ const schema = {
         alias:        { type:     [ 'string', 'null' ] },    // auto-generated alias of victim/survivor
         submitted:    { type:     'object' },                // originally submitted report (flexible format following incident reporting format)
         submittedRaw: { type:     'object' },                // originally submitted report - fields as per HTML input field names
+        submittedVersion: { type: 'object' }, // TODO: temporarily allow submittedVersion until existing reports cleaned
         files:        { type:     'array',                   // uploaded files
             items: { type: 'object' },                       // ... 'formidable' File objects
         },

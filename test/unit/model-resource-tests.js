@@ -13,7 +13,8 @@ import Resource from '../../models/resource.js';
 
 const db = 'grn-test'; // the test organisation for the live ‘grn‘ organisation
 
-import './before.js'; // set up database connections
+import './before.js';
+import Report from '../../models/report'; // set up database connections
 
 describe(`Resource model (${db})`, function() {
     this.timeout(5e3); // 5 sec
@@ -23,14 +24,15 @@ describe(`Resource model (${db})`, function() {
 
     describe('supplied db failures', function() {
         // note chai doesn't currently cope well with exceptions thrown from async functions:
-        // see github.com/chaijs/chai/issues/882#issuecomment-322131680
+        // see github.com/chaijs/chai/issues/882#issuecomment-322131680 TODO: convert to async try/catch
         it('throws on unknown db', () => Resource.init('no db by this name').catch(error => expect(error).to.be.an('error')));
         it('throws on empty string', () => Resource.init('').catch(error => expect(error).to.be.an('error')));
         it('throws on null', () => Resource.init(null).catch(error => expect(error).to.be.an('error')));
         it('throws on numeric', () => Resource.init(999).catch(error => expect(error).to.be.an('error')));
         it('throws on object', () => Resource.init({}).catch(error => expect(error).to.be.an('error')));
         it('throws on unset', () => Resource.init().catch(error => expect(error).to.be.an('error')));
-        // a few meaningless tests just to bump coverage stats
+        // a few meaningless tests just to bump coverage stats; note these are not robust tests, as
+        // a failure to throw will not get reported
         it('throws on unset - find', () => Resource.find().catch(error => expect(error).to.be.an('error')));
         it('throws on unset - get', () => Resource.get().catch(error => expect(error).to.be.an('error')));
         it('throws on unset - getAll', () => Resource.getAll().catch(error => expect(error).to.be.an('error')));
@@ -42,7 +44,7 @@ describe(`Resource model (${db})`, function() {
     });
 
     describe('init', function() {
-        it('initialises existing db (ie noop)', async function() {
+        it('initialises collection (noop)', async function() {
             expect(await Resource.init(db)).to.be.undefined;
         });
     });
@@ -115,6 +117,17 @@ describe(`Resource model (${db})`, function() {
             await Resource.update(db, resourceId.toString(), { services: [ 'rehab', 'comfort' ] });
             const resource = await Resource.get(db, resourceId);
             expect(resource.services).to.be.an('array');
+        });
+    });
+
+    describe('fails validation', function() {
+        it('fails to set no-such-field', async function() {
+            try {
+                await Resource.update(db, resourceId, { 'no-such-field': 'nothing here' }, null);
+                throw new Error('Resource.update should fail validation');
+            } catch (e) {
+                expect(e.message).to.equal('Resource failed validation [update]');
+            }
         });
     });
 

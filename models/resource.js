@@ -1,10 +1,11 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Resource model; rape/crisis resources for victim/survivor support.         C.Veness 2017-2018  */
-/*                                                                                                */
-/* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js
+import Debug        from 'debug';   // small debugging utility
+
+const debug = Debug('app:db'); // db write ops
 
 import Db from '../lib/db.js';
 
@@ -12,35 +13,38 @@ import Db from '../lib/db.js';
 /*
  * Rape crisis resources are provided as support information e.g. after incident report submission.
  */
-/* eslint-disable no-unused-vars, key-spacing */
 const schema = {
-    type: 'object',
-    required: [ '_id', 'name' ],
+    type:       'object',
+    required:   [ 'name' ],
     properties: {
-        name:     { type: 'string' },                                             // name of organisation
-        address:  { type: 'string' },                                             // full address (geocodable)
-        phone:    { type: 'array', items: { type: 'string' }  },                  // list of phone numbers
-        email:    { type: 'array', items: { type: 'string', format: 'email' }  }, // list of e-mail addresses
-        website:  { type: 'string', format: 'uri' },                              // web site
-        services: { type: 'array', items: { type: 'string' }  },                  // list of services offered
+        _id:      { bsonType: 'objectId' },
+        name:     { type: 'string' },                                                   // name of organisation
+        address:  { type: 'string' },                                                   // full address (geocodable)
+        phone:    { type: 'array', items: { type: 'string' }  },                        // list of phone numbers
+        email:    { type: 'array', items: { type: 'string', /* format: 'email' */ }  }, // list of e-mail addresses
+        website:  { type: 'string', /* format': 'uri' */ },                             // web site ['format' not currently supported]
+        services: { type: 'array', items: { type: 'string' }  },                        // list of services offered
         category: { type: 'string', enum: [ 'Legal aid', 'Medical help', 'Mental health counselling' ] },
-        location: { type: 'object' },                                             // GeoJSON (with spatial index)
+        location: { type: 'object' },                                                   // GeoJSON (with spatial index)
     },
+    additionalProperties: false,
 };
-/* eslint-enable no-unused-vars, key-spacing */
-/* once we have MongoDB 3.6, we can use db.runCommand({ 'collMod': 'reports' , validator: { $jsonSchema: schema } }); */
 
 
 class Resource {
 
     /**
-     * Initialise new database; if not present, create 'resources' collection, add validation for it,
-     * and add indexes. If everything is correctly set up, this is a no-op, so can be called freely
-     * (for instance any time someone logs in).
+     * Initialises 'resources' collection; if not present, create it, add validation for it, and add
+     * indexes.
+     *
+     * Currently this is invoked on any login, to ensure db is correctly initialised before it is
+     * used. If this becomes expensive, it could be done less simplistically.
      *
      * @param {string} db - Database to use.
      */
     static async init(db) {
+        debug('Resource.init', 'db:'+db);
+
         // if no 'resources' collection, create it
         const collections = await Db.collections(db);
         if (!collections.map(c => c.s.name).includes('resources')) {
@@ -49,19 +53,21 @@ class Resource {
 
         const resources = await Db.collection(db, 'resources');
 
-        // TODO: if 'resources' collection doesn't have validation, add it
-        //const infos = await resources.infos();
-        //await Db.command(db, { collMod: 'resources' , validator: validator }); TODO: sort out validation!
+        // in case 'resources' collection doesn't have validation (or validation is updated), add it
+        await Db.command(db, { collMod: 'resources', validator: { $jsonSchema: schema } });
+
 
         // if 'resources' collection doesn't have correct indexes, add them
         const indexes = (await resources.indexes()).map(i => i.key);
 
         // geospatial index
         if (indexes.name_location == undefined) resources.createIndex({ location: '2dsphere',  name: 1 }, { name: 'name_location' });
+
+        // TODO: indexes (incl unique)
     }
 
     /**
-     * Expose find method for flexible querying.
+     * Exposes find method for flexible querying.
      *
      * @param   {string}   db - Database to use.
      * @param   {*}        query - Query parameter to find().
@@ -79,7 +85,7 @@ class Resource {
      *
      * @param   {string}   db - Database to use.
      * @param   {ObjectId} id - Resource id or undefined if not found.
-     * @returns {Object}   Resource details.
+     * @returns {Object} Resource details.
      */
     static async get(db, id) {
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
@@ -113,7 +119,7 @@ class Resource {
      * @param   {string}        db - Database to use.
      * @param   {string}        field - Field to be matched.
      * @param   {string!number} value - Value to match against field.
-     * @returns {Object[]}      Resources details.
+     * @returns {Object[]} Resources details.
      */
     static async getBy(db, field, value) {
         const resources = await Db.collection(db, 'resources');
@@ -126,10 +132,10 @@ class Resource {
     /**
      * Returns Resources close to a given location. TODO: worth using this or just Resource.find?
      *
-     * @param   {string}   db - Database to use.
-     * @param   {number}   lat - Latitude to return results close to.
-     * @param   {number}   lon - Longitude to return results close to.
-     * @param   {number}   distance - Maximum distance (in metres) to return results for.
+     * @param   {string} db - Database to use.
+     * @param   {number} lat - Latitude to return results close to.
+     * @param   {number} lon - Longitude to return results close to.
+     * @param   {number} distance - Maximum distance (in metres) to return results for.
      * @returns {Object[]} Resources details.
      */
     static async getNear(db, lat, lon, distance) {
@@ -153,6 +159,8 @@ class Resource {
      * @throws  Error on validation or referential integrity errors.
      */
     static async insert(db, values, geocode) {
+        debug('Resource.insert', 'db:'+db);
+
         const resources = await Db.collection(db, 'resources');
 
         if (geocode) { // record (geoJSON) location for (indexed) geospatial queries
@@ -162,13 +170,20 @@ class Resource {
             };
         }
 
-        const { insertedId } = await resources.insertOne(values);
-        return insertedId;
+        try {
+
+            const { insertedId } = await resources.insertOne(values);
+            return insertedId;
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Resource failed validation [insert]`);
+            throw e;
+        }
     }
 
 
     /**
-     * Update Resource details.
+     * Updates Resource details.
      *
      * @param  {string}   db - Database to use.
      * @param  {number}   id - Resource id.
@@ -177,6 +192,8 @@ class Resource {
      * @throws Error on referential integrity errors.
      */
     static async update(db, id, values, geocode) {
+        debug('Resource.update', 'db:'+db, 'r:'+db);
+
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
         const resources = await Db.collection(db, 'resources');
@@ -188,20 +205,28 @@ class Resource {
             };
         }
 
-        await resources.updateOne({ _id: id }, { $set: values });
+        try {
+
+            await resources.updateOne({ _id: id }, { $set: values });
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Resource failed validation [update]`);
+            throw e;
+        }
     }
 
 
     /**
-     * Delete Resource record.
+     * Deletes Resource record.
      *
      * TODO: never actually delete, just flag deleted, so that recorded referrals don't have dead links
      *
      * @param  {string}   db - Database to use.
      * @param  {ObjectId} id - Resource id.
-     * @throws Error
-     */
+      */
     static async delete(db, id) {
+        debug('Resource.delete', 'db:'+db, 'r:'+db);
+
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
         const resources = await Db.collection(db, 'resources');

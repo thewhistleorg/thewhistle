@@ -51,9 +51,8 @@ describe(`Notification model (${db})`, function() {
 
 
     describe('supplied db failures', function() {
-        // note chai doesn't currently cope well with exceptions thrown from async functions:
-        // see github.com/chaijs/chai/issues/882#issuecomment-322131680
-        // a few meaningless tests just to bump coverage stats
+        // a few meaningless tests just to bump coverage stats; note these are not robust tests, as
+        // a failure to throw will not get reported
         it('throws on unset - notify', () => Notification.notify().catch(error => expect(error).to.be.an('error')));
         it('throws on unset - notifyMultiple', () => Notification.notifyMultiple().catch(error => expect(error).to.be.an('error')));
         it('throws on unset - listForReport', () => Notification.listForReport().catch(error => expect(error).to.be.an('error')));

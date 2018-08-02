@@ -18,14 +18,14 @@ const schema = {
     required:   [ 'name' ],
     properties: {
         _id:      { bsonType: 'objectId' },
-        name:     { type: 'string' },                                                   // name of organisation
-        address:  { type: 'string' },                                                   // full address (geocodable)
-        phone:    { type: 'array', items: { type: 'string' }  },                        // list of phone numbers
-        email:    { type: 'array', items: { type: 'string', /* format: 'email' */ }  }, // list of e-mail addresses
-        website:  { type: 'string', /* format': 'uri' */ },                             // web site ['format' not currently supported]
-        services: { type: 'array', items: { type: 'string' }  },                        // list of services offered
+        name:     { type: 'string' },                                                     // name of organisation
+        address:  { type: 'string' },                                                     // full address (geocodable)
+        phone:    { type: 'array', items: { type: 'string' }  },                          // list of phone numbers
+        email:    { type: 'array', items: { type: 'string' /* , format: 'email' */ }  },  // list of e-mail addresses
+        website:  { type: 'string' /* , format': 'uri' */ },                              // web site ['format' not currently supported]
+        services: { type: 'array', items: { type: 'string' }  },                          // list of services offered
         category: { type: 'string', enum: [ 'Legal aid', 'Medical help', 'Mental health counselling' ] },
-        location: { type: 'object' },                                                   // GeoJSON (with spatial index)
+        location: { type: 'object' },                                                     // GeoJSON (with spatial index)
     },
     additionalProperties: false,
 };
@@ -176,7 +176,7 @@ class Resource {
             return insertedId;
 
         } catch (e) {
-            if (e.code == 121) throw new Error(`Resource failed validation [insert]`);
+            if (e.code == 121) throw new Error('Resource failed validation [insert]');
             throw e;
         }
     }
@@ -210,7 +210,7 @@ class Resource {
             await resources.updateOne({ _id: id }, { $set: values });
 
         } catch (e) {
-            if (e.code == 121) throw new Error(`Resource failed validation [update]`);
+            if (e.code == 121) throw new Error('Resource failed validation [update]');
             throw e;
         }
     }

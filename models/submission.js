@@ -115,7 +115,7 @@ class Submission {
             return insertedId;
 
         } catch (e) {
-            if (e.code == 121) throw new Error(`Submission failed validation [insert]`);
+            if (e.code == 121) throw new Error('Submission failed validation [insert]');
             throw e;
         }
     }
@@ -142,7 +142,7 @@ class Submission {
             await submissions.updateOne({ _id: submissionId }, { $set: values });
 
         } catch (e) {
-            if (e.code == 121) throw new Error(`Submission failed validation [progress]`);
+            if (e.code == 121) throw new Error('Submission failed validation [progress]');
             throw e;
         }
     }
@@ -171,7 +171,7 @@ class Submission {
             await submissions.updateOne({ _id: submissionId }, { $set: values });
 
         } catch (e) {
-            if (e.code == 121) throw new Error(`Submission failed validation [complete]`);
+            if (e.code == 121) throw new Error('Submission failed validation [complete]');
             throw e;
         }
     }

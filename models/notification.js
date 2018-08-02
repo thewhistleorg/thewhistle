@@ -22,20 +22,20 @@ import Db from '../lib/db.js';
 
 
 /*
- *
+ * A notification holds outstanding events which need to be notified to specific user(s) concerning
+ * particular reports.
  */
-/* eslint-disable no-unused-vars, key-spacing */
 const schema = {
-    type: 'object',
-    required: [ 'event', 'users', 'report' ],
+    type:       'object',
+    required:   [ 'event', 'users', 'report' ],
     properties: {
+        _id:    { bsonType: 'objectId' },
         event:  { type: 'string' },                                 // event being notified
         users:  { type: 'array', items: { bsonType: 'objectId' } }, // users notification is for
         report: { bsonType: 'objectId' },                           // report notification relates to
     },
+    additionalProperties: false,
 };
-/* eslint-enable no-unused-vars, key-spacing */
-/* once we have MongoDB 3.6, we can use db.runCommand({ 'collMod': 'reports' , validator: { $jsonSchema: schema } }); */
 
 
 // keep a record of the last time any changes are made to notifications (notify, dismiss, cancel):
@@ -46,7 +46,37 @@ const lastUpdate = {};
 class Notification {
 
     /**
-     * Notify user of event relating to report.
+     * Initialises 'notifications' collection; if not present, create it, add validation for it, and add
+     * indexes.
+     *
+     * Currently this is invoked on any login, to ensure db is correctly initialised before it is
+     * used. If this becomes expensive, it could be done less simplistically.
+     *
+     * @param {string} db - Database to use.
+     */
+    static async init(db) {
+        debug('Notification.init', 'db:'+db);
+
+        // if no 'notifications' collection, create it
+        const collections = await Db.collections(db);
+        if (!collections.map(c => c.s.name).includes('notifications')) {
+            await Db.createCollection(db, 'notifications');
+        }
+
+        const notifications = await Db.collection(db, 'notifications');
+
+        // in case 'notifications' collection doesn't have validation (or validation is updated), add it
+        await Db.command(db, { collMod: 'notifications', validator: { $jsonSchema: schema } });
+
+        // indexes
+        notifications.createIndex({ report: 1 });
+        notifications.createIndex({ event: 1, report: 1 });
+        notifications.createIndex({ report: 1, users: 1 });
+    }
+
+
+    /**
+     * Notifies user of event relating to report.
      *
      * @param   {string}   db - Database to use.
      * @param   {string}   event - Event notification relates to.
@@ -67,16 +97,23 @@ class Notification {
             report: reportId,
         };
 
-        const { insertedId } = await notifications.insertOne(values);
+        try {
 
-        lastUpdate[db] = insertedId.getTimestamp().toISOString().slice(0, -5); // track most recent updates
+            const { insertedId } = await notifications.insertOne(values);
 
-        return insertedId;
+            lastUpdate[db] = insertedId.getTimestamp().toISOString().slice(0, -5); // track most recent updates
+
+            return insertedId;
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Notification of ${event} for ${userId} failed validation [notify]`);
+            throw e;
+        }
     }
 
 
     /**
-     * Notify multiple users of event relating to report.
+     * Notifies multiple users of event relating to report.
      *
      * This is for events which all users may need to be aware of, such as 'new report submitted'.
      * If all users for a certain organisation/database are to be notified, they can be found by
@@ -103,16 +140,22 @@ class Notification {
             report: reportId,
         };
 
-        const { insertedId } = await notifications.insertOne(values);
+        try {
+            const { insertedId } = await notifications.insertOne(values);
 
-        lastUpdate[db] = insertedId.getTimestamp().toISOString().slice(0, -5); // track most recent updates
+            lastUpdate[db] = insertedId.getTimestamp().toISOString().slice(0, -5); // track most recent updates
 
-        return insertedId;
+            return insertedId;
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Notification of ${event} for ${userIds} failed validation`);
+            throw e;
+        }
     }
 
 
     /**
-     * List all notifications for event relating to given report.
+     * Lists all notifications for event relating to given report.
      *
      * @param   {string}   db - Database to use.
      * @param   {string}   event - Event notification relates to.
@@ -131,7 +174,7 @@ class Notification {
 
 
     /**
-     * List all notifications for event for given user.
+     * Lists all notifications for event for given user.
      *
      * @param   {string}   db - Database to use.
      * @param   {ObjectId} userId - Id of user.
@@ -150,7 +193,7 @@ class Notification {
 
 
     /**
-     * List all notifications for debug purposes.
+     * Lists all notifications for debug purposes.
      *
      * @param   {string} db - Database to use.
      * @returns {Object[]} Notifications.
@@ -165,7 +208,7 @@ class Notification {
 
 
     /**
-     * Dismiss a notification for given user; if this notification is also for other users, they
+     * Dismisses a notification for given user; if this notification is also for other users, they
      * will not be affected; if there are no other users, this cancels the notification.
      *
      * @param {string}   db - Database to use.
@@ -180,18 +223,25 @@ class Notification {
 
         const notifications = await Db.collection(db, 'notifications');
 
-        await notifications.update({ _id: notificationId }, { $pull: { users: userId } });
+        try {
 
-        // if the last user for this notification dismissed it, delete the notification
-        const notification = await notifications.findOne(notificationId);
-        if (notification && notification.users.length == 0) await notifications.deleteOne({ _id: notificationId });
+            await notifications.update({ _id: notificationId }, { $pull: { users: userId } });
 
-        lastUpdate[db] = new Date().toISOString().slice(0, -5); // track most recent updates
+            // if the last user for this notification dismissed it, delete the notification
+            const notification = await notifications.findOne(notificationId);
+            if (notification && notification.users.length == 0) await notifications.deleteOne({ _id: notificationId });
+
+            lastUpdate[db] = new Date().toISOString().slice(0, -5); // track most recent updates
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Notification dismissal for ${userId} failed validation`);
+            throw e;
+        }
     }
 
 
     /**
-     * Dismiss all notifications for a given user relating to a given report.
+     * Dismisses all notifications for a given user relating to a given report.
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} userId - Id of user to be notified.
@@ -205,18 +255,24 @@ class Notification {
 
         const notifications = await Db.collection(db, 'notifications');
 
-        await notifications.update({ report: reportId }, { $pull: { users: userId } });
+        try {
+            await notifications.update({ report: reportId }, { $pull: { users: userId } });
 
-        // check for any notifications that no longer have any users as a result
-        const emptyNotifications = await notifications.find({ report: reportId, users: { $eq: [] } }).toArray();
-        for (const notfcn of emptyNotifications) await notifications.deleteOne({ _id: notfcn._id });
+            // check for any notifications that no longer have any users as a result
+            const emptyNotifications = await notifications.find({ report: reportId, users: { $eq: [] } }).toArray();
+            for (const notfcn of emptyNotifications) await notifications.deleteOne({ _id: notfcn._id });
 
-        lastUpdate[db] = new Date().toISOString().slice(0, -5); // track most recent updates
+            lastUpdate[db] = new Date().toISOString().slice(0, -5); // track most recent updates
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Notification dismissals for ${userId}/${reportId} failed validation`);
+            throw e;
+        }
     }
 
 
     /**
-     * Cancel a notification: this dismisses the notification for all users it was notifying.
+     * Cancels a notification: this dismisses the notification for all users it was notifying.
      *
      * A 'new report submitted' notification will get cancelled (for all notified users) when the
      * report is assigned to a user.
@@ -238,7 +294,7 @@ class Notification {
 
 
     /**
-     * Cancel all notification for a given report.
+     * Cancels all notification for a given report.
      *
      * This is for e.g. when a report is archived.
      *
@@ -259,7 +315,7 @@ class Notification {
 
 
     /**
-     * List all events there are currently notifications for.
+     * Lists all events there are currently notifications for.
      *
      * @param   {string} db - Database to use.
      * @returns {string[]} List of events.

@@ -1,7 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Report model.                                                              C.Veness 2017-2018  */
-/*                                                                                                */
-/* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import fs         from 'fs-extra';          // fs with extra functions & promise interface
@@ -32,11 +30,11 @@ import Update       from './update.js';
  * of the report. Of course, no operation should fail validation at this level: full validation
  * should be done both front-end and by the back-end app.
  */
-/* eslint-disable no-unused-vars, key-spacing */
 const schema = {
     type: 'object',
-    required: [ '_id', 'project', 'alias', 'submitted', 'location', 'analysis', 'assignedTo', 'status', 'tags', 'comments', 'archived', 'views' ],
+    required: [ 'project', 'alias', 'submitted', 'location', 'analysis', 'assignedTo', 'status', 'tags', 'comments', 'archived', 'views' ],
     properties: {
+        _id:          { bsonType: 'objectId' },
         project:      { type:     'string' },                // name of project report belongs to
         by:           { bsonType: [ 'objectId', 'null' ] },  // user entering incident report
         alias:        { type:     [ 'string', 'null' ] },    // auto-generated alias of victim/survivor
@@ -45,7 +43,7 @@ const schema = {
         files:        { type:     'array',                   // uploaded files
             items: { type: 'object' },                       // ... 'formidable' File objects
         },
-        ua:           { type: [ 'objectId', 'null' ] },      // user agent of browser used to report incident
+        ua:           { type: [ 'object', 'null' ] },        // user agent of browser used to report incident
         location:     { type: 'object',                      // geocoded incident location
             properties: {
                 address: { type: 'string' },                 // ... entered address used for geocoding
@@ -80,23 +78,27 @@ const schema = {
                 },
             },
         },
-        archived:     { type: 'boolean' },                   // archived flag
         views:        { type: [ 'object', 'null' ] },        // associative array of timestamps indexed by user id
+        archived:     { type: 'boolean' },                   // archived flag
     },
+    additionalProperties: false,
 };
-/* eslint-enable no-unused-vars, key-spacing */
-/* once we have MongoDB 3.6, we can use db.runCommand({ 'collMod': 'reports' , validator: { $jsonSchema: schema } }); */
+
 
 class Report {
 
     /**
-     * Initialise new database; if not present, create 'reports' collection, add validation for it,
-     * and add indexes. If everything is correctly set up, this is a no-op, so can be called freely
-     * (for instance any time someone logs in).
+     * Initialises 'reports' collection; if not present, create it, add validation for it, and add
+     * indexes.
+     *
+     * Currently this is invoked on any login, to ensure db is correctly initialised before it is
+     * used. If this becomes expensive, it could be done less simplistically.
      *
      * @param {string} db - Database to use.
      */
     static async init(db) {
+        debug('Report.init', 'db:'+db);
+
         // if no 'reports' collection, create it
         const collections = await Db.collections(db);
         if (!collections.map(c => c.s.name).includes('reports')) {
@@ -105,11 +107,10 @@ class Report {
 
         const reports = await Db.collection(db, 'reports');
 
-        // TODO: if 'reports' collection doesn't have validation, add it
-        //const infos = await reports.infos();
-        //await Db.command(db, { collMod: 'reports' , validator: validator }); TODO: sort out validation!
+        // in case 'reports' collection doesn't have validation (or validation is updated), add it
+        await Db.command(db, { collMod: 'reports', validator: { $jsonSchema: schema } });
 
-        // ---- indexing
+        // ---- indexes
 
         // indexes seem to be a bit strange in MongoDB: even determining if an index exists is not
         // straightforward; for now, just request index without testing if it already exists - this
@@ -118,9 +119,14 @@ class Report {
         //const indexes = (await reports.indexes()).map(i => i.key);
         //console.info('init/indexes', indexes)
 
-        // geospatial index
-
-        reports.createIndex({ 'location.geojson': '2dsphere' });
+        reports.createIndex({ project: 1 });
+        reports.createIndex({ by: 1 });
+        reports.createIndex({ alias: 1 });
+        reports.createIndex({ 'location.geojson': '2dsphere' }); // geospatial index
+        reports.createIndex({ assignedTo: 1 });
+        reports.createIndex({ status: 1 });
+        reports.createIndex({ tags: 1 });
+        reports.createIndex({ archived: 1 });
 
         // free-text index for submitted information (ie fields in report.submitted)
 
@@ -147,11 +153,12 @@ class Report {
         //reports.createIndex(fields, { name: 'freetextfieldssearch' });
     }
 
+
     /**
-     * Expose find method for flexible querying.
+     * Exposes find method for flexible querying.
      *
      * @param   {string}   db - Database to use.
-     * @param   {*}        query - Query parameter to find().
+     * @param   {Object}   query - Query parameter to find().
      * @returns {Object[]} Reports details.
      */
     static async find(db, query) {
@@ -291,7 +298,6 @@ class Report {
             project:          project,
             submitted:        { Alias: alias },
             submittedRaw:     {},
-            submittedVersion: {},
             alias:            alias,
             location:         { address: '', geocode: null, geojson: null },
             analysis:         {},
@@ -308,9 +314,15 @@ class Report {
         const ua = useragent.parse(userAgent);
         values.ua = Object.assign({}, ua, { os: ua.os }); // trigger on-demand parsing of os
 
-        const { insertedId } = await reports.insertOne(values);
+        try {
 
-        return insertedId; // TODO: toString()?
+        const { insertedId } = await reports.insertOne(values);
+            return insertedId; // TODO: toString()?
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report submitted by ${alias} failed validation [submissionStart]`);
+            throw e;
+    }
     }
 
 
@@ -328,14 +340,21 @@ class Report {
         id = objectId(id);  // allow id as string
 
         const reports = await Db.collection(db, 'reports');
-        for (const field in details) {
-            await reports.updateOne({ _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
-        }
 
-        for (const field in detailsRaw) {
-            await reports.updateOne({ _id: id }, { $set: { [`submittedRaw.${field}`]: detailsRaw[field] } });
-        }
+        try {
 
+            for (const field in details) {
+                await reports.updateOne({ _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
+            }
+
+            for (const field in detailsRaw) {
+                await reports.updateOne({ _id: id }, { $set: { [`submittedRaw.${field}`]: detailsRaw[field] } });
+            }
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [submissionDetails]`);
+            throw e;
+        }
     }
 
 
@@ -401,10 +420,7 @@ class Report {
             lastModifiedDate: formidableFile.lastModifiedDate,
         };
 
-        // and store it in the submitted report
-        await reports.updateOne({ _id: id }, { $push: { files: file } });
-
-        // extract EXIF metadata from files & save it in analysis
+        // extract EXIF metadata from files
         const exifData = await exiftool.read(src);
         const fileAnalysis = {
             exif: {
@@ -415,10 +431,21 @@ class Report {
             },
         };
 
+        try {
+
+            // store file details in the submitted report
+            await reports.updateOne({ _id: id }, { $push: { files: file } });
+
+            // store EXIF metadata in analysis
         await reports.updateOne({ _id: id }, { $push: { 'analysis.files': fileAnalysis } });
 
         // delete uploaded file from /tmp
         await fs.remove(src);
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [submissionFile]`);
+            throw e;
+    }
     }
 
 
@@ -518,7 +545,7 @@ class Report {
 
 
     /**
-     * Update Report details.
+     * Updates Report details.
      *
      * @param  {string}   db - Database to use.
      * @param  {ObjectId} id - Report id.
@@ -536,14 +563,21 @@ class Report {
 
         const reports = await Db.collection(db, 'reports');
 
+        try {
+
         await reports.updateOne({ _id: id }, { $set: values });
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [update]`);
+            throw e;
+        }
 
         await Update.insert(db, id, userId, { set: values }); // audit trail
     }
 
 
     /**
-     * Delete entire Report. Normally only for testing purposes.
+     * Deletes entire Report. Normally only for testing purposes.
      *
      * @param  {string}   db - Database to use.
      * @param  {ObjectId} id - Report id.
@@ -576,7 +610,7 @@ class Report {
 
 
     /**
-     * List all statuses used
+     * Lists all statuses used
      *
      * TODO: restrict by eg agency, age?
      * TODO: better name?
@@ -607,7 +641,7 @@ class Report {
 
 
     /**
-     * List all tags used.
+     * Lists all tags used.
      *
      * TODO: restrict by eg assignedTo, status?
      * TODO: better name?
@@ -629,7 +663,7 @@ class Report {
 
 
     /**
-     * Add tag to report. May be used as part of report submission, in which case userId will be null.
+     * Adds tag to report. May be used as part of report submission, in which case userId will be null.
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report id.
@@ -642,15 +676,22 @@ class Report {
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow userId as string
 
+        try {
+
         const reports = await Db.collection(db, 'reports');
         await reports.updateOne({ _id: id }, { $addToSet: { tags: tag } });
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [insertTag]`);
+            throw e;
+        }
 
         if (userId) await Update.insert(db, id, userId, { addToSet: { tags: tag } }); // audit trail
     }
 
 
     /**
-     * Delete tag from report. May be used as part of report submission, in which case userId will be null.
+     * Deletes tag from report. May be used as part of report submission, in which case userId will be null.
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report id.
@@ -663,15 +704,22 @@ class Report {
         id = objectId(id);         // allow id as string
         userId = objectId(userId); // allow id as string
 
+        try {
+
         const reports = await Db.collection(db, 'reports');
         await reports.updateOne({ _id: id }, { $pull: { tags: tag } });
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [deleteTag]`);
+            throw e;
+        }
 
         if (userId) await Update.insert(db, id, userId, { pull: { tags: tag } }); // audit trail
     }
 
 
     /**
-     * Add comment to report.
+     * Adds comment to report.
      *
      * @mentions get converted to markdown links with the userid as the target; eg '@chris' will be
      * converted to something like '[@chris](591d91d204815c13b2211420). This ties down the username
@@ -700,7 +748,14 @@ class Report {
         const user = await User.get(userId);
         const values = { byId: userId, byName: user.username, on: new Date(), comment };
 
+        try {
+
         await reports.updateOne({ _id: id }, { $push: { comments: values } });
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [insertComment]`);
+            throw e;
+        }
 
         await Update.insert(db, id, userId, { push: { comments: comment } }); // audit trail
 
@@ -709,7 +764,7 @@ class Report {
 
 
     /**
-     * Update comment identified by 'by', 'on' from report 'id'.
+     * Updates comment identified by 'by', 'on' from report 'id'.
      *
      * @mentions get converted to markdown links as per insertComment().
      *
@@ -740,16 +795,22 @@ class Report {
             commentMd = commentMd.replace('@'+user.username, `[@${user.username}](${user._id})`);
         }
 
-        const reports = await Db.collection(db, 'reports');
+        try {
 
-        await reports.updateOne({ _id: id, 'comments.byId': by, 'comments.on': on }, { $set: { 'comments.$.comment': commentMd } });
+        const reports = await Db.collection(db, 'reports');
+            await reports.updateOne({ _id: id, 'comments.byId': by, 'comments.on': on }, { $set: { 'comments.$.comment': commentMd } });
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [updateComment]`);
+            throw e;
+        }
 
         await Update.insert(db, id, userId, { set: { [`comment-${dateFormat(on, 'yyyy-mm-dd@HH:MM')}`]: commentPlain } }); // audit trail
     }
 
 
     /**
-     * Delete comment identified by 'by', 'on' from report 'id'.
+     * Deletes comment identified by 'by', 'on' from report 'id'.
      *
      * Note: currently, 'userId' is redundant as users can only delete their own comments, but it is
      * passed as a separate argument in case this should change in future.
@@ -769,15 +830,22 @@ class Report {
         if (!(on instanceof Date)) on = new Date(on); // allow timestamp as string
         if (isNaN(on.getTime())) throw new Error('invalid ‘on’ date');
 
+        try {
+
         const reports = await Db.collection(db, 'reports');
         await reports.updateOne({ _id: id }, { $pull: { comments: { byId: by, on: on } } });
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [deleteComment]`);
+            throw e;
+        }
 
         await Update.insert(db, id, userId, { pull: { comments: { byId: by, on: on } } }); // audit trail
     }
 
 
     /**
-     * Record report as having been viewed by current user.
+     * Records report as having been viewed by current user.
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report id.
@@ -796,7 +864,14 @@ class Report {
 
         views[userId] = new Date();
 
+        try {
+
         await reports.updateOne({ _id: id }, { $set: { views: views } });
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [views]`);
+            throw e;
+        }
 
         // no audit trail, of course!
     }

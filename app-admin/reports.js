@@ -1247,7 +1247,7 @@ class ReportsHandlers {
             // if we have a precise date for the incident, record weather conditions at location & date of incident
             // TODO: remove dependency on project-specific field name 'Happened'!
             const report = await Report.get(db, reportId);
-            if (report.submitted.Happened && report.submitted.Happened.getTime()) {
+            if (report.submitted.Happened && report.submitted.Happened.getTime) {
                 const weather = await Weather.fetchWeatherConditions(geocoded.latitude, geocoded.longitude, report.submitted.Happened);
                 await Report.update(db, reportId, { 'analysis.weather': weather }, ctx.state.user.id);
             }

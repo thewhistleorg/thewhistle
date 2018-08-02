@@ -773,8 +773,8 @@ describe(`Admin app (${org}/${app.env})`, function() {
             lastname:  'User',
             email:     'test@user.com',
             username:  'test',
-            roles:     'admin',
-            databases: org,
+            roles:     [ 'admin' ],
+            databases: [ org ],
         };
 
         it('gets add new user page', async function() {

@@ -1,11 +1,12 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Update model - audit trail of updates made to reports.                     C.Veness 2017-2018  */
-/*                                                                                                */
-/* All database modifications go through the model; most querying is in the handlers.             */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { ObjectId } from 'mongodb';    // MongoDB driver for Node.js
 import dateFormat   from 'dateformat'; // Steven Levithan's dateFormat()
+import Debug        from 'debug';      // small debugging utility
+
+const debug = Debug('app:db'); // db write ops
 
 import User   from './user.js';
 import Report from './report.js';
@@ -15,27 +16,55 @@ import Db     from '../lib/db.js';
 /*
  * An update record records all updates made to incident reports.
  */
-/* eslint-disable no-unused-vars, key-spacing */
 const schema = {
-    type: 'object',
-    required: [ 'reportId', 'userId', 'update' ],
+    type:       'object',
+    required:   [ 'reportId', 'userId', 'update' ],
     properties: {
+        _id:      { bsonType: 'objectId' },
         reportId: { bsonType: 'objectId' }, // report updated
         userId:   { bsonType: 'objectId' }, // user making update
-        update:   { bsonType: 'objectId' }, // update details as per update() update object
+        update:   { type:     'object' },   // update details as per update() update object
     },
+    additionalProperties: false,
 };
-/* eslint-enable no-unused-vars, key-spacing */
-/* once we have MongoDB 3.6, we can use db.runCommand({ 'collMod': 'reports' , validator: { $jsonSchema: schema } }); */
 
 
 class Update {
 
     /**
-     * Expose find method for flexible querying.
+     * Initialises 'updates' collection; if not present, create it, add validation for it, and add
+     * indexes.
      *
-     * @param   {string}   db - Database to use.
-     * @param   {*}        query - Query parameter to find().
+     * Currently this is invoked on any login, to ensure db is correctly initialised before it is
+     * used. If this becomes expensive, it could be done less simplistically.
+     *
+     * @param {string} db - Database to use.
+     */
+    static async init(db) {
+        debug('Update.init', 'db:'+db);
+
+        // if no 'updates' collection, create it
+        const collections = await Db.collections(db);
+        if (!collections.map(c => c.s.name).includes('updates')) {
+            await Db.createCollection(db, 'updates');
+        }
+
+        const updates = await Db.collection(db, 'updates');
+
+        // in case 'updates' collection doesn't have validation (or validation is updated), add it
+        await Db.command(db, { collMod: 'updates', validator: { $jsonSchema: schema } });
+
+        // indexes
+        updates.createIndex({ reportId: 1 });
+        updates.createIndex({ userId: 1 });
+    }
+
+
+    /**
+     * Exposes find method for flexible querying.
+     *
+     * @param   {string} db - Database to use.
+     * @param   {Object} query - Query parameter to find().
      * @returns {Object[]} Updates details.
      */
     static async find(db, query) {
@@ -50,7 +79,7 @@ class Update {
      *
      * @param   {string}   db - Database to use.
      * @param   {ObjectId} id - Update id.
-     * @returns {Object}   Update details or null if not found.
+     * @returns {Object} Update details or null if not found.
      */
     static async get(db, id) {
         try {
@@ -68,8 +97,8 @@ class Update {
     /**
      * Returns most recent Updates.
      *
-     * @param   {string}   db - Database to use.
-     * @param   {number}   limit - Limit on number of report details to be returned.
+     * @param   {string} db - Database to use.
+     * @param   {number} limit - Limit on number of report details to be returned.
      * @returns {Object[]} Updates details.
      */
     static async getAll(db, limit=12) {
@@ -104,6 +133,8 @@ class Update {
      * @throws  Error on validation or referential integrity errors.
      */
     static async insert(db, reportId, userId, update) {
+        debug('Update.insert', 'db:'+db, 'r:'+reportId, 'u:'+userId);
+
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow id as string
         if (!(userId instanceof ObjectId)) userId = new ObjectId(userId); // allow id as string
 
@@ -115,18 +146,27 @@ class Update {
             update:   update,
         };
 
-        const { insertedId } = await updates.insertOne(values);
+        try {
 
-        return insertedId; // TODO: toString()? entire document?
+            const { insertedId } = await updates.insertOne(values);
+            return insertedId; // TODO: toString()? entire document?
+
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Update ${db}/${reportId} failed validation [insert]`);
+            throw e;
+        }
     }
 
 
     /**
-     * Delete Update records relating to  given report (for test purposes).
+     * Deletes Update records relating to  given report (for test purposes).
      *
-     * @param  {ObjectId} id - Update id.
+     * @param {string}   db - Database to use.
+     * @param {ObjectId} reportId - Report update records are to be deleted for.
      */
     static async deleteForReport(db, reportId) {
+        debug('Update.deleteForReport', 'db:'+db, 'r:'+reportId);
+
         const updates = await Db.collection(db, 'updates');
         if (!(reportId instanceof ObjectId)) reportId = new ObjectId(reportId); // allow id as string
         await updates.deleteMany({ reportId: reportId });
@@ -137,7 +177,7 @@ class Update {
      * Updates made to given report.
      *
      * @param   {string}   db - Database to use.
-     * @param   {ObjectId} reportId - Report id.
+     * @param   {ObjectId} reportId - Report updates were made to.
      * @returns {Object[]} Updates details.
      */
     static async getByReport(db, reportId) {

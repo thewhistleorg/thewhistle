@@ -27,7 +27,7 @@ describe(`Report model (${db})`, function() {
 
     describe('setup', function() {
         it ('sets up test user', async function() {
-            const usr = { firstname: 'Test', lastname: 'User', email: 'test@user.com', username: 'test', roles: 'admin', databases: 'test' };
+            const usr = { firstname: 'Test', lastname: 'User', email: 'test@user.com', password: null, username: 'test', roles: [ 'admin' ], databases: [ 'test' ] };
             userId = await User.insert(usr);
             console.info('\tuser id:', userId);
         });
@@ -35,14 +35,15 @@ describe(`Report model (${db})`, function() {
 
     describe('supplied db failures', function() {
         // note chai doesn't currently cope well with exceptions thrown from async functions:
-        // see github.com/chaijs/chai/issues/882#issuecomment-322131680
+        // see github.com/chaijs/chai/issues/882#issuecomment-322131680 TODO: convert to async try/catch
         it('throws on unknown db', () => Report.init('no db by this name').catch(error => expect(error).to.be.an('error')));
         it('throws on empty string', () => Report.init('').catch(error => expect(error).to.be.an('error')));
         it('throws on null', () => Report.init(null).catch(error => expect(error).to.be.an('error')));
         it('throws on numeric', () => Report.init(999).catch(error => expect(error).to.be.an('error')));
         it('throws on object', () => Report.init({}).catch(error => expect(error).to.be.an('error')));
         it('throws on unset', () => Report.init().catch(error => expect(error).to.be.an('error')));
-        // a few meaningless tests just to bump coverage stats
+        // a few meaningless tests just to bump coverage stats; note these are not robust tests, as
+        // a failure to throw will not get reported
         it('throws on unset - find', () => Report.find().catch(error => expect(error).to.be.an('error')));
         it('throws on unset - get', () => Report.get().catch(error => expect(error).to.be.an('error')));
         it('throws on unset - getAll', () => Report.getAll().catch(error => expect(error).to.be.an('error')));
@@ -64,7 +65,7 @@ describe(`Report model (${db})`, function() {
     // note we won't bother checking the "if (!global.db[db]) throw" statement on all other functions!
 
     describe('init', function() {
-        it('initialises existing db (ie noop', async function() {
+        it('initialises existing db (noop', async function() {
             expect(await Report.init(db)).to.be.undefined;
         });
     });
@@ -194,11 +195,11 @@ describe(`Report model (${db})`, function() {
     });
 
     describe('updates', function() {
-        it('updates summary', async function() {
-            await Report.update(db, reportId, { summary: 'A test report' });
-            const rpt = await Report.get(db, reportId);
-            expect(rpt.summary).to.equal('A test report');
-        });
+        // it('updates summary', async function() {
+        //     await Report.update(db, reportId, { summary: 'A test report' });
+        //     const rpt = await Report.get(db, reportId);
+        //     expect(rpt.summary).to.equal('A test report');
+        // });
         it('updates assignedTo', async function() {
             await Report.update(db, reportId, { assignedTo: userId });
             const rpt = await Report.get(db, reportId);
@@ -273,6 +274,17 @@ describe(`Report model (${db})`, function() {
         it('verifies flag', async function() {
             const lastView = await Report.lastViewed(db, reportId, userId);
             expect(lastView.getTime()).to.be.closeTo(Date.now(), 1e3);
+        });
+    });
+
+    describe('fails validation', function() {
+        it('fails to set no-such-field', async function() {
+            try {
+                await Report.update(db, reportId, { 'no-such-field': 'nothing here' });
+                throw new Error('Report.update should fail validation');
+            } catch (e) {
+                expect(e.message).to.match(/Report grn-test\/[0-9a-f]+ failed validation \[update\]/);
+            }
         });
     });
 

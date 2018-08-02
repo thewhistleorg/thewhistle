@@ -30,9 +30,10 @@ import Update       from './update.js';
  * of the report. Of course, no operation should fail validation at this level: full validation
  * should be done both front-end and by the back-end app.
  */
+/* eslint-disable key-spacing */
 const schema = {
-    type: 'object',
-    required: [ 'project', 'alias', 'submitted', 'location', 'analysis', 'assignedTo', 'status', 'tags', 'comments', 'archived', 'views' ],
+    type:       'object',
+    required:   [ 'project', 'alias', 'submitted', 'location', 'analysis', 'assignedTo', 'status', 'tags', 'comments', 'archived', 'views' ],
     properties: {
         _id:          { bsonType: 'objectId' },
         project:      { type:     'string' },                // name of project report belongs to
@@ -83,6 +84,7 @@ const schema = {
     },
     additionalProperties: false,
 };
+/* eslint-enable key-spacing */
 
 
 class Report {
@@ -295,19 +297,19 @@ class Report {
         const reports = await Db.collection(db, 'reports');
 
         const values = {
-            project:          project,
-            submitted:        { Alias: alias },
-            submittedRaw:     {},
-            alias:            alias,
-            location:         { address: '', geocode: null, geojson: null },
-            analysis:         {},
-            // summary:       null,
-            assignedTo:       null,
-            status:           null,
-            tags:             [],
-            comments:         [],
-            views:            {},
-            archived:         false,
+            project:      project,
+            submitted:    { Alias: alias },
+            submittedRaw: {},
+            alias:        alias,
+            location:     { address: '', geocode: null, geojson: null },
+            analysis:     {},
+            // summary:   null,
+            assignedTo:   null,
+            status:       null,
+            tags:         [],
+            comments:     [],
+            views:        {},
+            archived:     false,
         };
 
         // record user agent for potential later analyses
@@ -316,13 +318,13 @@ class Report {
 
         try {
 
-        const { insertedId } = await reports.insertOne(values);
+            const { insertedId } = await reports.insertOne(values);
             return insertedId; // TODO: toString()?
 
         } catch (e) {
             if (e.code == 121) throw new Error(`Report submitted by ${alias} failed validation [submissionStart]`);
             throw e;
-    }
+        }
     }
 
 
@@ -437,15 +439,15 @@ class Report {
             await reports.updateOne({ _id: id }, { $push: { files: file } });
 
             // store EXIF metadata in analysis
-        await reports.updateOne({ _id: id }, { $push: { 'analysis.files': fileAnalysis } });
+            await reports.updateOne({ _id: id }, { $push: { 'analysis.files': fileAnalysis } });
 
-        // delete uploaded file from /tmp
-        await fs.remove(src);
+            // delete uploaded file from /tmp
+            await fs.remove(src);
 
         } catch (e) {
             if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [submissionFile]`);
             throw e;
-    }
+        }
     }
 
 
@@ -565,7 +567,7 @@ class Report {
 
         try {
 
-        await reports.updateOne({ _id: id }, { $set: values });
+            await reports.updateOne({ _id: id }, { $set: values });
 
         } catch (e) {
             if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [update]`);
@@ -678,8 +680,8 @@ class Report {
 
         try {
 
-        const reports = await Db.collection(db, 'reports');
-        await reports.updateOne({ _id: id }, { $addToSet: { tags: tag } });
+            const reports = await Db.collection(db, 'reports');
+            await reports.updateOne({ _id: id }, { $addToSet: { tags: tag } });
 
         } catch (e) {
             if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [insertTag]`);
@@ -706,8 +708,8 @@ class Report {
 
         try {
 
-        const reports = await Db.collection(db, 'reports');
-        await reports.updateOne({ _id: id }, { $pull: { tags: tag } });
+            const reports = await Db.collection(db, 'reports');
+            await reports.updateOne({ _id: id }, { $pull: { tags: tag } });
 
         } catch (e) {
             if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [deleteTag]`);
@@ -750,7 +752,7 @@ class Report {
 
         try {
 
-        await reports.updateOne({ _id: id }, { $push: { comments: values } });
+            await reports.updateOne({ _id: id }, { $push: { comments: values } });
 
         } catch (e) {
             if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [insertComment]`);
@@ -797,7 +799,7 @@ class Report {
 
         try {
 
-        const reports = await Db.collection(db, 'reports');
+            const reports = await Db.collection(db, 'reports');
             await reports.updateOne({ _id: id, 'comments.byId': by, 'comments.on': on }, { $set: { 'comments.$.comment': commentMd } });
 
         } catch (e) {
@@ -832,8 +834,8 @@ class Report {
 
         try {
 
-        const reports = await Db.collection(db, 'reports');
-        await reports.updateOne({ _id: id }, { $pull: { comments: { byId: by, on: on } } });
+            const reports = await Db.collection(db, 'reports');
+            await reports.updateOne({ _id: id }, { $pull: { comments: { byId: by, on: on } } });
 
         } catch (e) {
             if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [deleteComment]`);
@@ -866,7 +868,7 @@ class Report {
 
         try {
 
-        await reports.updateOne({ _id: id }, { $set: { views: views } });
+            await reports.updateOne({ _id: id }, { $set: { views: views } });
 
         } catch (e) {
             if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [views]`);

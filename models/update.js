@@ -16,6 +16,7 @@ import Db     from '../lib/db.js';
 /*
  * An update record records all updates made to incident reports.
  */
+/* eslint-disable key-spacing */
 const schema = {
     type:       'object',
     required:   [ 'reportId', 'userId', 'update' ],
@@ -27,6 +28,7 @@ const schema = {
     },
     additionalProperties: false,
 };
+/* eslint-enable key-spacing */
 
 
 class Update {

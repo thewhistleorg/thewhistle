@@ -141,7 +141,7 @@ class User {
             return insertedId;
 
         } catch (e) {
-            if (e.code == 121) throw new Error(`User failed validation`);
+            if (e.code == 121) throw new Error('User failed validation');
             if (e.code == 11000) throw new Error(`email/username ‘${e.errmsg.split('"')[1]}’ already in use`);
             throw e;
         }

@@ -14,7 +14,7 @@ import Resource from '../../models/resource.js';
 const db = 'grn-test'; // the test organisation for the live ‘grn‘ organisation
 
 import './before.js';
-import Report from '../../models/report'; // set up database connections
+
 
 describe(`Resource model (${db})`, function() {
     this.timeout(5e3); // 5 sec

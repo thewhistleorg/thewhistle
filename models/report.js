@@ -82,7 +82,7 @@ const schema = {
         },
         views:         { type: [ 'object', 'null' ] },        // associative array of timestamps indexed by user id
         archived:      { type: 'boolean' },                   // archived flag
-        lastUpdated:   { bsonType: 'date' },                  // Date of when the user last made an edit to their submission
+        lastUpdated:   { type: 'number' },                  // Date of when the user last made an edit to their submission
         evidenceToken: { type: 'string' },                    // Unique token which is used in a URL for a user to upload evidence
     },
     additionalProperties: false,

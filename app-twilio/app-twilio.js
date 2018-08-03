@@ -3,12 +3,14 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
-import Koa            from 'koa';
-import Router         from 'koa-router';
-import handlebars     from 'koa-handlebars'; 
-import serve          from 'koa-static';
-import SmsApp         from '../app-twilio/sms.js';
-import FormGenerator  from '../lib/form-generator.js';
+import Koa           from 'koa';
+import Router        from 'koa-router';
+import handlebars    from 'koa-handlebars'; 
+import serve         from 'koa-static';
+import SmsApp        from '../app-twilio/sms.js';
+import FormGenerator from '../lib/form-generator.js';
+import EvidencePage  from '../app-twilio/evidence.js'
+import Report        from '../models/report.js';
 
 
 const app = new Koa();
@@ -23,7 +25,8 @@ app.use(handlebars({
     viewsDir:  'app-twilio/templates',
 }));
 
-const routes = {};
+const smsRoutes = {};
+const evidenceRoutes = {};
 
 //Serve SMS test web app
 router.get('/sms-emulator', async function(ctx) {
@@ -39,12 +42,12 @@ router.post('/:org/:project', async function (ctx) {
     //If the organisation/project combination is valid
     if (FormGenerator.exists(ctx.params.org, ctx.params.project)) {
         //If this is the first request for the organisation/project combination (since server start)
-        if (!routes[ctx.url]) {
-            routes[ctx.url] = new SmsApp(ctx.params.org, ctx.params.project);
-            await routes[ctx.url].parseSpecifications();
-            await routes[ctx.url].setupDatabase();
+        if (!smsRoutes[ctx.url]) {
+            smsRoutes[ctx.url] = new SmsApp(ctx.params.org, ctx.params.project);
+            await smsRoutes[ctx.url].parseSpecifications();
+            await smsRoutes[ctx.url].setupDatabase();
         }
-        await routes[ctx.url].receiveText(ctx);
+        await smsRoutes[ctx.url].receiveText(ctx);
     }
 
     
@@ -57,6 +60,22 @@ router.post('/delete-outbound', function (ctx) {
     }
     ctx.status = 200;
     ctx.headers['Content-Type'] = 'text/xml';
+});
+
+//Direct user to the page allowing them to upload evidence
+router.get('/:org/:project/upload-evidence', async function (ctx) {
+    //TODO: Try not providing token
+    if (!evidenceRoutes[ctx.query.token]) {
+        const reportId = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.query.token);
+        if (reportId.length > 0) {
+            evidenceRoutes[ctx.query.token] = new EvidencePage(reportId[0]);
+            await evidenceRoutes[ctx.query.token].renderEvidencePage(ctx);
+        } else {
+            await EvidencePage.renderInvalidTokenPage(ctx);
+        }
+    } else {
+        await evidenceRoutes[ctx.query.token].renderEvidencePage(ctx);
+    }
 });
 
 app.use(router.routes());

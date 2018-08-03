@@ -4,6 +4,8 @@
 
 
 import $RefParser     from 'json-schema-ref-parser';
+import Twilio         from 'twilio';
+
 import Report         from '../models/report.js';
 import autoIdentifier from '../lib/auto-identifier.js';
 import Db             from '../lib/db.js';
@@ -44,7 +46,7 @@ class SmsApp {
      * @returns {Object}   SMS app object
      */    
     constructor(org, project) {
-        this.MessagingResponse = require('twilio').twiml.MessagingResponse;
+        this.MessagingResponse = Twilio.twiml.MessagingResponse;
         this.db = org;
         this.yamlFile = 'public/spec/' + org.replace('-test', '') + '/' + project + '.yaml';
         this.org = org;
@@ -171,7 +173,7 @@ class SmsApp {
     async generateAliasAndStart(ctx, twiml) {
         const alias = await this.generateUniqueAlias();
         await this.initiateSmsReport(ctx, alias);
-        const question = this.getNextQuestion(ctx, 0);
+        const question = await this.getNextQuestion(ctx, 0);
         this.sendSms(twiml, 'Your new anonymous alias is ' + alias + '.\n' + question);
     }
 
@@ -192,7 +194,8 @@ class SmsApp {
         } else {
             if (await this.aliasExists(alias)) {
                 await this.initiateSmsReport(ctx, alias);
-                this.sendSms(twiml, this.getNextQuestion(ctx, 0));
+                const firstQuestion = await this.getNextQuestion(ctx, 0);
+                this.sendSms(twiml, firstQuestion);
             } else {
                 this.askForAlias(ctx, twiml, 'Sorry, that alias hasn\'t been used before.');
             }
@@ -205,8 +208,8 @@ class SmsApp {
      * @param   {Object}   ctx 
      * @param   {Object}   twiml 
      */
-    sendQuestion(ctx, twiml, nextQuestion) {
-        const question = this.getNextQuestion(ctx, nextQuestion);
+    async sendQuestion(ctx, twiml, nextQuestion) {
+        const question = await this.getNextQuestion(ctx, nextQuestion);
         this.sendSms(twiml, question);
     }
 
@@ -220,7 +223,7 @@ class SmsApp {
      */
     async receiveResponse(ctx, twiml, incomingSms) {
         const nextQuestion = ctx.cookies.get(constants.cookies.NEXT_QUESTION);
-        this.sendQuestion(ctx, twiml, nextQuestion);
+        await this.sendQuestion(ctx, twiml, nextQuestion);
         //Update database with the user's response
         await this.updateResponse(ctx, nextQuestion - 1, incomingSms);
     }
@@ -437,6 +440,14 @@ class SmsApp {
         //Adds skeleton report to the database
         const sessionId = await Report.submissionStart(this.org, this.project, alias, version, ctx.headers['user-agent']);
         await Report.updateField(this.db, sessionId, 'First Text', ctx.cookies.get(constants.cookies.FIRST_TEXT));
+
+        let evidenceToken = '';
+
+        do {
+            evidenceToken = Math.random().toString(36).substring(2);
+        }
+        while (!(await Report.getBy(this.db, 'evidenceToken', evidenceToken)));
+        await Report.update(this.db, sessionId, {'evidenceToken': evidenceToken});
         this.setCookie(ctx, constants.cookies.SESSION_ID, sessionId);
         this.setCookie(ctx, constants.cookies.ALIAS, alias);
     }
@@ -467,6 +478,7 @@ class SmsApp {
         const field = this.getField(questionNo);
         try {
             await Report.updateField(this.db, sessionId, field, input);
+            await Report.updateField(this.db, sessionId, 'Last Updated', Date.now());
         } catch (e) {
             console.error(e);
         }
@@ -503,7 +515,7 @@ class SmsApp {
      * 
      * @returns {string}   Text of the next question
      */
-    getNextQuestion(ctx, nextQuestion) {
+    async getNextQuestion(ctx, nextQuestion) {
         let message = '';
 
         if (nextQuestion < this.questions.length) {
@@ -513,7 +525,10 @@ class SmsApp {
         } else {
             this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_FINAL);
             //TODO: Get this from YAML
-            message = 'Thank you for completing the questions. If you have any supplimentary information, please send it now. You can use MMS or a URL to provide picture, audio or video files. If you would like to amend any of responses, please reply explaining the changes. If you would like to start a new report, please reply \'RESTART\'';
+            const sessionId = ctx.cookies.get(constants.cookies.SESSION_ID);
+            const report = await Report.get(this.db, sessionId);
+            const evidenceToken = report.evidenceToken;
+            message = 'Thank you for completing the questions. If you have any supplimentary information, please send it now. Please go to sms.thewhistle.org/upload-evidence?token=' + evidenceToken + ' to provide picture, audio or video files. If you would like to amend any of responses, please reply explaining the changes. If you would like to start a new report, please reply \'RESTART\'';
         }
 
         return message;
@@ -530,10 +545,11 @@ class SmsApp {
         //TODO: Get tokens from .env
         const accountId = process.env.TWILIO_ACCOUNT_ID;
         const authToken = process.env.TWILIO_AUTH_TOKEN;
-        const client = require('twilio')(accountId, authToken);
-        client.messages(messageId)
-            .remove()
+        const client = Twilio(accountId, authToken);
+        
+        client.messages(messageId).remove()
             .catch(() => {
+                //If the message hasn't been delivered yet, wait a second, then rerun this function
                 setTimeout(() => SmsApp.deleteMessage(messageId), 1000);
             })
             .done();
@@ -620,7 +636,7 @@ class SmsApp {
                     switch (this.toYesOrNo(incomingSms)) {
                         case constants.YES:
                             const nextQuestion = ctx.cookies.get(constants.cookies.NEXT_QUESTION) - 1;
-                            this.sendQuestion(ctx, twiml, nextQuestion);
+                            await this.sendQuestion(ctx, twiml, nextQuestion);
                             break;
                         case constants.NO:
                             this.askIfStore(ctx, twiml);

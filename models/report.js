@@ -80,8 +80,10 @@ const schema = {
                 },
             },
         },
-        views:        { type: [ 'object', 'null' ] },        // associative array of timestamps indexed by user id
-        archived:     { type: 'boolean' },                   // archived flag
+        views:         { type: [ 'object', 'null' ] },        // associative array of timestamps indexed by user id
+        archived:      { type: 'boolean' },                   // archived flag
+        lastUpdated:   { bsonType: 'date' },                  // Date of when the user last made an edit to their submission
+        evidenceToken: { type: 'string' },                    // Unique token which is used in a URL for a user to upload evidence
     },
     additionalProperties: false,
 };
@@ -130,6 +132,7 @@ class Report {
         reports.createIndex({ status: 1 });
         reports.createIndex({ tags: 1 });
         reports.createIndex({ archived: 1 });
+        reports.createIndex({ evidenceToken: 1}, { unique : true });
 
         // free-text index for submitted information (ie fields in report.submitted)
 
@@ -553,10 +556,10 @@ class Report {
      * @param  {string}   db - Database to use.
      * @param  {ObjectId} id - Report id.
      * @param  {Object}   values - Report details.
-     * @param  {ObjectId} userId - User id (for update audit trail).
+     * @param  {ObjectId} [userId] - User id (for update audit trail).
      * @throws Error on validation or referential integrity errors.
      */
-    static async update(db, id, values, userId) {
+    static async update(db, id, values, userId=null) {
         debug('Report.update', 'db:'+db, 'r:'+id, values);
 
         id = objectId(id);         // allow id as string
@@ -567,15 +570,15 @@ class Report {
         const reports = await Db.collection(db, 'reports');
 
         try {
-
             await reports.updateOne({ _id: id }, { $set: values });
-
         } catch (e) {
             if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [update]`);
             throw e;
         }
 
-        await Update.insert(db, id, userId, { set: values }); // audit trail
+        if (userId) {
+            await Update.insert(db, id, userId, { set: values }); // audit trail   
+        }
     }
 
 

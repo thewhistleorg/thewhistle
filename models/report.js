@@ -132,7 +132,7 @@ class Report {
         reports.createIndex({ status: 1 });
         reports.createIndex({ tags: 1 });
         reports.createIndex({ archived: 1 });
-        reports.createIndex({ evidenceToken: 1}, { unique : true });
+        reports.createIndex({ evidenceToken: 1});
 
         // free-text index for submitted information (ie fields in report.submitted)
 

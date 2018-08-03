@@ -8,12 +8,13 @@ class EvidencePage {
      * @param   {string}   reportId
      * @returns {Object}   Evidence page object
      */    
-    constructor(reportId) {
-        this.reportId = reportId;
+    constructor(report) {
+        this.report = report;
     }
 
     async renderEvidencePage(ctx) {
         await ctx.render('upload-evidence');
+        console.log(this.report);
     }
 
     static async renderInvalidTokenPage(ctx) {

@@ -440,7 +440,7 @@ class SmsApp {
         //Adds skeleton report to the database
         const sessionId = await Report.submissionStart(this.org, this.project, alias, version, ctx.headers['user-agent']);
         await Report.updateField(this.db, sessionId, 'First Text', ctx.cookies.get(constants.cookies.FIRST_TEXT));
-
+        await Report.update(this.db, sessionId, {'lastUpdated': Date.now()});
         let evidenceToken = '';
 
         do {
@@ -478,7 +478,7 @@ class SmsApp {
         const field = this.getField(questionNo);
         try {
             await Report.updateField(this.db, sessionId, field, input);
-            await Report.updateField(this.db, sessionId, 'Last Updated', Date.now());
+            await Report.update(this.db, sessionId, {'lastUpdated': Date.now()});
         } catch (e) {
             console.error(e);
         }

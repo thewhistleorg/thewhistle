@@ -66,9 +66,9 @@ router.post('/delete-outbound', function (ctx) {
 router.get('/:org/:project/upload-evidence', async function (ctx) {
     //TODO: Try not providing token
     if (!evidenceRoutes[ctx.query.token]) {
-        const reportId = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.query.token);
-        if (reportId.length > 0) {
-            evidenceRoutes[ctx.query.token] = new EvidencePage(reportId[0]);
+        const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.query.token);
+        if (reports.length > 0) {
+            evidenceRoutes[ctx.query.token] = new EvidencePage(reports[0]);
             await evidenceRoutes[ctx.query.token].renderEvidencePage(ctx);
         } else {
             await EvidencePage.renderInvalidTokenPage(ctx);

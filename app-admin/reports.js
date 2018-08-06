@@ -879,7 +879,7 @@ class ReportsHandlers {
             const submissionTime = report._id.getTimestamp();
             for (const file of report.files) {
                 // get analysis data
-                const [ fileAnalysis ] = report.analysis ? report.analysis.files.filter(f => f.exif.name == file.name) : [];
+                const [ fileAnalysis ] = report.analysis && report.analysis.files ? report.analysis.files.filter(f => f.exif.name == file.name) : [];
                 if (!fileAnalysis) continue;
                 // proxy url
                 fileAnalysis.url = `/uploaded/${report.project}/${dateFormat(report._id.getTimestamp(), 'yyyy-mm')}/${report._id}/${file.name}`;

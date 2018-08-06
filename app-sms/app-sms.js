@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Twilio app - Pages and API for running and testing SMS reporting.           Louis Slater 2018  */
+/* SMS app - Pages and API for running and testing SMS reporting.              Louis Slater 2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
@@ -7,9 +7,9 @@ import Koa           from 'koa';
 import Router        from 'koa-router';
 import handlebars    from 'koa-handlebars'; 
 import serve         from 'koa-static';
-import SmsApp        from '../app-twilio/sms.js';
+import SmsApp        from '../app-sms/sms.js';
 import FormGenerator from '../lib/form-generator.js';
-import EvidencePage  from '../app-twilio/evidence.js'
+import EvidencePage  from '../app-sms/evidence.js'
 import Report        from '../models/report.js';
 
 
@@ -22,7 +22,7 @@ app.use(serve('public', { maxage: 1000*60*60*24 }));
 // handlebars templating
 app.use(handlebars({
     extension: [ 'html' ],
-    viewsDir:  'app-twilio/templates',
+    viewsDir:  'app-sms/templates',
 }));
 
 const smsRoutes = {};

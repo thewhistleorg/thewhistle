@@ -123,11 +123,13 @@ class Handlers {
             if (response.ok) {
                 const responseJs = await response.json();
                 if (responseJs.success == false) {
+                    console.error('reCAPTCHA verification failed (response.ok)', params, responseJs);
                     ctx.flash = { error: `reCAPTCHA verification failed: ${responseJs['error-codes']} – are you a bot?` };
                     ctx.response.set('X-Redirect-Reason', 'reCAPTCHA verification failed'); // for smoke tests
                     return ctx.response.redirect(ctx.request.url);
                 }
             } else {
+                console.error('reCAPTCHA verification failed (!response.ok)', params, response);
                 ctx.flash = { error: `reCAPTCHA verification failed: ${response.status} / ${response.statusText}` };
                 ctx.response.set('X-Redirect-Reason', 'reCAPTCHA verification failed'); // for smoke tests
                 return ctx.response.redirect(ctx.request.url);

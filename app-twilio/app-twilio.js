@@ -63,18 +63,18 @@ router.post('/delete-outbound', function (ctx) {
 });
 
 //Direct user to the page allowing them to upload evidence
-router.get('/:org/:project/upload-evidence', async function (ctx) {
+router.get('/:org/evidence/:token', async function (ctx) {
     //TODO: Try not providing token
-    if (!evidenceRoutes[ctx.query.token]) {
-        const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.query.token);
+    if (!evidenceRoutes[ctx.params.token]) {
+        const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.params.token);
         if (reports.length > 0) {
-            evidenceRoutes[ctx.query.token] = new EvidencePage(reports[0]);
-            await evidenceRoutes[ctx.query.token].renderEvidencePage(ctx);
+            evidenceRoutes[ctx.params.token] = new EvidencePage(reports[0]);
+            await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx);
         } else {
             await EvidencePage.renderInvalidTokenPage(ctx);
         }
     } else {
-        await evidenceRoutes[ctx.query.token].renderEvidencePage(ctx);
+        await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx);
     }
 });
 

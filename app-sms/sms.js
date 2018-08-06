@@ -7,6 +7,7 @@ import $RefParser     from 'json-schema-ref-parser';
 import Twilio         from 'twilio';
 
 import Report         from '../models/report.js';
+import User         from '../models/user.js';
 import autoIdentifier from '../lib/auto-identifier.js';
 import Db             from '../lib/db.js';
 
@@ -82,7 +83,8 @@ class SmsApp {
      */
     sendSms(twiml, message) {
         twiml.message({
-            action: '/delete-outbound',
+            //action: 'delete-outbound',
+            action: '/sms-delete-outbound',
             method: 'POST',
         }, message);
     }

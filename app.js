@@ -80,7 +80,7 @@ app.use(async function subApp(ctx, next) {
 
 import appAdmin  from './app-admin/app-admin.js';
 import appReport from './app-report/app-report.js';
-import appTwilio from './app-twilio/app-twilio.js';
+import appSms    from './app-sms/app-sms.js';
 import appTexit  from './app-textit/app-textit.js';
 
 
@@ -88,7 +88,7 @@ app.use(async function composeSubapp(ctx) { // note no 'next' after composed sub
     switch (ctx.state.subapp) {
         case 'admin':  await compose(appAdmin.middleware)(ctx);   break;
         case 'report': await compose(appReport.middleware)(ctx); break;
-        case 'twilio': await compose(appTwilio.middleware)(ctx); break;
+        case 'sms': await compose(appSms.middleware)(ctx); break;
         case 'textit': await compose(appTexit.middleware)(ctx); break;
         default: // no recognised subdomain
             if (process.env.SUBAPP) {

@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* SMS app integration tests.                                                  Louis Slater 2018  */
 /*                                                                                                */
-/* These tests require twilio.thewhistle.local & admin.thewhistle.local to be set in /etc/hosts.  */
+/* These tests require sms.thewhistle.local & admin.thewhistle.local to be set in /etc/hosts.  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
@@ -14,7 +14,7 @@ import Report         from '../../models/report.js';
 const org = 'hfrn-test';
 const project = 'hfrn-en';
 
-const appSms = supertest.agent(app.listen()).host('twilio.thewhistle.local');
+const appSms = supertest.agent(app.listen()).host('sms.thewhistle.local');
 
 const body = {
     'ToCountry':     'GB',

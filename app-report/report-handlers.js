@@ -24,6 +24,13 @@ import Log           from '../lib/log';
 
 class Handlers {
 
+    static async getEmulator(ctx) {
+        if (ctx.app.env === 'production') {
+            ctx.status = 404;
+        } else {
+            await ctx.render('../../app-sms/templates/test-chat');
+        }
+    }
     /**
      * GET / - (home page) list available reporting apps
      */

@@ -48,7 +48,7 @@ class EvidencePage {
                     await Report.submissionFile(ctx.params.org, this.report._id, file);
                     fileString += `<li>${file.name}</li>`;
                 }
-                let body = await fs.readFile('app-sms/templates/evidence/uploaded-hfrn-en.html', 'utf8');
+                let body = await fs.readFile('app-sms/templates/evidence-uploaded-hfrn-en.html', 'utf8');
                 body = body.replace('{{ files }}', fileString);
                 ctx.response.body = body;
                 ctx.response.status = 200;

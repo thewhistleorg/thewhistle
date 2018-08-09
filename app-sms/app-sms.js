@@ -9,7 +9,7 @@ import handlebars    from 'koa-handlebars';
 import serve         from 'koa-static';
 import SmsApp        from '../app-sms/sms.js';
 import FormGenerator from '../lib/form-generator.js';
-import EvidencePage  from '../app-sms/evidence-handlers.js'
+import EvidencePage  from '../app-sms/evidence-handlers.js';
 import Report        from '../models/report.js';
 
 
@@ -33,7 +33,7 @@ router.get('/sms-emulator', async function(ctx) {
     if (ctx.app.env === 'production') {
         ctx.status = 404;
     } else {
-        await ctx.render('test-chat');
+        await ctx.render('emulator');
     }
 });
 
@@ -70,12 +70,28 @@ router.get('/:org/evidence/:token', async function (ctx) {
         const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.params.token);
         if (reports.length > 0) {
             evidenceRoutes[ctx.params.token] = new EvidencePage(reports[0]);
-            await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx);
+            await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx, false);
         } else {
             await EvidencePage.renderInvalidTokenPage(ctx);
         }
     } else {
-        await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx);
+        await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx, false);
+    }
+});
+
+
+router.get('/:org/evidence/failed-upload/:token', async function (ctx) {
+    //TODO: Try not providing token
+    if (!evidenceRoutes[ctx.params.token]) {
+        const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.params.token);
+        if (reports.length > 0) {
+            evidenceRoutes[ctx.params.token] = new EvidencePage(reports[0]);
+            await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx, true);
+        } else {
+            await EvidencePage.renderInvalidTokenPage(ctx);
+        }
+    } else {
+        await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx, true);
     }
 });
 
@@ -94,13 +110,6 @@ router.post('/:org/evidence/:token', async function (ctx) {
         await evidenceRoutes[ctx.params.token].processEvidence(ctx);
     }
 });
-
-
-router.get('/:org/evidence/submitted/:token', async function (ctx) {
-    const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.params.token);
-    await ctx.render(`uploaded-${reports[0].project}`);
-    //TODO: Use token for link to more evidence
-})
 
 
 app.use(router.routes());

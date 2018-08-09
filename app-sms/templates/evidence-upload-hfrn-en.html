@@ -15,7 +15,7 @@
 <header>
     <nav class="pure-menu pure-menu-horizontal">
         <ul class="pure-menu-list  text-center">
-            <li class="pure-menu-item"><h3>HFRN Evidence Upload</h3></li>
+            <li class="pure-menu-item"><h3>Evidence Upload</h3></li>
         </ul>
         <ul class="pure-menu-list float-right">
             <li class="pure-menu-item">
@@ -27,13 +27,18 @@
 
 <main>
     <form id="evidenceForm" method="post" enctype="multipart/form-data" class="pure-form" onsubmit="return submitEvidence()">
+        {{#if uploadError}}
+            <div id="noFilesMessage" class="error-msg">Upload failed. Please try again.</div>
+        {{/if}}
+        
         <ul class="question-document">
             <li>
                 <label>
+                    <p>Hi {{ alias }},</p>
                     <p><strong>Please upload any evidence that could help.</strong> This can be photos, videos or any other documents.</p>
                 </label>
                 <input type="file" name="documents" id="files" value="0" class="upload-file" multiple>
-                <div id="errorMessage"></div>
+                <div id="noFilesMessage" class="error-msg hide">Please upload a file before submitting.</div>
             </li>
         </ul>
         <div class="text-center">

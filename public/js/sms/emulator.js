@@ -49,7 +49,7 @@ function addMessage(message, sent) {
 function postSms(message) {
     const request = new XMLHttpRequest();
     //TODO: Don't use static organisation/project
-    request.open('POST', '/sms-receive');
+    request.open('POST', '/hfrn-test/hfrn-en');
     request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     const body = {
         'ToCountry':     'GB',

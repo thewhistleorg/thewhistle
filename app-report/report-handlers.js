@@ -111,7 +111,7 @@ class Handlers {
         debug('postIndex', org, project);
 
         // verify client-side reCAPTCHA: developers.google.com/recaptcha/docs/verify
-        if (ctx.app.env != 'development') {
+        /* if (ctx.app.env != 'development') {
             const params = {
                 secret:   process.env.RECAPTCHA_SECRET_KEY,
                 response: ctx.request.body['g-recaptcha-response'],
@@ -133,7 +133,7 @@ class Handlers {
                 ctx.response.set('X-Redirect-Reason', 'reCAPTCHA verification failed'); // for smoke tests
                 return ctx.response.redirect(ctx.request.url);
             }
-        }
+        } */
 
         // record user-agent
         await UserAgent.log(org, ctx.request.ip, ctx.request.headers);

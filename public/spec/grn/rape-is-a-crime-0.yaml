@@ -16,7 +16,7 @@
 - input:
     name: nav-next
     label: false
-    type: recaptcha-button
+    type: button
     value: next
     text: Get started
     class: pure-button pure-button-primary

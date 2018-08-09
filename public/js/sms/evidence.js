@@ -5,16 +5,18 @@
 
 'use strict';
 
-function submitEvidence() {
-    var formData = new FormData(document.getElementById('evidenceForm'));
+function changeErrorVisibility() {
     if (document.getElementById('files').files.length == 0) {
-        const p = document.createElement('p');
-        const t = document.createTextNode('Please upload a file before submitting.');
-        const messages = document.getElementById('errorMessage');
-        p.appendChild(t);
-        messages.appendChild(p);
+        document.getElementById('noFilesMessage').classList.remove('hide');
         return false;
+    } else {
+        document.getElementById('noFilesMessage').classList.add('hide');
+        return true;
     }
 }
 
-//document.getElementById('submitBtn').addEventListener('click', submitEvidence);
+function submitEvidence() { // eslint-disable-line no-unused-vars
+    return changeErrorVisibility();
+}
+
+document.getElementById('files').onchange = changeErrorVisibility;

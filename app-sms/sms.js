@@ -7,7 +7,6 @@ import $RefParser     from 'json-schema-ref-parser';
 import Twilio         from 'twilio';
 
 import Report         from '../models/report.js';
-import User         from '../models/user.js';
 import autoIdentifier from '../lib/auto-identifier.js';
 import Db             from '../lib/db.js';
 
@@ -442,15 +441,14 @@ class SmsApp {
         //Adds skeleton report to the database
         const sessionId = await Report.submissionStart(this.org, this.project, alias, version, ctx.headers['user-agent']);
         await Report.updateField(this.db, sessionId, 'First Text', ctx.cookies.get(constants.cookies.FIRST_TEXT));
-        await Report.update(this.db, sessionId, {'lastUpdated': new Date()});
+        await Report.update(this.db, sessionId, { 'lastUpdated': new Date() });
         let evidenceToken = '';
 
         do {
             evidenceToken = Math.random().toString(36).substring(2);
         }
         while (!(await Report.getBy(this.db, 'evidenceToken', evidenceToken)));
-        console.log(evidenceToken);
-        await Report.update(this.db, sessionId, {'evidenceToken': evidenceToken});
+        await Report.update(this.db, sessionId, { 'evidenceToken': evidenceToken });
         this.setCookie(ctx, constants.cookies.SESSION_ID, sessionId);
         this.setCookie(ctx, constants.cookies.ALIAS, alias);
     }
@@ -481,7 +479,7 @@ class SmsApp {
         const field = this.getField(questionNo);
         try {
             await Report.updateField(this.db, sessionId, field, input);
-            await Report.update(this.db, sessionId, {'lastUpdated': new Date()});
+            await Report.update(this.db, sessionId, { 'lastUpdated': new Date() });
         } catch (e) {
             console.error(e);
         }
@@ -550,7 +548,7 @@ class SmsApp {
         const authToken = process.env.TWILIO_AUTH_TOKEN;
         const client = Twilio(accountId, authToken);
         
-        client.messages(messageId).remove()
+        return client.messages(messageId).remove()
             .catch(() => {
                 //If the message hasn't been delivered yet, wait a second, then rerun this function
                 setTimeout(() => SmsApp.deleteMessage(messageId), 1000);

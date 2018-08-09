@@ -21,65 +21,8 @@ import User          from '../models/user';
 import FormGenerator from '../lib/form-generator.js';
 import Geocoder      from '../lib/geocode.js';
 import Log           from '../lib/log';
-import SmsApp        from '../app-sms/sms.js';
-import EvidencePage  from '../app-sms/evidence.js'
-const smsRoutes = {};
-const evidenceRoutes = {};
 class Handlers {
-    //EMULATOR STARTS
-    
-    static async receive(ctx) {
-        console.log('URL', ctx.url)
-        console.log('receive');
-        const org = 'hfrn-test';
-        const project = 'hfrn-en';
-        //If the organisation/project combination is valid
-        if (FormGenerator.exists(org, project)) {
-            //If this is the first request for the organisation/project combination (since server start)
-            if (!smsRoutes[ctx.url]) {
-                smsRoutes[ctx.url] = new SmsApp(org, project);
-                await smsRoutes[ctx.url].parseSpecifications();
-                await smsRoutes[ctx.url].setupDatabase();
-            }
-            await smsRoutes[ctx.url].receiveText(ctx);
-        }
-    
-        
-    }
 
-    static async getEmulator(ctx) {
-        console.log('Emulate');
-        if (ctx.app.env === 'production') {
-            ctx.status = 404;
-        } else {
-            await ctx.render('../../app-sms/templates/test-chat');
-        }
-    }
-
-    static deleteOutbound(ctx) {
-        console.log('delete');
-        if (ctx.request.body.SmsStatus === 'delivered') {
-            SmsApp.deleteMessage(ctx.request.body.MessageSid);
-        }
-        ctx.status = 200;
-        ctx.headers['Content-Type'] = 'text/xml';
-    }
-    static async evidence(ctx) {
-        console.log('evidence');
-        //TODO: Try not providing token
-        if (!evidenceRoutes[ctx.params.token]) {
-            const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.params.token);
-            if (reports.length > 0) {
-                evidenceRoutes[ctx.params.token] = new EvidencePage(reports[0]);
-                await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx);
-            } else {
-                await EvidencePage.renderInvalidTokenPage(ctx);
-            }
-        } else {
-            await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx);
-        }
-    }
-    //EMULATOR ENDS
     /**
      * GET / - (home page) list available reporting apps
      */

@@ -9,7 +9,7 @@ import handlebars    from 'koa-handlebars';
 import serve         from 'koa-static';
 import SmsApp        from '../app-sms/sms.js';
 import FormGenerator from '../lib/form-generator.js';
-import EvidencePage  from '../app-sms/evidence.js'
+import EvidencePage  from '../app-sms/evidence-handlers.js'
 import Report        from '../models/report.js';
 
 
@@ -62,6 +62,7 @@ router.post('/delete-outbound', function (ctx) {
     ctx.headers['Content-Type'] = 'text/xml';
 });
 
+
 //Direct user to the page allowing them to upload evidence
 router.get('/:org/evidence/:token', async function (ctx) {
     //TODO: Try not providing token
@@ -77,6 +78,30 @@ router.get('/:org/evidence/:token', async function (ctx) {
         await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx);
     }
 });
+
+
+router.post('/:org/evidence/:token', async function (ctx) {
+    //TODO: Try not providing token
+    if (!evidenceRoutes[ctx.params.token]) {
+        const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.params.token);
+        if (reports.length > 0) {
+            evidenceRoutes[ctx.params.token] = new EvidencePage(reports[0]);
+            await evidenceRoutes[ctx.params.token].processEvidence(ctx);
+        } else {
+            EvidencePage.renderFailedUpload(ctx);
+        }
+    } else {
+        await evidenceRoutes[ctx.params.token].processEvidence(ctx);
+    }
+});
+
+
+router.get('/:org/evidence/submitted/:token', async function (ctx) {
+    const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.params.token);
+    await ctx.render(`uploaded-${reports[0].project}`);
+    //TODO: Use token for link to more evidence
+})
+
 
 app.use(router.routes());
 

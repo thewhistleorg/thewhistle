@@ -28,17 +28,6 @@ router.get( '/:database/:project',         handlers.getIndex);      // render in
 router.post('/:database/:project',         handlers.postIndex);     // process index page submission
 router.get( '/:database/:project/:page',   handlers.getPage);       // render report page
 router.post('/:database/:project/:page',   handlers.postPage);      // process page submission
-//EMULATOR STARTSs
-//On receiving a text
-router.post('/sms-receive', handlers.receive);
-
-//Delete a message sent by the system
-router.post('/sms-delete-outbound', handlers.deleteOutbound);
-
-//Direct user to the page allowing them to upload evidence
-//router.get('/sms/:org/evidence/:token', handlers.evidence);
-router.get('/sms-emulator',                handlers.getEmulator);
-//EMULATOR ENDS
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 

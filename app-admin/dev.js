@@ -12,11 +12,12 @@ import mda                from 'markdown-it-anchor';  // header anchors for mark
 const md = markdown();
 md.use(mda);
 
-import UserAgent  from '../models/user-agent.js';
-import Report     from '../models/report.js';
-import Submission from '../models/submission.js';
-import Db         from '../lib/db.js';
-import Ip         from '../lib/ip.js';
+import UserAgent   from '../models/user-agent.js';
+import Report      from '../models/report.js';
+import Submission  from '../models/submission.js';
+import Db          from '../lib/db.js';
+import Ip          from '../lib/ip.js';
+import Environment from '../lib/environment';
 
 
 class Dev {
@@ -438,15 +439,24 @@ class Dev {
 
 
     /**
-     * Invoke exception (for testing).
+     * /dev/throw - Invoke exception (for testing).
      */
     static throw(ctx) {
         const status = ctx.request.query.status || 500;
         ctx.throw(Number(status), 'This is a test error!');
     }
 
-}
 
+    /**
+     * PUT /dev/set-env/:env - Set app environment.
+     *
+     * When there is a need to test production functionality, this can be used to reset ctx.app.env.
+     */
+    static setEnv(ctx) {
+        Environment.set(ctx, ctx.params.env);
+    }
+
+}
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 

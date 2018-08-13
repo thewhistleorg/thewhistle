@@ -26,9 +26,9 @@
 </header>
 
 <main>
-    <form id="evidenceForm" method="post" enctype="multipart/form-data" class="pure-form" onsubmit="return submitEvidence()">
-        {{#if uploadError}}
-            <div id="noFilesMessage" class="error-msg">Upload failed. Please try again.</div>
+    <form id="evidenceForm" method="post" enctype="multipart/form-data" class="pure-form" onsubmit="return submitEvidence()" action="/{{ org }}/evidence/{{ token }}">
+        {{#if errorMessage}}
+            <div id="noFilesMessage" class="error-msg">{{ errorMessage }}. Please try again.</div>
         {{/if}}
         
         <ul class="question-document">

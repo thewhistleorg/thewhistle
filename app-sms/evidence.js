@@ -16,32 +16,39 @@ class EvidencePage {
         this.report = report;
     }
 
-    async renderEvidencePage(ctx, uploadError) {
+
+    evidenceTimeout() {
         const date = new Date();
         date.setDate(date.getDate() - 7);
-        if (date < this.report.lastUpdated) {
-            //Report last updated within the last week
-            await ctx.render(`evidence-upload-${this.report.project}`, { uploadError: uploadError, alias: this.report.alias });
-        } else {
-            //Report last updated more than a week ago
-            await ctx.render(`evidence-timeout-${this.report.project}`);
-        }
+        return date > this.report.lastUpdated;
     }
 
-
-    static async renderInvalidTokenPage(ctx) {
-        try {
-            await ctx.render(`evidence-invalid-token-${ctx.params.org}`);
-        } catch (e) {
-            await ctx.render('evidence-invalid-token-hfrn-en');
+    async renderEvidencePage(ctx, errorMessage) {
+        if (this.evidenceTimeout()) {
+            //Report last updated more than a week ago
+            await ctx.render(`evidence-timeout-${this.report.project}`);
+        } else {
+            //Report last updated within the last week
+            const context = {
+                errorMessage: errorMessage,
+                alias:        this.report.alias,
+                org:          ctx.params.org,
+                token:        ctx.params.token,
+            };
+            await ctx.render(`evidence-upload-${this.report.project}`, context);
         }
     }
 
 
     async processEvidence(ctx) {
-        if (ctx.request.files) {
-            let files = ctx.request.files.documents;
-            files = Array.isArray(files) ? files : [ files ];
+        let files = ctx.request.files.documents;
+        files = Array.isArray(files) ? files : [ files ];
+        files = files.filter(f => f.size > 0);
+        if (this.evidenceTimeout()) {
+            ctx.response.redirect(`/${this.report.project}/evidence-timeout`);
+        } else if (files.length == 0) {
+            ctx.response.redirect(`/${ctx.params.org}/evidence/${this.report.evidenceToken}?err=No%20files%20uploaded`);
+        } else {
             try {
                 let fileString = '';
                 for (const file of files) {
@@ -56,7 +63,7 @@ class EvidencePage {
                 ctx.response.status = 200;
             } catch (e) {
                 console.error(e);
-                ctx.response.redirect(`/${ctx.params.org}/evidence/failed-upload/${this.report.evidenceToken}`);
+                ctx.response.redirect(`/${ctx.params.org}/evidence/${this.report.evidenceToken}?err=Upload%20failed`);
             }
         }
     }

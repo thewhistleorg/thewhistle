@@ -448,6 +448,7 @@ class SmsApp {
             evidenceToken = Math.random().toString(36).substring(2);
         }
         while (!(await Report.getBy(this.db, 'evidenceToken', evidenceToken)));
+        console.log(evidenceToken);
         await Report.update(this.db, sessionId, { 'evidenceToken': evidenceToken });
         this.setCookie(ctx, constants.cookies.SESSION_ID, sessionId);
         this.setCookie(ctx, constants.cookies.ALIAS, alias);

@@ -14,9 +14,7 @@
     "test-intgn": "mocha --exit -r esm test/integration/*.js",
     "test-frontend": "node -r esm app.js & pid=$!; cypress run; kill -9 $pid; rm -r ./cypress",
     "test-smoke": "mocha --exit -r esm test/staging-smoke-tests.js",
-    "lint": "npm run lint-node; npm run lint-browser",
-    "lint-node": "eslint --env node --ignore-pattern public .",
-    "lint-browser": "eslint --env browser public/",
+    "lint": "eslint .",
     "stylelint": "stylelint public/css/*.css",
     "cover": "nyc --require esm --reporter=html mocha --exit -r esm test/*/*.js; rm -r ./.nyc_output",
     "cover-unit": "nyc --require esm --reporter=html npm run test-unit; rm -r ./.nyc_output",
@@ -99,7 +97,8 @@
   "eslintConfig": {
     "env": {
       "es6": true,
-      "mocha": true
+      "mocha": true,
+      "node": true
     },
     "plugins": [
       "promise"
@@ -114,88 +113,33 @@
       "plugin:promise/recommended"
     ],
     "rules": {
-      "array-bracket-spacing": [
-        "error",
-        "always"
-      ],
-      "comma-dangle": [
-        "error",
-        "always-multiline"
-      ],
-      "comma-spacing": [
-        "error"
-      ],
-      "curly": [
-        "error",
-        "multi-line"
-      ],
-      "indent": [
-        "error",
-        4,
-        {
-          "SwitchCase": 1
-        }
-      ],
-      "key-spacing": [
-        "error",
-        {
-          "align": "value"
-        }
-      ],
-      "keyword-spacing": [
-        "error"
-      ],
+      "array-bracket-spacing": [ "error", "always" ],
+      "comma-dangle": [ "error", "always-multiline" ],
+      "comma-spacing": [ "error" ],
+      "curly": [ "error", "multi-line" ],
+      "indent": [ "error", 4, { "SwitchCase": 1 } ],
+      "key-spacing": [ "error", { "align": "value" } ],
+      "keyword-spacing": [ "error" ],
       "no-case-declarations": "off",
-      "no-console": [
-        "warn",
-        {
-          "allow": [
-            "error",
-            "info"
-          ]
-        }
-      ],
+      "no-console": [ "warn", { "allow": [ "error", "info" ] } ],
       "no-redeclare": "warn",
       "no-shadow": "warn",
       "no-unused-vars": "warn",
       "no-var": "error",
-      "object-curly-spacing": [
-        "error",
-        "always"
-      ],
+      "object-curly-spacing": [ "error", "always" ],
       "prefer-const": "error",
-      "quotes": [
-        "error",
-        "single",
-        "avoid-escape"
-      ],
+      "quotes": [ "error", "single", "avoid-escape" ],
       "require-await": "error",
-      "semi": [
-        "error",
-        "always"
-      ],
-      "space-before-blocks": [
-        "error",
-        "always"
-      ],
-      "space-in-parens": [
-        "error"
-      ],
-      "strict": [
-        "error",
-        "global"
-      ]
+      "semi": [ "error", "always" ],
+      "space-before-blocks": [ "error", "always" ],
+      "space-in-parens": [ "error" ],
+      "strict": [ "error", "global" ]
     }
   },
   "stylelint": {
     "extends": "stylelint-config-standard",
     "rules": {
-      "block-opening-brace-space-before": [
-        "always",
-        {
-          "severity": "warning"
-        }
-      ],
+      "block-opening-brace-space-before": [ "always", { "severity": "warning" } ],
       "color-hex-length": "long",
       "comment-empty-line-before": null,
       "indentation": 4,

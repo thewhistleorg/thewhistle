@@ -319,6 +319,7 @@ class SmsApp {
      * Takes a user's input, makes it all lower case, removes leading and trailing spaces and removes punctuation
      *
      * @param   {string}   message - SMS text sent by user
+     * @returns {string} - Cleaned message
      */
     cleanResponse(message) {
         message = message.toLowerCase();

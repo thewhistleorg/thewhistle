@@ -794,6 +794,7 @@ class ReportsHandlers {
 
         report.reported = dateFormat(report._id.getTimestamp(), 'yyyy-mm-dd HH:MM');
         report.archived = report.archived ? 'y' : 'n';
+        report.country =  report.country? report.country.replace('GB', 'UK') : report.country;
 
         const users = await User.getAll(); // for assigned-to select
         users.sort((a, b) => { a = (a.firstname+a.lastname).toLowerCase(); b = (b.firstname+b.lastname).toLowerCase(); return a < b ? -1 : 1; });

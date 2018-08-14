@@ -48,6 +48,7 @@ const schema = {
             items: { type: 'object' },                       // ... 'formidable' File objects
         },
         ua:           { type: [ 'object', 'null' ] },        // user agent of browser used to report incident
+        country:      { type: [ 'string', 'null' ] },        // country report was submitted from
         location:     { type: 'object',                      // geocoded incident location
             properties: {
                 address: { type: 'string' },                 // ... entered address used for geocoding
@@ -84,8 +85,8 @@ const schema = {
         },
         views:         { type: [ 'object', 'null' ] },        // associative array of timestamps indexed by user id
         archived:      { type: 'boolean' },                   // archived flag
-        lastUpdated:   { bsonType: 'date' },                  // Date of when the user last made an edit to their submission
-        evidenceToken: { type: 'string' },                    // Unique token which is used in a URL for a user to upload evidence
+        lastUpdated:   { bsonType: 'date' },                  // date of when the user last made an edit to their submission
+        evidenceToken: { type: 'string' },                    // unique token which is used in a URL for a user to upload evidence
     },
     additionalProperties: false,
 };
@@ -298,9 +299,10 @@ class Report {
      * @param   {string}   alias - Alias to record for for submitter of report.
      * @param   {number}   version - Version of form spec (to distinguish different format reports).
      * @param   {string}   userAgent - User agent from http request header.
+     * @param   {string}   country - Country report was submitted from (obtained from IP address)
      * @returns {ObjectId} New report id.
      */
-    static async submissionStart(db, project, alias, version, userAgent) {
+    static async submissionStart(db, project, alias, version, userAgent, country) {
         debug('Report.submissionStart', 'db:'+db, 'p:'+project, alias);
 
         if (typeof alias != 'string' || alias.length == 0) throw new Error('Alias must be supplied');
@@ -312,6 +314,8 @@ class Report {
             submitted:    { Alias: alias },
             submittedRaw: {},
             alias:        alias,
+            ua:           null, // done below
+            country:      country,
             location:     { address: '', geocode: null, geojson: null },
             analysis:     {},
             // summary:   null,

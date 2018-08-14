@@ -64,7 +64,7 @@
     "markdown-it-anchor": "^5.0.2",
     "markdown-it-include": "^1.0.0",
     "moment": "^2.20.1",
-    "mongodb": "^3.0.3",
+    "mongodb": "3.1.1",
     "node-fetch": "^2.2.0",
     "node-geocoder": "^3.22.0",
     "nodejs-info": "^1.1.1",

@@ -20,7 +20,10 @@ import Notification  from '../models/notification';
 import User          from '../models/user';
 import FormGenerator from '../lib/form-generator.js';
 import Geocoder      from '../lib/geocode.js';
-import Log           from '../lib/log';
+import Log           from '../lib/log.js';
+import Ip            from '../lib/ip.js';
+
+
 class Handlers {
 
     /**
@@ -286,7 +289,9 @@ class Handlers {
             }
 
             // save the skeleton report
-            ctx.session.id = await Report.submissionStart(org, project, alias, version, ctx.request.headers['user-agent']);
+            const ua = ctx.request.headers['user-agent'];
+            const country = await Ip.getCountry(ctx.request.ip);
+            ctx.session.id = await Report.submissionStart(org, project, alias, version, ua, country);
             // TODO: ?? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.id, 'incomplete', null);
 
             // notify users of 'new report submitted'

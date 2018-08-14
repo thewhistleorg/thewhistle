@@ -911,8 +911,15 @@ class ReportsHandlers {
         // dismiss any notifications for this report for current user
         await Notification.dismissForUserReport(db, ctx.state.user.id, reportId);
 
+        try {
+            await Report.flagView(db, reportId, ctx.state.user.id);
+        } catch (e) {
+            ctx.response.status = 500; // force notification e-mail
+            await Log.error(ctx, e);
+            extra.error = e.message; // validation failure
+        }
+
         await ctx.render('reports-view', Object.assign(report, extra));
-        await Report.flagView(db, reportId, ctx.state.user.id);
     }
 
 

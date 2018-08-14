@@ -63,11 +63,13 @@
 </head>
 
 <body>
-{{>errpartial}}
 
 <header>
     {{>navpartial}}
 </header>
+
+{{>errpartial}}
+{{#if error}}<p class="error-msg">Error – {{error}}</p>{{/if}}
 
 <main id="individual-report" class="drop-shadow">
 

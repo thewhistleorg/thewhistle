@@ -29,6 +29,8 @@ import Update       from './update.js';
  * This schema is used for validation, specifying the metadata which the app expects to find as part
  * of the report. Of course, no operation should fail validation at this level: full validation
  * should be done both front-end and by the back-end app.
+ *
+ * When changes are made to the schema, they will be applied on next login, or by invoking /dev/init.
  */
 /* eslint-disable key-spacing */
 const schema = {
@@ -97,12 +99,14 @@ class Report {
      * indexes.
      *
      * Currently this is invoked on any login, to ensure db is correctly initialised before it is
-     * used. If this becomes expensive, it could be done less simplistically.
+     * used. If this becomes expensive, it could be done less simplistically (currently when there
+     * are no schema changes, it takes below 100ms).
      *
      * @param {string} db - Database to use.
      */
     static async init(db) {
         debug('Report.init', 'db:'+db);
+        const t1 = Date.now();
 
         // if no 'reports' collection, create it
         const collections = await Db.collections(db);
@@ -157,6 +161,9 @@ class Report {
         //const fields = {};
         //for (const f of flds) fields['report.'+f] = 'text';
         //reports.createIndex(fields, { name: 'freetextfieldssearch' });
+
+        const t2 = Date.now();
+        debug('Report.init', `${t2-t1}ms`);
     }
 
 
@@ -577,7 +584,7 @@ class Report {
         }
 
         if (userId) {
-            await Update.insert(db, id, userId, { set: values }); // audit trail   
+            await Update.insert(db, id, userId, { set: values }); // audit trail
         }
     }
 
@@ -875,7 +882,7 @@ class Report {
             await reports.updateOne({ _id: id }, { $set: { views: views } });
 
         } catch (e) {
-            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [views]`);
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [flagView]`);
             throw e;
         }
 

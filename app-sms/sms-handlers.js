@@ -76,17 +76,40 @@ class SmsHandlers {
 
 
     /**
+     * 
+     * 
+     * @param {Object} ctx 
+     */
+    static async renderInvalidOrgPage(ctx) {
+        ctx.response.status = 404;
+        await ctx.render('evidence-invalid-org');
+    }
+
+
+    /**
      * Responds with an invalid evidence token page
      * 
      * @param {Object} ctx 
      */
     static async renderInvalidTokenPage(ctx) {
+        ctx.response.status = 404;
         try {
             await ctx.render(`evidence-invalid-token-${ctx.params.org}`);
         } catch (e) {
             //If the page cannot be rendered for the given organisation, render the hfrn-en page
             await ctx.render('evidence-invalid-token-hfrn-en');
         }
+    }
+
+
+    /**
+     * Redirects the user to the failed upload page
+     * 
+     * @param {Object} ctx 
+     */
+    static async renderFailedUpload(ctx) {
+        await ctx.response.redirect('evidence-failed-upload');
+        ctx.response.status = 400;
     }
 
 
@@ -102,17 +125,21 @@ class SmsHandlers {
     static async setupEvidencePage(ctx, errorMessage) {
         if (!evidenceRoutes[ctx.params.token]) {
             //If the evidence page hasn't been setup yet
+            
+            try {
+                //reports will either be of length 0 or 1
+                const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.params.token);
 
-            //reports will either be of length 0 or 1
-            const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.params.token);
-
-            if (reports.length > 0) {
-                //If the token is valid
-                evidenceRoutes[ctx.params.token] = new EvidencePage(reports[0]);
-                await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx, errorMessage);
-            } else {
-                //If the token is invalid
-                await SmsHandlers.renderInvalidTokenPage(ctx);
+                if (reports.length > 0) {
+                    //If the token is valid
+                    evidenceRoutes[ctx.params.token] = new EvidencePage(ctx.params.org, reports[0], ctx.params.token);
+                    await evidenceRoutes[ctx.params.token].renderEvidencePage(ctx, errorMessage);
+                } else {
+                    //If the token is invalid
+                    await SmsHandlers.renderInvalidTokenPage(ctx);
+                }
+            } catch (e) {
+                await SmsHandlers.renderInvalidOrgPage(ctx);
             }
         } else {
             //If the evidence page has already been setup
@@ -140,6 +167,7 @@ class SmsHandlers {
      */
     static async getEvidenceTimeout(ctx) {
         await ctx.render(`evidence-timeout-${ctx.params.project}`);
+        ctx.response.status = 410;
     }
 
 
@@ -153,16 +181,19 @@ class SmsHandlers {
     static async receiveEvidence(ctx) {
         if (!evidenceRoutes[ctx.params.token]) {
             //If the evidence page hasn't been setup yet
-
-            //reports will either be of length 0 or 1
-            const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.params.token);
-            if (reports.length > 0) {
-                //If the token is valid
-                evidenceRoutes[ctx.params.token] = new EvidencePage(reports[0]);
-                await evidenceRoutes[ctx.params.token].processEvidence(ctx);
-            } else {
-                //If the token is invalid
-                EvidencePage.renderFailedUpload(ctx);
+            try {
+                //reports will either be of length 0 or 1
+                const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.params.token);
+                if (reports.length > 0) {
+                    //If the token is valid
+                    evidenceRoutes[ctx.params.token] = new EvidencePage(ctx.params.org, reports[0], ctx.params.token);
+                    await evidenceRoutes[ctx.params.token].processEvidence(ctx);
+                } else {
+                    //If the token is invalid
+                    SmsHandlers.renderFailedUpload(ctx);
+                }
+            } catch (e) {
+                SmsHandlers.renderFailedUpload(ctx);
             }
         } else {
             //If the evidence page has already been setup

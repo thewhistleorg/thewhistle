@@ -1,15 +1,19 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* SMS app integration tests.                                                  Louis Slater 2018  */
 /*                                                                                                */
-/* These tests require sms.thewhistle.local & admin.thewhistle.local to be set in /etc/hosts.  */
+/* These tests require sms.thewhistle.local & admin.thewhistle.local to be set in /etc/hosts.     */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import supertest  from 'supertest';  // SuperAgent driven library for testing HTTP servers
-import { expect } from 'chai';       // BDD/TDD assertion library
-import { DOMParser }                          from 'xmldom';                // DOMParser in node.js
 
-import app            from '../../app.js';
-import Report         from '../../models/report.js';
+import supertest     from 'supertest';  // SuperAgent driven library for testing HTTP servers
+import { expect }    from 'chai';       // BDD/TDD assertion library
+import { DOMParser } from 'xmldom';                // DOMParser in node.js
+import { JSDOM }     from 'jsdom';      // JavaScript implementation of DOM and HTML standards
+
+
+import app           from '../../app.js';
+import Report        from '../../models/report.js';
+
 
 const org = 'hfrn-test';
 const project = 'hfrn-en';
@@ -195,7 +199,6 @@ describe('SMS app'+' ('+app.env+')', function() {
         });
     });
     describe('Database checks', function() {
-        
         it('First report', async function() {
             const reportOne = await Report.get(org, reportIdOne);
             const expected = {
@@ -205,10 +208,9 @@ describe('SMS app'+' ('+app.env+')', function() {
                 'Name of person filling out form': 'Me',
             };
             expect(reportOne.submitted).to.deep.equal(expected);
-            await Report.delete(org, reportIdOne);
         });
         it('Second report', async function() {
-            const reportOne = await Report.get(org, reportIdTwo);
+            const reportTwo = await Report.get(org, reportIdTwo);
             const expected = {
                 'Alias':                                            aliasTwo,
                 'First Text':                                       'sTart ',
@@ -234,8 +236,7 @@ describe('SMS app'+' ('+app.env+')', function() {
                 'Consent to information?':                          'no',
                 'Supplimentary information':                        'Extra info 1 | Extra info 2',
             };
-            expect(reportOne.submitted).to.deep.equal(expected);
-            await Report.delete(org, reportIdTwo);
+            expect(reportTwo.submitted).to.deep.equal(expected);
         });
         it('Third report deleted', async function() {
             const reportThree = await Report.get(org, reportIdThree);
@@ -243,4 +244,116 @@ describe('SMS app'+' ('+app.env+')', function() {
 
         });
     });
+    describe('Evidence submission', function () {
+        let evidenceTokenOne = '';
+        let evidenceTokenTwo = '';
+        it('GET invalid project', async function () {
+            const response = await appSms.get('/hrfn-test/evidence/1nv4l1dt0k3n');
+            expect(response.status).to.equal(404);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('title').textContent).to.equal('Invalid Organisation');
+            expect(document.querySelector('h3').textContent).to.equal('Evidence Upload');
+        });
+        it('GET invalid token', async function () {
+            const response = await appSms.get('/hfrn-test/evidence/1nv4l1dt0k3n');
+            expect(response.status).to.equal(404);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('title').textContent).to.equal('Invalid Token');
+            expect(document.querySelector('h3').textContent).to.equal('Evidence Upload');
+        });
+        it('GET timed out token', async function () {
+            evidenceTokenOne = (await Report.get(org, reportIdOne)).evidenceToken;
+            const date = new Date();
+            date.setFullYear(2017);
+            await Report.update(org, reportIdOne, { 'lastUpdated': date });
+            const response = await appSms.get(`/hfrn-test/evidence/${evidenceTokenOne}`);
+            expect(response.status).to.equal(410);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('title').textContent).to.equal('Upload Timeout');
+            expect(document.querySelector('h3').textContent).to.equal('Evidence Upload');
+        });
+        it('POST invalid project', async function () {
+            const response = await appSms.post('/hrfn-test/evidence/1nv4l1dt0k3n')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .attach('documents', 'test/files/whistle.png');
+            expect(response.status).to.equal(400);
+            expect(response.text).to.equal('Redirecting to <a href="evidence-failed-upload">evidence-failed-upload</a>.');
+        });
+        it('POST invalid token', async function () {
+            const response = await appSms.post('/hfrn-test/evidence/1nv4l1dt0k3n')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .attach('documents', 'test/files/whistle.png');
+            expect(response.status).to.equal(400);
+            expect(response.text).to.equal('Redirecting to <a href="evidence-failed-upload">evidence-failed-upload</a>.');
+        });
+        it('POST timed out token', async function () {
+            const response = await appSms.post(`/hfrn-test/evidence/${evidenceTokenOne}`)
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .attach('documents', 'test/files/whistle.png');
+            expect(response.status).to.equal(410);
+            expect(response.text).to.equal('Redirecting to <a href="/hfrn-en/evidence-timeout">/hfrn-en/evidence-timeout</a>.');
+        });
+        it('POST no files', async function () {
+            await Report.update(org, reportIdOne, { 'lastUpdated': new Date() });
+            const response = await appSms.post(`/hfrn-test/evidence/${evidenceTokenOne}`)
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .field('Content-Type', 'multipart/form-data');
+            expect(response.status).to.equal(400);
+            expect(response.text).to.match(/Redirecting to <a href="\/hfrn-test\/evidence\/.+\?err=No%20files%20uploaded">\/hfrn-test\/evidence\/.+\?err=No%20files%20uploaded<\/a>\./);
+        });
+        it('POST 1 file', async function () {
+            const response = await appSms.post(`/hfrn-test/evidence/${evidenceTokenOne}`)
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .attach('documents', 'test/files/whistle.png');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('title').textContent).to.equal('Evidence Submitted');
+            expect(document.querySelector('h3').textContent).to.equal('Evidence Upload');
+            expect(document.querySelector('#file-list').textContent).to.match(/.*whistle.png.*/);
+        });
+        it('POST 2 files', async function () {
+            const response = await appSms.post(`/hfrn-test/evidence/${evidenceTokenOne}`)
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .attach('documents', 'test/files/whistle.mp4')
+                .attach('documents', 'test/files/whistle.pdf');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('title').textContent).to.equal('Evidence Submitted');
+            expect(document.querySelector('h3').textContent).to.equal('Evidence Upload');
+            expect(document.querySelector('#file-list').textContent).to.match(/.*whistle.mp4.*whistle.pdf.*/);
+        });
+        it('POST file to new report', async function () {
+            evidenceTokenTwo = (await Report.get(org, reportIdTwo)).evidenceToken;
+            const response = await appSms.post(`/hfrn-test/evidence/${evidenceTokenTwo}`)
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .attach('documents', 'test/files/whistle.jpg');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('title').textContent).to.equal('Evidence Submitted');
+            expect(document.querySelector('h3').textContent).to.equal('Evidence Upload');
+            expect(document.querySelector('#file-list').textContent).to.match(/.*whistle.jpg.*/);
+        });
+        it('Check files in database', async function () {
+            const filesOne = (await Report.get(org, reportIdOne)).files;
+
+            expect(filesOne[0].name).to.equal('whistle.png');
+            expect(filesOne[0].type).to.equal('image/png');
+
+            expect(filesOne[1].name).to.equal('whistle.mp4');
+            expect(filesOne[1].type).to.equal('video/mp4');
+
+            expect(filesOne[2].name).to.equal('whistle.pdf');
+            expect(filesOne[2].type).to.equal('application/pdf');
+            
+            const filesTwo = (await Report.get(org, reportIdTwo)).files;
+
+            expect(filesTwo[0].name).to.equal('whistle.jpg');
+            expect(filesTwo[0].type).to.equal('image/jpeg');
+
+            await Report.delete(org, reportIdOne);
+
+            await Report.delete(org, reportIdTwo);
+        });
+
+    }); //Delete reports at the end
 });

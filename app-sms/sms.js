@@ -449,7 +449,6 @@ class SmsApp {
             evidenceToken = Math.random().toString(36).substring(2);
         }
         while (!(await Report.getBy(this.db, 'evidenceToken', evidenceToken)));
-        console.log(evidenceToken);
         await Report.update(this.db, sessionId, { 'evidenceToken': evidenceToken });
         this.setCookie(ctx, constants.cookies.SESSION_ID, sessionId);
         this.setCookie(ctx, constants.cookies.ALIAS, alias);
@@ -545,7 +544,6 @@ class SmsApp {
      * @param   {string}   messageId - ID of the message to be deleted
      */
     static deleteMessage(messageId) {
-        //TODO: Get tokens from .env
         const accountId = process.env.TWILIO_ACCOUNT_ID;
         const authToken = process.env.TWILIO_AUTH_TOKEN;
         const client = Twilio(accountId, authToken);
@@ -597,16 +595,16 @@ class SmsApp {
                         case constants.YES:
                             this.askForAlias(ctx, twiml);
                             //User has used reporting service before
-                            //TODO: Ask user for alias
+                            //Ask user for alias
                             break;
                         case constants.NO:
                             await this.generateAliasAndStart(ctx, twiml);
                             //User hasn't used reporting service before
-                            //TODO: Generate alias and send it to user with first question
+                            //Generate alias and send it to user with first question
                             break;
                         case constants.UNKNOWN:
                             //Can't interpret user's response.
-                            //TODO: Re-ask user whether they have used the reporting service before
+                            //Re-ask user whether they have used the reporting service before
                             this.askIfUsedBefore(ctx, twiml, incomingSms, false);
                             break;
                         default:
@@ -614,20 +612,18 @@ class SmsApp {
                     }
                     break;
                 case constants.SMS_ALIAS:
-                    //TODO: Process the user's alias
+                    //Process the user's alias
                     await this.processAlias(ctx, twiml, incomingSms);
                     break;
                 case constants.SMS_FINAL:
                     //Process the user's post-report information
                     if (this.isRestart(incomingSms)) {
-                        //TODO: Start a new report
+                        //Start a new report
                         this.askIfUsedBefore(ctx, twiml, incomingSms, true);
                     } else {
-                        //TODO: Add amendments
-                        //TODO: Allow for MMS
+                        //Add amendments
                         await this.addAmendments(ctx, twiml, incomingSms);
                     }
-                    //TODO: Also cover MMS evidence (will this come here or not?)
                     break;
                 case constants.SMS_RESPONSE:
                     //Process the user's question response

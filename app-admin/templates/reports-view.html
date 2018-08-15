@@ -63,11 +63,13 @@
 </head>
 
 <body>
-{{>errpartial}}
 
 <header>
     {{>navpartial}}
 </header>
+
+{{>errpartial}}
+{{#if error}}<p class="error-msg">Error – {{error}}</p>{{/if}}
 
 <main id="individual-report" class="drop-shadow">
 
@@ -192,6 +194,7 @@
                 <li id="geocoding">
                     <span class="card-header">
                         LOCATION
+                        <span title="country report was submitted from">{{country}}</span>
                         <a href="https://maps.google.com/maps/search/{{formattedAddress}}" class="fa fa-globe"></a>
                         <button type="button" name="location-edit" id="location-edit" title="edit location" class="fa fa-pencil"></button>
                         <input type="text" name="address" id="address" value="{{location.address}}" placeholder="address to be geocoded" class="hide">

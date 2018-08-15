@@ -794,6 +794,7 @@ class ReportsHandlers {
 
         report.reported = dateFormat(report._id.getTimestamp(), 'yyyy-mm-dd HH:MM');
         report.archived = report.archived ? 'y' : 'n';
+        report.country =  report.country? report.country.replace('GB', 'UK') : report.country;
 
         const users = await User.getAll(); // for assigned-to select
         users.sort((a, b) => { a = (a.firstname+a.lastname).toLowerCase(); b = (b.firstname+b.lastname).toLowerCase(); return a < b ? -1 : 1; });
@@ -911,8 +912,15 @@ class ReportsHandlers {
         // dismiss any notifications for this report for current user
         await Notification.dismissForUserReport(db, ctx.state.user.id, reportId);
 
+        try {
+            await Report.flagView(db, reportId, ctx.state.user.id);
+        } catch (e) {
+            ctx.response.status = 500; // force notification e-mail
+            await Log.error(ctx, e);
+            extra.error = e.message; // validation failure
+        }
+
         await ctx.render('reports-view', Object.assign(report, extra));
-        await Report.flagView(db, reportId, ctx.state.user.id);
     }
 
 

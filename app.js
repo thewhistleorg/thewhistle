@@ -15,9 +15,12 @@ import compose         from 'koa-compose';    // middleware composer
 import compress        from 'koa-compress';   // HTTP compression
 import session         from 'koa-session';    // session for flash messages
 import dateFormat      from 'dateformat';     // Steven Levithan's dateFormat()
+import dotenv          from 'dotenv';         // load environment variables from a .env file into process.env
 
-import dotenv from 'dotenv';
-dotenv.config(); // loads environment variables from .env file (if available - eg dev env)
+dotenv.config();
+
+import Environment from './lib/environment.js';
+
 
 const app = new Koa();
 
@@ -48,6 +51,13 @@ app.use(compress({}));
 app.use(async function robots(ctx, next) {
     await next();
     if (ctx.request.hostname.slice(0, 6) != 'report') ctx.response.set('X-Robots-Tag', 'noindex, nofollow');
+});
+
+
+// set ctx.app.env from ctx.session.origEnv if it has been set
+app.use(async function robots(ctx, next) {
+    Environment.init(ctx);
+    await next();
 });
 
 

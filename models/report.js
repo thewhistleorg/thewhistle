@@ -29,6 +29,8 @@ import Update       from './update.js';
  * This schema is used for validation, specifying the metadata which the app expects to find as part
  * of the report. Of course, no operation should fail validation at this level: full validation
  * should be done both front-end and by the back-end app.
+ *
+ * When changes are made to the schema, they will be applied on next login, or by invoking /dev/init.
  */
 /* eslint-disable key-spacing */
 const schema = {
@@ -46,6 +48,7 @@ const schema = {
             items: { type: 'object' },                       // ... 'formidable' File objects
         },
         ua:           { type: [ 'object', 'null' ] },        // user agent of browser used to report incident
+        country:      { type: [ 'string', 'null' ] },        // country report was submitted from
         location:     { type: 'object',                      // geocoded incident location
             properties: {
                 address: { type: 'string' },                 // ... entered address used for geocoding
@@ -82,8 +85,8 @@ const schema = {
         },
         views:         { type: [ 'object', 'null' ] },        // associative array of timestamps indexed by user id
         archived:      { type: 'boolean' },                   // archived flag
-        lastUpdated:   { bsonType: 'date' },                  // Date of when the user last made an edit to their submission
-        evidenceToken: { type: 'string' },                    // Unique token which is used in a URL for a user to upload evidence
+        lastUpdated:   { bsonType: 'date' },                  // date of when the user last made an edit to their submission
+        evidenceToken: { type: 'string' },                    // unique token which is used in a URL for a user to upload evidence
     },
     additionalProperties: false,
 };
@@ -97,12 +100,14 @@ class Report {
      * indexes.
      *
      * Currently this is invoked on any login, to ensure db is correctly initialised before it is
-     * used. If this becomes expensive, it could be done less simplistically.
+     * used. If this becomes expensive, it could be done less simplistically (currently when there
+     * are no schema changes, it takes below 100ms).
      *
      * @param {string} db - Database to use.
      */
     static async init(db) {
         debug('Report.init', 'db:'+db);
+        const t1 = Date.now();
 
         // if no 'reports' collection, create it
         const collections = await Db.collections(db);
@@ -157,6 +162,9 @@ class Report {
         //const fields = {};
         //for (const f of flds) fields['report.'+f] = 'text';
         //reports.createIndex(fields, { name: 'freetextfieldssearch' });
+
+        const t2 = Date.now();
+        debug('Report.init', `${t2-t1}ms`);
     }
 
 
@@ -291,9 +299,10 @@ class Report {
      * @param   {string}   alias - Alias to record for for submitter of report.
      * @param   {number}   version - Version of form spec (to distinguish different format reports).
      * @param   {string}   userAgent - User agent from http request header.
+     * @param   {string}   country - Country report was submitted from (obtained from IP address)
      * @returns {ObjectId} New report id.
      */
-    static async submissionStart(db, project, alias, version, userAgent) {
+    static async submissionStart(db, project, alias, version, userAgent, country) {
         debug('Report.submissionStart', 'db:'+db, 'p:'+project, alias);
 
         if (typeof alias != 'string' || alias.length == 0) throw new Error('Alias must be supplied');
@@ -305,6 +314,8 @@ class Report {
             submitted:    { Alias: alias },
             submittedRaw: {},
             alias:        alias,
+            ua:           null, // done below
+            country:      country,
             location:     { address: '', geocode: null, geojson: null },
             analysis:     {},
             // summary:   null,
@@ -577,7 +588,7 @@ class Report {
         }
 
         if (userId) {
-            await Update.insert(db, id, userId, { set: values }); // audit trail   
+            await Update.insert(db, id, userId, { set: values }); // audit trail
         }
     }
 
@@ -875,7 +886,7 @@ class Report {
             await reports.updateOne({ _id: id }, { $set: { views: views } });
 
         } catch (e) {
-            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [views]`);
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [flagView]`);
             throw e;
         }
 

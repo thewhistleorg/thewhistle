@@ -55,7 +55,7 @@ class EvidencePage {
         if (await this.evidenceTimeout()) {
             //Report last updated more than a week ago
             await ctx.render(`evidence-timeout-${this.report.project}`);
-            ctx.response.status = 410;
+            ctx.response.status = 410; //Gone
         } else {
             //Report last updated within the last week
             const context = {
@@ -81,7 +81,7 @@ class EvidencePage {
         files = Array.isArray(files) ? files : [ files ];
 
         //If there are no files, files will contain 1 file object of size 0, so remove this (thus making files an empty array)
-        files = files.filter(f => f != undefined && f.size > 0);
+        files = files.filter(f => f && f.size > 0);
 
         if (await this.evidenceTimeout()) {
             //Report last updated more than a week ago
@@ -101,8 +101,11 @@ class EvidencePage {
                     fileString += `<li>${file.name}</li>`;
                 }
 
+                /* ctx.flash = { files: fileString, org: ctx.params.org, token: ctx.params.token };
+                ctx.redirect('app-sms/templates/evidence-uploaded-hfrn-en.html'); */
+
                 let body = await fs.readFile('app-sms/templates/evidence-uploaded-hfrn-en.html', 'utf8');
-                
+                //TODO: Change to ctx.flash = {}
                 //Make HTML replacements
                 body = body.replace('{{ files }}', fileString);
                 body = body.replace('{{ org }}', ctx.params.org);
@@ -111,7 +114,6 @@ class EvidencePage {
                 ctx.response.body = body;
                 ctx.response.status = 200;
             } catch (e) {
-                console.error(e);
                 await ctx.response.redirect(`/${ctx.params.org}/evidence/${this.report.evidenceToken}?err=Upload%20failed`);
             }
         }

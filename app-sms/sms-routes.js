@@ -25,10 +25,12 @@ router.get('/:project/evidence-timeout', SmsHandlers.getEvidenceTimeout);
 
 
 //On receiving a text
+//Twilio webhook
 router.post('/:org/:project', SmsHandlers.postSms);
 
 
 //Delete a message sent to the user from Twilio logs
+//Twilio calls this as a callback
 router.post('/delete-outbound', SmsHandlers.deleteOutbound);
 
 

@@ -10,6 +10,7 @@ import serve         from 'koa-static';
 
 import smsRoutes     from './sms-routes.js';
 
+//TODO: Add in error handling
 
 const app = new Koa();
 

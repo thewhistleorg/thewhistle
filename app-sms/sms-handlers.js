@@ -56,12 +56,16 @@ class SmsHandlers {
             }
             await smsRoutes[ctx.url].receiveText(ctx);
         }
+        //If the organisation/project combination isn't valid, we return a 404 status code
+        //Do not need any redirect, since this is through Twilio
     }
 
 
     /**
      * Attempts to delete an outbound SMS from the Twilio message logs
-     * Runs as a callback when the status of a sent message changes
+     * Runs as a callback when the status of a sent message changes.
+     * This is so that we cannot view numbers or messages of reporters
+     * from the Twilio dashboard.
      * 
      * @param {Object} ctx 
      */
@@ -155,6 +159,7 @@ class SmsHandlers {
      * @param {Object} ctx 
      */
     static async getEvidencePage(ctx) {
+        //TODO: change to ctx.request.query.err
         const errorMessage = ctx.url.substr(30, 5) === '?err=' ? ctx.url.substring(35).replace(/%20/g, ' ') : null;
         await SmsHandlers.setupEvidencePage(ctx, errorMessage);
     }
@@ -167,7 +172,7 @@ class SmsHandlers {
      */
     static async getEvidenceTimeout(ctx) {
         await ctx.render(`evidence-timeout-${ctx.params.project}`);
-        ctx.response.status = 410;
+        ctx.response.status = 410; //Gone
     }
 
 

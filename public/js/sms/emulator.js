@@ -76,6 +76,7 @@ function postSms(message) {
     let param = '';
     //Create query string
     Object.keys(body).forEach(function(key) {
+        //TODO: Use library function
         param = (key + '=' + body[key]).replace(' ', '%20');
         params = params === '' ? param : params + '&' + param;
     });

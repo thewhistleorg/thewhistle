@@ -160,7 +160,7 @@ describe('SMS app'+' ('+app.env+')', function() {
             expect(responseMessage).to.match(re);
             aliasTwo = responseMessage.substring(28, responseMessage.indexOf('.'));
         });
-        it('Provide supplimentary information', async function() {
+        it('Provide supplementary information', async function() {
             let responseMessage = '';
             for (let i = 0; i < 20; i++) {
                 responseMessage = await getResponseMessage('no');
@@ -234,7 +234,7 @@ describe('SMS app'+' ('+app.env+')', function() {
                 'Consent to being contacted?':                      'no',
                 'Consent to media testimony?':                      'no',
                 'Consent to information?':                          'no',
-                'Supplimentary information':                        'Extra info 1 | Extra info 2',
+                'Supplementary information':                        'Extra info 1 | Extra info 2',
             };
             expect(reportTwo.submitted).to.deep.equal(expected);
         });

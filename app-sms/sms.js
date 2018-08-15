@@ -82,10 +82,10 @@ class SmsApp {
      */
     sendSms(twiml, message) {
         twiml.message({
-            //action: 'delete-outbound',
-            action: '/sms-delete-outbound',
+            action: 'delete-outbound',
             method: 'POST',
         }, message);
+        //Asynchronous call - method returns before effects carried out
     }
 
 
@@ -231,7 +231,7 @@ class SmsApp {
 
 
     /**
-     * Append information to the supplimentary information field.
+     * Append information to the supplementary information field.
      *
      * @param   {Object}   ctx
      * @param   {Object}   twiml
@@ -241,10 +241,10 @@ class SmsApp {
         const sessionId = ctx.cookies.get(constants.cookies.SESSION_ID);
         const report = await Report.get(this.db, sessionId);
 
-        let info = report.submitted['Supplimentary information'] ? report.submitted['Supplimentary information'] : '';
+        let info = report.submitted['Supplementary information'] ? report.submitted['Supplementary information'] : '';
         info = info ==='' ? incomingSms : info + ' | ' + incomingSms;
 
-        await Report.updateField(this.db, sessionId, 'Supplimentary information', info);
+        await Report.updateField(this.db, sessionId, 'Supplementary information', info);
 
         this.sendSms(twiml, 'Thank you for this extra information. You can send more if you wish. To start a new report, reply \'RESTART\'');
     }
@@ -440,7 +440,7 @@ class SmsApp {
     async initiateSmsReport(ctx, alias) {
         const version = this.spec.version;
         //Adds skeleton report to the database
-        const sessionId = await Report.submissionStart(this.org, this.project, alias, version, ctx.headers['user-agent']);
+        const sessionId = await Report.submissionStart(this.org, this.project, alias, version, ctx.headers['user-agent'], null);
         await Report.updateField(this.db, sessionId, 'First Text', ctx.cookies.get(constants.cookies.FIRST_TEXT));
         await Report.update(this.db, sessionId, { 'lastUpdated': new Date() });
         let evidenceToken = '';
@@ -483,6 +483,7 @@ class SmsApp {
             await Report.update(this.db, sessionId, { 'lastUpdated': new Date() });
         } catch (e) {
             console.error(e);
+            //TODO: Error SMS
         }
     }
 
@@ -492,20 +493,18 @@ class SmsApp {
      */
     generateSmsQuestions() {
         this.questions = [];
-        //Matches 'p' followed by a number
-        const re = new RegExp('^p[0-9]+$');
         //Set pages list to all pages given in the .yaml specifications
-        const pages = Object.keys(this.spec.pages).filter(key => re.test(key));
+        //Matches 'p' followed by a number
+        const pages = Object.keys(this.spec.pages).filter(key => /^p[0-9]+$/.test(key));
         for (let p = 1; p < pages.length; p++) {
             //For each text/input combination on a page
             for (let i = 0; i < this.spec[pages[p]].length; i += 2) {
                 this.questions.push({
-                    'question': this.spec[pages[p]][i].text.substr(2), 
-                    'label':    this.spec[pages[p]][i + 1].input.label,
+                    question: this.spec[pages[p]][i].text.substr(2), 
+                    label:    this.spec[pages[p]][i + 1].input.label,
                 });
             }
         }
-        //this.questions = this.questions.slice(0, 3);
     }
 
 
@@ -525,12 +524,13 @@ class SmsApp {
             this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_RESPONSE);
             message = 'Question ' + (Number(nextQuestion) + 1) + ': ' + this.questions[nextQuestion].question;
         } else {
+            //At the end of questions
             this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_FINAL);
             //TODO: Get this from YAML
             const sessionId = ctx.cookies.get(constants.cookies.SESSION_ID);
             const report = await Report.get(this.db, sessionId);
             const evidenceToken = report.evidenceToken;
-            message = 'Thank you for completing the questions. If you have any supplimentary information, please send it now. Please go to sms.thewhistle.org/upload-evidence?token=' + evidenceToken + ' to provide picture, audio or video files. If you would like to amend any of responses, please reply explaining the changes. If you would like to start a new report, please reply \'RESTART\'';
+            message = 'Thank you for completing the questions. If you have any supplementary information, please send it now. Please go to sms.thewhistle.org/upload-evidence?token=' + evidenceToken + ' to provide picture, audio or video files. If you would like to amend any of responses, please reply explaining the changes. If you would like to start a new report, please reply \'RESTART\'';
         }
 
         return message;

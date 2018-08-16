@@ -542,6 +542,14 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
         });
+
+        if (process.env.CIRCLECI) {
+            it('no longer sees submitted file in AWS S3', async function() {
+                const src = `/uploaded/${proj}/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
+                const response = await appReport.get(src);
+                expect(response.status).to.equal(404);
+            });
+        }
     });
 
     describe('single page report submission', function() {

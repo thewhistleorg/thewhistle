@@ -2,6 +2,9 @@
 /* Report app integration/acceptance tests.                                   C.Veness 2017-2018  */
 /*                                                                                                */
 /* These tests require report.thewhistle.local & admin.thewhistle.local to be set in /etc/hosts.  */
+/*                                                                                                */
+/* AWS Free Tier is just 2,000 put requests per month, so tests involving file upload are limited */
+/* to CI tests. To run these locally set environment variable CIRCLECI to true.                   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import supertest    from 'supertest';  // SuperAgent driven library for testing HTTP servers
@@ -269,7 +272,7 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
 
             const values = {
-                'description': 'erroneous description',
+                'description': 'Submission test',
                 'nav-next':    'next',
             };
             const responsePost = await appReport.post(`/${org}/${proj}/6`).send(values);
@@ -326,7 +329,10 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1); // description
             expect(document.querySelectorAll('input')).to.have.lengthOf(13);   // file selector, skip, applicable × 11
             expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
-            expect(document.querySelector('textarea').textContent).to.equal('erroneous description');
+            expect(document.querySelector('textarea').textContent).to.equal('Submission test');
+
+            if (!process.env.CIRCLECI) return; // AWS Free Tier is just 2,000 put requests per month, so limit to CI tests
+
             const values = {
                 'description': 'Submission test',
                 'nav-next':    'next',
@@ -465,21 +471,25 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(document.querySelector('#weather div.weather-body img').src).to.match(iconRe);
         });
 
-        it('fetches uploaded image from AWS S3', async function() {
-            const src = `/uploaded/${proj}/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
-            const response = await appAdmin.get(src);
-            expect(response.status).to.equal(200);
-            expect(response.headers['content-type']).to.equal('image/jpeg');
-        });
+        if (process.env.CIRCLECI) {
+            it('fetches uploaded image from AWS S3', async function() {
+                const src = `/uploaded/${proj}/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
+                const response = await appAdmin.get(src);
+                expect(response.status).to.equal(200);
+                expect(response.headers['content-type']).to.equal('image/jpeg');
+            });
+        }
 
-        it('sees uploaded image in report page', async function() {
-            const response = await appAdmin.get(`/reports/${reportId}`);
-            expect(response.status).to.equal(200);
-            const document = new JSDOM(response.text).window.document;
-            const src = `/uploaded/${proj}/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
-            expect(document.getElementById(imgFile).querySelector('td a').href).to.equal(src);
-            expect(document.getElementById(imgFile).querySelector('td img').src).to.equal(src);
-        });
+        if (process.env.CIRCLECI) {
+            it('sees uploaded image in report page', async function() {
+                const response = await appAdmin.get(`/reports/${reportId}`);
+                expect(response.status).to.equal(200);
+                const document = new JSDOM(response.text).window.document;
+                const src = `/uploaded/${proj}/${dateFormat('yyyy-mm')}/${reportId}/${imgFile}`;
+                expect(document.getElementById(imgFile).querySelector('td a').href).to.equal(src);
+                expect(document.getElementById(imgFile).querySelector('td img').src).to.equal(src);
+            });
+        }
 
         it('gets address for Heddon-on-the-Wall (close to test photo) (ajax)', async function() {
             const response = await appAdmin.get('/ajax/geocode?address=Heddon-on-the-Wall');
@@ -493,14 +503,16 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(200);
         });
 
-        it('sees uploaded image exif metadata in report page', async function() {
-            const response = await appAdmin.get('/reports/'+reportId);
-            expect(response.status).to.equal(200);
-            const document = new JSDOM(response.text).window.document;
-            const distRe = new RegExp('^7.2 km W from incident location');
-            expect(document.getElementById(imgFile).querySelector('td.exif div').textContent).to.match(distRe);
-            // note don't bother checking time as it will change in future
-        });
+        if (process.env.CIRCLECI) {
+            it('sees uploaded image exif metadata in report page', async function() {
+                const response = await appAdmin.get('/reports/'+reportId);
+                expect(response.status).to.equal(200);
+                const document = new JSDOM(response.text).window.document;
+                const distRe = new RegExp('^7.2 km W from incident location');
+                expect(document.getElementById(imgFile).querySelector('td.exif div').textContent).to.match(distRe);
+                // note don't bother checking time as it will change in future
+            });
+        }
 
         it('gets timestamp of new report (ajax)', async function() {
             const response = await appAdmin.get('/ajax/reports/latest-timestamp');

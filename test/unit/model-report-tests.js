@@ -2,6 +2,9 @@
 /* Report model unit tests.                                                   C.Veness 2017-2018  */
 /*                                                                                                */
 /* Note these tests do not mock out database components, but operate on the live 'grn-test' db.   */
+/*                                                                                                */
+/* AWS Free Tier is just 2,000 put requests per month, so tests involving file upload are limited */
+/* to CI tests. To run these locally set environment variable CIRCLECI to true.                   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { expect }         from 'chai';       // BDD/TDD assertion library
@@ -111,34 +114,38 @@ describe(`Report model (${db})`, function() {
             expect(report.submitted.Happened.getTime()).to.equal(new Date(dateFormat('yyyy-mm-dd')).getTime());
         });
 
-        it('submits file', async function() {
-            // spoof file upload (copy file to /tmp & create formidable object)
-            await fs.copy('./test/img/s_gps.jpg', '/tmp/upload_s_gps.jpg');
-            const stat = await fs.stat('/tmp/upload_s_gps.jpg');
-            const file = {
-                size:             stat.size,
-                path:             '/tmp/upload_s_gps.jpg',
-                name:             's_gps.jpg',
-                type:             'image/jpeg',
-                lastModifiedDate: stat.mtime,
-            };
+        if (process.env.CIRCLECI) {
+            it('submits file', async function() {
+                // spoof file upload (copy file to /tmp & create formidable object)
+                await fs.copy('./test/img/s_gps.jpg', '/tmp/upload_s_gps.jpg');
+                const stat = await fs.stat('/tmp/upload_s_gps.jpg');
+                const file = {
+                    size:             stat.size,
+                    path:             '/tmp/upload_s_gps.jpg',
+                    name:             's_gps.jpg',
+                    type:             'image/jpeg',
+                    lastModifiedDate: stat.mtime,
+                };
 
-            await Report.submissionFile(db, reportId, file);
+                await Report.submissionFile(db, reportId, file);
 
-            const report = await Report.get(db, reportId);
-            expect(report.files).to.be.an('array');
-            expect(report.files[0].name).to.equal('s_gps.jpg');
-            expect(report.files[0].path).to.equal(`test-project/${dateFormat('yyyy-mm')}/${reportId}/`);
-        });
+                const report = await Report.get(db, reportId);
+                expect(report.files).to.be.an('array');
+                expect(report.files[0].name).to.equal('s_gps.jpg');
+                expect(report.files[0].path).to.equal(`test-project/${dateFormat('yyyy-mm')}/${reportId}/`);
+            });
+        }
 
-        it('has extracted exif data in analysis', async function() {
-            const report = await Report.get(db, reportId);
-            expect(report.analysis).to.be.an('object');
-            expect(report.analysis.files).to.be.an('array');
-            expect(report.analysis.files[0].exif).to.be.an('object');
-            expect(report.analysis.files[0].exif.GPSLatitude).to.equal(54.98966667);
-            expect(report.analysis.files[0].exif.GPSLongitude).to.equal(-1.91416667);
-        });
+        if (process.env.CIRCLECI) {
+            it('has extracted exif data in analysis', async function() {
+                const report = await Report.get(db, reportId);
+                expect(report.analysis).to.be.an('object');
+                expect(report.analysis.files).to.be.an('array');
+                expect(report.analysis.files[0].exif).to.be.an('object');
+                expect(report.analysis.files[0].exif.GPSLatitude).to.equal(54.98966667);
+                expect(report.analysis.files[0].exif.GPSLongitude).to.equal(-1.91416667);
+            });
+        }
     });
 
     describe('find', function() {

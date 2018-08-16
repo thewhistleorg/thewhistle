@@ -87,7 +87,6 @@ class EvidencePage {
         } else if (files.length == 0) {
             //No files submitted. This is caught by front-end code, so this is defensive.
             ctx.response.redirect(`/${ctx.params.org}/evidence/${this.report.evidenceToken}?err=No%20files%20uploaded`);
-            ctx.response.status = 400;
         } else {
             try {
                 //fileString is the HTML list of files submitted
@@ -97,18 +96,9 @@ class EvidencePage {
                     await Report.submissionFile(ctx.params.org, this.report._id, file);
                     fileList.push(file.name);
                 }
+                
                 ctx.flash = { files: fileList, org: ctx.params.org, token: ctx.params.token };
                 ctx.response.redirect(`/${this.report.project}/evidence-uploaded`);
-                //ctx.response.status = 200;
-                /* let body = await fs.readFile('app-sms/templates/evidence-uploaded-hfrn-en.html', 'utf8');
-                //TODO: Change to ctx.flash = {}
-                //Make HTML replacements
-                body = body.replace('{{ files }}', fileString);
-                body = body.replace('{{ org }}', ctx.params.org);
-                body = body.replace('{{ token }}', ctx.params.token);
-
-                ctx.response.body = body;
-                ctx.response.status = 200; */
             } catch (e) {
                 ctx.response.redirect(`/${ctx.params.org}/evidence/${this.report.evidenceToken}?err=Upload%20failed`);
             }

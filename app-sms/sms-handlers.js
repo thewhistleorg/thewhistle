@@ -159,9 +159,7 @@ class SmsHandlers {
      * @param {Object} ctx 
      */
     static async getEvidencePage(ctx) {
-        //TODO: change to ctx.request.query.err
-        const errorMessage = ctx.url.substr(30, 5) === '?err=' ? ctx.url.substring(35).replace(/%20/g, ' ') : null;
-        await SmsHandlers.setupEvidencePage(ctx, errorMessage);
+        await SmsHandlers.setupEvidencePage(ctx, ctx.request.query.err);
     }
 
 
@@ -211,15 +209,6 @@ class SmsHandlers {
         await ctx.render(`evidence-uploaded-${ctx.params.project}`);
     }
 
-
-    static async getEvidenceUploadedTest(ctx) {
-        if (ctx.app.env === 'development') {
-            ctx.flash = { files: [ 'whistle.png', 'whistle.pdf' ] };
-            await ctx.render('evidence-uploaded-hfrn-en');
-        } else {
-            ctx.response.status = 404;
-        }
-    }
 }
 
 

@@ -28,11 +28,6 @@ router.get('/:project/evidence-timeout', SmsHandlers.getEvidenceTimeout);
 router.get('/:project/evidence-uploaded', SmsHandlers.getEvidenceUploaded);
 
 
-//Serve spoofed evidence uploaded page
-//Returns 404 outside of development
-router.get('/evidence-uploaded-test', SmsHandlers.getEvidenceUploadedTest);
-
-
 //On receiving a text
 //Twilio webhook
 router.post('/:org/:project', SmsHandlers.postSms);

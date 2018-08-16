@@ -17,7 +17,7 @@
 function changeErrorVisibility() {
     if (document.getElementById('files').files.length == 0) {
         document.getElementById('noFilesMessage').classList.remove('hide');
-        return false;
+        return true;
     } else {
         document.getElementById('noFilesMessage').classList.add('hide');
         return true;

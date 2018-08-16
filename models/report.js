@@ -605,6 +605,7 @@ class Report {
 
         // retrieve report to determine project, in case there are persistent files to delete
         const report = await Report.get(db, id);
+        if (!report) throw new Error(`Report ${id} not found`);
 
         // delete audit trail
         await Update.deleteForReport(db, id);

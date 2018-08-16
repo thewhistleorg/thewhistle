@@ -6,6 +6,8 @@
 import Koa           from 'koa';
 import handlebars    from 'koa-handlebars'; 
 import serve         from 'koa-static';
+import flash      from 'koa-flash';
+import convert    from 'koa-convert'; 
 
 
 import smsRoutes     from './sms-routes.js';
@@ -23,6 +25,9 @@ app.use(handlebars({
     extension: [ 'html' ],
     viewsDir:  'app-sms/templates',
 }));
+
+
+app.use(convert(flash()));
 
 
 app.use(smsRoutes);

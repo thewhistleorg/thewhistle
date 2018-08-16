@@ -43,7 +43,6 @@ describe(`Report app (${org}/${app.env})`, function() {
         if (responseGrnRpt.status != 200) throw new Error(`${org}/${proj} not found`);
 
         // check previous test report deleted
-        console.log('ORG', org);
         const responseTestRpt = await appReport.get(`/ajax/${org}/aliases/testy+terrain`);
         if (responseTestRpt.status != 404) throw new Error('Previous test report was not deleted');
     });

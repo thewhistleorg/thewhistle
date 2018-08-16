@@ -3,9 +3,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
-import fs from 'fs-extra';    // File system with extra functions & promise interface
-
-
 import Report from '../models/report.js';
 
 
@@ -94,17 +91,16 @@ class EvidencePage {
         } else {
             try {
                 //fileString is the HTML list of files submitted
-                let fileString = '';
+                const fileList = [];
                 for (const file of files) {
                     //Upload file to AWS and store reference in database
                     await Report.submissionFile(ctx.params.org, this.report._id, file);
-                    fileString += `<li>${file.name}</li>`;
+                    fileList.push(file.name);
                 }
-
-                /* ctx.flash = { files: fileString, org: ctx.params.org, token: ctx.params.token };
-                ctx.redirect('app-sms/templates/evidence-uploaded-hfrn-en.html'); */
-
-                let body = await fs.readFile('app-sms/templates/evidence-uploaded-hfrn-en.html', 'utf8');
+                ctx.flash = { files: fileList, org: ctx.params.org, token: ctx.params.token };
+                ctx.response.redirect(`/${this.report.project}/evidence-uploaded`);
+                //ctx.response.status = 200;
+                /* let body = await fs.readFile('app-sms/templates/evidence-uploaded-hfrn-en.html', 'utf8');
                 //TODO: Change to ctx.flash = {}
                 //Make HTML replacements
                 body = body.replace('{{ files }}', fileString);
@@ -112,9 +108,9 @@ class EvidencePage {
                 body = body.replace('{{ token }}', ctx.params.token);
 
                 ctx.response.body = body;
-                ctx.response.status = 200;
+                ctx.response.status = 200; */
             } catch (e) {
-                await ctx.response.redirect(`/${ctx.params.org}/evidence/${this.report.evidenceToken}?err=Upload%20failed`);
+                ctx.response.redirect(`/${ctx.params.org}/evidence/${this.report.evidenceToken}?err=Upload%20failed`);
             }
         }
     }

@@ -332,12 +332,9 @@ class Report {
         values.ua = Object.assign({}, ua, { os: ua.os }); // trigger on-demand parsing of os
 
         try {
-            console.log('val you', values);
             const { insertedId } = await reports.insertOne(values);
             return insertedId; // TODO: toString()?
-
         } catch (e) {
-            console.log(e);
             if (e.code == 121) throw new Error(`Report submitted by ${alias} failed validation [submissionStart]`);
             throw e;
         }

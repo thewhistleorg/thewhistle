@@ -26,10 +26,13 @@
 <main>
     <h1 class="banner ">✔ We’ve received your evidence</h1>
     You have just submitted the following files:
+    
     <ul id="file-list">
-        {{ files }}
+        {{#each @koa.flash.files}}
+            <li>{{this}}</li>
+        {{/each}}
     </ul>
-    Click <a href="/{{ org }}/evidence/{{ token }}" class="bold">here</a> to add more evidence to your report.
+    Click <a href="/{{ @koa.flash.org }}/evidence/{{ @koa.flash.token }}" class="bold">here</a> to add more evidence to your report.
     <p class="not-working">Form not working? Let us know
         <a href="https://docs.google.com/forms/d/e/1FAIpQLSfOQAPHzHGw2e9LfxRZPVzxi8YKVbQnWpqX_Dnf7MA85dZJyA/viewform?ts=5a7f42b3" target="_blank" class="bold">here</a>
     </p>

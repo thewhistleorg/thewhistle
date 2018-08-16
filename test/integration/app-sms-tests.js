@@ -241,7 +241,6 @@ describe('SMS app'+' ('+app.env+')', function() {
         it('Third report deleted', async function() {
             const reportThree = await Report.get(org, reportIdThree);
             expect(reportThree).to.equal(null);
-
         });
     });
     describe('Evidence submission', function () {
@@ -305,28 +304,27 @@ describe('SMS app'+' ('+app.env+')', function() {
             const response = await appSms.post(`/hfrn-test/evidence/${evidenceTokenOne}`)
                 .set('Content-Type', 'application/x-www-form-urlencoded')
                 .attach('documents', 'test/files/whistle.png');
-            expect(response.status).to.equal(200);
-            const document = new JSDOM(response.text).window.document;
-            expect(document.querySelector('title').textContent).to.equal('Evidence Submitted');
-            expect(document.querySelector('h3').textContent).to.equal('Evidence Upload');
-            expect(document.querySelector('#file-list').textContent).to.match(/.*whistle.png.*/);
+            expect(response.status).to.equal(302);
+            expect(response.text).to.equal('Redirecting to <a href="/hfrn-en/evidence-uploaded">/hfrn-en/evidence-uploaded</a>.');
         });
         it('POST 2 files', async function () {
             const response = await appSms.post(`/hfrn-test/evidence/${evidenceTokenOne}`)
                 .set('Content-Type', 'application/x-www-form-urlencoded')
                 .attach('documents', 'test/files/whistle.mp4')
                 .attach('documents', 'test/files/whistle.pdf');
-            expect(response.status).to.equal(200);
-            const document = new JSDOM(response.text).window.document;
-            expect(document.querySelector('title').textContent).to.equal('Evidence Submitted');
-            expect(document.querySelector('h3').textContent).to.equal('Evidence Upload');
-            expect(document.querySelector('#file-list').textContent).to.match(/.*whistle.mp4.*whistle.pdf.*/);
+            expect(response.status).to.equal(302);
+            expect(response.text).to.equal('Redirecting to <a href="/hfrn-en/evidence-uploaded">/hfrn-en/evidence-uploaded</a>.');
         });
         it('POST file to new report', async function () {
             evidenceTokenTwo = (await Report.get(org, reportIdTwo)).evidenceToken;
             const response = await appSms.post(`/hfrn-test/evidence/${evidenceTokenTwo}`)
                 .set('Content-Type', 'application/x-www-form-urlencoded')
                 .attach('documents', 'test/files/whistle.jpg');
+            expect(response.status).to.equal(302);
+            expect(response.text).to.equal('Redirecting to <a href="/hfrn-en/evidence-uploaded">/hfrn-en/evidence-uploaded</a>.');
+        });
+        it('Uploaded page', async function () {
+            const response = await appSms.get('/evidence-uploaded-test');
             expect(response.status).to.equal(200);
             const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('title').textContent).to.equal('Evidence Submitted');

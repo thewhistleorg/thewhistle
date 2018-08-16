@@ -205,6 +205,21 @@ class SmsHandlers {
             await evidenceRoutes[ctx.params.token].processEvidence(ctx);
         }
     }
+
+
+    static async getEvidenceUploaded(ctx) {
+        await ctx.render(`evidence-uploaded-${ctx.params.project}`);
+    }
+
+
+    static async getEvidenceUploadedTest(ctx) {
+        if (ctx.app.env === 'development') {
+            ctx.flash = { files: [ 'whistle.png', 'whistle.pdf' ] };
+            await ctx.render('evidence-uploaded-hfrn-en');
+        } else {
+            ctx.response.status = 404;
+        }
+    }
 }
 
 

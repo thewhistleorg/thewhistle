@@ -326,7 +326,7 @@ describe('SMS app'+' ('+app.env+')', function() {
                 const document = new JSDOM(response.text).window.document;
                 expect(document.querySelector('title').textContent).to.equal('Evidence Submitted');
                 expect(document.querySelector('h3').textContent).to.equal('Evidence Upload');
-                expect(document.querySelector('#file-list').textContent).to.match(/.*whistle.mp4.*whistle.pdf.*/);
+                expect(document.querySelector('#file-list').textContent).to.match(/[\s\S]*whistle\.mp4[\s\S]*whistle\.pdf[\s\S]*/);
             });
             it('POST file to new report', async function () {
                 evidenceTokenTwo = (await Report.get(org, reportIdTwo)).evidenceToken;

@@ -318,18 +318,15 @@ describe('SMS app'+' ('+app.env+')', function() {
                     .attach('documents', 'test/files/whistle.pdf');
                 expect(response.status).to.equal(302);
                 //TODO: Test for response.headers.location
-                console.log(response.headers.location);
                 expect(response.text).to.equal('Redirecting to <a href="/hfrn-en/evidence-uploaded">/hfrn-en/evidence-uploaded</a>.');
             });
             it('GET evidence uploaded page', async function () {
                 const response = await appSms.get('/hfrn-en/evidence-uploaded');
-                console.log(response.text);
                 expect(response.status).to.equal(200);
                 const document = new JSDOM(response.text).window.document;
                 expect(document.querySelector('title').textContent).to.equal('Evidence Submitted');
                 expect(document.querySelector('h3').textContent).to.equal('Evidence Upload');
-                console.log(document.querySelector('#file-list').textContent)
-                expect(document.querySelector('#file-list').textContent).to.match(/.*whistle.jpg.*/);
+                expect(document.querySelector('#file-list').textContent).to.match(/.*whistle.mp4.*whistle.pdf.*/);
             });
             it('POST file to new report', async function () {
                 evidenceTokenTwo = (await Report.get(org, reportIdTwo)).evidenceToken;

@@ -1,21 +1,60 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>SMS Test</title>
+    <title>SMS Emulator</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script defer src="/js/sms/emulator.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js" integrity="sha256-9Nt2r+tJnSd2A2CRUvnjgsD+ES1ExvjbjBNqidm9doI=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/sms-emulator.css">
 </head>
 <body>
     <div id="phone">
+        <div id="settings-button" data-toggle="modal" data-target="#myModal"><i style="font-size:24px" class="fa">&#xf013;</i></div>
         <div id="messages"></div>
         <span id="input">
             <input type="text" id="txt"/>
             <i style="font-size:36px" class="fa" id="btn">&#xf18e;</i>
         </span>
+    </div>
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Change Settings</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="settings">
+                            <div style="white-space:nowrap"><label for="To">To:</label><input type="text" name="To" value="+441727260269" id="To" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="ToCountry">To Country:</label><input type="text" name="ToCountry" value="GB" id="ToCountry" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="ToState">To State:</label><input type="text" name="ToState" value="St Albans" id="ToState" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="ToCity">To City:</label><input type="text" name="ToCity" value="" id="ToCity" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="ToZip">To Zip:</label><input type="text" name="ToZip" value="" id="ToZip" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="From">From:</label><input type="text" name="From" value="+447716364079" id="From" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="FromCountry">From Country:</label><input type="text" name="FromCountry" value="GB" id="FromCountry" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="FromState">From State:</label><input type="text" name="FromState" value="" id="FromState" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="FromCity">From City:</label><input type="text" name="FromCity" value="" id="FromCity" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="FromZip">From Zip:</label><input type="text" name="FromZip" value="" id="FromZip" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="SmsMessageSid">Message ID:</label><input type="text" name="SmsMessageSid" value="SMb2e0e20fdf02480a7a9fd5324cc1e307" id="SmsMessageSid" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="NumMedia">No of Media:</label><input type="text" name="NumMedia" value="0" id="NumMedia" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="SmsSid">SMS ID:</label><input type="text" name="SmsSid" value="SMb2e0e20fdf02480a7a9fd5324cc1e307" id="SmsSid" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="SmsStatus">SMS Status:</label><input type="text" name="SmsStatus" value="received" id="SmsStatus" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="NumSegments">No of Segments:</label><input type="text" name="NumSegments" value="1" id="NumSegments" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="MessageSid">Message ID:</label><input type="text" name="MessageSid" value="SMb2e0e20fdf02480a7a9fd5324cc1e307" id="MessageSid" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="AccountSid">Account ID:</label><input type="text" name="AccountSid" value="AC5da0166da2047a8e4d3b3709982ebaae" id="AccountSid" class="settings-input"/></div>
+                            <div style="white-space:nowrap"><label for="ApiVersion">API Version:</label><input type="text" name="ApiVersion" value="2010-04-01" id="ApiVersion" class="settings-input"/></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

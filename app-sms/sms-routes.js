@@ -13,7 +13,7 @@ const router = new Router();
 
 
 //Serve SMS emulator
-router.get('/sms-emulator', SmsHandlers.getEmulator);
+router.get('/:org/:project/emulator', SmsHandlers.getEmulator);
 
 
 //Serve the evidence upload page

@@ -31,10 +31,15 @@ class SmsHandlers {
      */
     static async getEmulator(ctx) {
         if (ctx.app.env === 'production') {
-            //Do not serve the emulator in production
+            //Do not serve the emulator in production or if the org/project combination is invalid
             ctx.status = 404;
         } else {
-            await ctx.render('emulator');
+            const exists = await FormGenerator.exists(ctx.params.org, ctx.params.project);
+            if (exists) {
+                await ctx.render('emulator');
+            } else {
+                ctx.status = 404;
+            }
         }
     }
 
@@ -45,7 +50,6 @@ class SmsHandlers {
      * @param {Object} ctx 
      */
     static async postSms(ctx) {
-        
         if (FormGenerator.exists(ctx.params.org, ctx.params.project)) {
             //If the organisation/project combination is valid
             if (!smsRoutes[ctx.url]) {

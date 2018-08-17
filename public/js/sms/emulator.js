@@ -49,37 +49,18 @@ function addMessage(message, sent) {
 function postSms(message) {
     const request = new XMLHttpRequest();
     //TODO: Don't use static organisation/project
-    request.open('POST', '/hfrn-test/hfrn-en');
+    const org = window.location.pathname.split('/')[1];
+    const project = window.location.pathname.split('/')[2];
+    request.open('POST', `/${org}/${project}`);
     request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    const body = {
-        'ToCountry':     'GB',
-        'ToState':       'St Albans',
-        'SmsMessageSid': 'SMb2e0e20fdf02480a7a9fd5324cc1e307',
-        'NumMedia':      '0',
-        'ToCity':        '',
-        'FromZip':       '',
-        'SmsSid':        'SMb2e0e20fdf02480a7a9fd5324cc1e307',
-        'FromState':     '',
-        'SmsStatus':     'received',
-        'FromCity':      '',
-        'Body':          message,
-        'FromCountry':   'GB',
-        'To':            '+441727260269',
-        'ToZip':         '',
-        'NumSegments':   '1',
-        'MessageSid':    'SMb2e0e20fdf02480a7a9fd5324cc1e307',
-        'AccountSid':    'AC5da0166da2047a8e4d3b3709982ebaae',
-        'From':          '+447716364079',
-        'ApiVersion':    '2010-04-01',
-    };
+    const body = new FormData(document.getElementById('settings'));
+    body.append('Body', message);
     let params = '';
     let param = '';
-    //Create query string
-    Object.keys(body).forEach(function(key) {
-        //TODO: Use library function
-        param = encodeURIComponent(key) + '=' + encodeURIComponent(body[key]);
+    for (const pair of body.entries()) {
+        param = encodeURIComponent(pair[0]) + '=' + encodeURIComponent(pair[1]);
         params = params === '' ? param : params + '&' + param;
-    });
+    }
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
             if (request.status == 200) {

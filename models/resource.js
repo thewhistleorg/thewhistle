@@ -43,7 +43,7 @@ class Resource {
      * @param {string} db - Database to use.
      */
     static async init(db) {
-        debug('Resource.init', 'db:'+db);
+        const t1 = Date.now();
 
         // if no 'resources' collection, create it
         const collections = await Db.collections(db);
@@ -64,6 +64,8 @@ class Resource {
         if (indexes.name_location == undefined) resources.createIndex({ location: '2dsphere',  name: 1 }, { name: 'name_location' });
 
         // TODO: indexes (incl unique)
+
+        debug('Resource.init', db, `${Date.now()-t1}ms`);
     }
 
     /**

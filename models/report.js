@@ -106,7 +106,6 @@ class Report {
      * @param {string} db - Database to use.
      */
     static async init(db) {
-        debug('Report.init', 'db:'+db);
         const t1 = Date.now();
 
         // if no 'reports' collection, create it
@@ -137,7 +136,7 @@ class Report {
         reports.createIndex({ status: 1 });
         reports.createIndex({ tags: 1 });
         reports.createIndex({ archived: 1 });
-        reports.createIndex({ evidenceToken: 1});
+        reports.createIndex({ evidenceToken: 1 });
 
         // free-text index for submitted information (ie fields in report.submitted)
 
@@ -163,8 +162,7 @@ class Report {
         //for (const f of flds) fields['report.'+f] = 'text';
         //reports.createIndex(fields, { name: 'freetextfieldssearch' });
 
-        const t2 = Date.now();
-        debug('Report.init', `${t2-t1}ms`);
+        debug('Report.init', db, `${Date.now()-t1}ms`);
     }
 
 

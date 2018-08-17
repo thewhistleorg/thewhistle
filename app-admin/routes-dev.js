@@ -33,7 +33,7 @@ router.get('/dev/submissions',           Dev.submissions);
 
 router.get('/dev/throw',                 Dev.throw);             // invoke exception
 
-router.put('/dev/set-env/:env',          Dev.setEnv);           // reset app environment
+router.put('/dev/set-env/:env',          Dev.setEnv);            // reset app environment
 
 router.get('/dev/ip-cache', function(ctx) { // for debug
     ctx.response.body = `countries (${global.ipsCountry.size})\n`;
@@ -42,21 +42,20 @@ router.get('/dev/ip-cache', function(ctx) { // for debug
     for (const [ key, val ] of global.ipsDomain) ctx.response.body += ` ${key} => ${val}\n`;
 });
 
-// reinitialise collections: sets indexes, document validation, etc: this is useful if indexes or
-// validations change, as otherwise it involves logging out and logging in again
+// reinitialise collections: sets indexes, document validation, etc: this is normally done on app
+// startup, this is only likely to be needed to e.g. set validation on production databases from
+// development environment
 import Notification from '../models/notification';
 import Report       from '../models/report.js';
 import Resource     from '../models/resource';
 import Submission   from '../models/submission';
 import Update       from '../models/update';
-import User         from '../models/user';
 router.get('/dev/init', async ctx => {
     await Notification.init(ctx.state.user.db);
     await Report.init(ctx.state.user.db);
     await Resource.init(ctx.state.user.db);
     await Submission.init(ctx.state.user.db);
     await Update.init(ctx.state.user.db);
-    await User.init();
     ctx.response.body = 'ok';
 });
 

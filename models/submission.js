@@ -44,7 +44,7 @@ class Submission {
      * @param {string} db - Database to use.
      */
     static async init(db) {
-        debug('Submission.init', 'db:'+db);
+        const t1 = Date.now();
 
         // if no 'submissions' collection, create it
         const collections = await Db.collections(db);
@@ -59,6 +59,8 @@ class Submission {
 
         // indexes
         submissions.createIndex({ reportId: 1 });
+
+        debug('Submission.init', db, `${Date.now()-t1}ms`);
     }
 
 

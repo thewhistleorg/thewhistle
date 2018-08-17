@@ -55,7 +55,7 @@ class Notification {
      * @param {string} db - Database to use.
      */
     static async init(db) {
-        debug('Notification.init', 'db:'+db);
+        const t1 = Date.now();
 
         // if no 'notifications' collection, create it
         const collections = await Db.collections(db);
@@ -72,6 +72,8 @@ class Notification {
         notifications.createIndex({ report: 1 });
         notifications.createIndex({ event: 1, report: 1 });
         notifications.createIndex({ report: 1, users: 1 });
+
+        debug('Notification.init', db, `${Date.now()-t1}ms`);
     }
 
 

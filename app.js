@@ -21,6 +21,14 @@ dotenv.config();
 
 import Environment from './lib/environment.js';
 
+// models are imported to invoke their init() methods
+import Notification from './models/notification.js';
+import Report       from './models/report.js';
+import Resource     from './models/resource.js';
+import Submission   from './models/submission.js';
+import Update       from './models/update.js';
+import User         from './models/user.js';
+
 
 const app = new Koa();
 
@@ -74,6 +82,47 @@ app.keys = [ 0, 1, 2 ].map(x => process.env.COOKIE_KEY + dateFormat(new Date(dat
 
 // session for flash messages (uses signed session cookies, with no server storage)
 app.use(session(app));
+
+
+// invoke model init() methods to ensure current validation is applied to all databases (in
+// development or staging environments, all databases ending with '-test'; in production environment,
+// all databases not ending in '-test'; 'user' database is initialised in all cases)
+async function initModels() {
+    if (global.it) return 0; // don't bother reinitialising within mocha tests
+
+    const t1 = Date.now();
+
+    const databases = Object.keys(process.env)
+        .filter(env => env.slice(0, 3)=='DB_' && env!='DB_USERS')
+        .map(db => db.slice(3).toLowerCase().replace(/_/g, '-'))
+        .filter(db => app.env=='production' ? !/-test$/.test(db) : /-test$/.test(db));
+
+    // set up array of init methods...
+    const initMethods = [];
+    for (const db of databases) {
+        initMethods.push(Notification.init(db));
+        initMethods.push(Report.init(db));
+        initMethods.push(Resource.init(db));
+        initMethods.push(Submission.init(db));
+        initMethods.push(Update.init(db));
+    }
+    initMethods.push(User.init());
+
+    // ... so that we can run all init methods in parallel
+    try {
+        await Promise.all(initMethods);
+    } catch (e) {
+        throw new Error('Model initialisation failed');
+    }
+
+    return Date.now() - t1;
+}
+
+// model initialisation runs asynchronously and won't complete until after app startup, but that's
+// fine: we've no reason to wait on model init's before responding to requests
+initModels()
+    .then(t => console.info(t?`${app.env=='production'?'live':'test'} database collections re-initialised (${t}ms)`:''))
+    .catch(err => console.error(err));
 
 
 // select sub-app (admin/api) according to host subdomain (could also be by analysing request.url);

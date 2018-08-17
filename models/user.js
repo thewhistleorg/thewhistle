@@ -41,7 +41,7 @@ class User {
      * used. If this becomes expensive, it could be done less simplistically.
      */
     static async init() {
-        debug('User.init');
+        const t1 = Date.now();
 
         // if no 'users' collection, create it
         const collections = await Db.collections('users');
@@ -61,6 +61,8 @@ class User {
         users.createIndex({ roles: 1 });
         users.createIndex({ databases: 1 });
         // TODO: can we do a compound unique index on username+databases? how would it operate?
+
+        debug('User.init', `${Date.now()-t1}ms`);
     }
 
 

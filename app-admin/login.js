@@ -7,12 +7,7 @@
 import Scrypt from 'scrypt-kdf';   // scrypt key derivation function
 import jwt    from 'jsonwebtoken'; // JSON Web Token implementation
 
-import Notification from '../models/notification.js';
-import Report       from '../models/report.js';
-import Resource     from '../models/resource.js';
-import Submission   from '../models/submission.js';
-import Update       from '../models/update.js';
-import User         from '../models/user.js';
+import User from '../models/user.js';
 
 
 class LoginHandlers {
@@ -117,15 +112,6 @@ class LoginHandlers {
         // if user has access to just one database, pick it up from user details, otherwise it will
         // have been supplied in the post data
         const db = user.databases.length>1 ? body.database : user.databases[0];
-
-        // initialise db collections in case this is first time db is used; if this becomes
-        // expensive, it could be done less simplistically.
-        await Notification.init(db);
-        await Report.init(db);
-        await Resource.init(db);
-        await Submission.init(db);
-        await Update.init(db);
-        await User.init();
 
         // submitted credentials validate: create JWT & record it in a cookie to 'log in' user
 

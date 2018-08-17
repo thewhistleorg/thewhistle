@@ -43,7 +43,7 @@ class Update {
      * @param {string} db - Database to use.
      */
     static async init(db) {
-        debug('Update.init', 'db:'+db);
+        const t1 = Date.now();
 
         // if no 'updates' collection, create it
         const collections = await Db.collections(db);
@@ -59,6 +59,8 @@ class Update {
         // indexes
         updates.createIndex({ reportId: 1 });
         updates.createIndex({ userId: 1 });
+
+        debug('Update.init', db, `${Date.now()-t1}ms`);
     }
 
 

@@ -81,11 +81,11 @@ class SmsApp {
      * @param   {Object}   twiml
      * @param   {string}   message - Text of the message to the user
      */
-    sendSms(ctx, twiml, message) {
-        const options = { method: 'POST' };
-        if (!ctx.request.body.To.startsWith('whatsapp:')) {
-            options.action = '/delete-outbound';
-        }
+    sendSms(twiml, message) {
+        const options = {
+            method: 'POST',
+            action: '/delete-outbound',
+        };
         twiml.message(options, message);
         //Asynchronous call - method returns before effects carried out
     }
@@ -145,7 +145,7 @@ class SmsApp {
         //Done now, so that we can store this in the database when the user has an alias
         this.setCookie(ctx, constants.cookies.FIRST_TEXT, incomingSms);
         const message = firstSms ? this.initialSms : 'Sorry, we didn\'t understand that response. Have you used this service before?';
-        this.sendSms(ctx, twiml, message);
+        this.sendSms(twiml, message);
     }
 
 
@@ -163,7 +163,7 @@ class SmsApp {
         let message = opening ? opening + ' ': '';
         message += 'Please enter your anonymous alias. To use a new alias, please reply \'NEW\'';
         this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_ALIAS);
-        this.sendSms(ctx, twiml, message); //TODO: Get this from somewhere else?
+        this.sendSms(twiml, message); //TODO: Get this from somewhere else?
     }
 
 
@@ -177,7 +177,7 @@ class SmsApp {
         const alias = await this.generateUniqueAlias();
         await this.initiateSmsReport(ctx, alias);
         const question = await this.getNextQuestion(ctx, 0);
-        this.sendSms(ctx, twiml, 'Your new anonymous alias is ' + alias + '.\n' + question);
+        this.sendSms(twiml, 'Your new anonymous alias is ' + alias + '.\n' + question);
     }
 
 
@@ -198,7 +198,7 @@ class SmsApp {
             if (await this.aliasExists(alias)) {
                 await this.initiateSmsReport(ctx, alias);
                 const firstQuestion = await this.getNextQuestion(ctx, 0);
-                this.sendSms(ctx, twiml, firstQuestion);
+                this.sendSms(twiml, firstQuestion);
             } else {
                 this.askForAlias(ctx, twiml, 'Sorry, that alias hasn\'t been used before.');
             }
@@ -213,7 +213,7 @@ class SmsApp {
      */
     async sendQuestion(ctx, twiml, nextQuestion) {
         const question = await this.getNextQuestion(ctx, nextQuestion);
-        this.sendSms(ctx, twiml, question);
+        this.sendSms(twiml, question);
     }
 
 
@@ -248,7 +248,7 @@ class SmsApp {
 
         await Report.updateField(this.db, sessionId, 'Supplementary information', info);
 
-        this.sendSms(ctx, twiml, 'Thank you for this extra information. You can send more if you wish. To start a new report, reply \'RESTART\'');
+        this.sendSms(twiml, 'Thank you for this extra information. You can send more if you wish. To start a new report, reply \'RESTART\'');
     }
 
 
@@ -262,7 +262,7 @@ class SmsApp {
     askIfContinue(ctx, twiml, opening) {
         const message = 'Would you like to continue with this report?';
         this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_CONTINUE);
-        this.sendSms(ctx, twiml, opening + ' ' + message);
+        this.sendSms(twiml, opening + ' ' + message);
     }
 
 
@@ -280,7 +280,7 @@ class SmsApp {
             this.askIfContinue(ctx, twiml, callMessage);
         } else {
             this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_NEW_REPORT);
-            this.sendSms(ctx, twiml, callMessage + ' ' + 'Reply \'START\' to start submitting a report');
+            this.sendSms(twiml, callMessage + ' ' + 'Reply \'START\' to start submitting a report');
         }
     }
 
@@ -294,7 +294,7 @@ class SmsApp {
         let message = opening ? opening + ' ': '';
         message += 'Would you like to store your report? Please note that if you have amendments to your responses, you can give them after the last question.';
         this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_STORE);
-        this.sendSms(ctx, twiml, message);
+        this.sendSms(twiml, message);
     }
 
 
@@ -313,7 +313,7 @@ class SmsApp {
      */
     sendFinalSms(ctx, twiml, opening) {
         this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_NEW_REPORT);
-        this.sendSms(ctx, twiml, opening + ' Thank you for using this reporting service. If you want to submit a new report, please send another text to this number. If you have any questions, please call XXXXXX');
+        this.sendSms(twiml, opening + ' Thank you for using this reporting service. If you want to submit a new report, please send another text to this number. If you have any questions, please call XXXXXX');
     }
 
 

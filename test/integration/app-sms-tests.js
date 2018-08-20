@@ -359,9 +359,24 @@ describe('SMS app'+' ('+app.env+')', function() {
     });
 
     describe('Tidy up', function () {
-        it ('Delete reports', async function() {
+        it ('Delete reports', async function () {
             await Report.delete(org, reportIdOne);
             await Report.delete(org, reportIdTwo);
+        });
+    });
+
+    describe('Emulator', function () {
+        it('Get router in development', async function () {
+            const response = await appSms.get('/hfrn-test/hfrn-en/emulator');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('title').textContent).to.equal('SMS Emulator');
+        });
+        it('Try to get router in production', async function () {
+            let response = await appSms.put('/dev/set-env/production');
+            expect(response.status).to.equal(200);
+            response = await appSms.get('/hfrn-test/hfrn-en/emulator');
+            expect(response.status).to.equal(404);
         });
     });
 });

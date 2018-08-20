@@ -17,7 +17,7 @@ import base64             from 'base-64';            // base64 encoder/decoder
 import fs         from 'fs';         // nodejs.org/api/fs.html
 import csvParse           from 'csv-parse/lib/sync'; // full featured CSV parser
 
-import app      from '../../app.js';
+import app from '../../app.js';
 
 const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn-test‘ organisation only
 const testpass = process.env.TESTPASS; // (for successful login & ‘rape-is-a-crime‘ report submission)
@@ -1012,6 +1012,41 @@ describe(`Admin app (${org}/${app.env})`, function() {
         it('throws error', async function() {
             const response = await appAdmin.get('/dev/throw');
             expect(response.status).to.equal(500);
+        });
+    });
+
+    describe('environment reset', function() { // note /lib/environment.js has no unit tests as it relies on ctx
+        it('gets current env (development)', async function() {
+            const response = await appAdmin.get('/dev/env');
+            expect(response.status).to.equal(200);
+            expect(response.text).to.equal('development');
+        });
+
+        it('sets to staging', async function() {
+            const response = await appAdmin.put('/dev/env').send({ 'environment': 'staging' });
+            expect(response.status).to.equal(200);
+        });
+
+        it('gets reset env (staging)', async function() {
+            const response = await appAdmin.get('/dev/env');
+            expect(response.status).to.equal(200);
+            expect(response.text).to.equal('staging');
+        });
+
+        it('fails to set invalid env', async function() {
+            const response = await appAdmin.put('/dev/env').send({ 'environment': 'no-such-env' });
+            expect(response.status).to.equal(403);
+        });
+
+        it('sets env back to development', async function() {
+            const response = await appAdmin.put('/dev/env').send({ 'environment': 'development' });
+            expect(response.status).to.equal(200);
+        });
+
+        it('gets reset env (development)', async function() {
+            const response = await appAdmin.get('/dev/env');
+            expect(response.status).to.equal(200);
+            expect(response.text).to.equal('development');
         });
     });
 

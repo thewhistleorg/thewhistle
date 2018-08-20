@@ -1,9 +1,10 @@
 {
   "env": {
-    "browser": true
+    "browser": true,
+    "node": false
   },
+  "parser": "espree",
   "parserOptions": {
-    "ecmaVersion": 3,
     "sourceType": "script"
   }
 }

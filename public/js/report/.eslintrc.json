@@ -2,6 +2,7 @@
   "env": {
     "browser": true
   },
+  "parser": "espree",
   "parserOptions": {
     "ecmaVersion": 3,
     "sourceType": "script"

@@ -5,7 +5,6 @@
 
 import Router        from 'koa-router';
 
-
 import SmsHandlers   from './sms-handlers.js';
 
 
@@ -40,6 +39,10 @@ router.post('/delete-outbound', SmsHandlers.deleteOutbound);
 
 //On receiving evidence
 router.post('/:org/evidence/:token', SmsHandlers.receiveEvidence);
+
+
+//Change app environment
+router.put('/dev/env', SmsHandlers.setEnv);
 
 
 export default router.middleware();

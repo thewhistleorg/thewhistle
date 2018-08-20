@@ -246,7 +246,7 @@ class SmsApp {
         let info = report.submitted['Supplementary information'] ? report.submitted['Supplementary information'] : '';
         info = info ==='' ? incomingSms : info + ' | ' + incomingSms;
 
-        await Report.updateField(this.db, sessionId, 'Supplementary information', info);
+        await Report.submissionDetails(this.db, sessionId, { 'Supplementary information': info });
 
         this.sendSms(twiml, 'Thank you for this extra information. You can send more if you wish. To start a new report, reply \'RESTART\'');
     }
@@ -443,7 +443,7 @@ class SmsApp {
         const version = this.spec.version;
         //Adds skeleton report to the database
         const sessionId = await Report.submissionStart(this.org, this.project, alias, version, ctx.headers['user-agent'], null);
-        await Report.updateField(this.db, sessionId, 'First Text', ctx.cookies.get(constants.cookies.FIRST_TEXT));
+        await Report.submissionDetails(this.db, sessionId, { 'First Text': ctx.cookies.get(constants.cookies.FIRST_TEXT) });
         await Report.update(this.db, sessionId, { 'lastUpdated': new Date() });
         let evidenceToken = '';
 
@@ -481,7 +481,7 @@ class SmsApp {
         const sessionId = ctx.cookies.get(constants.cookies.SESSION_ID);
         const field = this.getField(questionNo);
         try {
-            await Report.updateField(this.db, sessionId, field, input);
+            await Report.submissionDetails(this.db, sessionId, { [field]: input });
             await Report.update(this.db, sessionId, { 'lastUpdated': new Date() });
         } catch (e) {
             console.error(e);

@@ -345,9 +345,9 @@ class Report {
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report Id.
      * @param {Object}   details - Report details to be added/updated, prettified for attractive display
-     * @param {Object}   detailsRaw- Report details to be added/updated, as per HTML input elements
+     * @param {Object}   [detailsRaw] - Report details to be added/updated, as per HTML input elements
      */
-    static async submissionDetails(db, id, details, detailsRaw) {
+    static async submissionDetails(db, id, details, detailsRaw={}) {
         debug('Report.submissionDetails', 'db:'+db, 'r:'+id, details);
 
         id = objectId(id);  // allow id as string
@@ -356,10 +356,10 @@ class Report {
 
         try {
 
+            // TODO: is there any way to do this as atomic updates rather than multiple calls?
             for (const field in details) {
                 await reports.updateOne({ _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
             }
-
             for (const field in detailsRaw) {
                 await reports.updateOne({ _id: id }, { $set: { [`submittedRaw.${field}`]: detailsRaw[field] } });
             }
@@ -368,24 +368,6 @@ class Report {
             if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [submissionDetails]`);
             throw e;
         }
-    }
-
-
-    /**
-     * Sets (or updates) a report field.
-     *
-     * @param {string}   db - Database to use.
-     * @param {ObjectId} id - Report Id.
-     * @param {Object}   key - Field name to update
-     * @param {Object}   value - User's response to given field
-     */
-    static async updateField(db, id, key, value) {
-        if (!global.db[db]) await Db.connect(db, { useNewUrlParser: true });
-        const reports = global.db[db].collection('reports');
-        await reports.updateOne(
-            { _id: ObjectId(id) },
-            { $set: { [`submitted.${key}`]: value } }
-        );
     }
 
 

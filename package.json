@@ -25,32 +25,32 @@
     "node": "^10.5.0"
   },
   "dependencies": {
-    "aws-sdk": "^2.281.1",
+    "aws-sdk": "^2.296.0",
     "chrono-node": "^1.3.5",
     "dateformat": "^3.0.3",
     "debug": "^3.1.0",
     "dot-prop": "^4.2.0",
     "dotenv": "^6.0.0",
-    "esm": "^3.0.72",
-    "exiftool-vendored": "^5.4.0",
+    "esm": "^3.0.79",
+    "exiftool-vendored": "^6.1.2",
     "forever": "^0.15.3",
     "fs-extra": "^7.0.0",
-    "geodesy": "^1.1.2",
-    "google-libphonenumber": "^3.1.0",
+    "geodesy": "^1.1.3",
+    "google-libphonenumber": "^3.1.11",
     "handlebars": "^4.0.11",
     "html-pdf": "^2.2.0",
     "html-to-text": "^4.0.0",
-    "isemail": "^3.1.1",
-    "jimp": "^0.2.28",
-    "js-yaml": "^3.11.0",
-    "jsdom": "^11.6.2",
-    "json-schema-ref-parser": "^5.0.3",
-    "json2csv": "^4.0.2",
+    "isemail": "^3.1.3",
+    "jimp": "^0.3.5",
+    "js-yaml": "^3.12.0",
+    "jsdom": "^12.0.0",
+    "json-schema-ref-parser": "^5.1.2",
+    "json2csv": "^4.2.1",
     "jsonschema": "^1.2.4",
-    "jsonwebtoken": "^8.1.1",
-    "koa": "^2.5.0",
+    "jsonwebtoken": "^8.3.0",
+    "koa": "^2.5.2",
     "koa-body": "^4.0.4",
-    "koa-compose": "^4.0.0",
+    "koa-compose": "^4.1.0",
     "koa-compress": "^3.0.0",
     "koa-convert": "^1.2.0",
     "koa-flash": "^1.0.0",
@@ -58,40 +58,40 @@
     "koa-lusca": "git://github.com/chrisveness/koa-lusca",
     "koa-router": "^7.4.0",
     "koa-send": "^5.0.0",
-    "koa-session": "^5.8.1",
+    "koa-session": "^5.8.2",
     "koa-static": "^5.0.0",
-    "markdown-it": "^8.4.1",
+    "markdown-it": "^8.4.2",
     "markdown-it-anchor": "^5.0.2",
     "markdown-it-include": "^1.0.0",
-    "moment": "^2.20.1",
+    "moment": "^2.22.2",
     "mongodb": "3.1.1",
     "node-fetch": "^2.2.0",
     "node-geocoder": "^3.22.0",
     "nodejs-info": "^1.1.1",
-    "nodemailer": "^4.6.0",
+    "nodemailer": "^4.6.8",
     "scrypt-kdf": "^1.0.0",
-    "slugify": "^1.3.0",
-    "twilio": "^3.12.0",
+    "slugify": "^1.3.1",
+    "twilio": "^3.19.1",
     "useragent": "^2.3.0",
     "xmldom": "^0.1.27",
     "xmlify": "^1.1.0"
   },
   "devDependencies": {
     "apidoc": "^0.17.6",
-    "babel-eslint": "^8.2.2",
+    "babel-eslint": "^8.2.6",
     "base-64": "^0.1.0",
     "chai": "^4.1.2",
-    "csv-parse": "^2.0.4",
+    "csv-parse": "^2.5.0",
     "cypress": "^3.1.0",
-    "eslint": "^5.2.0",
-    "eslint-plugin-promise": "^3.8.0",
-    "mocha": "^5.0.1",
-    "nodemon": "^1.15.1",
-    "npm-check": "^5.6.0",
-    "npm-check-updates": "^2.14.0",
+    "eslint": "^5.4.0",
+    "eslint-plugin-promise": "^4.0.0",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.3",
+    "npm-check": "^5.8.0",
+    "npm-check-updates": "^2.14.2",
     "nyc": "^12.0.2",
-    "stylelint": "^9.4.0",
-    "stylelint-config-standard": "^18.1.0",
+    "stylelint": "^9.5.0",
+    "stylelint-config-standard": "^18.2.0",
     "supertest": "^3.1.0"
   },
   "eslintConfig": {
@@ -113,88 +113,32 @@
       "plugin:promise/recommended"
     ],
     "rules": {
-      "array-bracket-spacing": [
-        "error",
-        "always"
-      ],
-      "comma-dangle": [
-        "error",
-        "always-multiline"
-      ],
-      "comma-spacing": [
-        "error"
-      ],
-      "curly": [
-        "error",
-        "multi-line"
-      ],
-      "indent": [
-        "error",
-        4,
-        {
-          "SwitchCase": 1
-        }
-      ],
-      "key-spacing": [
-        "error",
-        {
-          "align": "value"
-        }
-      ],
-      "keyword-spacing": [
-        "error"
-      ],
+      "array-bracket-spacing": [ "error", "always" ],
+      "comma-dangle": [ "error", "always-multiline" ],
+      "comma-spacing": [ "error" ],
+      "curly": [ "error", "multi-line" ],
+      "indent": [ "error", 4, { "SwitchCase": 1 } ],
+      "key-spacing": [ "error", { "align": "value" } ],
+      "keyword-spacing": [ "error" ],
       "no-case-declarations": "off",
-      "no-console": [
-        "warn",
-        {
-          "allow": [
-            "error",
-            "info"
-          ]
-        }
-      ],
+      "no-console": [ "warn", { "allow": [ "error", "info" ] } ],
       "no-redeclare": "warn",
       "no-shadow": "warn",
       "no-unused-vars": "warn",
       "no-var": "error",
-      "object-curly-spacing": [
-        "error",
-        "always"
-      ],
+      "object-curly-spacing": [ "error", "always" ],
       "prefer-const": "error",
-      "quotes": [
-        "error",
-        "single",
-        "avoid-escape"
-      ],
+      "quotes": [ "error", "single", "avoid-escape" ],
       "require-await": "error",
-      "semi": [
-        "error",
-        "always"
-      ],
-      "space-before-blocks": [
-        "error",
-        "always"
-      ],
-      "space-in-parens": [
-        "error"
-      ],
-      "strict": [
-        "error",
-        "global"
-      ]
-    }
+      "semi": [ "error", "always" ],
+      "space-before-blocks": [ "error", "always" ],
+      "space-in-parens": [ "error" ],
+      "strict": [ "error", "global" ] }
   },
   "stylelint": {
     "extends": "stylelint-config-standard",
     "rules": {
-      "block-opening-brace-space-before": [
-        "always",
-        {
-          "severity": "warning"
-        }
-      ],
+      "block-opening-brace-space-before": [ "always", { "severity": "warning" } ],
       "color-hex-length": "long",
       "comment-empty-line-before": null,
       "indentation": 4,

@@ -42,7 +42,7 @@ router.post('/:org/evidence/:token', SmsHandlers.receiveEvidence);
 
 
 //Change app environment
-router.put('/dev/set-env/:env', SmsHandlers.setEnv);
+router.put('/dev/env', SmsHandlers.setEnv);
 
 
 export default router.middleware();

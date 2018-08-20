@@ -62,13 +62,6 @@ app.use(async function robots(ctx, next) {
 });
 
 
-// set ctx.app.env from ctx.session.origEnv if it has been set
-app.use(async function robots(ctx, next) {
-    Environment.init(ctx);
-    await next();
-});
-
-
 // parse request body into ctx.request.body
 // - multipart allows parsing of enctype=multipart/form-data
 app.use(body({ multipart: true }));

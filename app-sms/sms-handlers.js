@@ -27,8 +27,8 @@ class SmsHandlers {
 
     /**
      * Respond with the SMS emulator web app
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      */
     static async getEmulator(ctx) {
         if (ctx.app.env === 'production') {
@@ -47,8 +47,8 @@ class SmsHandlers {
 
     /**
      * Processes and responds to an incoming POST request of a valid SMS
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      */
     static async postSms(ctx) {
         if (FormGenerator.exists(ctx.params.org, ctx.params.project)) {
@@ -71,8 +71,8 @@ class SmsHandlers {
      * Runs as a callback when the status of a sent message changes.
      * This is so that we cannot view numbers or messages of reporters
      * from the Twilio dashboard.
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      */
     static deleteOutbound(ctx) {
         if (ctx.request.body.SmsStatus === 'delivered') {
@@ -85,9 +85,9 @@ class SmsHandlers {
 
 
     /**
-     * 
-     * 
-     * @param {Object} ctx 
+     *
+     *
+     * @param {Object} ctx
      */
     static async renderInvalidOrgPage(ctx) {
         ctx.response.status = 404;
@@ -97,8 +97,8 @@ class SmsHandlers {
 
     /**
      * Responds with an invalid evidence token page
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      */
     static async renderInvalidTokenPage(ctx) {
         ctx.response.status = 404;
@@ -113,8 +113,8 @@ class SmsHandlers {
 
     /**
      * Redirects the user to the failed upload page
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      */
     static async renderFailedUpload(ctx) {
         await ctx.response.redirect('evidence-failed-upload');
@@ -126,15 +126,15 @@ class SmsHandlers {
      * Responds with the relevant evidence page, if the given evidence token is valid.
      * Sets up the evidence page, if this is the first request using a particular token.
      * Responds with the relevant error page where necessary.
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      * @param {string} errorMessage - Text of error message to be displayed to user.
      *                                Null if there is no error.
      */
     static async setupEvidencePage(ctx, errorMessage) {
         if (!evidenceRoutes[ctx.params.token]) {
             //If the evidence page hasn't been setup yet
-            
+
             try {
                 //reports will either be of length 0 or 1
                 const reports = await Report.getBy(ctx.params.org, 'evidenceToken', ctx.params.token);
@@ -160,8 +160,8 @@ class SmsHandlers {
     /**
      * Parses the URL to get the error messages (if it exists)
      * and then sets up and responds with the evidence page
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      */
     static async getEvidencePage(ctx) {
         await SmsHandlers.setupEvidencePage(ctx, ctx.request.query.err);
@@ -170,8 +170,8 @@ class SmsHandlers {
 
     /**
      * Responds with the evidence timeout page for the relevant project
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      */
     static async getEvidenceTimeout(ctx) {
         await ctx.render(`evidence-timeout-${ctx.params.project}`);
@@ -183,8 +183,8 @@ class SmsHandlers {
      * Processes and stores evidence in a POST request, if the given evidence token is valid.
      * Sets up the evidence page, if this is the first request using a particular token.
      * Responds with the relevant error page where necessary.
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      */
     static async receiveEvidence(ctx) {
         if (!evidenceRoutes[ctx.params.token]) {
@@ -216,7 +216,7 @@ class SmsHandlers {
 
 
     static setEnv(ctx) {
-        Environment.set(ctx, ctx.params.env);
+        Environment.set(ctx, ctx.request.body.environment);
         ctx.response.status = 200;
     }
 

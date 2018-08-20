@@ -373,9 +373,9 @@ describe('SMS app'+' ('+app.env+')', function() {
             expect(document.querySelector('title').textContent).to.equal('SMS Emulator');
         });
         it('Try to get router in production', async function () {
-            let response = await appSms.put('/dev/set-env/production');
-            expect(response.status).to.equal(200);
-            response = await appSms.get('/hfrn-test/hfrn-en/emulator');
+            const responseEnv = await appSms.put('/dev/env').send({ 'environment': 'production' });
+            expect(responseEnv.status).to.equal(200);
+            const response = await appSms.get('/hfrn-test/hfrn-en/emulator');
             expect(response.status).to.equal(404);
         });
     });

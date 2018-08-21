@@ -279,21 +279,21 @@ describe('SMS app'+' ('+app.env+')', function() {
                 .set('Content-Type', 'application/x-www-form-urlencoded')
                 .attach('documents', 'test/files/whistle.png');
             expect(response.status).to.equal(400);
-            expect(response.text).to.equal('Redirecting to <a href="evidence-failed-upload">evidence-failed-upload</a>.');
+            expect(response.headers.location).to.equal('evidence-failed-upload');
         });
         it('POST invalid token', async function () {
             const response = await appSms.post('/hfrn-test/evidence/1nv4l1dt0k3n')
                 .set('Content-Type', 'application/x-www-form-urlencoded')
                 .attach('documents', 'test/files/whistle.png');
             expect(response.status).to.equal(400);
-            expect(response.text).to.equal('Redirecting to <a href="evidence-failed-upload">evidence-failed-upload</a>.');
+            expect(response.headers.location).to.equal('evidence-failed-upload');
         });
         it('POST timed out token', async function () {
             const response = await appSms.post(`/hfrn-test/evidence/${evidenceTokenOne}`)
                 .set('Content-Type', 'application/x-www-form-urlencoded')
                 .attach('documents', 'test/files/whistle.png');
             expect(response.status).to.equal(410);
-            expect(response.text).to.equal('Redirecting to <a href="/hfrn-en/evidence-timeout">/hfrn-en/evidence-timeout</a>.');
+            expect(response.headers.location).to.equal('/hfrn-en/evidence-timeout');
         });
         it('POST no files', async function () {
             await Report.update(org, reportIdOne, { 'lastUpdated': new Date() });
@@ -301,7 +301,7 @@ describe('SMS app'+' ('+app.env+')', function() {
                 .set('Content-Type', 'application/x-www-form-urlencoded')
                 .field('Content-Type', 'multipart/form-data');
             expect(response.status).to.equal(302);
-            expect(response.text).to.match(/Redirecting to <a href="\/hfrn-test\/evidence\/.+\?err=No%20files%20uploaded">\/hfrn-test\/evidence\/.+\?err=No%20files%20uploaded<\/a>\./);
+            expect(response.headers.location).to.match(/\/hfrn-test\/evidence\/.+\?err=No%20files%20uploaded/);
         });
         if (process.env.CIRCLECI) {
             it('POST 1 file', async function () {
@@ -309,7 +309,7 @@ describe('SMS app'+' ('+app.env+')', function() {
                     .set('Content-Type', 'application/x-www-form-urlencoded')
                     .attach('documents', 'test/files/whistle.png');
                 expect(response.status).to.equal(302);
-                expect(response.text).to.equal('Redirecting to <a href="/hfrn-en/evidence-uploaded">/hfrn-en/evidence-uploaded</a>.');
+                expect(response.headers.location).to.equal('/hfrn-en/evidence-uploaded');
             });
             it('POST 2 files', async function () {
                 const response = await appSms.post(`/hfrn-test/evidence/${evidenceTokenOne}`)
@@ -317,8 +317,7 @@ describe('SMS app'+' ('+app.env+')', function() {
                     .attach('documents', 'test/files/whistle.mp4')
                     .attach('documents', 'test/files/whistle.pdf');
                 expect(response.status).to.equal(302);
-                //TODO: Test for response.headers.location
-                expect(response.text).to.equal('Redirecting to <a href="/hfrn-en/evidence-uploaded">/hfrn-en/evidence-uploaded</a>.');
+                expect(response.headers.location).to.equal('/hfrn-en/evidence-uploaded');
             });
             it('GET evidence uploaded page', async function () {
                 const response = await appSms.get('/hfrn-en/evidence-uploaded');
@@ -334,7 +333,7 @@ describe('SMS app'+' ('+app.env+')', function() {
                     .set('Content-Type', 'application/x-www-form-urlencoded')
                     .attach('documents', 'test/files/whistle.jpg');
                 expect(response.status).to.equal(302);
-                expect(response.text).to.equal('Redirecting to <a href="/hfrn-en/evidence-uploaded">/hfrn-en/evidence-uploaded</a>.');
+                expect(response.headers.location).to.equal('/hfrn-en/evidence-uploaded');
             });
         }
         if (process.env.CIRCLECI) {

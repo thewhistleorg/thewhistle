@@ -19,7 +19,6 @@ import dotenv          from 'dotenv';         // load environment variables from
 
 dotenv.config();
 
-import Environment from './lib/environment.js';
 
 // models are imported to invoke their init() methods
 import Notification from './models/notification.js';

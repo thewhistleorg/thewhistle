@@ -41,8 +41,4 @@ router.post('/delete-outbound', SmsHandlers.deleteOutbound);
 router.post('/:org/evidence/:token', SmsHandlers.receiveEvidence);
 
 
-//Change app environment
-router.put('/dev/env', SmsHandlers.setEnv);
-
-
 export default router.middleware();

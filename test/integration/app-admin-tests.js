@@ -1014,42 +1014,6 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(500);
         });
     });
-
-    describe('environment reset', function() { // note /lib/environment.js has no unit tests as it relies on ctx
-        it('gets current env (development)', async function() {
-            const response = await appAdmin.get('/dev/env');
-            expect(response.status).to.equal(200);
-            expect(response.text).to.equal('development');
-        });
-
-        it('sets to staging', async function() {
-            const response = await appAdmin.put('/dev/env').send({ 'environment': 'staging' });
-            expect(response.status).to.equal(200);
-        });
-
-        it('gets reset env (staging)', async function() {
-            const response = await appAdmin.get('/dev/env');
-            expect(response.status).to.equal(200);
-            expect(response.text).to.equal('staging');
-        });
-
-        it('fails to set invalid env', async function() {
-            const response = await appAdmin.put('/dev/env').send({ 'environment': 'no-such-env' });
-            expect(response.status).to.equal(403);
-        });
-
-        it('sets env back to development', async function() {
-            const response = await appAdmin.put('/dev/env').send({ 'environment': 'development' });
-            expect(response.status).to.equal(200);
-        });
-
-        it('gets reset env (development)', async function() {
-            const response = await appAdmin.get('/dev/env');
-            expect(response.status).to.equal(200);
-            expect(response.text).to.equal('development');
-        });
-    });
-
     describe('misc', function() {
         it('returns 404 for non-existent page', async function() {
             const response = await appAdmin.get('/zzzzzz');

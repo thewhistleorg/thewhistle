@@ -17,7 +17,6 @@ import Report      from '../models/report.js';
 import Submission  from '../models/submission.js';
 import Db          from '../lib/db.js';
 import Ip          from '../lib/ip.js';
-import Environment from '../lib/environment';
 
 
 class Dev {
@@ -445,33 +444,6 @@ class Dev {
         const status = ctx.request.query.status || 500;
         ctx.throw(Number(status), 'This is a test error!');
     }
-
-
-    /**
-     * PUT /dev/env - Set app environment.
-     *
-     * When there is a need to test production functionality, this can be used to reset ctx.app.env.
-     */
-    static setEnv(ctx) {
-        try {
-            Environment.set(ctx, ctx.request.body.environment);
-            ctx.status = 200;
-        } catch (e) {
-            // don't just throw, as thrown exceptions outside of dev will get notified by e-mail!
-            ctx.status = 403;
-            ctx.body = `Invalid environment ‘${ctx.request.body.environment}’`;
-        }
-    }
-
-
-    /**
-     * GET /dev/env - Return current app environment.
-     */
-    static getEnv(ctx) {
-        const env = Environment.get(ctx);
-        ctx.body = env;
-    }
-
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

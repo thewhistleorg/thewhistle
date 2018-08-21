@@ -31,10 +31,7 @@ router.get('/dev/notes/:notes',          Dev.notes);
 
 router.get('/dev/submissions',           Dev.submissions);
 
-router.get('/dev/throw',                 Dev.throw);             // invoke exception
-
-router.put('/dev/env',                   Dev.setEnv);            // reset app environment
-router.get('/dev/env',                   Dev.getEnv);            // return current app environment
+router.get('/dev/throw',                 Dev.throw);
 
 router.get('/dev/ip-cache', function(ctx) { // for debug
     ctx.response.body = `countries (${global.ipsCountry.size})\n`;

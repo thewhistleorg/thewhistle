@@ -8,7 +8,6 @@ import Router from 'koa-router'; // router middleware for koa
 const router = new Router();
 
 import handlers    from './report-handlers.js';
-import Environment from '../lib/environment.js';
 
 
 // JUST FOR TESTING: supertest doesn't appear to manage to pass koa:jwt cookie between apps on
@@ -22,7 +21,7 @@ router.post('/:database/:project/login', adminLogin.postLogin);
 router.get( '/test-grn/sexual-assault', ctx => ctx.response.redirect('/grn/rape-is-a-crime'));
 
 router.get( '/',                handlers.getHomePage);                        // home page
-router.put('/dev/set-env/:env', ctx => Environment.set(ctx, ctx.params.env)); // set ctx.app.env for testing
+
 
 // tmp: serve SMS test web app TODO: remove once sms app fully functional
 

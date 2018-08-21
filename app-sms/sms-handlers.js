@@ -7,7 +7,6 @@ import SmsApp        from '../app-sms/sms.js';
 import EvidencePage  from '../app-sms/evidence.js';
 import FormGenerator from '../lib/form-generator.js';
 import Report        from '../models/report.js';
-import Environment   from '../lib/environment';
 
 
 //Indexed by URL. One element for each project/organisation combination.
@@ -212,12 +211,6 @@ class SmsHandlers {
 
     static async getEvidenceUploaded(ctx) {
         await ctx.render(`evidence-uploaded-${ctx.params.project}`);
-    }
-
-
-    static setEnv(ctx) {
-        Environment.set(ctx, ctx.request.body.environment);
-        ctx.response.status = 200;
     }
 
 

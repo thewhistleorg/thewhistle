@@ -23,7 +23,6 @@ import Geocoder      from '../lib/geocode.js';
 import Log           from '../lib/log.js';
 import Ip            from '../lib/ip.js';
 
-
 class Handlers {
 
     /**
@@ -114,6 +113,7 @@ class Handlers {
         debug('postIndex', org, project);
 
         // verify client-side reCAPTCHA: developers.google.com/recaptcha/docs/verify
+
         if (ctx.app.env != 'development') {
             const params = {
                 secret:   process.env.RECAPTCHA_SECRET_KEY,

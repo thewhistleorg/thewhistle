@@ -364,19 +364,4 @@ describe('SMS app'+' ('+app.env+')', function() {
             await Report.delete(org, reportIdTwo);
         });
     });
-
-    describe('Emulator', function () {
-        it('Get router in development', async function () {
-            const response = await appSms.get('/hfrn-test/hfrn-en/emulator');
-            expect(response.status).to.equal(200);
-            const document = new JSDOM(response.text).window.document;
-            expect(document.querySelector('title').textContent).to.equal('SMS Emulator');
-        });
-        it('Try to get router in production', async function () {
-            const responseEnv = await appSms.put('/dev/env').send({ 'environment': 'production' });
-            expect(responseEnv.status).to.equal(200);
-            const response = await appSms.get('/hfrn-test/hfrn-en/emulator');
-            expect(response.status).to.equal(404);
-        });
-    });
 });

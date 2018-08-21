@@ -181,8 +181,7 @@ app.use(async function ctxAddDomain(ctx, next) {
 app.use(async function generateForms(ctx, next) {
     const org = ctx.request.url.split('/')[1];
     const project = ctx.request.url.split('/')[2];
-
-    if (!FormGenerator.built(org, project) && org && project && org!='spec' && org!='ajax' && org!='test-grn') {
+    if (!FormGenerator.built(org, project) && org && project && org!='spec' && org!='ajax' && org!='test-grn' && org !='dev') {
         try {
             await FormGenerator.build(org, project);
         } catch (e) {

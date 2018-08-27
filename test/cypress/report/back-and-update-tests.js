@@ -340,6 +340,8 @@ describe(`Submit ${org}/${proj} incident report covering various enter-next-back
         cy.visit(admin+'/login');
         cy.get('input[name=username]').type(testuser);
         cy.get('input[name=password]').type(testpass);
+        cy.wait(200); // TODO: use .as() / .wait()?
+        cy.get('label').contains(org).click();
         cy.get('form').contains('Login').click();
         cy.url().should('include', '/reports');
         cy.contains('Cypress test '+date).click();

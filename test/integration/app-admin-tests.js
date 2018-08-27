@@ -39,8 +39,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
     before(async function() {
         // check testuser 'tester' exists and has access to ‘grn-test’ org (only)
         const responseUsr = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
-        if (responseUsr.body.databases.length != 1) throw new Error(`${testuser} must have access to ‘${org}’ org (only)`);
-        if (responseUsr.body.databases[0] != org) throw new Error(`${testuser} must have access to ‘${org}’ org (only)`);
+        if (!responseUsr.body.databases.includes(org)) throw new Error(`${testuser} must have access to ‘${org}’ org`);
 
         // check previous test user deleted
         const responseTestUsr = await appAdmin.get('/ajax/login/databases?user=test@user.com');
@@ -159,19 +158,19 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(document.querySelectorAll('input')).to.have.lengthOf(3);
         });
 
-        it('login page shows no org’s for user arg ‘tester‘', async function() {
+        it('login page shows org’s for testuser', async function() {
             const response = await appAdmin.get(`/login?user=${testuser}`);
             expect(response.status).to.equal(200);
             const document = new JSDOM(response.text).window.document;
-            expect(document.querySelectorAll('input').length).to.equal(3); // username, password, remember-me (no db)
+            expect(document.querySelectorAll('input').length).to.be.at.least(4); // username, password, remember-me, db's
             expect(document.querySelector('input[name=username]').value).to.equal(testuser); // username prefilled
         });
 
         it('ajax: lists user databases', async function() {
             const response = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
             expect(response.status).to.equal(200);
-            expect(response.body.databases).to.have.lengthOf(1);
-            expect(response.body.databases[0]).to.equal(org);
+            expect(response.body.databases.length).to.be.at.least(1);
+            expect(response.body.databases).to.include(org);
         });
 
         it('shows e-mail/password not recognised on failed login', async function() {
@@ -186,7 +185,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         });
 
         it('logs in, and redirects to /', async function() {
-            const values = { username: testuser, password: testpass, 'remember-me': 'on' };
+            const values = { username: testuser, password: testpass, database: org, 'remember-me': 'on' };
             const response = await appAdmin.post('/login').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/');
@@ -239,7 +238,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
         // supertest doesn't appear to be able to pass koa:jwt cookie between apps running on
         // different ports, so log in explicitly to emulate browser behaviour
         it('logs in to report app (supertest doesn’t share login)', async function() {
-            const values = { username: testuser, password: testpass, 'remember-me': 'on' };
+            const values = { username: testuser, password: testpass, database: org, 'remember-me': 'on' };
             const response = await appReport.post(`/${org}/${proj}/login`).send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal(`/${org}/${proj}`);

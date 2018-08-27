@@ -38,8 +38,7 @@ describe(`Report app (${org}/${app.env})`, function() {
     before(async function() {
         // check testuser 'tester' exists and has access to ‘grn-test’ org (only)
         const responseUsr = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
-        if (responseUsr.body.databases.length != 1) throw new Error(`${testuser} must have access to ‘${org}’ org (only)`);
-        if (responseUsr.body.databases[0] != org) throw new Error(`${testuser} must have access to ‘${org}’ org (only)`);
+        if (!responseUsr.body.databases.includes(org)) throw new Error(`${testuser} must have access to ‘${org}’ org`);
 
         // force db connection to ‘grn-test‘ db (ajax calls don't)
         const responseGrnRpt = await appReport.get(`/${org}/${proj}`);
@@ -389,7 +388,7 @@ describe(`Report app (${org}/${app.env})`, function() {
 
     describe('submitted report in admin app', function() {
         it('redirects to /reports on login', async function() {
-            const values = { username: testuser, password: testpass };
+            const values = { username: testuser, password: testpass, database: org };
             const response = await appAdmin.post('/login/reports').send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal('/reports');
@@ -559,7 +558,7 @@ describe(`Report app (${org}/${app.env})`, function() {
         // supertest doesn't appear to be able to pass koa:jwt cookie between apps running on
         // different ports, so log in explicitly to emulate browser behaviour
         it('logs in to report app (supertest doesn’t share login)', async function() {
-            const values = { username: testuser, password: testpass, 'remember-me': 'on' };
+            const values = { username: testuser, password: testpass, database: org, 'remember-me': 'on' };
             const response = await appReport.post(`/${org}/${proj}/login`).send(values);
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal(`/${org}/${proj}`);

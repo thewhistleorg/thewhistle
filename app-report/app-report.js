@@ -10,11 +10,10 @@ import serve      from 'koa-static';     // static file serving middleware
 import convert    from 'koa-convert';    // tmp for koa-flash, koa-lusca
 import Debug      from 'debug';          // small debugging utility
 
-const debug  = Debug('app:req:r'); // debug each request
+const debug = Debug('app:req:r'); // debug each request
 
-import Log        from '../lib/log.js';
-import Middleware from '../lib/middleware.js';
-import FormGenerator     from '../lib/form-generator.js';
+import Log               from '../lib/log.js';
+import Middleware        from '../lib/middleware.js';
 import HandlebarsHelpers from '../lib/handlebars-helpers';
 
 
@@ -173,24 +172,6 @@ app.use(convert(lusca({ // note koa-lusca@2.2.0 is v1 middleware which generates
 app.use(async function ctxAddDomain(ctx, next) {
     ctx.state.domain = ctx.request.host.replace('report.', '');
     ctx.state.hostAdmin = ctx.request.host.replace('report.', 'admin.');
-    await next();
-});
-
-
-// if this is the first reference to this form, run the form generation process before continuing
-app.use(async function generateForms(ctx, next) {
-    const org = ctx.request.url.split('/')[1];
-    const project = ctx.request.url.split('/')[2];
-    if (!FormGenerator.built(org, project) && org && project && org!='spec' && org!='ajax' && org!='test-grn' && org !='dev') {
-        try {
-            await FormGenerator.build(org, project);
-        } catch (e) {
-            if (e.status == 404) ctx.throw(404, e.message);
-            if (e.status == 410) ctx.throw(410, e.message); // form build failed
-            console.error(e); // TODO: handle JSON schema validation failure
-        }
-    }
-
     await next();
 });
 

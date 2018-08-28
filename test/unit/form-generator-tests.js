@@ -12,20 +12,6 @@ const test = it; // just an alias
 describe('Form generator', function() {
     // this.timeout(4e3); // 4 sec
 
-    describe('location', function() {
-        test('location of grn-test/rape-is-a-crime', async function() {
-            expect(await FormGenerator.location('grn-test', 'rape-is-a-crime')).to.equal('public/spec/grn/rape-is-a-crime.yaml');
-        });
-
-        test('location of unknown project is null', async function() {
-            expect(await FormGenerator.location('grn-test', 'no-such-project')).to.equal(null);
-        });
-
-        test('location of unknown org is null', async function() {
-            expect(await FormGenerator.location('no-such-org', 'no-such-project')).to.equal(null);
-        });
-    });
-
     describe('exists', function() {
         test('grn-test/rape-is-a-crime exists', async function() {
             expect(await FormGenerator.exists('grn-test', 'rape-is-a-crime')).to.be.true;

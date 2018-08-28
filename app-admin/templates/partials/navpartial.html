@@ -10,6 +10,7 @@
                 <li class="pure-menu-item"><a href="#" class="pure-menu-link">TBC</a></li>
             </ul>
         </li> -->
+        <li class="pure-menu-item {{#contains @koa.request.url '/form-specifications'}} pure-menu-active {{/contains}}"><a href="/form-specifications" class="pure-menu-link">Form specs</a></li>
         {{#if @koa.state.user.isAdmin}}
         <li class="pure-menu-item {{#contains @koa.request.url '/users'}} pure-menu-active {{/contains}}"><a href="/users" class="pure-menu-link">Users</a></li>
         <li class="pure-menu-item {{#contains @koa.request.url '/resources'}} pure-menu-active {{/contains}}"><a href="/resources" class="pure-menu-link">Resources</a></li>

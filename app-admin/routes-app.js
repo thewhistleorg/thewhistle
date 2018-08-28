@@ -146,6 +146,21 @@ router.get('/ajax/users',        users.ajaxUserDetails); // get user details
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/*  Form Specifications routes                                                                    */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+import formSpecs from './form-specifications.js';
+
+router.get('/form-specifications',             formSpecs.list);          // render list form-specifications page
+router.get('/form-specifications/add',         formSpecs.add);           // render add form-specification page
+router.get('/form-specifications/:id/edit',    formSpecs.edit);          // render edit form-specification page
+
+router.post('/form-specifications/add',        formSpecs.processAdd);    // process add form-specification
+router.post('/form-specifications/:id/edit',   formSpecs.processEdit);   // process edit form-specification
+router.post('/form-specifications/:id/delete', formSpecs.processDelete); // process delete form-specification
+
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /*  Resources routes                                                                              */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 

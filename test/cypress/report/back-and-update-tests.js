@@ -1,8 +1,8 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Cypress front-end integration tests.                                            C.Veness 2018  */
 /*                                                                                                */
-/* Backup and update to cover most permutations of error-free movement back and forth through     */
-/* the reporting process.                                                                         */
+/* GRN report backup and update to cover most permutations of error-free movement back and forth  */
+/* through the reporting process.                                                                 */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 /* eslint promise/catch-or-return: off, promise/always-return: off */

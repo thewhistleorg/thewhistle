@@ -3,12 +3,12 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
-import $RefParser     from 'json-schema-ref-parser';
 import Twilio         from 'twilio';
 
 import Report         from '../models/report.js';
 import autoIdentifier from '../lib/auto-identifier.js';
 import Db             from '../lib/db.js';
+import FormGenerator  from '../lib/form-generator.js';
 
 
 const constants = {
@@ -44,22 +44,14 @@ class SmsApp {
      * @param   {string}   org - Organisation name
      * @param   {string}   project - Project name
      * @returns {Object}   SMS app object
-     */    
+     */
     constructor(org, project) {
         this.MessagingResponse = Twilio.twiml.MessagingResponse;
         this.db = org;
-        this.yamlFile = 'public/spec/' + org.replace('-test', '') + '/' + project + '.yaml';
         this.org = org;
         this.project = project;
-    }
-
-
-    /**
-     * Sets this.spec by parsing the .yaml file
-     */
-    async getSpecifications() {
-        //Set this.spec to object containing yaml specifications
-        this.spec = await $RefParser.dereference(this.yamlFile);
+        this.spec = null; // has to be done later as constructors can't have async expressions!
+        this.questions = [];
     }
 
 
@@ -68,7 +60,7 @@ class SmsApp {
      * and this.questions using the specifications.
      */
     async parseSpecifications() {
-        await this.getSpecifications();
+        if (!this.spec) this.spec = await FormGenerator.spec(this.org, this.project);
         this.getInitialSms();
         this.generateSmsQuestions();
     }
@@ -151,7 +143,7 @@ class SmsApp {
 
     /**
      * Sends the user an SMS asking them to enter their alias
-     * 
+     *
      * Only runs if the user has said they have an existing alias
      *
      * @param   {Object}   ctx
@@ -207,9 +199,9 @@ class SmsApp {
 
 
     /**
-     * 
-     * @param   {Object}   ctx 
-     * @param   {Object}   twiml 
+     *
+     * @param   {Object}   ctx
+     * @param   {Object}   twiml
      */
     async sendQuestion(ctx, twiml, nextQuestion) {
         const question = await this.getNextQuestion(ctx, nextQuestion);
@@ -254,9 +246,9 @@ class SmsApp {
 
     /**
      * Ask the user if they want to continue with the report
-     * 
-     * @param   {Object}   ctx 
-     * @param   {Object}   twiml 
+     *
+     * @param   {Object}   ctx
+     * @param   {Object}   twiml
      * @param   {string}   opening - Text to prepend to SMS
      */
     askIfContinue(ctx, twiml, opening) {
@@ -268,7 +260,7 @@ class SmsApp {
 
     /**
      * Sends the user the help text
-     * 
+     *
      * @param   {Object}   ctx
      * @param   {Object}   twiml
      * @param   {boolean}  reportStarted - True if the user is currently submitting answers. False otherwise.
@@ -286,9 +278,9 @@ class SmsApp {
 
 
     /**
-     * 
-     * @param   {Object}   ctx 
-     * @param   {Object}   twiml 
+     *
+     * @param   {Object}   ctx
+     * @param   {Object}   twiml
      */
     askIfStore(ctx, twiml, opening) {
         let message = opening ? opening + ' ': '';
@@ -307,7 +299,7 @@ class SmsApp {
 
     /**
      * Send user final text after they have chosen to stop a report
-     * 
+     *
      * @param   {Object}   twiml
      * @param   {string}   opening - text to prepend to SMS
      */
@@ -494,16 +486,15 @@ class SmsApp {
      * Gets the questions from the yaml specifications
      */
     generateSmsQuestions() {
-        this.questions = [];
         //Set pages list to all pages given in the .yaml specifications
         //Matches 'p' followed by a number
         const pages = Object.keys(this.spec.pages).filter(key => /^p[0-9]+$/.test(key));
         for (let p = 1; p < pages.length; p++) {
             //For each text/input combination on a page
-            for (let i = 0; i < this.spec[pages[p]].length; i += 2) {
+            for (let i = 0; i < this.spec.pages[pages[p]].length; i += 2) {
                 this.questions.push({
-                    question: this.spec[pages[p]][i].text.substr(2), 
-                    label:    this.spec[pages[p]][i + 1].input.label,
+                    question: this.spec.pages[pages[p]][i].text.substr(2),
+                    label:    this.spec.pages[pages[p]][i + 1].input.label,
                 });
             }
         }
@@ -512,10 +503,10 @@ class SmsApp {
 
     /**
      * Returns the next question to send to the user
-     * 
+     *
      * @param   {Object}   ctx
      * @param   {number}   questionNo - Index of the relevant question
-     * 
+     *
      * @returns {string}   Text of the next question
      */
     async getNextQuestion(ctx, nextQuestion) {
@@ -536,13 +527,13 @@ class SmsApp {
         }
 
         return message;
-        
+
     }
 
-    
+
     /**
      * Deletes a message from the Twilio message logs
-     * 
+     *
      * @param   {string}   messageId - ID of the message to be deleted
      */
     static deleteMessage(messageId) {
@@ -557,10 +548,10 @@ class SmsApp {
             .done();
     }
 
-    
+
     /**
      * Processes and responds to a user's SMS
-     * 
+     *
      * @param   {Object}   ctx
      */
     async receiveText(ctx) {

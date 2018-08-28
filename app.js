@@ -19,14 +19,16 @@ import dotenv          from 'dotenv';         // load environment variables from
 
 dotenv.config();
 
+import FormGenerator from './lib/form-generator.js';
 
 // models are imported to invoke their init() methods
-import Notification from './models/notification.js';
-import Report       from './models/report.js';
-import Resource     from './models/resource.js';
-import Submission   from './models/submission.js';
-import Update       from './models/update.js';
-import User         from './models/user.js';
+import FormSpecification from './models/form-specification.js';
+import Notification      from './models/notification.js';
+import Report            from './models/report.js';
+import Resource          from './models/resource.js';
+import Submission        from './models/submission.js';
+import Update            from './models/update.js';
+import User              from './models/user.js';
 
 
 const app = new Koa();
@@ -92,6 +94,7 @@ async function initModels() {
     // set up array of init methods...
     const initMethods = [];
     for (const db of databases) {
+        initMethods.push(FormSpecification.init(db));
         initMethods.push(Notification.init(db));
         initMethods.push(Report.init(db));
         initMethods.push(Resource.init(db));
@@ -109,11 +112,23 @@ async function initModels() {
 
     return Date.now() - t1;
 }
-
 // model initialisation runs asynchronously and won't complete until after app startup, but that's
 // fine: we've no reason to wait on model init's before responding to requests
 initModels()
     .then(t => console.info(t?`${app.env=='production'?'live':'test'} database collections re-initialised (${t}ms)`:''))
+    .catch(err => console.error(err));
+
+
+async function buildForms() {
+    const t1 = Date.now();
+    await FormGenerator.buildAll();
+    return Date.now() - t1;
+}
+// form building runs asynchronously and won't complete until after app startup, but that's fine:
+// we've no reason to wait on form builds before responding to requests (a request will initiate a
+// form build, and await on completion)
+buildForms()
+    .then(t => console.info(`forms built (${t}ms)`))
     .catch(err => console.error(err));
 
 

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Form specifications | The Whistle</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <style>
+        form { margin: 0; }
+        td, th { min-width: 1em; }
+        button.fa-trash { background: none; border: none; color: #990000; padding: 1px; }
+        button.fa-trash:hover { cursor: pointer; }
+    </style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js" integrity="sha256-+JMHsXRyeTsws/tzbIh5YHQxRdKCuNjmvNcTFtY6DLc=" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js" integrity="sha256-9Nt2r+tJnSd2A2CRUvnjgsD+ES1ExvjbjBNqidm9doI=" crossorigin="anonymous"></script>
+    <script src="/js/admin/notifications.js" defer></script>
+    <script>
+        'use strict';
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // show/hide delete button on hover over formSpec tr
+            document.querySelectorAll('tr.formSpec').forEach(tr => tr.onmouseenter = async function showDeleteButton() {
+                this.querySelector('button').classList.remove('hide');
+                this.querySelector('a').classList.remove('hide');
+            });
+            document.querySelectorAll('tr.formSpec').forEach(tr => tr.onmouseleave = async function hideDeleteButton() {
+                this.querySelector('button').classList.add('hide');
+                this.querySelector('a').classList.add('hide');
+            });
+
+            // report deletion confirmation pop-up
+            document.querySelectorAll('form.delete').forEach(form => form.onsubmit = function confirmDelete() {
+                return confirm('Are you sure you want to delete this form spec?');
+            });
+
+        });
+    </script>
+    <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
+    <script src="/js/admin/ga.js" async></script>
+</head>
+<body>
+
+<header>
+
+{{>navpartial}}
+
+</header>
+
+<main>
+
+<h1>Form specifications</h1>
+
+{{>errpartial}}
+{{#if @koa.flash.notification}}<p class="alert">{{@koa.flash.notification}}</p>{{/if}}
+
+<table>
+    <tr>
+        <th>Project</th>
+        <th>Page</th>
+        <th></th>
+        <th><a href="/form-specifications/add" title="Add new form spec" class="fa fa-plus primary-blue"></a></th>
+    </tr>
+    {{#formSpecs}}
+    <tr id="{{_id}}" class="formSpec">
+        <td>{{project}}</td>
+        <td>{{page}}</td>
+        <td><a href="/form-specifications/{{_id}}/edit" title="Edit form spec" class="fa fa-pencil grey hide"></a></td>
+        <td><form action="/form-specifications/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" title="Delete form spec" class="fa fa-trash hide"></button></form></td>
+    </tr>
+    {{/formSpecs}}
+</table>
+
+</main>
+
+</body>
+</html>

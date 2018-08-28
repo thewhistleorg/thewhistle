@@ -3,16 +3,16 @@ title: The Whistle / Global Rights Nigeria Incident Report
 version: 1
 
 pages:
-  index:    { $ref: 'rape-is-a-crime-0.yaml' }
-  p1:       { $ref: 'rape-is-a-crime-1.yaml' }
-  p2:       { $ref: 'rape-is-a-crime-2.yaml' }
-  p3:       { $ref: 'rape-is-a-crime-3.yaml' }
-  p4:       { $ref: 'rape-is-a-crime-4.yaml' }
-  p5:       { $ref: 'rape-is-a-crime-5.yaml' }
-  p6:       { $ref: 'rape-is-a-crime-6.yaml' }
-  p7:       { $ref: 'rape-is-a-crime-7.yaml' }
-  p8:       { $ref: 'rape-is-a-crime-8.yaml' }
-  whatnext: { $ref: 'rape-is-a-crime-whatnext.yaml' }
+  index:    { $ref: 'rape-is-a-crime-0' }
+  p1:       { $ref: 'rape-is-a-crime-1' }
+  p2:       { $ref: 'rape-is-a-crime-2' }
+  p3:       { $ref: 'rape-is-a-crime-3' }
+  p4:       { $ref: 'rape-is-a-crime-4' }
+  p5:       { $ref: 'rape-is-a-crime-5' }
+  p6:       { $ref: 'rape-is-a-crime-6' }
+  p7:       { $ref: 'rape-is-a-crime-7' }
+  p8:       { $ref: 'rape-is-a-crime-8' }
+  whatnext: { $ref: 'rape-is-a-crime-whatnext' }
 
 options:
   pages:

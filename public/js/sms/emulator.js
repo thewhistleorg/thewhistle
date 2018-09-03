@@ -48,7 +48,6 @@ function addMessage(message, sent) {
  */
 function postSms(message) {
     const request = new XMLHttpRequest();
-    //TODO: Don't use static organisation/project
     const org = window.location.pathname.split('/')[1];
     const project = window.location.pathname.split('/')[2];
     request.open('POST', `/${org}/${project}`);

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>No can do!</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+<header>
+    <nav class="pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item">The Whistle SMS Reporting</li>
+            <li class="pure-menu-item"><img alt="powered by the Whistle" src="/img/powered-by-the-whistle-horiz-white-180x20.png" height="20" width="180"></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+<h1>:(</h1>
+
+<p>Sorry, can’t do that for you!...</p>
+
+<pre class="small grey">{{err.status}} {{err.message}}</pre>
+
+{{#if err.stack}}
+<pre class="small grey">{{err.stack}}.</pre>
+{{/if}}
+
+</main>
+
+</body>
+</html>

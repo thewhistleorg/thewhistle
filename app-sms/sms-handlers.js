@@ -5,6 +5,7 @@
 
 import SmsApp        from '../app-sms/sms.js';
 import EvidencePage  from '../app-sms/evidence.js';
+import SmsError      from '../app-sms/sms-error.js';
 import FormGenerator from '../lib/form-generator.js';
 import Report        from '../models/report.js';
 
@@ -33,12 +34,14 @@ class SmsHandlers {
         if (ctx.app.env === 'production') {
             //Do not serve the emulator in production or if the org/project combination is invalid
             ctx.status = 404;
+            throw new SmsError('Not found.', true);
         } else {
             const exists = await FormGenerator.exists(ctx.params.org, ctx.params.project);
             if (exists) {
                 await ctx.render('emulator');
             } else {
                 ctx.status = 404;
+                throw new SmsError('Project-organisation combination doesn\'t exist.', true);
             }
         }
     }

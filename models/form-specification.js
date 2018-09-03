@@ -38,15 +38,15 @@ class FormSpecification {
         const t1 = Date.now();
 
         // if no 'form-specifications' collection, create it
-        const collections = await Db.collections('form-specifications');
+        const collections = await Db.collections(db);
         if (!collections.map(c => c.s.name).includes('form-specifications')) {
-            await Db.createCollection('form-specifications', 'form-specifications');
+            await Db.createCollection(db, 'form-specifications');
         }
 
         const formSpecifications = await Db.collection(db, 'form-specifications');
 
         // in case 'form-specifications' collection doesn't have validation (or validation is updated), add it
-        await Db.command('form-specifications', { collMod: 'form-specifications', validator: { $jsonSchema: schema } });
+        await Db.command(db, { collMod: 'form-specifications', validator: { $jsonSchema: schema } });
 
         // indexes
         formSpecifications.createIndex({ page: 1 });

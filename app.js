@@ -107,7 +107,7 @@ async function initModels() {
     try {
         await Promise.all(initMethods);
     } catch (e) {
-        throw new Error('Model initialisation failed');
+        throw new Error(`Model initialisation failed: ${e.message}`);
     }
 
     return Date.now() - t1;

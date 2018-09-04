@@ -31,6 +31,7 @@ router.post('/:database/:project',         handlers.postIndex); // process index
 router.get( '/:database/:project/:page',   handlers.getPage);   // render report page
 router.post('/:database/:project/:page',   handlers.postPage);  // process page submission
 
+
 /* - - - - - - - - - - SMS CODE TO DELETE - - - - - - - - - - - - */
 
 //Serve SMS emulator
@@ -46,6 +47,9 @@ router.post('/sms-post', SmsHandlers.postSms);
 router.post('/delete-outbound', SmsHandlers.deleteOutbound);
 
 /* - - - - - - - -  END OF SMS CODE TO DELETE - - - - - - - - - - */
+
+router.get('/racism', handlers.getRacism);
+
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 

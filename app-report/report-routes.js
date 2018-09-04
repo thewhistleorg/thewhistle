@@ -31,6 +31,10 @@ router.post('/:database/:project',         handlers.postIndex); // process index
 router.get( '/:database/:project/:page',   handlers.getPage);   // render report page
 router.post('/:database/:project/:page',   handlers.postPage);  // process page submission
 
+
+router.get('/racism', handlers.getRacism);
+
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 export default router.middleware();

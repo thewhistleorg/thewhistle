@@ -138,6 +138,19 @@ class Handlers {
     }
 
 
+    
+
+    static checkAuthentication(ctx, next) {
+        console.log('next', next.toString());
+        if (ctx.req.isAuthenticated()) {
+            console.log('orth');
+            next();
+        } else {
+            console.log('orc(h)');
+            ctx.response.redirect('/racism-login');
+        }
+    }
+
     static async getRacism(ctx) {
         const wlsResponse = ctx.request.query['WLS-Response'];
         if (wlsResponse) {

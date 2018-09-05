@@ -14,6 +14,8 @@
         td, th { min-width: 1em; }
         button.fa-trash { background: none; border: none; color: #990000; padding: 1px; }
         button.fa-trash:hover { cursor: pointer; }
+        pre { font: 0.8em monaco, Consolas, 'Lucida Console', monospace; border: 1px solid #cccccc; min-width: 48em; padding: 0.4em; }
+        .highlight { background-color: #e6e6e6 }
     </style>
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js" integrity="sha256-+JMHsXRyeTsws/tzbIh5YHQxRdKCuNjmvNcTFtY6DLc=" crossorigin="anonymous"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js" integrity="sha256-9Nt2r+tJnSd2A2CRUvnjgsD+ES1ExvjbjBNqidm9doI=" crossorigin="anonymous"></script>
@@ -37,6 +39,21 @@
                 return confirm('Are you sure you want to delete this form spec?');
             });
 
+            // display specification
+            document.querySelectorAll('td.spec').forEach(td => td.onclick = async function displaySpec() {
+                const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+                const credentials = 'same-origin';
+                const response = await fetch(`/ajax/form-specifications/${this.parentElement.id}`, { headers, credentials });
+                if (response.ok) {
+                    const spec = await response.json();
+                    document.querySelector('#spec').textContent = spec.spec.specification;
+                    document.querySelectorAll('td.spec').forEach(td => td.classList.remove('highlight'));
+                    this.parentElement.querySelectorAll('td.spec').forEach(td => td.classList.add('highlight'));
+                } else {
+                    alert(response.status+': '+body.message);
+                }
+            });
+
         });
     </script>
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
@@ -57,22 +74,29 @@
 {{>errpartial}}
 {{#if @koa.flash.notification}}<p class="alert">{{@koa.flash.notification}}</p>{{/if}}
 
-<table>
-    <tr>
-        <th>Project</th>
-        <th>Page</th>
-        <th></th>
-        <th><a href="/form-specifications/add" title="Add new form spec" class="fa fa-plus primary-blue"></a></th>
-    </tr>
-    {{#formSpecs}}
-    <tr id="{{_id}}" class="formSpec">
-        <td>{{project}}</td>
-        <td>{{page}}</td>
-        <td><a href="/form-specifications/{{_id}}/edit" title="Edit form spec" class="fa fa-pencil grey hide"></a></td>
-        <td><form action="/form-specifications/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" title="Delete form spec" class="fa fa-trash hide"></button></form></td>
-    </tr>
-    {{/formSpecs}}
-</table>
+    <table>
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <th>Project</th>
+                        <th>Page</th>
+                        <th></th>
+                        <th><a href="/form-specifications/add" title="Add new form spec" class="fa fa-plus primary-blue"></a></th>
+                    </tr>
+                    {{#formSpecs}}
+                    <tr id="{{_id}}" class="formSpec">
+                        <td class="spec nowrap">{{project}}</td>
+                        <td class="spec nowrap">{{page}}</td>
+                        <td><a href="/form-specifications/{{_id}}/edit" title="Edit form spec" class="fa fa-pencil grey hide"></a></td>
+                        <td><form action="/form-specifications/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" title="Delete form spec" class="fa fa-trash hide"></button></form></td>
+                    </tr>
+                    {{/formSpecs}}
+                </table>
+            </td>
+            <td><pre id="spec"></pre></td>
+        </tr>
+    </table>
 
 </main>
 

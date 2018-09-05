@@ -159,6 +159,8 @@ router.post('/form-specifications/add',        formSpecs.processAdd);    // proc
 router.post('/form-specifications/:id/edit',   formSpecs.processEdit);   // process edit form-specification
 router.post('/form-specifications/:id/delete', formSpecs.processDelete); // process delete form-specification
 
+router.get('/ajax/form-specifications/:id',    formSpecs.ajaxFormSpec);  // get form spec
+
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /*  Resources routes                                                                              */

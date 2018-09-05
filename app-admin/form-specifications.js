@@ -6,6 +6,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import FormSpecification from '../models/form-specification.js';
+import Log from '../lib/log';
 
 
 class FormSpecificationsHandlers {
@@ -119,6 +120,29 @@ class FormSpecificationsHandlers {
             // stay on current page to report error
             ctx.flash = { _error: e.message };
             ctx.response.redirect(ctx.request.url);
+        }
+    }
+
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+    /* Ajax functions                                                                             */
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+
+    /**
+     * GET /ajax/form-specifications/:id - return form spec identified by id
+     */
+    static async ajaxFormSpec(ctx) {
+        const db = ctx.state.user.db;
+
+        try {
+            const formSpec = await FormSpecification.get(db, ctx.params.id);
+            ctx.response.status = 200; // Ok
+            ctx.response.body = { spec: formSpec };
+        } catch (e) {
+            ctx.response.status = 500; // Internal Server Error
+            ctx.response.body = e;
+            await Log.error(ctx, e);
         }
     }
 }

@@ -122,7 +122,7 @@ class LoginHandlers {
             db:       db,                                                        // currently selected database
             remember: body['remember-me'] ? true : false,                        // whether token can be renewed
         };
-        const token = jwt.sign(payload, 'the-whistle-jwt-signature-key', { expiresIn: '24h' });
+        const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '24h' });
 
         // record token in signed cookie, in top-level domain to be available to both admin. and report. subdomains
         // note in test suite, this is invoked also from report app

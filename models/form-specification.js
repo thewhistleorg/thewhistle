@@ -11,15 +11,16 @@ import Db from '../lib/db.js';
 
 
 /*
- * TODO
+ * A form specification defines the questions that will be asked as part of a report submission.
  */
 const schema = {
     type:       'object',
-    required:   [ 'page', 'specification' ],
+    required:   [ 'project', 'page', 'specification' ],
     properties: {
-        project:       { type: 'string' }, //
-        page:          { type: 'string' }, //
-        specification: { type: 'string' }, //
+        _id:           { bsonType: 'objectId' },
+        project:       { type: 'string' }, // project (aka campaign) form is reporting for
+        page:          { type: 'string' }, // which page of a multi-page form (empty string for top-level page)
+        specification: { type: 'string' }, // the JSON/YAML specification
     },
     additionalProperties: false,
 };
@@ -51,7 +52,7 @@ class FormSpecification {
         // indexes
         formSpecifications.createIndex({ page: 1 });
 
-        debug('FormSpecification.init', `${Date.now()-t1}ms`);
+        debug('FormSpecification.init', db, `${Date.now()-t1}ms`);
     }
 
 
@@ -101,7 +102,7 @@ class FormSpecification {
      *
      * @param   {Object} values - Form-specification details.
      * @returns {number} New form-specification id.
-     * @throws  Error on validation or referential integrity errors.
+     * @throws  Error on validation errors.
      */
     static async insert(db, values) {
         debug('FormSpecification.insert', values.email);
@@ -128,7 +129,7 @@ class FormSpecification {
      *
      * @param  {number}   id - Form-specification id.
      * @param  {ObjectId} values - Form-specification details.
-     * @throws Error on referential integrity errors.
+     * @throws Error on validation errors.
      */
     static async update(db, id, values) {
         debug('FormSpecification.update', 'u:'+id);

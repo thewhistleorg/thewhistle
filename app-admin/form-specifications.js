@@ -97,7 +97,7 @@ class FormSpecificationsHandlers {
 
         } catch (e) {
             // stay on current page to report error
-            ctx.flash = { _error: e.message };
+            ctx.flash = { formdata: body, _error: e.message };
             ctx.response.redirect(ctx.request.url);
         }
     }

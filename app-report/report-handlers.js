@@ -10,9 +10,12 @@ import dateFormat                    from 'dateformat';  // Steven Levithan's da
 import { LatLonSpherical as LatLon } from 'geodesy';     // library of geodesy functions
 import Debug                         from 'debug';       // small debugging utility
 import crypto                        from 'crypto';
-import fs                            from 'fs';
+import fs                            from 'fs-extra';
+import jwt    from 'jsonwebtoken'; // JSON Web Token implementation
+
 
 const debug = Debug('app:report'); // submission process
+
 
 import Report        from '../models/report.js';
 import Resource      from '../models/resource.js';
@@ -28,53 +31,93 @@ class Handlers {
 
     static async validWlsResponse(wlsResponse) {
         const params = wlsResponse.split('!');
-        //const ver = params[0];
+        const ver = params[0];
         const status = params[1];
-        //const msg = params[2];
-        //const issue = params[3];
-        //const id = params[4];
-        //const url = params[5];
-        //const principal = params[6];
-        //const ptags = params[7];
-        //const auth = params[8];
-        //const sso = params[9];
-        //const life = params[10];
-        //const reqParams = params[11];
-        //const kid = params[12];
+        const msg = params[2];
+        const issue = params[3];
+        const id = params[4];
+        const url = params[5];
+        const principal = params[6];
+        const ptags = params[7];
+        const auth = params[8];
+        const sso = params[9];
+        const life = params[10];
+        const reqParams = params[11];
+        const kid = params[12];
         const sig = decodeURI(params[13]).replace(/-/g, '+').replace(/\./g, '/').replace(/_/g, '=');
         if (status != 200) {
             return false;
+        }
+        if (ver != 3) {
+            return false;
+        }
+        if (kid != 2) {
+            return false;
+        }
+        /* console.log('KEY', life);
+        console.log('SONG', issue); */
+        //TODO: Require issue
+        //TODO: Require id
+        //TODO: Require url
+        //TODO: Require principal
+        //TODO: Require auth
+        //TODO: Require kid
+        const verifier = crypto.createVerify('SHA1');
+        verifier.update(decodeURI(params.slice(0, -2).join('!')));
+        const key = await fs.readFile('public/keys/pubkey2.crt');
+        const authenticated = verifier.verify(key, sig, 'base64');
+        return authenticated;
+    }
+
+
+    static storeJwtToken(ctx, wlsResponse) {
+        const params = wlsResponse.split('!');
+        const crsid = params[6];
+        const life = params[10];
+        console.log('CRSID', crsid);
+        const payload = {
+            crsid: crsid,
+        };
+        const jwtOptions = {};
+        if (life !== '') {
+            jwtOptions.expiresIn = life * 1000;
+            payload.oneUse = false;
         } else {
-            const verifier = crypto.createVerify('SHA1');
-            verifier.update(decodeURI(params.slice(0, -2).join('!')));
-            const key = await fs.readFileSync('public/keys/pubkey2.crt');
-            const authenticated = verifier.verify(key, sig, 'base64');
-            return authenticated;
+            jwtOptions.expiresIn = 7 * 24 * 60 * 60 * 1000;
+            payload.oneUse = true;
+            payload.used = false;
+        }
+        const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, jwtOptions);
+        const cookieOptions = {
+            signed:  true,
+            expires: new Date(Date.now() + jwtOptions.expiresIn),
+        };
+        ctx.cookies.set('ravenJwt', token, cookieOptions);
+    }
+
+
+    static validJwtToken(token) {
+        try {
+            const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
+            if (payload.oneUse && payload.used) {
+                return false;
+            }
+            return true;
+        } catch (e) {
+            return false;
         }
     }
 
-    static checkAuthentication(ctx, next) {
-        console.log('next', next.toString());
-        if (ctx.req.isAuthenticated()) {
-            console.log('orth');
-            next();
-        } else {
-            console.log('orc(h)');
-            ctx.response.redirect('/racism-login');
-        }
-    }
 
     static async getRacism(ctx) {
-        let wlsResponse = ctx.request.query['WLS-Response'];
+        const wlsResponse = ctx.request.query['WLS-Response'];
         if (wlsResponse) {
             if (Handlers.validWlsResponse(wlsResponse)) {
-                ctx.cookies.set('WLS-Response', wlsResponse);
+                Handlers.storeJwtToken(ctx, wlsResponse);
             }
             await ctx.response.redirect('/racism');
         } else {
-            wlsResponse = ctx.cookies.get('WLS-Response');
-            console.log('wlsres', wlsResponse);
-            if (wlsResponse && Handlers.validWlsResponse(wlsResponse)) {
+            if (Handlers.validJwtToken(ctx.cookies.get('ravenJwt', { signed: true }))) {
                 await ctx.render('racism');
             } else {
                 const params = {
@@ -86,6 +129,7 @@ class Handlers {
             }
         }
     }
+
 
     /**
      * GET / - (home page) list available reporting apps

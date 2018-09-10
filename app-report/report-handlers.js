@@ -28,45 +28,75 @@ import Geocoder      from '../lib/geocode.js';
 import Log           from '../lib/log.js';
 import Ip            from '../lib/ip.js';
 class Handlers {
+    //TODO: Document Raven code
+    static timeSinceVerification(issue) {
+        const year = issue.substr(0, 4);
+        const month = issue.substr(4, 2) - 1;
+        const day = issue.substr(6, 2);
+        const hour = issue.substr(9, 2);
+        const minute = issue.substr(11, 2);
+        const second = issue.substr(13, 2);
+        const verificationDate = new Date(Date.UTC(year, month, day, hour, minute, second));
+        return Date.now() - verificationDate.getTime();
+    }
+
 
     static async validWlsResponse(wlsResponse) {
-        const params = wlsResponse.split('!');
-        const ver = params[0];
-        const status = params[1];
-        const msg = params[2];
-        const issue = params[3];
-        const id = params[4];
-        const url = params[5];
-        const principal = params[6];
-        const ptags = params[7];
-        const auth = params[8];
-        const sso = params[9];
-        const life = params[10];
-        const reqParams = params[11];
-        const kid = params[12];
-        const sig = decodeURI(params[13]).replace(/-/g, '+').replace(/\./g, '/').replace(/_/g, '=');
-        if (status != 200) {
+        try {
+            const params = wlsResponse.split('!');
+            const ver = params[0];
+            const status = params[1];
+            //const msg = params[2];
+            const issue = params[3];
+            const id = params[4];
+            const url = params[5];
+            const principal = params[6];
+            //const ptags = params[7];
+            const auth = params[8];
+            //const sso = params[9];
+            //const life = params[10];
+            //const reqParams = params[11];
+            const kid = params[12];
+            const sig = decodeURI(params[13]).replace(/-/g, '+').replace(/\./g, '/').replace(/_/g, '=');
+            if (status != 200) {
+                return false;
+            }
+            if (ver != 3) {
+                return false;
+            }
+            if (kid != 2) {
+                return false;
+            }
+            const timeSinceVerification = Handlers.getTimeSinceVerification(issue);
+            if (timeSinceVerification > 60000) {
+                return false;
+            }
+            const splitUrl = url.split('/');
+            if (!(splitUrl[0] === 'http:' || splitUrl[0] === 'https:')) {
+                return false;
+            }
+            if (!splitUrl[2].startsWith('report.thewhistle.')) {
+                return false;
+            }
+            if (!auth === 'pwd') {
+                return false;
+            }
+            if (!id) {
+                return false;
+            }
+            if (!principal) {
+                return false;
+            }
+
+            const verifier = crypto.createVerify('SHA1');
+            verifier.update(decodeURI(params.slice(0, -2).join('!')));
+            const key = await fs.readFile('public/keys/pubkey2.crt');
+            const authenticated = verifier.verify(key, sig, 'base64');
+
+            return authenticated;
+        } catch (e) {
             return false;
         }
-        if (ver != 3) {
-            return false;
-        }
-        if (kid != 2) {
-            return false;
-        }
-        /* console.log('KEY', life);
-        console.log('SONG', issue); */
-        //TODO: Require issue
-        //TODO: Require id
-        //TODO: Require url
-        //TODO: Require principal
-        //TODO: Require auth
-        //TODO: Require kid
-        const verifier = crypto.createVerify('SHA1');
-        verifier.update(decodeURI(params.slice(0, -2).join('!')));
-        const key = await fs.readFile('public/keys/pubkey2.crt');
-        const authenticated = verifier.verify(key, sig, 'base64');
-        return authenticated;
     }
 
 
@@ -74,7 +104,6 @@ class Handlers {
         const params = wlsResponse.split('!');
         const crsid = params[6];
         const life = params[10];
-        console.log('CRSID', crsid);
         const payload = {
             crsid: crsid,
         };
@@ -122,7 +151,7 @@ class Handlers {
             } else {
                 const params = {
                     ver: 3,
-                    url: 'http://report.thewhistle.local:3000/racism',
+                    url: 'http://report.thewhistle.local:3000/racism', //TODO: Change this depending on environment
                 };
                 const url = 'https://raven.cam.ac.uk/auth/authenticate.html';
                 ctx.redirect(`${url}?${querystring.stringify(params)}`);

@@ -36,6 +36,10 @@ class SmsHandlers {
             ctx.status = 404;
             throw new SmsError('Not found.', true);
         } else {
+            if (!(ctx.params.org && ctx.params.project)) {
+                ctx.params.org = 'hfrn-test';
+                ctx.params.project = 'hfrn-en';
+            }
             const exists = await FormGenerator.exists(ctx.params.org, ctx.params.project);
             if (exists) {
                 await ctx.render('emulator');
@@ -53,6 +57,10 @@ class SmsHandlers {
      * @param {Object} ctx
      */
     static async postSms(ctx) {
+        if (!(ctx.params.org && ctx.params.project)) {
+            ctx.params.org = 'hfrn-test';
+            ctx.params.project = 'hfrn-en';
+        }
         if (FormGenerator.exists(ctx.params.org, ctx.params.project)) {
             //If the organisation/project combination is valid
             if (!smsRoutes[ctx.url]) {

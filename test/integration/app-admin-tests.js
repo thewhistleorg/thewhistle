@@ -991,12 +991,12 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const responseIpCache = await appAdmin.get('/dev/ip-cache');
             expect(responseIpCache.status).to.equal(200);
         });
-        /* TEST NOT WORKING
+
         it('sees dev/nodeinfo page', async function() {
             const response = await appAdmin.get('/dev/nodeinfo');
             expect(response.status).to.equal(200);
         });
-        */
+
         it('sees dev/user-agents pages', async function() {
             const responseV1 = await appAdmin.get('/dev/user-agents');
             expect(responseV1.status).to.equal(200);

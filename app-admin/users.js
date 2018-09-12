@@ -346,7 +346,7 @@ class UsersHandlers {
  */
 function availableDatabases() {
     const dbEnvVars = Object.keys(process.env).filter(envvar => envvar.slice(0, 3)=='DB_');
-    const databases = dbEnvVars.map(db => db.slice(3).toLowerCase().replace('_', '-'));
+    const databases = dbEnvVars.map(db => db.slice(3).toLowerCase().replace(/_/g, '-'));
     return databases.filter(db => db!='users').sort();
 }
 

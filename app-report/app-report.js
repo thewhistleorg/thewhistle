@@ -65,6 +65,7 @@ app.use(async function handleErrors(ctx, next) {
 
     } catch (err) {
         ctx.response.status = err.status || 500;
+        await Log.error(ctx, err);
         if (app.env == 'production') delete err.stack; // don't leak sensitive info!
         switch (ctx.response.status) {
             case 404: // Not Found
@@ -80,7 +81,6 @@ app.use(async function handleErrors(ctx, next) {
                 // ctx.app.emit('error', err, ctx); // github.com/koajs/koa/wiki/Error-Handling
                 break;
         }
-        await Log.error(ctx, err);
     }
 });
 

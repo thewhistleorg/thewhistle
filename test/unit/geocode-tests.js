@@ -33,7 +33,6 @@ describe('Geocode', function() {
         expect(result.country).to.equal('United Kingdom');
         expect(result.administrativeLevels.level1long).to.equal('England');
         expect(result.administrativeLevels.level2long).to.equal('Cambridgeshire');
-        expect(result.extra.neighborhood).to.equal('Cambridge'); // !!
         expect(result.city).to.equal('Cambridge');
         expect(result.streetName).to.equal('Free School Lane');
         expect(result.formattedAddress).to.equal('The Large Examination Hall, Free School Ln, Cambridge CB2 3RF, UK'); // !!

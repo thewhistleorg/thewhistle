@@ -459,14 +459,14 @@ describe(`Admin app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(200);
             const document = new JSDOM(response.text).window.document;
             const input = document.querySelector('input#address');
-            expect(input.value).to.equal('Department Of Mass Communication, Tafawa Balewa Way, University Of Lagos, Lagos, Nigeria');
+            expect(input.value).to.equal('Tafawa Balewa Way, University Of Lagos, Lagos, Nigeria');
         });
 
         it('sees refined location in audit trail', async function() {
             const response = await appAdmin.get('/reports/'+reportId);
             expect(response.status).to.equal(200);
             const document = new JSDOM(response.text).window.document;
-            const matches = document.evaluate('count(//td[text()="Set location to ‘Department Of Mass Communication, Tafawa Balewa Way, University Of Lagos, Lagos, Nigeria’"])', document, null, 0, null);
+            const matches = document.evaluate('count(//td[text()="Set location to ‘Tafawa Balewa Way, University Of Lagos, Lagos, Nigeria’"])', document, null, 0, null);
             expect(matches.numberValue).to.equal(1);
         });
 

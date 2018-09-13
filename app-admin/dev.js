@@ -48,7 +48,7 @@ class Dev {
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 
-        const dbs = [ ...new Set(entriesAll.map(e => e.db)) ].sort();
+        const orgs = [ ...new Set(entriesAll.map(e => e.org)) ].sort();
         const users = [ ...new Set(entriesAll.map(e => e.user)) ].sort();
         const statuses = [ ...new Set(entriesAll.map(e => e.status)) ].sort();
 
@@ -67,7 +67,7 @@ class Dev {
             .filter(e => ctx.request.query.from ? e._id.getTimestamp() >= new Date(ctx.request.query.from) : true)
             .filter(e => ctx.request.query.to ? e._id.getTimestamp() <= toFilter : true)
             .filter(e => ctx.request.query.app ? RegExp('^'+ctx.request.query.app).test(e.host) : true)
-            .filter(e => ctx.request.query.organisation ? ctx.request.query.organisation=='-' ? e.db==undefined : e.db==ctx.request.query.organisation : true)
+            .filter(e => ctx.request.query.organisation ? ctx.request.query.organisation=='-' ? e.org==undefined : e.org==ctx.request.query.organisation : true)
             .filter(e => ctx.request.query.user ? ctx.request.query.user=='-' ? e.user==undefined : e.user==ctx.request.query.user : true)
             .filter(e => ctx.request.query.time ? e.ms > ctx.request.query.time : true)
             .filter(e => ctx.request.query.status ? e.status==ctx.request.query.status : true);
@@ -104,7 +104,7 @@ class Dev {
 
         const context = {
             entries:   entries,
-            dbs:       dbs,
+            orgs:      orgs,
             users:     users,
             statuses:  statuses,
             filter:    ctx.request.query,
@@ -130,7 +130,7 @@ class Dev {
                 timestamp: dateFormat(e._id.getTimestamp(), 'UTC:yyyy-mm-dd HH:MM:ss'),
                 host:      e.host,
                 url:       e.url,
-                org:       e.db,
+                org:       e.org,
                 user:      e.user,
                 status:    e.status,
                 referrer:  e.referer,
@@ -159,7 +159,7 @@ class Dev {
 
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
 
-        const dbs = [ ...new Set(entriesAll.map(e => e.db)) ].sort();
+        const orgs = [ ...new Set(entriesAll.map(e => e.org)) ].sort();
         const users = [ ...new Set(entriesAll.map(e => e.user)) ].sort();
         const statuses = [ ...new Set(entriesAll.map(e => e.status)) ].sort();
 
@@ -177,7 +177,7 @@ class Dev {
         const entriesFiltered = entriesAll
             .filter(e => ctx.request.query.from ? e._id.getTimestamp() >= new Date(ctx.request.query.from) : true)
             .filter(e => ctx.request.query.to ? e._id.getTimestamp() <= toFilter : true)
-            .filter(e => ctx.request.query.organisation ? ctx.request.query.organisation=='-' ? e.db==undefined : e.db==ctx.request.query.organisation : true)
+            .filter(e => ctx.request.query.organisation ? ctx.request.query.organisation=='-' ? e.org==undefined : e.org==ctx.request.query.organisation : true)
             .filter(e => ctx.request.query.user ? ctx.request.query.user=='-' ? e.user==undefined : e.user==ctx.request.query.user : true)
             .filter(e => ctx.request.query.status ? e.status==ctx.request.query.status : true);
 
@@ -213,7 +213,7 @@ class Dev {
 
         const context = {
             entries:   entries,
-            dbs:       dbs,
+            orgs:      orgs,
             users:     users,
             statuses:  statuses,
             filter:    ctx.request.query,
@@ -266,7 +266,7 @@ class Dev {
         const entriesAll = (await log.find({}).sort({ $natural: -1 }).toArray());
         const entries = entriesAll
             .filter(e => e.host.split('.')[0] == app)
-            .filter(e => ctx.request.query.organisation ? e.db==ctx.request.query.organisation : true);
+            .filter(e => ctx.request.query.organisation ? e.org==ctx.request.query.organisation : true);
 
         // tmp convert old 'platform' back to 'os' TODO: remove once cycled out of log
         entries.forEach(e => e.ua.os = e.ua.os || e.ua.platform);

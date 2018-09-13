@@ -129,7 +129,7 @@ async function buildForms() {
 // form build, and await on completion)
 buildForms()
     .then(t => console.info(`forms built (${t}ms)`))
-    .catch(err => console.error(err));
+    .catch(err => console.error('ERR (buildForms):', err.message));
 
 
 // select sub-app (admin/api) according to host subdomain (could also be by analysing request.url);

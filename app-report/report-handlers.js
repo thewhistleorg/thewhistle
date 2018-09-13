@@ -65,14 +65,21 @@ class Handlers {
      * GET /:database/:project/rebuild - rebuild report from specification.
      *
      * This is not useful for specs hosted by The Whistle, as any spec change will trigger an app
-     * rebuild, but once organisations are hosting their own specs, this can be used to trigger
-     * regeneration of a report after a spec change.
+     * rebuild, but for specs held in the database (or made available by http), this can be used to
+     * trigger regeneration of a report after a spec change.
      */
     static async rebuild(ctx) {
         const org = ctx.params.database;
         const project = ctx.params.project;
 
-        await FormGenerator.build(org, project);
+        try {
+            await FormGenerator.build(org, project);
+        } catch (e) {
+            if (e instanceof ReferenceError) ctx.throw(404, `Form specification ‘${org}/${project}’ not found`);
+            if (e instanceof SyntaxError) ctx.throw(500, `Form specification ‘${org}/${project}’ has invalid syntax (${e.message})`);
+            if (e instanceof EvalError) ctx.throw(500, `Form specification ‘${org}/${project}’ failed validation (${e.message})`);
+            ctx.throw(500, `Form specification ‘${org}/${project}’ failed to build (${e.message})`);
+        }
 
         ctx.response.redirect(`/${org}/${project}`);
     }
@@ -85,7 +92,12 @@ class Handlers {
         const org = ctx.params.database;
         const project = ctx.params.project;
         debug('getIndex', org, project);
-        if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
+        try {
+            if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
+        } catch (e) {
+            if (e instanceof ReferenceError) ctx.throw(404, `Submission form ${org}/${project} not found`);
+            ctx.throw(500, e.message);
+        }
 
         // clear previous session
         ctx.session = null;
@@ -113,7 +125,12 @@ class Handlers {
         const org = ctx.params.database;
         const project = ctx.params.project;
         debug('postIndex', org, project);
-        if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
+        try {
+            if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
+        } catch (e) {
+            if (e instanceof ReferenceError) ctx.throw(404, `Submission form ${org}/${project} not found`);
+            ctx.throw(500, e.message);
+        }
 
         // verify client-side reCAPTCHA: developers.google.com/recaptcha/docs/verify
         if (ctx.app.env != 'development') {
@@ -161,7 +178,12 @@ class Handlers {
         const org = ctx.params.database;
         const project = ctx.params.project;
         debug('getPage ', `${org}/${project}/${ctx.params.page}`, 'id:'+ctx.session.id);
-        if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
+        try {
+            if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
+        } catch (e) {
+            if (e instanceof ReferenceError) ctx.throw(404, `Submission form ${org}/${project} not found`);
+            ctx.throw(500, e.message);
+        }
 
         if (org == 'spec') {
             // a request has been made for a (static) form spec page which doesn't exist, and has
@@ -236,7 +258,12 @@ class Handlers {
         const org = ctx.params.database;
         const project = ctx.params.project;
         debug('postPage', `${org}/${project}/${ctx.params.page}`, 'id:'+ctx.session.id);
-        if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
+        try {
+            if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
+        } catch (e) {
+            if (e instanceof ReferenceError) ctx.throw(404, `Submission form ${org}/${project} not found`);
+            ctx.throw(500, e.message);
+        }
 
         const version = FormGenerator.forms[`${org}/${project}`].version;
         const nPages = Object.keys(FormGenerator.forms[`${org}/${project}`].steps).length;

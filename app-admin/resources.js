@@ -14,6 +14,7 @@ import isEmail                                from 'isemail';               // e
 import Resource         from '../models/resource.js';
 import validationErrors from '../lib/validation-errors.js';
 import Geocoder         from '../lib/geocode.js';
+import Db               from '../lib/db.js';
 
 const phoneUtil = PhoneNumberUtil.getInstance();
 
@@ -28,7 +29,7 @@ class Handlers {
      * GET /resources/add - Render add resource page.
      */
     static async add(ctx) {
-        const availableDatabases = Object.keys(global.db).filter(db => db!='resources');
+        const availableDatabases = Object.keys(Db.databases).filter(db => db!='resources');
         const context = Object.assign({ availableDatabases }, ctx.flash.formdata);
         await ctx.render('resources-add', context);
     }

@@ -100,7 +100,7 @@ app.use(async function handleErrors(ctx, next) {
 // considered if we were to use this app; perhaps it will be consumed into the textit app or
 // something... for now we'll just hardwire the grn-test db
 app.use(async function(ctx, next) {
-    if (!global.db['grn-test']) {
+    if (!Db.databases['grn-test']) {
         try {
             await Db.connect('grn-test', { useNewUrlParser: true });
         } catch (e) {

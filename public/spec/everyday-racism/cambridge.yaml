@@ -1,0 +1,64 @@
+title: The Whistle / Everyday Racism at Cambridge Incident Report
+
+version: 1
+
+pages:
+  index:    { $ref: 'cambridge-0' }
+  p1:       { $ref: 'cambridge-1' }
+  p2:       { $ref: 'cambridge-2' }
+  p3:       { $ref: 'cambridge-3' }
+  p4:       { $ref: 'cambridge-4' }
+  p5:       { $ref: 'cambridge-5' }
+  p6:       { $ref: 'cambridge-6' }
+  p7:       { $ref: 'cambridge-7' }
+  p8:       { $ref: 'cambridge-8' }
+  p9:       { $ref: 'cambridge-9' }
+  p10:      { $ref: 'cambridge-10' }
+  p11:      { $ref: 'cambridge-11' }
+  p12:      { $ref: 'cambridge-12' }
+  p13:      { $ref: 'cambridge-13' }
+  p14:      { $ref: 'cambridge-14' }
+  whatnext: { $ref: 'cambridge-whatnext' }
+
+options:
+  pages:
+    index:
+      prev: false
+      step: false
+      next: false
+    p1:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+      prev: false
+    p2:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p3:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p4:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p5:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p6:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p7:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p8:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p9:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p10:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p11:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p12:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p13:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p14:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+      next: Submit and continue to Resources
+    whatnext:
+      handler: resources
+      method: get
+      prev: false
+      step: false
+      next: false

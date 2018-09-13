@@ -22,6 +22,7 @@ import FormGenerator from '../lib/form-generator.js';
 import Geocoder      from '../lib/geocode.js';
 import Log           from '../lib/log.js';
 import Ip            from '../lib/ip.js';
+import Db            from '../lib/db.js';
 
 
 class Handlers {
@@ -92,6 +93,14 @@ class Handlers {
         const org = ctx.params.database;
         const project = ctx.params.project;
         debug('getIndex', org, project);
+
+        // check we have db connection for org
+        try {
+            await Db.connect(org);
+        } catch (e) {
+            ctx.throw(404, `Submission form ${org}/${project} not found`)
+        }
+
         try {
             if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
         } catch (e) {

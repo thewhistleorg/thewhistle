@@ -6,6 +6,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import FormSpecification from '../models/form-specification.js';
+import FormGenerator     from '../lib/form-generator.js';
 import Log from '../lib/log';
 
 
@@ -65,6 +66,9 @@ class FormSpecificationsHandlers {
         try {
 
             const id = await FormSpecification.insert(db, body);
+            // TODO: validate & undo on fail!
+            FormGenerator.build(db, body.project);
+
             ctx.response.set('X-Insert-Id', id); // for integration tests
 
             // return to list of form-specifications
@@ -91,6 +95,9 @@ class FormSpecificationsHandlers {
         try {
 
             await FormSpecification.update(db, ctx.params.id, body);
+
+            // TODO: validate & undo on fail!
+            FormGenerator.build(db, body.project);
 
             // return to list of form-specifications
             ctx.response.redirect('/form-specifications');

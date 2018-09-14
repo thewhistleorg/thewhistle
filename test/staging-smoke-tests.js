@@ -13,31 +13,33 @@ import dotenv     from 'dotenv';    // load environment variables from a .env fi
 
 dotenv.config();
 
-const requestAdmin = supertest.agent('http://admin.staging.thewhistle.org');
-const requestReport = supertest.agent('http://report.staging.thewhistle.org');
+const domain = process.env.NODE_ENV == 'production' ? 'thewhistle.org' : 'staging.thewhistle.org';
+
+const adminApp = supertest.agent(`http://admin.${domain}`);
+const reportApp = supertest.agent(`http://report.${domain}`);
 
 const testuser = process.env.TESTUSER; // note testuser must have access to ‘grn-test‘ organisation only
 const testpass = process.env.TESTPASS; // (for successful login)
 
 
-describe('Admin app', function() {
+describe(`Admin app (admin.${domain}`, function() {
     this.timeout(30e3); // 30 sec - app can take some time to wake
 
     it('has home page with login link in nav when not logged-in', async function() {
-        const response = await requestAdmin.get('/');
+        const response = await adminApp.get('/');
         expect(response.status).to.equal(302);
         expect(response.headers.location).to.equal('/login');
     });
 
     it('redirects to / on login', async function() {
         const values = { username: testuser, password: testpass, database: 'grn-test', 'remember-me': 'on' };
-        const response = await requestAdmin.post('/login').send(values);
+        const response = await adminApp.post('/login').send(values);
         expect(response.status).to.equal(302);
         expect(response.headers.location).to.equal('/');
     });
 
     it('sees list of reports', async function() {
-        const response = await requestAdmin.get('/reports');
+        const response = await adminApp.get('/reports');
         expect(response.status).to.equal(200);
         const document = new JSDOM(response.text).window.document;
         expect(document.querySelector('title').textContent).to.equal('Reports list');
@@ -46,24 +48,24 @@ describe('Admin app', function() {
     });
 
     it('sees list of users', async function() {
-        const response = await requestAdmin.get('/users');
+        const response = await adminApp.get('/users');
         expect(response.status).to.equal(200);
         const document = new JSDOM(response.text).window.document;
         expect(document.querySelector('h1').textContent).to.equal('Users');
     });
 
     it('logs out and redirects to /', async function() {
-        const response = await requestAdmin.get('/logout');
+        const response = await adminApp.get('/logout');
         expect(response.status).to.equal(302);
         expect(response.headers.location).to.equal('/');
     });
 });
 
-describe('Report app', function() {
+describe(`Report app (report.${domain}`, function() {
     this.timeout(30e3); // 30 sec - app can take some time to wake
 
     it('sees grn-test/rape-is-a-crime (spec on filesys) home page', async function() {
-        const responseGet = await requestReport.get('/grn-test/rape-is-a-crime');
+        const responseGet = await reportApp.get('/grn-test/rape-is-a-crime');
         expect(responseGet.status).to.equal(200);
         const document = new JSDOM(responseGet.text).window.document;
         expect(document.querySelector('title').textContent).to.equal('The Whistle / Global Rights Nigeria Incident Report');
@@ -72,14 +74,14 @@ describe('Report app', function() {
 
     it('fails recaptcha check', async function() {
         const values = { 'nav-next': 'next' };
-        const responsePost = await requestReport.post('/grn-test/rape-is-a-crime').send(values);
+        const responsePost = await reportApp.post('/grn-test/rape-is-a-crime').send(values);
         expect(responsePost.status).to.equal(302);
         expect(responsePost.headers.location).to.equal('/grn-test/rape-is-a-crime');
         expect(responsePost.headers['x-redirect-reason']).to.equal('reCAPTCHA verification failed');
     });
 
     it('sees hfrn-test/hfrn-en (spec in db) home page', async function() {
-        const responseGet = await requestReport.get('/hfrn-test/hfrn-en');
+        const responseGet = await reportApp.get('/hfrn-test/hfrn-en');
         expect(responseGet.status).to.equal(200);
         const document = new JSDOM(responseGet.text).window.document;
         expect(document.querySelector('title').textContent).to.equal('The Whistle / Humans for Rights Network Incident Report');
@@ -88,7 +90,7 @@ describe('Report app', function() {
 
     it('fails recaptcha check', async function() {
         const values = { 'nav-next': 'next' };
-        const responsePost = await requestReport.post('/hfrn-test/hfrn-en').send(values);
+        const responsePost = await reportApp.post('/hfrn-test/hfrn-en').send(values);
         expect(responsePost.status).to.equal(302);
         expect(responsePost.headers.location).to.equal('/hfrn-test/hfrn-en');
         expect(responsePost.headers['x-redirect-reason']).to.equal('reCAPTCHA verification failed');

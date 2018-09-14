@@ -128,7 +128,7 @@ async function buildForms() {
 // we've no reason to wait on form builds before responding to requests (a request will initiate a
 // form build, and await on completion)
 buildForms()
-    .then(t => console.info(`forms built (${t}ms)`))
+    .then(t => console.info(`All forms built (${t}ms)`))
     .catch(err => console.error('ERR (buildForms):', err.message));
 
 

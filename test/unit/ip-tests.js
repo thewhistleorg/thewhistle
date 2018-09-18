@@ -26,7 +26,7 @@ describe('IP caching', function() {
         });
         test('get IP country (from ipinfo.io)', async function() {
             const t0 = process.hrtime();
-            const ipsCountry = await ip.getCountry('82.69.8.1');
+            const ipsCountry = await ip.getCountry('82.69.8.1'); // CV IP addr
             const t1 = process.hrtime(t0);
             const elapsed = t1[0]*1e3 + t1[1]/1e6; // ms
             expect(ipsCountry).to.equal('GB');
@@ -34,14 +34,14 @@ describe('IP caching', function() {
         });
         test('get IP country (cached)', async function() {
             const t0 = process.hrtime();
-            const ipsCountry = await ip.getCountry('82.69.8.1');
+            const ipsCountry = await ip.getCountry('82.69.8.1'); // CV IP addr
             const t1 = process.hrtime(t0);
             const elapsed = t1[0]*1e3 + t1[1]/1e6; // ms
             expect(ipsCountry).to.equal('GB');
             expect(elapsed).to.be.below(10); // cached
         });
         test('IP country for TEST-NET-1 fails', async function() {
-            const ipsCountry = await ip.getCountry('192.0.2.0');
+            const ipsCountry = await ip.getCountry('192.0.2.0'); // q.v. tools.ietf.org/html/rfc5735
             expect(ipsCountry).to.be.null;
         });
         test('IP country for invalid ip fails', async function() {
@@ -59,7 +59,7 @@ describe('IP caching', function() {
         });
         test('get IP domain (from node.js dns module)', async function() {
             const t0 = process.hrtime();
-            const ipDomain = await ip.getDomain('82.69.8.1');
+            const ipDomain = await ip.getDomain('82.69.8.1'); // CV IP addr
             const t1 = process.hrtime(t0);
             const elapsed = t1[0]*1e3 + t1[1]/1e6; // ms
             expect(ipDomain).to.equal('82-69-8-1.dsl.in-addr.zen.co.uk');
@@ -67,14 +67,14 @@ describe('IP caching', function() {
         });
         test('get IP domain (from node.js dns module)', async function() {
             const t0 = process.hrtime();
-            const ipDomain = await ip.getDomain('82.69.8.1');
+            const ipDomain = await ip.getDomain('82.69.8.1'); // CV IP addr
             const t1 = process.hrtime(t0);
             const elapsed = t1[0]*1e3 + t1[1]/1e6; // ms
             expect(ipDomain).to.equal('82-69-8-1.dsl.in-addr.zen.co.uk');
             expect(elapsed).to.be.below(1); // full lookup
         });
         test('IP domain for TEST-NET-1 fails', async function() {
-            const ipDomain = await ip.getDomain('192.0.2.0');
+            const ipDomain = await ip.getDomain('192.0.2.0'); // q.v. tools.ietf.org/html/rfc5735
             expect(ipDomain).to.be.null;
         });
         test('IP country for invalid ip fails', async function() {

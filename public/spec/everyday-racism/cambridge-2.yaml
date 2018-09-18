@@ -12,11 +12,15 @@
         friend: 
             label: Someone else
             branch:
-                - text: Please fill in the report to the best of your knowledge following your friend’s request. Do not mind if the form refers to ‘you’.
+                in-box: true
+                body:
+                    - text: Please fill in the report to the best of your knowledge following your friend’s request. Do not mind if the form refers to ‘you’.
         observer: 
             label: Observer/witness
             branch:
-                - text: Please fill in the report to the best of your knowledge following your friend’s request. Do not mind if the form refers to ‘you’.
+                in-box: true
+                body:
+                    - text: Please fill in the report to the best of your knowledge following your friend’s request. Do not mind if the form refers to ‘you’.
 
 - text: |
     # Racist Incident

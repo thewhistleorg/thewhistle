@@ -6,10 +6,10 @@ description: The Whistle Form specification Schema
 type: object
 required: [ pages ]
 properties:
-  title:   { type: string }
-  version: { type: number }
-  pages:   { $ref: '#/pages' }
-  options: { type: object }
+  title:   { type: string }    # overall title of project (page titles if not over-ridden in options)
+  pages:   { $ref: '#/pages' } # the individual pages
+  options: { type: object }    # TODO: customisation of individual pages (title, prev/next, etc)
+# additional properties are allowed as they are individual pages in single-file spec
 
 pages:
   type: object                                                  # associative array indexed by 'page'
@@ -19,12 +19,57 @@ pages:
   additionalProperties: false
 
 page:
-  type: array                    # a page comprises an array of texts and inputs
+  type: array                                # a page comprises a sequence of texts and inputs
   items:
-    type: object
-    properties:
-      flash:      { type: object }             # TODO
-      text:       { type: [ string, object ] } # TODO
-      input:      { type: object }             # TODO
-      notworking: { type: [ object, null ] }   # TODO
+    type: object                             # each item is an object containing...
+    properties:                              #   text or input (or flash / notworking messages)
+      text:       { $ref: '#/text' }         # any text to be displayed (questions, explanations, etc)
+      input:      { $ref: '#/input' }        # what it's all about!
+      flash:      { $ref: '#/flash' }        # for displaying flash error messages
+      notworking: { type: [ object, null ] } # TODO 'form not working?' message
     additionalProperties: false
+
+flash:
+  type: object # TODO
+
+text:
+  type: [ string, object ] # TODO
+
+input:
+  type: object
+  required: [ type ]
+  properties:
+    name:        { type: string, pattern: '^[a-z][a-z0-9-]+$' }           # alphanum + hyphen
+    label:       { type: [ string, boolean ] }                            # any string or 'false'
+    type:        { type: string, pattern: '^text|textbox|select|radio|checkbox|button|recaptcha-button|library-[a-z0-9]+$' }
+    value:       { type: string, pattern: '^({{)?[a-z][a-z0-9-]+({{)?$' } # TODO: should fail! alphanum + hyphen with optional handlebars escapes
+    text:        { type: string }
+    options:     { $ref: '#/options' }                                    # for radio/checkbox/select inputs
+    class:       { type: string }                                         # HTML class attribute
+    data:        { type: object } # TODO: no longer used now recaptcha-button defined?
+    attributes:  { type: string }                                         # HTML element attributes
+    accesskey:   { type: string }  # TODO: use 'attributes' rather than separate property?
+    required:    { type: boolean } # TODO: use 'attributes' rather than separate property?
+    placeholder: { type: string }  # TODO: use 'attributes' rather than separate property?
+    subsidiary:  { type: array }   # TODO { $ref: '#/page' } note 'select' subsidiary is attached to the <select>
+  additionalProperties: false
+
+options:                                                              # for radio/checkbox/select inputs: either...
+  oneOf:
+    - type: object                                                    # ... 'option' object for radio / checkbox
+      properties: { }                                                 #     (no fixed properties)
+      patternProperties: { '^[a-z][a-z0-9]*$': { $ref: '#/option' } } #     (key must be alphanumeric)
+    - type: array                                                     # ... array of strings for select
+      items: { type: [ string, 'null' ] }                             #     (null is also allowed)
+
+option:
+  oneOf:
+    - type: string                   # option is simply the label
+    - type: object                   # option has attributes and/or subsidiary elements
+      required: [ label ]            # ... there's always gotta be a label
+      properties:
+        label:      { type: string } # ... which is a simple string
+        attributes: { type: string } # ... extra HTML input attributes
+        subsidiary: { type: array }  # TODO { $ref: '#/page' } note 'radio'/'checkbox' subsidiary is attached to option
+        branch:     { type: object } # TODO
+      additionalProperties: false

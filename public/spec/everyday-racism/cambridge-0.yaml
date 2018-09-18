@@ -31,12 +31,16 @@
       * **Student Counselling Services**: [www.counselling.cam.ac.uk](https://www.counselling.cam.ac.uk/)
       * Look out for your BME contacts in your College.
 
+    ### Support for Academic, Academic-Related and Professional Services Staff is available via:
+      * **University and College Union**, University of Cambridge Branch: [Cambridge UCU](http://www.ucu.cam.ac.uk/), [admin@ucu.cam.ac.uk](mailto:admin@ucu.cam.ac.uk), Tel, 01223 764944
+      * **Support Services at the University**: [www.hr.admin.cam.ac.uk/hr-services/wellbeing/support-services-university](https://www.hr.admin.cam.ac.uk/hr-services/wellbeing/support-services-university) 
+
 - input:
     name: nav-next
     label: false
     type: recaptcha-button
     value: next
-    text: Get started
+    text: Next
     class: pure-button pure-button-primary
     accesskey: g
 

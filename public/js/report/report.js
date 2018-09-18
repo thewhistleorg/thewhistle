@@ -4,6 +4,18 @@ function reCaptchaSubmitCallback(token) { // eslint-disable-line no-unused-vars
     document.querySelector('form').submit();
 }
 
+
+function clearValues(elements) {
+    for (var index = 0; index < elements.length; index++) {
+        if (elements[index].type == 'radio' || elements[index].type == 'checkbox') {
+            elements[index].checked = false;
+        } else {
+            elements[index].value = null;
+        }
+    }
+}
+
+
 document.addEventListener('DOMContentLoaded', function() {
     var i;
 
@@ -75,6 +87,39 @@ document.addEventListener('DOMContentLoaded', function() {
                         var otherCheckboxes = document.querySelectorAll('input[type=checkbox][name='+inputName+']');
                         otherCheckboxes.forEach(function(c) { c.checked = false; });
                     });
+                }
+                
+                //TODO: Make it remove branch if option is unselected as a radio button
+                if (this.type == 'checkbox') {
+                    const className = this.name + '-' + this.value.replace(new RegExp(' ', 'g'), '_') + '-branch';    
+                    const branches = document.getElementsByClassName(className);
+                    if (this.checked) {
+                        for (let b = 0; b < branches.length; b++) {
+                            branches[b].classList.remove('hide');
+                        }
+                    } else {
+                        for (let b = 0; b < branches.length; b++) {
+                            branches[b].classList.add('hide');
+                        }
+                    }
+                } else if (this.type == 'radio') {
+                    const options = document.getElementsByName(this.name);
+                    for (let o = 0; o < options.length; o++) {
+                        let className = options[o].name + '-' + options[o].value.replace(new RegExp(' ', 'g'), '_') + '-branch';
+                        const branches = document.getElementsByClassName(className);
+                        if (options[o].checked) {
+                            for (let b = 0; b < branches.length; b++) {
+                                branches[b].classList.remove('hide');
+                            }
+                        } else {
+                            for (let b = 0; b < branches.length; b++) {
+                                branches[b].classList.add('hide');
+                                clearValues(branches[b].getElementsByTagName('input'));
+                                clearValues(branches[b].getElementsByTagName('textarea'));
+                                clearValues(branches[b].getElementsByTagName('select'));
+                            }
+                        }
+                    }
                 }
 
                 // if 'this' is a skip option, clear any selects of the same name (eg survivor-age)

@@ -11,17 +11,16 @@
             attributes: checked
         friend: 
             label: Someone else
-            subsidiary:
+            branch:
                 - text: Please fill in the report to the best of your knowledge following your friend’s request. Do not mind if the form refers to ‘you’.
         observer: 
             label: Observer/witness
-            subsidiary:
+            branch:
                 - text: Please fill in the report to the best of your knowledge following your friend’s request. Do not mind if the form refers to ‘you’.
 
 - text: |
     # Racist Incident
 
-- text:
     We understand this can be difficult. Please take your time and tell us as much as you want about what happened to you or the person you are writing it for. You can also report an incident you witnessed even if you were not asked to do so. You will have the opportunity to write about this circumstance at the end of the report
 
     Experiences of racism can be so ordinary that it might be difficult to isolate particular incidents. In this report we are aiming to capture different ‘types’ (from the more subtle and everyday to the most obvious and deliberate) and frequencies of forms of racism. We are calling them ‘incidents’ although we are aware this term might limit the complex forms in which racism is expressed and experienced. 

@@ -426,7 +426,7 @@ class Handlers {
 
         if (page==1 & ctx.session.id) { ctx.flash = { error: 'Trying to save already saved report!' }; return ctx.response.redirect(ctx.request.url); }
 
-        if (page==1 || page=='+') { // create the skeleton report (with alias)
+        if (body['used-before']) { // create the skeleton report (with alias)
             let alias = null;
 
             switch (body['used-before']) {
@@ -637,7 +637,7 @@ function formatReport(org, project, page, body) {
         }
 
         // check for any subsidiary inputs: if there are, append the subsidiary value within quotes
-        if (Array.isArray(rpt[label])) { // multiple response to checkboxes
+        if (Array.isArray(rpt[label]) && pageInputs[inputName].subsidiary) { // multiple response to checkboxes
             for (let i=0; i<rpt[label].length; i++) {
                 const subsidiaryFieldName = pageInputs[inputName].subsidiary[body[inputName][i]];
                 if (body[subsidiaryFieldName]) rpt[label][i] += ` (${body[subsidiaryFieldName]})`;

@@ -27,7 +27,11 @@ import FormGenerator from '../lib/form-generator.js';
 import Geocoder      from '../lib/geocode.js';
 import Log           from '../lib/log.js';
 import Ip            from '../lib/ip.js';
+import Db            from '../lib/db.js';
+
+
 class Handlers {
+    
     //TODO: Document Raven code
     static timeSinceVerification(issue) {
         const year = issue.substr(0, 4);
@@ -231,6 +235,13 @@ class Handlers {
         } catch (e) {
             if (e instanceof ReferenceError) ctx.throw(404, `Submission form ${org}/${project} not found`);
             ctx.throw(500, e.message);
+        }
+
+        // check we have db connection for org
+        try {
+            await Db.connect(org);
+        } catch (e) {
+            ctx.throw(404, `Submission form ${org}/${project} not found`)
         }
 
         // clear previous session

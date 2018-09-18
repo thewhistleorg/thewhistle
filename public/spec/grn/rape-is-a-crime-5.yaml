@@ -10,7 +10,7 @@
     options:
       y:
         label: Known
-        todo: record subsidiary relationship!
+        # TODO: record subsidiary relationship!
         subsidiary:
           - text: Please give us a description of the person/people. Please include how you know
                   them (for example, it could be a relative, colleague, or acquaintance.

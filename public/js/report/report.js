@@ -63,8 +63,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (sub) {
                     var showSubsidiary = this.type=='radio'
                         || (this.type=='checkbox' && this.checked)
-                        || (this.type=='select-one' && this.value!=''); // note front-end DOM gives 'select-one' rather than 'select'
-
+                        || (this.type=='select-one' && this.value!='' && sub.classList.contains('select-any-subsidiary')) // note front-end DOM gives 'select-one' rather than 'select'
+                        || (this.type=='select-one' && sub.classList.contains(`${this.value.replace(new RegExp(' ', 'g'), '_')}-subsidiary`));
+                    console.log(this.value);
                     if (showSubsidiary) {  // show && re-enable element
                         sub.classList.remove('hide');
                         sub.querySelectorAll('input,textarea,select').forEach(j => j.disabled = false);

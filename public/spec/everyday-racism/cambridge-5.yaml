@@ -1,11 +1,32 @@
 - text: '# Do you remember what were you doing when this racist incident occurred?'
 
 - input:
-    name: on-behalf-of
-    label: On behalf of
-    type: radio
+    name: doing-what
+    label: Doing what
+    type: select
     options:
-        self:
-            label: Myself
-            attributes: checked
-        other: Someone else
+        blank:
+            label: ''
+        lecture:
+            label: I was in a lecture
+        supervision:
+            label: I was in a supervision
+        seminar:
+            label: I was in a seminar/conference
+        food:
+            label: I was in a lunch/dinner context
+        work:
+            label: I was in my place of work
+        accommodation:
+            label: I was in my accommodation
+        transit:
+            label: I was in transit (walking, cycling, etc)
+        other:
+            label: I prefer to describe in my own words
+            subsidiary:
+                - text: '## What were you doing? (in your own words)'
+                - input:
+                    name: doing-what-own-words
+                    type: textbox
+        skip:
+            label: Skip

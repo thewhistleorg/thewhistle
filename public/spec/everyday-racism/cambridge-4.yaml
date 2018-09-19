@@ -1,4 +1,4 @@
-- text: '# Are you reporting on behalf of yourself or someone else?'
+- text: '# Please select where this particular incident happened.'
 
 - input:
     name: on-behalf-of

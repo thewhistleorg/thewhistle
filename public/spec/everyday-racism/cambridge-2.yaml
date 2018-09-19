@@ -1,34 +1,82 @@
 - text: |
-    # Are you reporting on behalf of yourself or someone else?
+    ### Please read and tick to acknowledge this information below and give your consent to participate in this project.
 
+    <br><br>
+    ### University of Cambridge Official Reporting Procedures
 - input:
-    name: on-behalf-of
-    label: On behalf of
-    type: radio
+    name: procedure
+    type: checkbox
+    required: true
     options:
-        self:
-            label: Myself
-            attributes: checked
-        friend: 
-            label: Someone else
-            branch:
-                in-box: true
-                body:
-                    - text: Please fill in the report to the best of your knowledge following your friend’s request. Do not mind if the form refers to ‘you’.
-        observer: 
-            label: Observer/witness
-            branch:
-                in-box: true
-                body:
-                    - text: Please fill in the report to the best of your knowledge following your friend’s request. Do not mind if the form refers to ‘you’.
-
-- text: |
-    # Racist Incident
-
-    We understand this can be difficult. Please take your time and tell us as much as you want about what happened to you or the person you are writing it for. You can also report an incident you witnessed even if you were not asked to do so. You will have the opportunity to write about this circumstance at the end of the report
-
-    Experiences of racism can be so ordinary that it might be difficult to isolate particular incidents. In this report we are aiming to capture different ‘types’ (from the more subtle and everyday to the most obvious and deliberate) and frequencies of forms of racism. We are calling them ‘incidents’ although we are aware this term might limit the complex forms in which racism is expressed and experienced. 
-
-    You will have the option to add different incidents under this same report or create a new one. You can write about a cluster of incidents that are similar in nature, if they have happened in the same place and with the same people under one single incident. If there are variations and differences, please register each incident separately. 
-
-    You will be able to create and download a PDF with your information. You can always log in back to your report with your alias, which is XXXX XXXX, and add another incident later on.
+      confirm:
+        label: I understand that this is not a formal reporting procedure within the University of Cambridge. I can also raise an official complaint following the University of Cambridge official reporting procedures [**here**](https://www.studentcomplaints.admin.cam.ac.uk/harassment-sexual-misconduct/reporting-harassment-bullying-discrimination-or-sexual-misconduct) or through its [**anonymous reporting procedure**](https://www.studentcomplaints.admin.cam.ac.uk/anonymous-reporting-harassment-hate-crime-sexual-misconduct).
+        branch:
+            in-box: false
+            body:
+                - text: |
+                    <br>
+                    
+                    ### How is this incident reporting anonymous?
+                - input:
+                    name: anonymous
+                    type: checkbox
+                    required: true
+                    options:
+                        confirm:
+                            label: If you have concerns that providing detailed information might lead to your being identified, please note that we take the protection of your identity very seriously. We are also careful about collecting data pertaining only to members of the University of Cambridge. You will be asked to verify your link to the university by providing a current or alumni email address, to which an email will be sent that verifies your email address and gives you access to the report. After you do this, we will not keep your email and have no way to link it to your identity. The report will generate an alias which you must safeguard if you want to log into your report and add an incident to your file. You will also have the opportunity to create and download a PDF with your report at the end after you submit it. For our purposes, we will use your data by aggregating and crossing the details so your profile and report cannot be put together unless you explicitly ask for it using your alias.
+                            branch:
+                                in-box: false
+                                body:
+                                    - text: |
+                                        <br>
+                                        
+                                        ### Consent Statement
+                                    - input:
+                                        name: consent
+                                        type: checkbox
+                                        required: true
+                                        options:
+                                            confirm:
+                                                label: Any information you provide will be seen and analysed by the research team and volunteers of the Whistle – Everyday Racism Research Project. By filling in this Incident Report you agree to take part in this study; you understand that your participation is voluntary and that you are free to stop at anytime and your data will not be used unless you submit your whole report; you also agree that if you stop before submitting the whole report, your data will not be saved; you give your consent for the information to be used for academic purposes (i.e. reports, publications, presentations); you agree that your information informs antiracist activism in the University of Cambridge and beyond.
+                                                branch:
+                                                    in-box: false
+                                                    body:
+                                                        - text: |
+                                                            ### Have you used this reporting service before?
+                                                        - input:
+                                                            name: used-before
+                                                            label: Alias
+                                                            type: radio
+                                                            required: true
+                                                            options:
+                                                                y:
+                                                                    label: Yes
+                                                                    subsidiary:
+                                                                        - input:
+                                                                            name: existing-alias
+                                                                            type: text
+                                                                            label: Enter your anonymous alias
+                                                                        - html: |
+                                                                            <span id="alias-ok" title="alias available" class="alias-available hide">✓</span>
+                                                                            <span id="alias-nok" title="alias not available" class="alias-available hide">✗</span>
+                                                                n:
+                                                                    label: No
+                                                                    attributes: checked
+                                                                    subsidiary:
+                                                                        - option: show
+                                                                        - text: |
+                                                                            We make sure that your report is anonymous by creating a random identification alias.
+                                                                            If you want to follow up, use the anonymous alias below so we can access any relevant
+                                                                            information.
+                                                                        - html: |
+                                                                            <p>Your alias for this session is 
+                                                                                <b><output name="used-before-generated-alias">{{generated-alias}}</output></b>. Please make a note of this alias and keep it in a safe place so you can check back in with us if necessary. We are not able to retrieve your alias.</p>
+                                                                        - input:
+                                                                            type: hidden
+                                                                            name: generated-alias
+                                                                            value: {{generated-alias}}
+                                                                        - input:
+                                                                            type: button
+                                                                            name: get-alt-alias
+                                                                            class: inline-link
+                                                                            text: Generate another random alias

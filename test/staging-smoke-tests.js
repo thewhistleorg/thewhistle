@@ -22,8 +22,8 @@ const testuser = process.env.TESTUSER; // note testuser must have access to ‘g
 const testpass = process.env.TESTPASS; // (for successful login)
 
 
-describe(`Admin app (admin.${domain}`, function() {
-    this.timeout(30e3); // 30 sec - app can take some time to wake
+describe(`Admin app (admin.${domain})`, function() {
+    this.timeout(120e3); // 120 sec - (free-tier) staging app can take some time to wake
 
     it('has home page with login link in nav when not logged-in', async function() {
         const response = await adminApp.get('/');
@@ -61,7 +61,7 @@ describe(`Admin app (admin.${domain}`, function() {
     });
 });
 
-describe(`Report app (report.${domain}`, function() {
+describe(`Report app (report.${domain})`, function() {
     this.timeout(30e3); // 30 sec - app can take some time to wake
 
     it('sees grn-test/rape-is-a-crime (spec on filesys) home page', async function() {

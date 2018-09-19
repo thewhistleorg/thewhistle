@@ -19,7 +19,8 @@
     "cover": "nyc --require esm --reporter=html mocha --exit -r esm test/*/*.js; rm -r ./.nyc_output",
     "cover-unit": "nyc --require esm --reporter=html npm run test-unit; rm -r ./.nyc_output",
     "cover-intgn": "nyc --require esm --reporter=html npm run test-intgn; rm -r ./.nyc_output",
-    "apidoc": "apidoc -i app-api -o app-api/apidoc/apidoc"
+    "apidoc": "apidoc -i app-api -o app-api/apidoc/apidoc",
+    "heroku-postbuild": "npm run test-smoke"
   },
   "engines": {
     "node": "^10.5.0"

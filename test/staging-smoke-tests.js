@@ -23,7 +23,7 @@ const testpass = process.env.TESTPASS; // (for successful login)
 
 
 describe(`Admin app (admin.${domain}`, function() {
-    this.timeout(120e3); // 120 sec - app can take some time to wake
+    this.timeout(121e3); // 120 sec - app can take some time to wake
 
     it('has home page with login link in nav when not logged-in', async function() {
         const response = await adminApp.get('/');

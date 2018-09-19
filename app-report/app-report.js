@@ -43,9 +43,9 @@ app.use(async function logAccess(ctx, next) {
 });
 
 
-// handlebars templating (supra database/project)
-
-app.use(handlebars({
+// handlebars templating (supra database/project) - leave the renderer in global so that
+// FormGenerator can access it to rebuild templates after a form spec is saved to the database
+global.renderer = handlebars.Renderer({
     extension:   [ 'html' ],
     viewsDir:    'app-report/templates',
     partialsDir: 'app-report/templates/partials',
@@ -54,7 +54,8 @@ app.use(handlebars({
         checked:  HandlebarsHelpers.checked,
         show:     HandlebarsHelpers.show,
     },
-}));
+});
+app.use(global.renderer.middleware());
 
 
 // handle thrown or uncaught exceptions anywhere down the line

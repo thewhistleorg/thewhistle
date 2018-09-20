@@ -65,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         || (this.type=='checkbox' && this.checked)
                         || (this.type=='select-one' && this.value!='' && sub.classList.contains('select-any-subsidiary')) // note front-end DOM gives 'select-one' rather than 'select'
                         || (this.type=='select-one' && sub.classList.contains(`${this.value.replace(new RegExp(' ', 'g'), '_')}-subsidiary`));
-                    console.log(this.value);
                     if (showSubsidiary) {  // show && re-enable element
                         sub.classList.remove('hide');
                         sub.querySelectorAll('input,textarea,select').forEach(j => j.disabled = false);
@@ -92,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 //TODO: Make it remove branch if option is unselected as a radio button
                 if (this.type == 'checkbox') {
-                    const className = this.name + '-' + this.value.replace(new RegExp(' ', 'g'), '_') + '-branch';    
+                    const className = this.id + '-branch';    
                     const branches = document.getElementsByClassName(className);
                     if (this.checked) {
                         for (let b = 0; b < branches.length; b++) {
@@ -106,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (this.type == 'radio') {
                     const options = document.getElementsByName(this.name);
                     for (let o = 0; o < options.length; o++) {
-                        let className = options[o].name + '-' + options[o].value.replace(new RegExp(' ', 'g'), '_') + '-branch';
+                        let className = options[o].id + '-branch';
                         const branches = document.getElementsByClassName(className);
                         if (options[o].checked) {
                             for (let b = 0; b < branches.length; b++) {

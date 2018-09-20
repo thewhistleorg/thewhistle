@@ -422,7 +422,6 @@ class Handlers {
         if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.response.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
 
         const body = ctx.request.body;
-
         if (ctx.request.files) {
             // normalise files to be array of File objects (koa-body does not provide array if just 1 file uploaded)
             if (!Array.isArray(ctx.request.files)) ctx.request.files = [ ctx.request.files ];

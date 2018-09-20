@@ -4,6 +4,7 @@
     <br><br>
     ### University of Cambridge Official Reporting Procedures
 - input:
+    no-store: true
     name: procedure
     type: checkbox
     required: true
@@ -18,6 +19,7 @@
                     
                     ### How is this incident reporting anonymous?
                 - input:
+                    no-store: true
                     name: anonymous
                     type: checkbox
                     required: true
@@ -32,6 +34,7 @@
                                         
                                         ### Consent Statement
                                     - input:
+                                        no-store: true
                                         name: consent
                                         type: checkbox
                                         required: true

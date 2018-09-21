@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // get list of inputs named 'inputName'
         var inputsSelector = 'input[name='+inputName+'], textarea[name='+inputName+'], select[name='+inputName+']';
         var inputs = document.querySelectorAll(inputsSelector);
-
         // set up listeners to show current subsidiary and hide others
         for (i=0; i<inputs.length; i++) {
             inputs[i].addEventListener('change', function() { // note cannot simply assign to .onchange due to alternate texts listener
@@ -91,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 //TODO: Make it remove branch if option is unselected as a radio button
                 if (this.type == 'checkbox') {
-                    const className = this.id + '-branch';    
+                    const className = this.id + '-branch'; 
                     const branches = document.getElementsByClassName(className);
                     if (this.checked) {
                         for (let b = 0; b < branches.length; b++) {

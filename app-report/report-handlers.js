@@ -32,6 +32,7 @@ import Db            from '../lib/db.js';
 
 class Handlers {
     
+
     //TODO: Document Raven code
     static timeSinceVerification(issue) {
         const year = issue.substr(0, 4);
@@ -163,7 +164,13 @@ class Handlers {
         }
     }
 
-
+    static removeNoStores(obj) {
+        for (const field in obj) {
+            if (field.endsWith('-nostore')) {
+                delete obj[field];
+            }
+        }
+    }
     /**
      * GET / - (home page) list available reporting apps
      */
@@ -422,6 +429,9 @@ class Handlers {
         if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.response.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
 
         const body = ctx.request.body;
+
+        Handlers.removeNoStores(body);
+
         if (ctx.request.files) {
             // normalise files to be array of File objects (koa-body does not provide array if just 1 file uploaded)
             if (!Array.isArray(ctx.request.files)) ctx.request.files = [ ctx.request.files ];
@@ -623,7 +633,7 @@ function formatReport(org, project, page, body) {
     const pageInputs = page=='+'
         ? [ ...Object.values(inputs) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
         : inputs[page];                                                                  // inputs from this page
-
+    Handlers.removeNoStores(pageInputs);
     const rpt = {}; // the processed version of body
 
     for (const inputName in pageInputs) {
@@ -666,7 +676,6 @@ function formatReport(org, project, page, body) {
             const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
             rpt[label] = date;
         }
-
         debug('...', `${inputName} => ${label}: “${rpt[label]}”`);
     }
 

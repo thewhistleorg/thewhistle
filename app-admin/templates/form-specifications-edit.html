@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="/css/form-editor.css">
     <style>
         textarea { font: 0.8em monaco, Consolas, 'Lucida Console', monospace; height: 36em; width: 48em; }
     </style>
@@ -16,6 +17,25 @@
     <script src="/js/admin/notifications.js" defer></script>
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
     <script src="/js/admin/ga.js" async></script>
+    <script>
+        'use strict';
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // show/hide delete button on hover over formSpec tr
+            document.querySelectorAll('.formSpec').forEach(tr => tr.onclick = async function displaySpec() {
+                const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+                const credentials = 'same-origin';
+                const response = await fetch(`/ajax/form-specifications/${this.dataset.id}`, { headers, credentials });
+                if (response.ok) {
+                  const spec = await response.json();
+                  const editURI = '/form-specifications/' + spec.spec._id + '/edit'
+                  window.location.href = editURI;
+                } else {
+                    alert(response.status+': '+body.message);
+                }
+            });
+        });
+    </script>
 </head>
 <body>
 
@@ -27,31 +47,102 @@
 
 <main>
 
-<h1>Edit Form specification</h1>
+<!-- <h1>Edit Form specification</h1> -->
 
 {{>errpartial}}
+<div class="pure-u-1 header-container border-bottom">
+            <div class="header-table">
+                <div class="header-table-body">
+                    <div class="header-table-row">
+                        <div class="header-table-cell">
+                            <div class="content-header"><a class="bold" href="#"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back </a></div>
+                        </div>
 
-<form method="post" class="pure-form pure-form-aligned">
-    <ul>
-        <li class="pure-control-group">
-            <label for="project">Project</label>
-            <input type="text" name="project" id="project" value="{{project}}" required autofocus class="w12">
-        </li>
-        <li class="pure-control-group">
-            <label for="page">Page</label>
-            <input type="text" name="page" id="page" value="{{page}}" class="w12">
-            <span>leave blank for top-level page</span>
-        </li>
-        <li class="pure-control-group">
-            <label for="specification">Specification</label>
-            <textarea name="specification" id="specification">{{specification}}</textarea>
-        </li>
-        <li class="pure-control-group">
-            <label></label>
-            <button type="submit" class="pure-button pure-button-primary">Update form spec</button>
-        </li>
-    </ul>
-</form>
+                        <div class="header-table-cell">
+                            <div class="content-header">Edit campaign</div>
+                        </div>
+
+                        <div class="header-table-cell">
+                        </div>
+
+                        <div class="header-table-cell">
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+<div class="pure-g editor-container">
+  <div class="pure-u-1-5 bg-white page-list boder-right ">
+    <div class="new-button">
+      <a class="pure-button pure-button-primary filter-toggle" href="/form-specifications/add" title="Add new form spec"><i class="fa fa-plus"></i> New page</a>
+    </div>
+    <table class="">
+      <tr>
+        <!-- <th>Project</th>
+                            <th>Page</th>
+                            <th></th>
+                            <th></th> -->
+      </tr>
+      {{#formSpecs}}
+      <tr id="{{_id}}" data-id = "{{_id}}" class="formSpec">
+        <td class="spec nowrap">{{project}}</td>
+        <td class="spec nowrap">{{page}}</td>
+      </tr>
+      {{/formSpecs}}
+    </table>
+  </div>
+  <div class="pure-u-3-5 bg-white border-right ">
+    <form method="post" class="pure-form pure-form-aligned">
+      <div class="border-bottom editor-toolbox pure-g">
+        <div class="pure-u-12-24 bg-white " id="page-name">
+          <label for="project">Project</label>
+          <input type="text" name="project" id="project" value="{{formSpec.project}}" required autofocus class="w12">
+        </div>
+        <div class="pure-u-12-24 bg-white action-container">
+          <label for="page">Page</label>
+          <input type="text" name="page" id="page" value="{{formSpec.page}}" class="w12">
+          <span>leave blank for top-level page</span>
+          <!-- <div class="edit-button hide">
+            <a id="page-id" class="pure-button pure-button-primary button-small filter-toggle" href="/form-specifications/{{_id}}/edit" title="Edit form spec"><i class="fa fa-pencil"></i> Edit</a>
+          </div> -->
+        </div>
+      </div>
+      <div id="border-bottom">
+        <label for="specification">Specification</label>
+        <textarea name="specification" id="specification">{{formSpec.specification}}</textarea>
+      </div>
+          <!-- <ul> -->
+              <!-- <li class="pure-control-group">
+                  <label for="project">Project</label>
+                  <input type="text" name="project" id="project" value="{{project}}" required autofocus class="w12">
+              </li> -->
+              <!-- <li class="pure-control-group">
+                  <label for="page">Page</label>
+                  <input type="text" name="page" id="page" value="{{page}}" class="w12">
+                  <span>leave blank for top-level page</span>
+              </li> -->
+              <!-- <li class="pure-control-group">
+                  <label for="specification">Specification</label>
+                  <textarea name="specification" id="specification">{{specification}}</textarea>
+              </li> -->
+              <!-- <li class="pure-control-group">
+                  <label></label>
+                  <button type="submit" class="pure-button pure-button-primary">Update form spec</button>
+              </li> -->
+          <!-- </ul> -->
+      <div class="pure-g">
+        <div class="pure-u-5-5">
+          <button type="submit" class="pure-button pure-button-primary">Update form spec</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="pure-u-4-24 bg-white ">DOCS</div>
+</div>
+
+
 
 </main>
 

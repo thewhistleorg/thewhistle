@@ -9,13 +9,8 @@
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="/css/form-editor.css">
     <style>
-        form { margin: 0; }
-        td, th { min-width: 1em; }
-        button.fa-trash { background: none; border: none; color: #990000; padding: 1px; }
-        button.fa-trash:hover { cursor: pointer; }
-        pre { font: 0.8em monaco, Consolas, 'Lucida Console', monospace; border: 1px solid #cccccc; min-width: 48em; padding: 0.4em; }
-        .highlight { background-color: #e6e6e6 }
     </style>
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js" integrity="sha256-+JMHsXRyeTsws/tzbIh5YHQxRdKCuNjmvNcTFtY6DLc=" crossorigin="anonymous"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js" integrity="sha256-9Nt2r+tJnSd2A2CRUvnjgsD+ES1ExvjbjBNqidm9doI=" crossorigin="anonymous"></script>
@@ -40,15 +35,19 @@
             });
 
             // display specification
-            document.querySelectorAll('td.spec').forEach(td => td.onclick = async function displaySpec() {
+            document.querySelectorAll('.spec').forEach(td => td.onclick = async function displaySpec() {
                 const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
                 const credentials = 'same-origin';
                 const response = await fetch(`/ajax/form-specifications/${this.parentElement.id}`, { headers, credentials });
                 if (response.ok) {
                     const spec = await response.json();
+                    const editURI = '/form-specifications/' + spec.spec._id + '/edit'
                     document.querySelector('#spec').textContent = spec.spec.specification;
-                    document.querySelectorAll('td.spec').forEach(td => td.classList.remove('highlight'));
-                    this.parentElement.querySelectorAll('td.spec').forEach(td => td.classList.add('highlight'));
+                    document.querySelector('#page-name').textContent = spec.spec.project;
+                    document.querySelector('#page-id').href = editURI;
+                    document.querySelector('#page-id').classList.remove('hide');
+                    document.querySelectorAll('.spec').forEach(td => td.classList.remove('highlight'));
+                    this.parentElement.querySelectorAll('.spec').forEach(td => td.classList.add('highlight'));
                 } else {
                     alert(response.status+': '+body.message);
                 }
@@ -68,35 +67,70 @@
 </header>
 
 <main>
+  <div class="pure-u-1 header-container border-bottom">
+              <div class="header-table">
+                  <div class="header-table-body">
+                      <div class="header-table-row">
+                          <div class="header-table-cell">
+                              <div class="content-header"><a class="bold" href="#"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back </a></div>
+                          </div>
 
-<h1>Form specifications</h1>
+                          <div class="header-table-cell">
+                              <div class="content-header">Campaign name</div>
+                          </div>
+
+                          <div class="header-table-cell">
+                          </div>
+
+                          <div class="header-table-cell">
+
+                          </div>
+
+                      </div>
+                  </div>
+              </div>
+          </div>
+<!-- <h1>Form specifications</h1> -->
 
 {{>errpartial}}
 {{#if @koa.flash.notification}}<p class="alert">{{@koa.flash.notification}}</p>{{/if}}
-
-    <table>
-        <tr>
-            <td>
-                <table>
-                    <tr>
-                        <th>Project</th>
-                        <th>Page</th>
-                        <th></th>
-                        <th><a href="/form-specifications/add" title="Add new form spec" class="fa fa-plus primary-blue"></a></th>
-                    </tr>
-                    {{#formSpecs}}
-                    <tr id="{{_id}}" class="formSpec">
-                        <td class="spec nowrap">{{project}}</td>
-                        <td class="spec nowrap">{{page}}</td>
-                        <td><a href="/form-specifications/{{_id}}/edit" title="Edit form spec" class="fa fa-pencil grey hide"></a></td>
-                        <td><form action="/form-specifications/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" title="Delete form spec" class="fa fa-trash hide"></button></form></td>
-                    </tr>
-                    {{/formSpecs}}
-                </table>
-            </td>
-            <td><pre id="spec"></pre></td>
-        </tr>
+<div class="pure-g editor-container">
+  <div class="pure-u-1-5 bg-white page-list boder-right ">
+    <div class="new-button">
+      <a class="pure-button pure-button-primary filter-toggle" href="/form-specifications/add" title="Add new form spec"><i class="fa fa-plus"></i> New page</a>
+    </div>
+    <table class="">
+      <tr>
+        <!-- <th>Project</th>
+                            <th>Page</th>
+                            <th></th>
+                            <th></th> -->
+      </tr>
+      {{#formSpecs}}
+      <tr id="{{_id}}" class="formSpec">
+        <td class="spec nowrap">{{project}}</td>
+        <td class="spec nowrap">{{page}}</td>
+        <td class="spec"><a href="/form-specifications/{{_id}}/edit" title="Edit form spec" class="fa fa-pencil grey hide"></a></td>
+        <td class="spec">
+          <form action="/form-specifications/{{_id}}/delete" method="post" class="delete"><button name="delete" value="{{_id}}" title="Delete form spec" class="fa fa-trash hide"></button></form>
+        </td>
+      </tr>
+      {{/formSpecs}}
     </table>
+  </div>
+  <div class="pure-u-3-5 bg-white border-right ">
+    <div class="border-bottom editor-toolbox pure-g">
+      <div class="pure-u-21-24 bg-white " id="page-name"></div>
+      <div class="pure-u-1-24 bg-white action-container">
+        <div class="edit-button ">
+          <a id="page-id" class="pure-button hide pure-button-primary button-small filter-toggle" href="/form-specifications/{{_id}}/edit" title="Edit form spec"><i class="fa fa-pencil"></i> Edit</a>
+        </div>
+      </div>
+    </div>
+    <pre id="spec"> <span class="grey-color"><i class="fa fa-long-arrow-left" aria-hidden="true"></i> Create a new page or select a page from the list to view or edit.</span> </pre>
+  </div>
+  <div class="pure-u-4-24 bg-white ">DOCS</div>
+</div>
 
 </main>
 

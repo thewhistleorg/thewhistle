@@ -249,9 +249,38 @@ span.tag, a.tag {
 }
 
 /* override pure primary button colour */
-.pure-button-primary {
-    background-color: #50addb;
+.pure-button-primary,
+a.pure-button-primary {
+    background-color: #50addb !important;
 }
+
+a.pure-button-primary {
+  color: #fff !important;
+}
+
+a.pure-button-primary:hover {
+    text-decoration: none;
+}
+
+/*
+* button sizes
+*/
+.button-xsmall {
+   font-size: 70%;
+}
+
+.button-small {
+   font-size: 85%;
+}
+
+.button-large {
+   font-size: 110%;
+}
+
+.button-xlarge {
+   font-size: 125%;
+}
+
 
 /*
  * Helper classes
@@ -271,7 +300,7 @@ a, a:visited {
     color: #50addb;
 }
 
-a.grey {
+a.grey, .grey-color {
     color: #999999;
 }
 

@@ -5,6 +5,11 @@ function reCaptchaSubmitCallback(token) { // eslint-disable-line no-unused-vars
 }
 
 
+/**
+ * Clears the values of given inputs
+ * 
+ * @param {Object[]} elements - Array of input elements to clear values from
+ */
 function clearValues(elements) {
     for (var index = 0; index < elements.length; index++) {
         if (elements[index].type == 'radio' || elements[index].type == 'checkbox') {
@@ -44,6 +49,70 @@ document.addEventListener('DOMContentLoaded', function() {
     for (var q=0; q<questions.length; q++) {
         const [ questionInputName ] = [ ...questions[q].classList ].filter(c => c.match(/^question/)); // TODO: convert to ES5
         manageVisibility(questionInputName.replace('question-', ''));
+    }
+
+
+    /**
+     *  Appropriately changes the visibility of branches when a checkbox value changes
+     * 
+     * @param {HTMLInputElement} checkbox - Checkbox element whose value determines whether a branch shows
+     */
+    function manageCheckboxBranchVisibility(checkbox) {
+        const className = checkbox.id + '-branch'; 
+        //Any element whose visibility depends on this checkbox's value must have this class
+        const branches = document.getElementsByClassName(className);
+        if (checkbox.checked) {
+            for (let b = 0; b < branches.length; b++) {
+                branches[b].classList.remove('hide');
+            }
+        } else {
+            for (let b = 0; b < branches.length; b++) {
+                branches[b].classList.add('hide');
+            }
+        }
+    }
+
+
+    /**
+     *  Appropriately changes the visibility of branches when a radio button value changes
+     * 
+     * @param {HTMLInputElement} radio - Radio element whose value determines whether a branch shows
+     */
+    function manageRadioBranchVisibility(radio) {
+        const options = document.getElementsByName(radio.name);
+        //Since one radio button being selected deselects any with the same name,
+        //we must iterate through all such elements.
+        for (let o = 0; o < options.length; o++) {
+            let className = options[o].id + '-branch';
+            //Any element whose visibility depends on this checkbox's value must have this class
+            const branches = document.getElementsByClassName(className);
+            if (options[o].checked) {
+                for (let b = 0; b < branches.length; b++) {
+                    branches[b].classList.remove('hide');
+                }
+            } else {
+                for (let b = 0; b < branches.length; b++) {
+                    branches[b].classList.add('hide');
+                    clearValues(branches[b].getElementsByTagName('input'));
+                    clearValues(branches[b].getElementsByTagName('textarea'));
+                    clearValues(branches[b].getElementsByTagName('select'));
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Appropriately changes the visibility of branches when an input's value changes
+     * 
+     * @param {HTMLInputElement} input - Input element whose value determines whether a branch shows
+     */
+    function manageBranchVisibility(input) {
+        if (input.type == 'checkbox') {
+            manageCheckboxBranchVisibility(input);
+        } else if (input.type == 'radio') {
+            manageRadioBranchVisibility(input);
+        }
     }
 
 
@@ -88,38 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }
                 
-                //TODO: Make it remove branch if option is unselected as a radio button
-                if (this.type == 'checkbox') {
-                    const className = this.id + '-branch'; 
-                    const branches = document.getElementsByClassName(className);
-                    if (this.checked) {
-                        for (let b = 0; b < branches.length; b++) {
-                            branches[b].classList.remove('hide');
-                        }
-                    } else {
-                        for (let b = 0; b < branches.length; b++) {
-                            branches[b].classList.add('hide');
-                        }
-                    }
-                } else if (this.type == 'radio') {
-                    const options = document.getElementsByName(this.name);
-                    for (let o = 0; o < options.length; o++) {
-                        let className = options[o].id + '-branch';
-                        const branches = document.getElementsByClassName(className);
-                        if (options[o].checked) {
-                            for (let b = 0; b < branches.length; b++) {
-                                branches[b].classList.remove('hide');
-                            }
-                        } else {
-                            for (let b = 0; b < branches.length; b++) {
-                                branches[b].classList.add('hide');
-                                clearValues(branches[b].getElementsByTagName('input'));
-                                clearValues(branches[b].getElementsByTagName('textarea'));
-                                clearValues(branches[b].getElementsByTagName('select'));
-                            }
-                        }
-                    }
-                }
+                manageBranchVisibility(this);
 
                 // if 'this' is a skip option, clear any selects of the same name (eg survivor-age)
                 if (this.value == 'Skip') {

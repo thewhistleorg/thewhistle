@@ -20,7 +20,8 @@ class FormSpecificationsHandlers {
 
         const formSpecs = await FormSpecification.getAll(db);
 
-        formSpecs.sort((a, b) => { return a.page < b.page ? -1 : 1; });
+        formSpecs.sort((a, b) => { return a.project+a.page < b.project+b.page ? -1 : 1; });
+
         await ctx.render('form-specifications-list', { formSpecs });
     }
 

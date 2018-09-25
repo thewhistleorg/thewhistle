@@ -2,8 +2,9 @@
 /* Form generator unit tests.                                                      C.Veness 2018  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import { expect } from 'chai';     // BDD/TDD assertion library
-import fs         from 'fs-extra'; // fs with extra functions & promise interface
+import { expect } from 'chai';           // BDD/TDD assertion library
+import fs         from 'fs-extra';       // fs with extra functions & promise interface
+import handlebars from 'koa-handlebars'; // handlebars templating
 
 import FormGenerator from '../../lib/form-generator.js';
 
@@ -11,6 +12,11 @@ const test = it; // just an alias
 
 describe('Form generator', function() {
     // this.timeout(4e3); // 4 sec
+
+    before(function() {
+        // set up global.renderer for FormGenerator.build() (normally done in app-report.js)
+        global.renderer = handlebars.Renderer();
+    });
 
     describe('exists', function() {
         test('grn-test/rape-is-a-crime exists', async function() {

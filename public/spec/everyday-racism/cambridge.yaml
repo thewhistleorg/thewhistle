@@ -28,12 +28,12 @@ options:
       next: false
     p1:
       title: The Whistle / Everyday Racism at Cambridge Incident Report?
-      prev: false
       next: Start
     p2:
       title: The Whistle / Everyday Racism at Cambridge Incident Report?
     p3:
       title: The Whistle / Everyday Racism at Cambridge Incident Report?
+      prev: false
     p4:
       title: The Whistle / Everyday Racism at Cambridge Incident Report?
     p5:

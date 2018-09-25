@@ -33,9 +33,16 @@ import Db            from '../lib/db.js';
 class Handlers {
     
 
-    //TODO: Document Raven code
+    /**
+     * Given the Raven issue string, returns the milliseconds since Raven verification
+     * 
+     * @param {string} issue - String of the verification time (provided by Raven)
+     * 
+     * @returns {number} - Milliseconds since verification
+     */
     static timeSinceVerification(issue) {
         const year = issue.substr(0, 4);
+        //Constructor takes month as an integer from 0 to 11 (rather than 1 to 12 which raven gives)
         const month = issue.substr(4, 2) - 1;
         const day = issue.substr(6, 2);
         const hour = issue.substr(9, 2);
@@ -46,9 +53,27 @@ class Handlers {
     }
 
 
+    /**
+     * Determines if the Raven authentication was successful.
+     * Does so by processing the Web Login Service response string.
+     * This method adheres to the 'The Cambridge Web Authentication System:
+     * WAA->WLS communication protocol' document, version 4.1 (March 2015).
+     * This is the latest version of the document at the time of development
+     * (September 2018).
+     * Document can be found here: https://raven.cam.ac.uk/project/waa2wls-protocol.txt
+     * 
+     * @param {string} wlsResponse - Web Login Service response string.
+     *                               Given following Raven authentication attempt.
+     * @returns {boolean} - True if the data in the given wlsResponse string is valid
+     *                      and indicates successful authentication.
+     *                      False otherwise.
+     */
     static async validWlsResponse(wlsResponse) {
         try {
+            //wlsResponse is delimited by '!'s
             const params = wlsResponse.split('!');
+            //Detailed description of these variables is given in the protocol documentation
+            //Unused parameters are commented out rather than omitted altogether
             const ver = params[0];
             const status = params[1];
             //const msg = params[2];
@@ -62,40 +87,51 @@ class Handlers {
             //const life = params[10];
             //const reqParams = params[11];
             const kid = params[12];
+            //These replacements are necessary according to the protocol documentation
             const sig = decodeURI(params[13]).replace(/-/g, '+').replace(/\./g, '/').replace(/_/g, '=');
+            //All the following tests are defined in the protocol documentation
             if (status != 200) {
                 return false;
             }
+            //We are only using WLS protocol version 3
             if (ver != 3) {
                 return false;
             }
+            //We are only using key 2
             if (kid != 2) {
                 return false;
             }
             const timeSinceVerification = Handlers.getTimeSinceVerification(issue);
-            if (timeSinceVerification > 60000) {
+            if (timeSinceVerification > 60000) { //60 seconds is suggested maximum
                 return false;
             }
             const splitUrl = url.split('/');
+            //Must use http or https protocol
             if (!(splitUrl[0] === 'http:' || splitUrl[0] === 'https:')) {
                 return false;
             }
+            //Where the request came from must be the report subapp
             if (!splitUrl[2].startsWith('report.thewhistle.')) {
                 return false;
             }
+            //pwd refers to username/password authentication
+            //At time of development, this is the only acceptable authentication type
             if (!auth === 'pwd') {
                 return false;
             }
             if (!id) {
                 return false;
             }
+            //Principal is the user's identity, which must be present given a 200 status code
             if (!principal) {
                 return false;
             }
 
+            //SHA1 is the hashing algorithm used
             const verifier = crypto.createVerify('SHA1');
             verifier.update(decodeURI(params.slice(0, -2).join('!')));
             const key = await fs.readFile('public/keys/pubkey2.crt');
+            //Authenticated is true iff hash matches
             const authenticated = verifier.verify(key, sig, 'base64');
 
             return authenticated;
@@ -105,8 +141,16 @@ class Handlers {
     }
 
 
+    /**
+     * Signs and stores the jwt token in a cookie
+     * 
+     * @param {Object} ctx
+     * @param {string} wlsResponse - Web Login Service response string.
+     *                               Given following Raven authentication attempt.
+     */
     static storeJwtToken(ctx, wlsResponse) {
         const params = wlsResponse.split('!');
+        //These array positions are defined in the WLS protocol documentation
         const crsid = params[6];
         const life = params[10];
         const payload = {
@@ -114,10 +158,14 @@ class Handlers {
         };
         const jwtOptions = {};
         if (life !== '') {
+            //If life of the token is already defined
+            //jwt takes milliseconds rather than seconds, hence multiplication
             jwtOptions.expiresIn = life * 1000;
             payload.oneUse = false;
         } else {
+            //Life isn't defined, so give 1 week max
             jwtOptions.expiresIn = 7 * 24 * 60 * 60 * 1000;
+            //Set oneUse so user has to re-authenticate for any subsequent session
             payload.oneUse = true;
             payload.used = false;
         }
@@ -130,6 +178,15 @@ class Handlers {
     }
 
 
+    /**
+     * Determines whether a given token is valid
+     * 
+     * @param {string} token - JWT token
+     * 
+     * @returns {boolean} - True if the given token is valid and unused,
+     *                      if authentication was for one session.
+     *                      False otherwise.
+     */
     static validJwtToken(token) {
         try {
             const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
@@ -142,8 +199,8 @@ class Handlers {
         }
     }
 
-
-    static async getRacism(ctx) {
+    //Left in for reference when Raven authentication is implemented
+    /* static async getRacism(ctx) {
         const wlsResponse = ctx.request.query['WLS-Response'];
         if (wlsResponse) {
             if (Handlers.validWlsResponse(wlsResponse)) {
@@ -162,7 +219,7 @@ class Handlers {
                 ctx.redirect(`${url}?${querystring.stringify(params)}`);
             }
         }
-    }
+    } */
 
     static removeNoStores(obj) {
         for (const field in obj) {

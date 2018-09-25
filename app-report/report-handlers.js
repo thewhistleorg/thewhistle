@@ -488,7 +488,7 @@ class Handlers {
         }
 
         // remember if we're going forward or back, then delete nav from body
-        const goNum = body['nav-next'] ? page + 1 : page - 1;
+        const goNum = body['nav-next'] ? page + 1 : body['nav-prev'] ? page - 1 : page; // we should normally have either next or prev, but...
         const go = goNum==0 ? '' : goNum>nPages || page=='+' ? 'whatnext' : goNum;
         delete body['nav-prev'];
         delete body['nav-next'];

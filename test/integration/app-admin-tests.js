@@ -218,6 +218,65 @@ describe(`Admin app (${org}/${app.env})`, function() {
         });
     });
 
+    describe('form specification', function() {
+        let specId = null;
+
+        const minimalSpec = `
+title: Minimal form spec (non-functional, but will validate)
+
+pages:
+  index: { $ref: '#/index' }
+
+index:
+- text: Minimal validating form.
+`;
+
+        it('sees list form specs page', async function() {
+            const response = await appAdmin.get('/form-specifications');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal('Form specifications');
+        });
+
+        it('sees add form spec page', async function() {
+            const response = await appAdmin.get('/form-specifications/add');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal('Add Form specification');
+        });
+
+        it('adds minimal form spec', async function() {
+            const values = { project: 'integration-test', page: '', specification: minimalSpec };
+            const response = await appAdmin.post('/form-specifications/add').send(values);
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/form-specifications');
+            specId = response.headers['x-insert-id'];
+        });
+
+        it('sees form spec in list form specs page', async function() {
+            const response = await appAdmin.get('/form-specifications');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            const matches = document.evaluate('count(//td[text()="integration-test"])', document, null, 0, null);
+            expect(matches.numberValue).to.equal(1);
+        });
+
+        it('deletes form spec', async function() {
+            const response = await appAdmin.post(`/form-specifications/${specId}/delete`);
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/form-specifications');
+        });
+
+        it('no longer sees form spec in list form specs page', async function() {
+            const response = await appAdmin.get('/form-specifications');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            const matches = document.evaluate('count(//td[text()="integration-test"])', document, null, 0, null);
+            expect(matches.numberValue).to.equal(0);
+        });
+
+    });
+
     describe('submit (internal single-page) incident report', function() {
         // note app-report-tests also does single-page submission, but this does various admin functions
         let reportId = null;

@@ -38,39 +38,39 @@
     options:
       blank:
         label: ''
-      from0to4:
+      0-4:
         label: 0-4
-      from5to9:
+      5-9:
         label: 5-9
-      from10to14:
+      10-14:
         label: 10-14
-      from15to19:
+      15-19:
         label: 15-19
-      from20to24:
+      20-24:
         label: 20-24
-      from25to29:
+      25-29:
         label: 25-29
-      from30to34:
+      30-34:
         label: 30-34
-      from35to39:
+      35-39:
         label: 35-39
-      from40to44:
+      40-44:
         label: 40-44
-      from45to49:
+      45-49:
         label: 45-49
-      from50to54:
+      50-54:
         label: 50-54
-      from55to59:
+      55-59:
         label: 55-59
-      from60to64:
+      60-64:
         label: 60-64
-      from65to69:
+      65-69:
         label: 65-69
-      from70to74:
+      70-74:
         label: 70-74
-      from75to79:
+      75-79:
         label: 75-79
-      over79:
+      80+:
         label: 80+
 
 - input: # note skip radio button has same name as select list

@@ -221,6 +221,12 @@ class Handlers {
         }
     } */
 
+
+    /**
+     * Removes all fields whose key string ends with 'no-store' from a given object
+     * 
+     * @param {Object} obj - Can be any object
+     */
     static removeNoStores(obj) {
         for (const field in obj) {
             if (field.endsWith('-nostore')) {
@@ -228,6 +234,8 @@ class Handlers {
             }
         }
     }
+
+
     /**
      * GET / - (home page) list available reporting apps
      */

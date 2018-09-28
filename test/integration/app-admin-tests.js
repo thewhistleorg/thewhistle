@@ -19,8 +19,8 @@ import csvParse           from 'csv-parse/lib/sync'; // full featured CSV parser
 
 import app from '../../app.js';
 
-const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn-test‘ organisation only
-const testpass = process.env.TESTPASS; // (for successful login & ‘rape-is-a-crime‘ report submission)
+const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn-test’ organisation
+const testpass = process.env.TESTPASS; // (for admin login test)
 
 const org = 'grn-test';         // the test organisation for the live ‘grn‘ organisation
 const proj = 'rape-is-a-crime'; // GRN's only project
@@ -37,7 +37,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
     this.slow(250);
 
     before(async function() {
-        // check testuser 'tester' exists and has access to ‘grn-test’ org (only)
+        // check testuser 'tester' exists and has access to ‘grn-test’ org
         const responseUsr = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
         if (!responseUsr.body.databases.includes(org)) throw new Error(`${testuser} must have access to ‘${org}’ org`);
 

@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/css/notifications.css">
     <style>
         textarea { font: 0.8em monaco, Consolas, 'Lucida Console', monospace; height: 36em; width: 48em; }
+        div.error-msg pre { margin: 0 2em; }
     </style>
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js" integrity="sha256-+JMHsXRyeTsws/tzbIh5YHQxRdKCuNjmvNcTFtY6DLc=" crossorigin="anonymous"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js" integrity="sha256-9Nt2r+tJnSd2A2CRUvnjgsD+ES1ExvjbjBNqidm9doI=" crossorigin="anonymous"></script>
@@ -29,7 +30,7 @@
 
 <h1>Add Form specification</h1>
 
-{{>errpartial}}
+{{>errpartialraw}}
 
 <form method="post" class="pure-form pure-form-aligned">
     <ul>

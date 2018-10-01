@@ -29,6 +29,7 @@ import Resource          from './models/resource.js';
 import Submission        from './models/submission.js';
 import Update            from './models/update.js';
 import User              from './models/user.js';
+import Group             from './models/group.js';
 
 
 const app = new Koa();
@@ -100,6 +101,7 @@ async function initModels() {
         initMethods.push(Resource.init(db));
         initMethods.push(Submission.init(db));
         initMethods.push(Update.init(db));
+        initMethods.push(Group.init(db));
     }
     initMethods.push(User.init());
 

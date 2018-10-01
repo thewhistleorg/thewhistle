@@ -736,7 +736,7 @@ function formatReport(org, project, page, body) {
         if (inputName == 'when' && body.date) { // TODO: this is depending on naming within yaml, not on use of library-date!
             const d = typeof body.date=='object' ? body.date : JSON.parse(body.date);
             const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
-            const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
+            const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ];
             // const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, d.hour, d.minute);
             const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
             rpt[label] = date;

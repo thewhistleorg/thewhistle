@@ -9,8 +9,13 @@ import querystring                   from 'querystring'; // nodejs.org/api/query
 import dateFormat                    from 'dateformat';  // Steven Levithan's dateFormat()
 import { LatLonSpherical as LatLon } from 'geodesy';     // library of geodesy functions
 import Debug                         from 'debug';       // small debugging utility
+import crypto                        from 'crypto';
+import fs                            from 'fs-extra';
+import jwt    from 'jsonwebtoken'; // JSON Web Token implementation
+
 
 const debug = Debug('app:report'); // submission process
+
 
 import Report        from '../models/report.js';
 import Resource      from '../models/resource.js';
@@ -26,6 +31,210 @@ import Db            from '../lib/db.js';
 
 
 class Handlers {
+    
+
+    /**
+     * Given the Raven issue string, returns the milliseconds since Raven verification
+     * 
+     * @param {string} issue - String of the verification time (provided by Raven)
+     * 
+     * @returns {number} - Milliseconds since verification
+     */
+    static timeSinceVerification(issue) {
+        const year = issue.substr(0, 4);
+        //Constructor takes month as an integer from 0 to 11 (rather than 1 to 12 which raven gives)
+        const month = issue.substr(4, 2) - 1;
+        const day = issue.substr(6, 2);
+        const hour = issue.substr(9, 2);
+        const minute = issue.substr(11, 2);
+        const second = issue.substr(13, 2);
+        const verificationDate = new Date(Date.UTC(year, month, day, hour, minute, second));
+        return Date.now() - verificationDate.getTime();
+    }
+
+
+    /**
+     * Determines if the Raven authentication was successful.
+     * Does so by processing the Web Login Service response string.
+     * This method adheres to the 'The Cambridge Web Authentication System:
+     * WAA->WLS communication protocol' document, version 4.1 (March 2015).
+     * This is the latest version of the document at the time of development
+     * (September 2018).
+     * Document can be found here: https://raven.cam.ac.uk/project/waa2wls-protocol.txt
+     * 
+     * @param {string} wlsResponse - Web Login Service response string.
+     *                               Given following Raven authentication attempt.
+     * @returns {boolean} - True if the data in the given wlsResponse string is valid
+     *                      and indicates successful authentication.
+     *                      False otherwise.
+     */
+    static async validWlsResponse(wlsResponse) {
+        try {
+            //wlsResponse is delimited by '!'s
+            const params = wlsResponse.split('!');
+            //Detailed description of these variables is given in the protocol documentation
+            //Unused parameters are commented out rather than omitted altogether
+            const ver = params[0];
+            const status = params[1];
+            //const msg = params[2];
+            const issue = params[3];
+            const id = params[4];
+            const url = params[5];
+            const principal = params[6];
+            //const ptags = params[7];
+            const auth = params[8];
+            //const sso = params[9];
+            //const life = params[10];
+            //const reqParams = params[11];
+            const kid = params[12];
+            //These replacements are necessary according to the protocol documentation
+            const sig = decodeURI(params[13]).replace(/-/g, '+').replace(/\./g, '/').replace(/_/g, '=');
+            //All the following tests are defined in the protocol documentation
+            if (status != 200) {
+                return false;
+            }
+            //We are only using WLS protocol version 3
+            if (ver != 3) {
+                return false;
+            }
+            //We are only using key 2
+            if (kid != 2) {
+                return false;
+            }
+            const timeSinceVerification = Handlers.getTimeSinceVerification(issue);
+            if (timeSinceVerification > 60000) { //60 seconds is suggested maximum
+                return false;
+            }
+            const splitUrl = url.split('/');
+            //Must use http or https protocol
+            if (!(splitUrl[0] === 'http:' || splitUrl[0] === 'https:')) {
+                return false;
+            }
+            //Where the request came from must be the report subapp
+            if (!splitUrl[2].startsWith('report.thewhistle.')) {
+                return false;
+            }
+            //pwd refers to username/password authentication
+            //At time of development, this is the only acceptable authentication type
+            if (!auth === 'pwd') {
+                return false;
+            }
+            if (!id) {
+                return false;
+            }
+            //Principal is the user's identity, which must be present given a 200 status code
+            if (!principal) {
+                return false;
+            }
+
+            //SHA1 is the hashing algorithm used
+            const verifier = crypto.createVerify('SHA1');
+            verifier.update(decodeURI(params.slice(0, -2).join('!')));
+            const key = await fs.readFile('public/keys/pubkey2.crt');
+            //Authenticated is true iff hash matches
+            const authenticated = verifier.verify(key, sig, 'base64');
+
+            return authenticated;
+        } catch (e) {
+            return false;
+        }
+    }
+
+
+    /**
+     * Signs and stores the jwt token in a cookie
+     * 
+     * @param {Object} ctx
+     * @param {string} wlsResponse - Web Login Service response string.
+     *                               Given following Raven authentication attempt.
+     */
+    static storeJwtToken(ctx, wlsResponse) {
+        const params = wlsResponse.split('!');
+        //These array positions are defined in the WLS protocol documentation
+        const crsid = params[6];
+        const life = params[10];
+        const payload = {
+            crsid: crsid,
+        };
+        const jwtOptions = {};
+        if (life !== '') {
+            //If life of the token is already defined
+            //jwt takes milliseconds rather than seconds, hence multiplication
+            jwtOptions.expiresIn = life * 1000;
+            payload.oneUse = false;
+        } else {
+            //Life isn't defined, so give 1 week max
+            jwtOptions.expiresIn = 7 * 24 * 60 * 60 * 1000;
+            //Set oneUse so user has to re-authenticate for any subsequent session
+            payload.oneUse = true;
+            payload.used = false;
+        }
+        const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, jwtOptions);
+        const cookieOptions = {
+            signed:  true,
+            expires: new Date(Date.now() + jwtOptions.expiresIn),
+        };
+        ctx.cookies.set('ravenJwt', token, cookieOptions);
+    }
+
+
+    /**
+     * Determines whether a given token is valid
+     * 
+     * @param {string} token - JWT token
+     * 
+     * @returns {boolean} - True if the given token is valid and unused,
+     *                      if authentication was for one session.
+     *                      False otherwise.
+     */
+    static validJwtToken(token) {
+        try {
+            const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
+            if (payload.oneUse && payload.used) {
+                return false;
+            }
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    //Left in for reference when Raven authentication is implemented
+    /* static async getRacism(ctx) {
+        const wlsResponse = ctx.request.query['WLS-Response'];
+        if (wlsResponse) {
+            if (Handlers.validWlsResponse(wlsResponse)) {
+                Handlers.storeJwtToken(ctx, wlsResponse);
+            }
+            await ctx.response.redirect('/racism');
+        } else {
+            if (Handlers.validJwtToken(ctx.cookies.get('ravenJwt', { signed: true }))) {
+                await ctx.render('racism');
+            } else {
+                const params = {
+                    ver: 3,
+                    url: 'http://report.thewhistle.local:3000/racism', //TODO: Change this depending on environment
+                };
+                const url = 'https://raven.cam.ac.uk/auth/authenticate.html';
+                ctx.redirect(`${url}?${querystring.stringify(params)}`);
+            }
+        }
+    } */
+
+
+    /**
+     * Removes all fields whose key string ends with 'no-store' from a given object
+     * 
+     * @param {Object} obj - Can be any object
+     */
+    static removeNoStores(obj) {
+        for (const field in obj) {
+            if (field.endsWith('-nostore')) {
+                delete obj[field];
+            }
+        }
+    }
+
 
     /**
      * GET / - (home page) list available reporting apps
@@ -93,19 +302,18 @@ class Handlers {
         const org = ctx.params.database;
         const project = ctx.params.project;
         debug('getIndex', org, project);
+        try {
+            if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
+        } catch (e) {
+            if (e instanceof ReferenceError) ctx.throw(404, `Submission form ${org}/${project} not found`);
+            ctx.throw(500, e.message);
+        }
 
         // check we have db connection for org
         try {
             await Db.connect(org);
         } catch (e) {
             ctx.throw(404, `Submission form ${org}/${project} not found`)
-        }
-
-        try {
-            if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
-        } catch (e) {
-            if (e instanceof ReferenceError) ctx.throw(404, `Submission form ${org}/${project} not found`);
-            ctx.throw(500, e.message);
         }
 
         // clear previous session
@@ -287,6 +495,8 @@ class Handlers {
 
         const body = ctx.request.body;
 
+        Handlers.removeNoStores(body);
+
         if (ctx.request.files) {
             // normalise files to be array of File objects (koa-body does not provide array if just 1 file uploaded)
             if (!Array.isArray(ctx.request.files)) ctx.request.files = [ ctx.request.files ];
@@ -301,7 +511,7 @@ class Handlers {
 
         if (page==1 & ctx.session.id) { ctx.flash = { error: 'Trying to save already saved report!' }; return ctx.response.redirect(ctx.request.url); }
 
-        if (page==1 || page=='+') { // create the skeleton report (with alias)
+        if (body['used-before']) { // create the skeleton report (with alias)
             let alias = null;
 
             switch (body['used-before']) {
@@ -343,7 +553,7 @@ class Handlers {
         }
 
         // remember if we're going forward or back, then delete nav from body
-        const goNum = body['nav-next'] ? page + 1 : page - 1;
+        const goNum = body['nav-next'] ? page + 1 : body['nav-prev'] ? page - 1 : page; // we should normally have either next or prev, but...
         const go = goNum==0 ? '' : goNum>nPages || page=='+' ? 'whatnext' : goNum;
         delete body['nav-prev'];
         delete body['nav-next'];
@@ -488,7 +698,7 @@ function formatReport(org, project, page, body) {
     const pageInputs = page=='+'
         ? [ ...Object.values(inputs) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
         : inputs[page];                                                                  // inputs from this page
-
+    Handlers.removeNoStores(pageInputs);
     const rpt = {}; // the processed version of body
 
     for (const inputName in pageInputs) {
@@ -512,7 +722,7 @@ function formatReport(org, project, page, body) {
         }
 
         // check for any subsidiary inputs: if there are, append the subsidiary value within quotes
-        if (Array.isArray(rpt[label])) { // multiple response to checkboxes
+        if (Array.isArray(rpt[label]) && pageInputs[inputName].subsidiary) { // multiple response to checkboxes
             for (let i=0; i<rpt[label].length; i++) {
                 const subsidiaryFieldName = pageInputs[inputName].subsidiary[body[inputName][i]];
                 if (body[subsidiaryFieldName]) rpt[label][i] += ` (${body[subsidiaryFieldName]})`;
@@ -531,7 +741,6 @@ function formatReport(org, project, page, body) {
             const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
             rpt[label] = date;
         }
-
         debug('...', `${inputName} => ${label}: “${rpt[label]}”`);
     }
 

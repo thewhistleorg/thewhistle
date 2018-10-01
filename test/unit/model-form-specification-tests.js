@@ -1,0 +1,74 @@
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/* Form specification model unit tests.                                            C.Veness 2018  */
+/*                                                                                                */
+/* Note these tests do not mock out database components, but operate on the live 'demo' db.       */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+import { expect } from 'chai';   // BDD/TDD assertion library
+import dotenv     from 'dotenv'; // load environment variables from a .env file into process.env
+
+dotenv.config();
+
+import FormSpecification from '../../models/form-specification.js';
+
+const testuser = process.env.TESTUSER;
+
+const db = 'demo'; // the demo organisation
+
+import './before.js';
+
+const minimalSpec = `
+title: Minimal form spec (non-functional, but will validate)
+
+pages:
+  index: { $ref: '#/index' }
+
+index:
+- text: Minimal validating form.
+`;
+
+describe(`FormSpecification model (${db})`, function() {
+    this.timeout(5e3); // 5 sec
+    this.slow(100);
+
+    let specId = null;
+
+    it('creates form spec', async function() {
+        const spec = { project: 'unit-test', page: '', specification: minimalSpec };
+        specId = await FormSpecification.insert(db, spec);
+        // console.info('\tspec id', specId);
+    });
+
+    it('gets form spec', async function() {
+        const spec = await FormSpecification.get(db, specId);
+        expect(spec.project).to.equal('unit-test');
+        expect(spec.page).to.equal('');
+        expect(spec.specification).to.equal(minimalSpec);
+    });
+
+    it('gets all form specs in project', async function() {
+        const specs = await FormSpecification.getBy(db, 'project', 'unit-test');
+        expect(specs.length).to.equal(1);
+        expect(specs.filter(s => s.project=='unit-test' && s.page=='').length).to.equal(1);
+    });
+
+    it('gets all form specs', async function() {
+        const specs = await FormSpecification.getAll(db);
+        expect(specs.length).to.be.at.least(1);
+        expect(specs.filter(s => s.project=='unit-test' && s.page=='').length).to.equal(1);
+    });
+
+    it('updates form spec', async function() {
+        await FormSpecification.update(db, specId, { project: 'unit-test-2' });
+        const spec = await FormSpecification.get(db, specId);
+        expect(spec.project).to.equal('unit-test-2');
+    });
+
+    it('deletes form spec', async function() {
+        await FormSpecification.delete(db, specId);
+        const deletedSpec = await FormSpecification.get(db, specId);
+        expect(deletedSpec).to.be.null;
+    });
+
+
+});

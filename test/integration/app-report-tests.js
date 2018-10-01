@@ -15,8 +15,8 @@ import dateFormat   from 'dateformat'; // Steven Levithan's dateFormat()
 
 import app from '../../app.js';
 
-const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn-test‘ organisation only
-const testpass = process.env.TESTPASS; // (for successful login & ‘rape-is-a-crime‘ report submission)
+const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn-test’ organisation
+const testpass = process.env.TESTPASS; // (for admin login test)
 
 const org = 'grn-test';         // the test organisation for the live ‘grn‘ organisation
 const proj = 'rape-is-a-crime'; // GRN's only project

@@ -26,13 +26,19 @@
           - text: For example, last month, a couple of years ago, …
           - input:
               name: within-options
+              label: Within options
               type: select
               options:
-                -
-                - last week
-                - last month
-                - last year
-                - more than a year ago
+                blank:
+                    label:
+                lastweek:
+                    label: last week
+                lastmonth:
+                    label: last month
+                lastyear:
+                    label: last year
+                overyear:
+                    label: more than a year ago
       dont-remember: I do not remember
       skip: Skip
 

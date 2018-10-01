@@ -1,0 +1,50 @@
+- flash:
+    type: standard
+
+- text: |
+    # Before you start...
+    By completing this incident report form you are taking part in an independent research project developed by Dr Ella McPherson and Dr Mónica Moreno Figueroa based at the Department of Sociology, University of Cambridge.
+
+    **We want to know what, how and where it happened, not your identity, even if this may be apparent through other types of data like location data. You will not be named. There will be no formal repercussions for any specific person, either the one who reports or if there is anyone in particular being reported as this is a research project and not a formal reporting university procedure.**
+
+    This incident report form is a safe and confidential way to report everyday racist occurrences that have happened to you, someone you know or that you have observed at the University of Cambridge. One of the ways in which racism is perpetuated as a system of oppression is through everyday manifestations. Expressions of racism include beliefs, feelings, attitudes, utterances and actions that end up reproducing and re-establishing a system that offers dominant groups opportunities to thrive while negatively impacting minority groups. Forms of racism can also refer to structural processes, environments or atmospheres and less discrete or more diffuse experiences. We are aware that some forms of racism might be easier to capture in this format than others and that the term ‘racist incident’ might fall short for what you experienced or saw. We also understand that everyday racism can be so normalised that many will not even perceive it as such. However, the acknowledgement of racism as an important social problem is increasing and this project aims to contribute to its visibility and eradication while critically acknowledging the limitations that a format like this might have. We think that a first step to inform policy and action is to offer analysis and information on the issues at stake and to get a better idea of who is affected within the University. 
+
+    Tell us as little or as much as you feel comfortable doing.
+
+      * Your report will help us understand how racism is experienced at Cambridge with numeric, descriptive and geographic evidence to inform advocacy but also for academic presentations and publications. Your data will be added to this map of reported racist incidents that could help us focus antiracist actions [link??]
+      * Your report will help us generate weekly and monthly reports to inform the work of student and staff antiracist activism in the University pushing the agenda for institutional change.
+      * As researchers we are trained in keeping data confidential. We will preserve your confidentiality and keep the raw data safely stored.  Your whole report will only be seen by staff and volunteers of The Whistle/Everyday Racism project at the University of Cambridge.
+      * This report should take around 15 minutes to complete, but this might vary.
+
+    Please be aware that this is not a formal reporting procedure of the University of Cambridge. You may also wish to make a report using the University of Cambridge official reporting procedures [**here**](https://www.studentcomplaints.admin.cam.ac.uk/harassment-sexual-misconduct/reporting-harassment-bullying-discrimination-or-sexual-misconduct) or through its [**anonymous reporting procedure**](https://www.studentcomplaints.admin.cam.ac.uk/anonymous-reporting-harassment-hate-crime-sexual-misconduct). This project, Everyday Racism at Cambridge, differs from the anonymous reporting that the University offers because it wants more detail about the nature of the event that took place as well as the location and its aim is to highlight how racism is normalised.
+
+    If you are experiencing a crisis and need medical attention, call 111. For hate crimes, please call 999 or go to [**report-it.org.uk/your_police_force**](http://report-it.org.uk/your_police_force).
+
+    Please take care of yourself, reach out if you are struggling and try and find support from people you trust if you can.
+
+    ## Where can you get further support?
+    ### Support for Students is available via:
+      * **Cambridge University Student Union**: [www.cusu.co.uk](https://www.cusu.co.uk/), [advice@studentadvice.cam.ac.uk](mailto:advice@studentadvice.cam.ac.uk), Tel, 01223 333313
+      * **BME Campaign**, Cambridge University Student Union: [www.cusu.co.uk/about/liberation-campaigns/the-black-and-minority-ethnic-campaign](https://www.cusu.co.uk/about/liberation-campaigns/the-black-and-minority-ethnic-campaign/)
+      * **FLY**, Cambridge University's network and forum for women and non-binary people of colour: [www.facebook.com/FLYcambridge](https://www.facebook.com/FLYcambridge/), [flygirlsofcambridge.com](https://flygirlsofcambridge.com/)
+      * **Graduate Union**: [www.gradunion.cam.ac.uk](https://www.gradunion.cam.ac.uk/)
+      * **Student Counselling Services**: [www.counselling.cam.ac.uk](https://www.counselling.cam.ac.uk/)
+      * Look out for your BME contacts in your College.
+
+    ### Support for Academic, Academic-Related and Professional Services Staff is available via:
+      * **University and College Union**, University of Cambridge Branch: [Cambridge UCU](http://www.ucu.cam.ac.uk/), [admin@ucu.cam.ac.uk](mailto:admin@ucu.cam.ac.uk), Tel, 01223 764944
+      * **Support Services at the University**: [www.hr.admin.cam.ac.uk/hr-services/wellbeing/support-services-university](https://www.hr.admin.cam.ac.uk/hr-services/wellbeing/support-services-university) 
+
+- input:
+    name: nav-next
+    label: false
+    type: recaptcha-button
+    value: next
+    text: Next
+    class: pure-button pure-button-primary
+    accesskey: g
+
+- text: |
+    ## Other ways to get in touch with us
+    You can contact Everyday Racism at Cambridge for general enquiries by e-mailing [everydayracism@cam.ac.uk](mailto:everydayracism@cam.ac.uk) 
+    For reports use this form and please do not send them by email.

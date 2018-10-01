@@ -8,7 +8,6 @@ import Router from 'koa-router'; // router middleware for koa
 const router = new Router();
 
 import handlers    from './report-handlers.js';
-import SmsHandlers   from '../app-sms/sms-handlers.js';
 
 // JUST FOR TESTING: supertest doesn't appear to manage to pass koa:jwt cookie between apps on
 // different ports, so provide a way for the test suite to explicitly log in to the report app
@@ -31,21 +30,6 @@ router.post('/:database/:project',         handlers.postIndex); // process index
 router.get( '/:database/:project/:page',   handlers.getPage);   // render report page
 router.post('/:database/:project/:page',   handlers.postPage);  // process page submission
 
-/* - - - - - - - - - - SMS CODE TO DELETE - - - - - - - - - - - - */
-
-//Serve SMS emulator
-router.get('/sms-emulator', SmsHandlers.getEmulator);
-
-//On receiving a text
-//Twilio webhook
-router.post('/sms-post', SmsHandlers.postSms);
-
-
-//Delete a message sent to the user from Twilio logs
-//Twilio calls this as a callback
-router.post('/delete-outbound', SmsHandlers.deleteOutbound);
-
-/* - - - - - - - -  END OF SMS CODE TO DELETE - - - - - - - - - - */
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 

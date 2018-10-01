@@ -24,10 +24,8 @@ app.use(async function handleErrors(ctx, next) {
     try {
         await next();
     } catch (err) {
-        if (app.env == 'production') {
-            //Don't leak sensitive info
-            delete err.stack;
-        }
+        await Log.error(ctx, err);
+        if (app.env == 'production') delete err.stack; // don't leak sensitive info!
         if ((! (err instanceof SmsError)) || err.webRequest) {
             ctx.response.status = err.status || 500;
             //Evidence page or emulator
@@ -67,7 +65,6 @@ app.use(async function handleErrors(ctx, next) {
                 ctx.status = 500;
             }
         }
-        await Log.error(ctx, err);
     }
 });
 

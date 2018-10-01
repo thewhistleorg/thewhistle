@@ -6,14 +6,22 @@
     type: select
     label: Where
     options:
-      -
-      - School
-      - Place of work
-      - Neighbourhood
-      - Survivor’s home
-      - Perpetrator’s home
-      - Other
-      - I don’t remember / don’t know
+      blank:
+        label: ''
+      school:
+        label: School
+      work:
+        label: Place of work
+      neighbourhood:
+        label: Neighbourhood
+      survivorshome:
+        label: Survivor’s home
+      perpetratorshome:
+        label: Perpetrator’s home
+      other:
+        label: Other
+      unsure:
+        label: I don’t remember / don’t know
     subsidiary:
       - text: |
           Please provide as much detail as you are able – this could be an address, restaurant

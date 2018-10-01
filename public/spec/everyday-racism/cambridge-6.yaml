@@ -1,0 +1,11 @@
+- text: '# Are you reporting on behalf of yourself or someone else?'
+
+- input:
+    name: on-behalf-of
+    label: On behalf of
+    type: radio
+    options:
+        self:
+            label: Myself
+            attributes: checked
+        other: Someone else

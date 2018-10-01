@@ -624,7 +624,7 @@ class SmsApp {
                 const sessionId = this.getCookie(ctx, constants.cookies.SESSION_ID, twiml);
                 const report = await Report.get(this.db, sessionId);
                 const evidenceToken = report.evidenceToken;
-                message = 'Thank you for completing the questions. If you have any supplementary information, please send it now. Please go to sms.thewhistle.org/upload-evidence?token=' + evidenceToken + ' to provide picture, audio or video files. If you would like to amend any of responses, please reply explaining the changes. If you would like to start a new report, please reply \'RESTART\'';
+                message = `Thank you for completing the questions. If you have any supplementary information, please send it now. Please go to sms.thewhistle.org/${this.db}/evidence/${evidenceToken} to provide picture, audio or video files. If you would like to amend any of responses, please reply explaining the changes. If you would like to start a new report, please reply 'RESTART'`;
             }
         } catch (e) {
             throw new SmsError('Could not get next message.', false, twiml);

@@ -206,7 +206,7 @@ class UsersHandlers {
             // send e-mail
             try {
                 const context = { firstname: body.firstname, host: ctx.request.host, token: token };
-                if (ctx.app.env != 'development') await Mail.send(body.email, 'users-add.email', context);
+                await Mail.send(`"${body.firstname} ${body.lastname}" <${body.email}>`, 'users-add.email', context, ctx);
                 ctx.flash = { notification: `Notification e-mail sent to ${body.email}` };
             } catch (e) {
                 await Log.error(ctx, e);

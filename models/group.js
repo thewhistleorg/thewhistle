@@ -5,7 +5,6 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
-import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js
 import Debug        from 'debug';   // small debugging utility
 
 const debug = Debug('app:db'); // db write ops
@@ -24,7 +23,7 @@ const schema = {
         _id:            { bsonType: 'objectId' },
         name:           { type: 'string' }, //Group name
         organisationId: { bsonType: 'objectId' }, //Organisation the group comes under
-        reportIds:      { type: 'array', items: { type: 'objectId' }  }, //Reports associated with the group
+        reportIds:      { type: 'array', items: { bsonType: 'objectId' }  }, //Reports associated with the group
     },
     additionalProperties: false,
 };

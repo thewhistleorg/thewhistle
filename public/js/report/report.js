@@ -11,7 +11,7 @@ function reCaptchaSubmitCallback(token) { // eslint-disable-line no-unused-vars
  * @param {Object[]} elements - Array of input elements to clear values from
  */
 function clearValues(elements) {
-    for (var index = 0; index < elements.length; index++) {
+    for (var index=0; index<elements.length; index++) {
         if (elements[index].type == 'radio' || elements[index].type == 'checkbox') {
             elements[index].checked = false;
         } else {
@@ -45,9 +45,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // set up listeners to manage visibility of subsidiary details and selection of associated inputs
-    var questions = document.querySelectorAll('[class^=question], [class*=" question"]');
+    var questions = document.querySelectorAll('[class^=question], [class*=" question"]'); // all question elements
     for (var q=0; q<questions.length; q++) {
-        const [ questionInputName ] = [ ...questions[q].classList ].filter(c => c.match(/^question/)); // TODO: convert to ES5
+        // const [ questionInputName ] = [ ...questions[q].classList ].filter(c => c.match(/^question/));
+        var classes = [].slice.call(questions[q].classList); // convert DomTokenList to array
+        var questionInputName = classes.filter(function(c) { return c.match(/^question/); })[0];
         manageVisibility(questionInputName.replace('question-', ''));
     }
 
@@ -58,15 +60,16 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {HTMLInputElement} checkbox - Checkbox element whose value determines whether a branch shows
      */
     function manageCheckboxBranchVisibility(checkbox) {
-        const className = checkbox.id + '-branch'; 
+        var className = checkbox.id + '-branch';
         //Any element whose visibility depends on this checkbox's value must have this class
-        const branches = document.getElementsByClassName(className);
+        var branches = document.getElementsByClassName(className);
+        var b;
         if (checkbox.checked) {
-            for (let b = 0; b < branches.length; b++) {
+            for (b=0; b<branches.length; b++) {
                 branches[b].classList.remove('hide');
             }
         } else {
-            for (let b = 0; b < branches.length; b++) {
+            for (b=0; b<branches.length; b++) {
                 branches[b].classList.add('hide');
             }
         }
@@ -79,19 +82,20 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {HTMLInputElement} radio - Radio element whose value determines whether a branch shows
      */
     function manageRadioBranchVisibility(radio) {
-        const options = document.getElementsByName(radio.name);
+        var options = document.getElementsByName(radio.name);
         //Since one radio button being selected deselects any with the same name,
         //we must iterate through all such elements.
-        for (let o = 0; o < options.length; o++) {
-            let className = options[o].id + '-branch';
+        for (var o=0; o<options.length; o++) {
+            var className = options[o].id + '-branch';
             //Any element whose visibility depends on this checkbox's value must have this class
-            const branches = document.getElementsByClassName(className);
+            var branches = document.getElementsByClassName(className);
+            var b;
             if (options[o].checked) {
-                for (let b = 0; b < branches.length; b++) {
+                for (b=0; b<branches.length; b++) {
                     branches[b].classList.remove('hide');
                 }
             } else {
-                for (let b = 0; b < branches.length; b++) {
+                for (b=0; b<branches.length; b++) {
                     branches[b].classList.add('hide');
                     clearValues(branches[b].getElementsByTagName('input'));
                     clearValues(branches[b].getElementsByTagName('textarea'));
@@ -132,14 +136,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     var showSubsidiary = this.type=='radio'
                         || (this.type=='checkbox' && this.checked)
                         || (this.type=='select-one' && this.value!='' && sub.classList.contains('select-any-subsidiary')) // note front-end DOM gives 'select-one' rather than 'select'
-                        || (this.type=='select-one' && sub.classList.contains(`${this.value.replace(new RegExp(' ', 'g'), '_')}-subsidiary`));
+                        || (this.type=='select-one' && sub.classList.contains(this.value.replace(new RegExp(' ', 'g'), '_')+'-subsidiary'));
                     if (showSubsidiary) {  // show && re-enable element
                         sub.classList.remove('hide');
-                        sub.querySelectorAll('input,textarea,select').forEach(j => j.disabled = false);
+                        sub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = false; });
                         sub.querySelector('input,textarea,select').focus();
                     } else {               // hide & disable element
                         sub.classList.add('hide'); // hide element
-                        sub.querySelectorAll('input,textarea,select').forEach(j => j.disabled = true);
+                        sub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = true; });
                     }
                 }
 
@@ -150,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         var otherSub = input.parentElement.querySelector('.subsidiary');
                         if (otherSub && otherSub!=sub) {
                             otherSub.classList.add('hide');
-                            otherSub.querySelectorAll('input,textarea,select').forEach(j => j.disabled = true);
+                            otherSub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = true; });
                         }
                         var otherCheckboxes = document.querySelectorAll('input[type=checkbox][name='+inputName+']');
                         otherCheckboxes.forEach(function(c) { c.checked = false; });
@@ -199,8 +203,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // handle radio buttons which might be determining alternate texts
     document.querySelectorAll('input[type=radio]').forEach(function(input) {
         input.addEventListener('change', function() { // note cannot simply assign to .onchange due to visibility listener
-            const altTextsShow = document.querySelectorAll(`[data-${this.name}][data-${this.name}="${this.value}"]`);
-            const altTextsHide = document.querySelectorAll(`[data-${this.name}]:not([data-${this.name}="${this.value}"])`);
+            var altTextsShow = document.querySelectorAll('[data-'+this.name+'][data-'+this.name+'="'+this.value+'"]');
+            var altTextsHide = document.querySelectorAll('[data-'+this.name+']:not([data-'+this.name+'="'+this.value+'"])');
             altTextsShow.forEach(function (el) { el.classList.remove('hide'); el.classList.add('show'); });
             altTextsHide.forEach(function (el) { el.classList.remove('show'); el.classList.add('hide'); });
         });
@@ -224,8 +228,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // listener to set focus to existing-alias if used-before-y selected
         document.querySelector('#used-before-y').onclick = function() {
-            const usedBeforeY = document.querySelector('#used-before-y');
-            const usedBeforeN = document.querySelector('#used-before-n');
+            var usedBeforeY = document.querySelector('#used-before-y');
+            var usedBeforeN = document.querySelector('#used-before-n');
             if (this.checked) {
                 usedBeforeY.parentElement.querySelector('.subsidiary').classList.remove('hide');
                 usedBeforeN.parentElement.querySelector('.subsidiary').classList.add('hide');
@@ -240,8 +244,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // listener to display use-generated and clear existing-alias if used-before-n clicked
         document.querySelector('#used-before-n').onclick = function() {
-            const usedBeforeY = document.querySelector('#used-before-y');
-            const usedBeforeN = document.querySelector('#used-before-n');
+            var usedBeforeY = document.querySelector('#used-before-y');
+            var usedBeforeN = document.querySelector('#used-before-n');
             if (this.checked) {
                 usedBeforeN.parentElement.querySelector('.subsidiary').classList.remove('hide');
                 usedBeforeY.parentElement.querySelector('.subsidiary').classList.add('hide');

@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/css/form-editor.css">
     <style>
         textarea { font: 0.8em monaco, Consolas, 'Lucida Console', monospace; height: 36em; width: 48em; }
+        div.error-msg pre { margin: 0 2em; }
     </style>
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js" integrity="sha256-+JMHsXRyeTsws/tzbIh5YHQxRdKCuNjmvNcTFtY6DLc=" crossorigin="anonymous"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js" integrity="sha256-9Nt2r+tJnSd2A2CRUvnjgsD+ES1ExvjbjBNqidm9doI=" crossorigin="anonymous"></script>
@@ -103,8 +104,10 @@
         </div>
         <div class="pure-u-14-24 bg-white padding-10">
           <label for="page">Page Name</label>
-          <input type="text" name="page" id="page" value="{{formSpec.page}}" class="w12">
-          <small>(leave blank for top-level page)</small>
+          <input type="text" name="page" id="page" value="{{formSpec.page}}" pattern="[a-zA-Z].*" title="Page must start with a letter"  class="w12">
+          <span><small>leave blank for top-level page; otherwise must start with a letter</small></span>
+          <!-- <input type="text" name="page" id="page" value="{{formSpec.page}}" class="w12">
+          <small>(leave blank for top-level page)</small> -->
           <!-- <div class="edit-button hide">
             <a id="page-id" class="pure-button pure-button-primary button-small filter-toggle" href="/form-specifications/{{_id}}/edit" title="Edit form spec"><i class="fa fa-pencil"></i> Edit</a>
           </div> -->
@@ -142,8 +145,29 @@
   </div>
   <div class="pure-u-4-24 bg-white ">DOCS</div>
 </div>
-
-
+{{>errpartialraw}}
+<!--
+<form method="post" class="pure-form pure-form-aligned">
+    <ul>
+        <li class="pure-control-group">
+            <label for="project">Project</label>
+            <input type="text" name="project" id="project" value="{{project}}" required autofocus class="w12">
+        </li>
+        <li class="pure-control-group">
+            <label for="page">Page</label>
+            <input type="text" name="page" id="page" value="{{page}}" pattern="[a-zA-Z].*" title="Page must start with a letter"  class="w12">
+            <span>leave blank for top-level page; otherwise must start with a letter</span>
+        </li>
+        <li class="pure-control-group">
+            <label for="specification">Specification</label>
+            <textarea name="specification" id="specification">{{specification}}</textarea>
+        </li>
+        <li class="pure-control-group">
+            <label></label>
+            <button type="submit" class="pure-button pure-button-primary">Update form spec</button>
+        </li>
+    </ul>
+</form> -->
 
 </main>
 

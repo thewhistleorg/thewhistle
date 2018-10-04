@@ -19,9 +19,10 @@ dotenv.config();
 //   NODE_ENV=production npm run test-smoke
 
 const domain = process.env.NODE_ENV == 'production' ? 'thewhistle.org' : 'staging.thewhistle.org';
+const protocol = process.env.NODE_ENV == 'production' ? 'https' : 'http';
 
-const adminApp = supertest.agent(`http://admin.${domain}`);
-const reportApp = supertest.agent(`http://report.${domain}`);
+const adminApp = supertest.agent(`${protocol}://admin.${domain}`);
+const reportApp = supertest.agent(`${protocol}://report.${domain}`);
 
 const testuser = process.env.TESTUSER; // note testuser must have access to ‘demo’ organisation
 const testpass = process.env.TESTPASS; // (for admin login test)

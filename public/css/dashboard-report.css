@@ -89,6 +89,7 @@
 }
 
 .header-table-cell select, .header-table-cell input {
+    height: 32px;
     width: 100%;
 }
 

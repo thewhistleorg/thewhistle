@@ -27,21 +27,45 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
     }
 
     // use range slider for filtering submitted/updated dates
-    const submittedSlider = new Slider('input.submitted', {
-        min:       new Date(slider.oldest).valueOf(),
-        max:       new Date(slider.latest).valueOf(),
-        range:     true,
-        step:      1000 * 60 * 60 * 24,
-        formatter: function(t) {
-            if (Array.isArray(t)) return dateFormat(t[0], 'd mmm yyyy') + ' – ' + dateFormat(t[1], 'd mmm yyyy');
-            return dateFormat(t, 'd mmm yyyy');
-        },
-    });
-    submittedSlider.on('slideStop', function(value) {
-        const [ from, to ] = value;
+    // const submittedSlider = new Slider('input.submitted', {
+    //     min:       new Date(slider.oldest).valueOf(),
+    //     max:       new Date(slider.latest).valueOf(),
+    //     range:     true,
+    //     step:      1000 * 60 * 60 * 24,
+    //     formatter: function(t) {
+    //         if (Array.isArray(t)) return dateFormat(t[0], 'd mmm yyyy') + ' – ' + dateFormat(t[1], 'd mmm yyyy');
+    //         return dateFormat(t, 'd mmm yyyy');
+    //     },
+    // });
+    const currentUrl = new URL(location.href);
+    const paramSubmitted = currentUrl.searchParams.get("submitted");
+    let sortedDates = [];
+    if (paramSubmitted) {
+      sortedDates = paramSubmitted.split("–");
+    }
+
+    const submittedSlider2 =  flatpickr('.date-range-container',{
+      minDate:       new Date(slider.oldest).valueOf(),
+      maxDate:       new Date(slider.latest).valueOf(),
+      defaultDate: [new Date(sortedDates[0]).valueOf(), new Date(sortedDates[1]).valueOf()],
+      inline: true,
+      mode: "range",
+      onClose: function(selectedDates) {
+        const [ from, to ] = selectedDates;
         addFilter('submitted', dateFormat(from, 'd-mmm-yyyy') + '–' + dateFormat(to, 'd-mmm-yyyy'));
         applyFilter();
+      },
+      onOpen: function(selectedDates, dateStr, instance) {
+        instance.defaultDate = [new Date(sortedDates[0]).valueOf(), new Date(sortedDates[1]).valueOf()]
+      }
     });
+
+    //
+    // submittedSlider.on('slideStop', function(value) {
+    //     const [ from, to ] = value;
+    //     addFilter('submitted', dateFormat(from, 'd-mmm-yyyy') + '–' + dateFormat(to, 'd-mmm-yyyy'));
+    //     applyFilter();
+    // });
 
     // toggle search filter list container
     document.getElementById('filter-toggle-button').onclick = toggleContainer;

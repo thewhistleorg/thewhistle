@@ -67,7 +67,8 @@
 </header>
 
 <main>
-  <div class="pure-u-1 header-container border-bottom">
+  <!-- hidden for now -->
+  <div class="pure-u-1 header-container border-bottom hide">
               <div class="header-table">
                   <div class="header-table-body">
                       <div class="header-table-row">
@@ -100,12 +101,6 @@
       <a class="pure-button pure-button-primary filter-toggle" href="/form-specifications/add" title="Add new form spec"><i class="fa fa-plus"></i> New page</a>
     </div>
     <table class="">
-      <tr>
-        <!-- <th>Project</th>
-                            <th>Page</th>
-                            <th></th>
-                            <th></th> -->
-      </tr>
       {{#formSpecs}}
       <tr id="{{_id}}" class="formSpec">
         <td class="spec nowrap">{{project}}</td>

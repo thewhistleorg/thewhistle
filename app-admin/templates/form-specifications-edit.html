@@ -52,7 +52,9 @@
 <!-- <h1>Edit Form specification</h1> -->
 
 {{>errpartial}}
-<div class="pure-u-1 header-container border-bottom">
+<!-- hidden for now -->
+
+<div class="pure-u-1 header-container border-bottom hide">
             <div class="header-table">
                 <div class="header-table-body">
                     <div class="header-table-row">
@@ -81,12 +83,6 @@
       <a class="pure-button pure-button-primary filter-toggle" href="/form-specifications/add" title="Add new form spec"><i class="fa fa-plus"></i> New page</a>
     </div>
     <table class="">
-      <tr>
-        <!-- <th>Project</th>
-                            <th>Page</th>
-                            <th></th>
-                            <th></th> -->
-      </tr>
       {{#formSpecs}}
       <tr id="{{_id}}" data-id = "{{_id}}" class="formSpec">
         <td class="spec nowrap">{{project}}</td>
@@ -106,36 +102,12 @@
           <label for="page">Page Name</label>
           <input type="text" name="page" id="page" value="{{formSpec.page}}" pattern="[a-zA-Z].*" title="Page must start with a letter"  class="w12">
           <span><small>leave blank for top-level page; otherwise must start with a letter</small></span>
-          <!-- <input type="text" name="page" id="page" value="{{formSpec.page}}" class="w12">
-          <small>(leave blank for top-level page)</small> -->
-          <!-- <div class="edit-button hide">
-            <a id="page-id" class="pure-button pure-button-primary button-small filter-toggle" href="/form-specifications/{{_id}}/edit" title="Edit form spec"><i class="fa fa-pencil"></i> Edit</a>
-          </div> -->
         </div>
       </div>
       <div id="border-bottom">
         <!-- <label for="specification">Specification</label> -->
         <textarea name="specification" id="specification" class=" set-screen-height">{{formSpec.specification}}</textarea>
       </div>
-          <!-- <ul> -->
-              <!-- <li class="pure-control-group">
-                  <label for="project">Project</label>
-                  <input type="text" name="project" id="project" value="{{project}}" required autofocus class="w12">
-              </li> -->
-              <!-- <li class="pure-control-group">
-                  <label for="page">Page</label>
-                  <input type="text" name="page" id="page" value="{{page}}" class="w12">
-                  <span>leave blank for top-level page</span>
-              </li> -->
-              <!-- <li class="pure-control-group">
-                  <label for="specification">Specification</label>
-                  <textarea name="specification" id="specification">{{specification}}</textarea>
-              </li> -->
-              <!-- <li class="pure-control-group">
-                  <label></label>
-                  <button type="submit" class="pure-button pure-button-primary">Update form spec</button>
-              </li> -->
-          <!-- </ul> -->
       <div class="pure-g">
         <div class="pure-u-5-5 padding-10">
           <button type="submit" class="pure-button pure-button-primary">Update</button>
@@ -146,29 +118,6 @@
   <div class="pure-u-4-24 bg-white ">DOCS</div>
 </div>
 {{>errpartialraw}}
-<!--
-<form method="post" class="pure-form pure-form-aligned">
-    <ul>
-        <li class="pure-control-group">
-            <label for="project">Project</label>
-            <input type="text" name="project" id="project" value="{{project}}" required autofocus class="w12">
-        </li>
-        <li class="pure-control-group">
-            <label for="page">Page</label>
-            <input type="text" name="page" id="page" value="{{page}}" pattern="[a-zA-Z].*" title="Page must start with a letter"  class="w12">
-            <span>leave blank for top-level page; otherwise must start with a letter</span>
-        </li>
-        <li class="pure-control-group">
-            <label for="specification">Specification</label>
-            <textarea name="specification" id="specification">{{specification}}</textarea>
-        </li>
-        <li class="pure-control-group">
-            <label></label>
-            <button type="submit" class="pure-button pure-button-primary">Update form spec</button>
-        </li>
-    </ul>
-</form> -->
-
 </main>
 
 </body>

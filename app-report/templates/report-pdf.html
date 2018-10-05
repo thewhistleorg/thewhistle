@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            color: #333333;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            font-size: 40%;  /* !! - phantomjs? */
+            line-height: 1.6;
+            margin: 8em;
+        }
+        table {
+            border-collapse: collapse;
+            border-spacing: 0 0;
+        }
+        td, th {
+            border: none !important;
+            font-size: 1.2em;
+            padding: 0.4em 2em 0.4em 0;
+            vertical-align: top;
+        }
+        th {
+            text-align: left;
+            font-style: italic;
+            font-weight: normal;
+        }
+        header {
+            background: #033549;
+            color: #ffffff;
+            height: 40px;
+        }
+        header img {
+            float: right;
+            margin-top: -8px;
+        }
+        h1 {
+            padding: 1em;
+        }
+        h2 {
+            padding-top: 2em;
+        }
+        .nowrap {
+            white-space: nowrap;
+        }
+        .align-right {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>The Whistle submitted incident report <img src="file:///{{root}}/public/img/logo-32.png"></h1>
+    <img src="/img/logo-32.png">
+</header>
+
+<main>
+
+    <h2>{{database}}/{{project}} submitted {{timestamp}} by {{alias}}</h2>
+
+    {{{reportHtml}}}
+
+</main>
+
+</body>
+</html>

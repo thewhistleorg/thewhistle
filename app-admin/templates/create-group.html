@@ -1,10 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Edit User {{firstname}} {{lastname}} | The Whistle</title>
+    <title>Create Group | The Whistle</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/notifications.css">
@@ -13,14 +14,6 @@
     <script src="/js/admin/notifications.js" defer></script>
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
     <script src="/js/admin/ga.js" async></script>
-    <script src="/js/admin/users-edit.js" defer></script>
-    <script>
-        'use strict;'
-        document.addEventListener('DOMContentLoaded', function() {
-            setCurrentDb('{{currentDb}}');
-            checkGroups('{{groups}}');
-        });
-    </script>
 </head>
 <body>
 
@@ -32,13 +25,26 @@
 
 <main>
 
-<h1>Edit User {{firstname}} {{lastname}}</h1>
+<h1>Create Group</h1>
 
 {{>errpartial}}
+{{#if @koa.flash.notification}}<p class="alert">{{@koa.flash.notification}}</p>{{/if}}
 
-{{>useredit}}
+<form method="post" class="pure-form pure-form-aligned">
+    <ul id="user-inputs">
+        <li class="pure-control-group">
+            <label for="name">Name</label>
+            <input type="text" name="name" id="name" required autofocus class="w12">
+        </li>
+        <li class="pure-control-group">
+            <label></label>
+            <button type="submit" class="pure-button pure-button-primary">Create Group</button>
+        </li>
+    </ul>
+</form>
 
 </main>
 
 </body>
+
 </html>

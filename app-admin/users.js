@@ -12,6 +12,7 @@ import dateFormat from 'dateformat'; // Steven Levithan's dateFormat()
 import crypto     from 'crypto';     // nodejs.org/api/crypto.html
 
 import User   from '../models/user.js';
+import Group  from '../models/group.js';
 import Report from '../models/report.js';
 import Log    from '../lib/log';
 import Mail   from '../lib/mail';
@@ -39,10 +40,15 @@ class UsersHandlers {
         }
 
         const isSuUser = ctx.state.user.roles.includes('su') ? 'show' : 'hide';
+        const groupsVisibility = 'hide';
+        const availableGroups = Group.getAll(ctx.state.user.db);
         const context = {
             isSuUser:           isSuUser,             // su can view users from all organisations, and set org access
             availableDatabases: availableDatabases(), // su can set which organisations use can access
             databases:          ctx.state.user.db,    // make current user's organisation checked by default
+            groupsVisibility:   groupsVisibility,
+            availableGroups:    availableGroups,
+            currentDb:          ctx.state.user.db,
         };
 
         await ctx.render('users-add', Object.assign(context, ctx.flash.formdata));
@@ -91,11 +97,16 @@ class UsersHandlers {
         if (!user) ctx.throw(404, 'User not found');
 
         const isSuUser = ctx.state.user.roles.includes('su') ? 'show' : 'hide';
+        const hasGroups = user.roles.includes('group-leader') && !user.roles.includes('su') && user.databases.includes(ctx.state.user.db);
+        const groupsVisibility = hasGroups ? 'show' : 'hide';
+        const availableGroups = await Group.getAll(ctx.state.user.db);
         const context = {
             isSuUser:           isSuUser,             // su can view users from all organisations, and set org access
             availableDatabases: availableDatabases(), // su can set which organisations use can access
+            groupsVisibility:   groupsVisibility,
+            availableGroups:    availableGroups,
+            currentDb:          ctx.state.user.db,
         };
-
         await ctx.render('users-edit', Object.assign(user, context, ctx.flash.formdata));
     }
 
@@ -246,9 +257,9 @@ class UsersHandlers {
         };
 
         try {
-
-            if (validationErrors(ctx.request.body, validation)) {
-                throw new Error(validationErrors(ctx.request.body, validation));
+            const errs = validationErrors(ctx.request.body, validation);
+            if (errs) {
+                throw new Error(errs);
             }
 
             // ensure roles is array (koa-body will return single selection as string not array)

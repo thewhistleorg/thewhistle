@@ -209,8 +209,8 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const document = new JSDOM(response.text).window.document;
             //expect(document.querySelector('title').textContent).to.match(/.*Activity.+/); home page is temporarily list of reports
             expect(document.querySelector('title').textContent).to.equal('Reports list');
-            // nav should be /, Reports, Form specs, Users, Resources, Submit – feedback, user-name, notifications, Logout
-            expect(document.querySelectorAll('header nav > ul > li').length).to.equal(10);
+            // nav should be /, Reports, Form specs, Users, Resources, Submit – feedback, Groups, user-name, notifications, Logout
+            expect(document.querySelectorAll('header nav > ul > li').length).to.equal(11);
             // 'Submit' menu should have entry linking to /grn-test/rape-is-a-crime
             expect(document.querySelector('header nav > ul > li ul li a').textContent).to.equal('The Whistle / Global Rights Nigeria Incident Report – Internal Form');
             const regexp = new RegExp(`${org}\\/${proj}\\/\\*$`);

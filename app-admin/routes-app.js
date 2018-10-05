@@ -237,5 +237,16 @@ router.get('/ajax/geocode', async function getGeocode(ctx) {
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/*  Group routes                                                                                  */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+import groups from './groups.js';
+
+router.get('/groups', groups.getGroupsPage);
+router.get('/create-group', groups.getCreateGroupPage);
+
+router.post('/create-group', groups.postCreateGroup);
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 export default router.middleware();

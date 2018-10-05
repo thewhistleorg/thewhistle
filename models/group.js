@@ -18,12 +18,11 @@ import Db           from '../lib/db.js';
  */
 const schema = {
     type:       'object',
-    required:   [ 'organisationId', 'reportIds' ],
+    required:   [ 'reportIds' ],
     properties: {
-        _id:            { bsonType: 'objectId' },
-        name:           { type: 'string' }, //Group name
-        organisationId: { bsonType: 'objectId' }, //Organisation the group comes under
-        reportIds:      { type: 'array', items: { bsonType: 'objectId' }  }, //Reports associated with the group
+        _id:       { bsonType: 'objectId' },
+        name:      { type: 'string' }, //Group name
+        reportIds: { type: 'array', items: { bsonType: 'objectId' }  }, //Reports associated with the group
     },
     additionalProperties: false,
 };
@@ -49,18 +48,21 @@ class Group {
         // in case 'groups' collection doesn't have validation (or validation is updated), add it
         await Db.command(db, { collMod: 'groups', validator: { $jsonSchema: schema } });
 
+        const groups = await Db.collection(db, 'groups');
+
+        groups.createIndex({ roles: 1 });
+
         debug('Group.init', db, `${Date.now()-t1}ms`);
     }
 
-    static async create(db, name, organisation, reports) {
-        debug('Group.create', db, name, organisation);
+    static async create(db, name) {
+        debug('Group.create', db, name);
 
         const groups = await Db.collection(db, 'groups');
 
         const values = {
-            name:           name,
-            organisationId: organisation,
-            reportIds:      reports,
+            name:      name,
+            reportIds: [],
         };
         
         try {
@@ -194,6 +196,7 @@ class Group {
             }
         }
     }
+
 }
 
 

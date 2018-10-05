@@ -127,7 +127,7 @@ class SmsHandlers {
      * @param {Object} ctx
      */
     static async renderFailedUpload(ctx) {
-        await ctx.response.redirect('evidence-failed-upload');
+        await ctx.response.redirect('evidence-failed-upload'); //TODO: shouldn't have await?
         ctx.response.status = 400;
     }
 

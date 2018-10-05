@@ -138,8 +138,9 @@ class User {
 
         const users = await Db.collection('users', 'users');
 
-        try {
+        values.groups = User.processGroups(values.groups);
 
+        try {
             // note insertOne() adds an _id field to values, so pass a copy to leave the original clean
             const { insertedId } = await users.insertOne({ ...values });
             return insertedId;
@@ -165,10 +166,9 @@ class User {
         const users = await Db.collection('users', 'users');
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
+        values.groups = User.processGroups(values.groups);
         try {
-
             await users.updateOne({ _id: id }, { $set: values });
-
         } catch (e) {
             if (e.code == 121) throw new Error(`User ${id} failed validation`);
             if (e.code == 11000) throw new Error(`email/username ${e.errmsg.split('"')[1]} already in use`);
@@ -176,6 +176,17 @@ class User {
         }
     }
 
+    static processGroups(groups) {
+        if (groups) {
+            if (!Array.isArray(groups)) {
+                groups = new Array(groups);
+            }
+            groups = groups.map(groupId => new ObjectId(groupId));
+        } else {
+            groups = [];
+        }
+        return groups;
+    }
 
     /**
      * Deletes User record.
@@ -278,15 +289,21 @@ class User {
     }
 
 
+    static async getGroupLeaders(groupId) {
+        const users = await Db.collection('users', 'users');
+        const leaders = await users.find({ groups: { $in: [ groupId ] } });
+        return leaders.toArray();
+    }
+
+
     /**
      * Deletes a given group from all user instances
      * 
      * @param {ObjectId} groupId - Group being deleted
      */
     static async deleteForGroup(groupId) {
-        const users = await Db.collection('users', 'users');
-        const usersWithGroup = await users.find({ groups: { $in: [ groupId ] } });
-        usersWithGroup.forEach(u => User.removeGroup(u._id, groupId));
+        const leaders = await User.getGroupLeaders(groupId);
+        leaders.forEach(u => User.removeGroup(u._id, groupId));
     }
 
 

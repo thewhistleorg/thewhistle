@@ -26,6 +26,7 @@ const schema = {
         roles:                { type: 'array', items: { type: 'string', enum: [ 'reporter', 'user', 'admin', 'su' ] }  },
         databases:            { type: 'array', items: { type: 'string' }  },        // databases (organisations) user has access to
         passwordResetRequest: { type: [ 'string', 'null' ] },                       // token to validate password reset request
+        groups:               { type: 'array', items: { bsonType: 'objectId' } },
     },
     additionalProperties: false,
 };

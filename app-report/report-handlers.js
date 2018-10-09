@@ -12,9 +12,11 @@ import Debug                         from 'debug';        // small debugging uti
 import crypto                        from 'crypto';       // nodejs.org/api/crypto.html
 import fs                            from 'fs-extra';     // fs with extra functions & promise interface
 import jwt                           from 'jsonwebtoken'; // JSON Web Token implementation
+import { ObjectId }                  from 'mongodb';      // MongoDB driver for Node.js
 
 const debug = Debug('app:report'); // submission process
 
+import ReportPdf     from './report-pdf';
 import Report        from '../models/report.js';
 import Resource      from '../models/resource.js';
 import Submission    from '../models/submission.js';
@@ -593,6 +595,26 @@ class Handlers {
         }
 
         ctx.response.redirect(`/${org}/${project}/${go}`);
+    }
+
+
+    /**
+     * GET /:org/:project/pdf/:reportid - save PDF of submitted report.
+     */
+    static async downloadPdf(ctx) {
+        debug('downloadPdf', ctx.params);
+
+        const { database, project, reportid } = ctx.params;
+        const submissionDate = ObjectId(reportid).getTimestamp();
+        const rptDate = dateFormat(submissionDate, 'yyyy-mm-dd HH.MM');
+        const filename = `the whistle incident report ${database} ${project} ${rptDate}.pdf`;
+
+        const report = await ReportPdf.generate(database, project, reportid);
+
+        if (report == null) ctx.throw(404);
+
+        ctx.response.body = report;
+        ctx.response.attachment(filename);
     }
 
 }

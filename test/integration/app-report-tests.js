@@ -378,6 +378,14 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
         });
 
+        it('gets PDF of report', async function() {
+            const response = await appReport.get(`/${org}/${proj}/pdf/${reportId}`);
+            expect(response.status).to.equal(200);
+            expect(response.headers['content-type']).to.equal('application/pdf');
+            const re = /attachment; filename="the whistle incident report grn-test rape-is-a-crime \d\d\d\d-\d\d-\d\d \d\d.\d\d.pdf/;
+            expect(response.headers['content-disposition']).to.match(re);
+        });
+
         it('submits whatnext "back to start"', async function() {
             const values = { 'submit': 'end' };
             const response = await appReport.post(`/${org}/${proj}/whatnext`).send(values);

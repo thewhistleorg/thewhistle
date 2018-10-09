@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 theWhistle.notifications.template = `
-<section id="notifications" class="hide">
+<section id="notifications" class="hide drop-shadow">
     <table>
     {{#each events}}
         <tr>
@@ -126,7 +126,7 @@ theWhistle.notifications.template = `
         </tr>
         {{#each this}}
         <tr id="{{this.nId}}">
-            <td>&mdash;</td>
+            <td><div class="fa fa-circle new-indicator"></div></td>
             <td class="report" title="go to report"><a href="/reports/{{this.rId}}">{{this.alias}} ({{this.at}})</a><section id="notifications" class="hide"></section></td>
             <td class="dismiss" title="dismiss notification">✖</td>
         </tr>

@@ -9,12 +9,13 @@ nav li.notifications { /* the 'bell' */
 
 nav li.notifications div.counter { /* the red notification counter */
     position: absolute;
-    right: 0;
-    top: 0;
+    right: -6px;
+    top: -10px;
     background-color: #e1141e;
-    font: 700 0.5em 'Open Sans', 'Segoe UI', Tahoma, sans-serif; /* reset from FontAwesome */
-    padding: 0 2px;
+    font: 700 0.5em 'Open Sans', 'Segoe UI', Tahoma, sans-serif;
+    padding: 1px 5px;
     border-radius: 3px;
+    line-height: 14px;
 }
 
 #notifications { /* the drop-down list */
@@ -30,7 +31,7 @@ nav li.notifications div.counter { /* the red notification counter */
 }
 
 #notifications a { /* make <a> match plain text */
-    color: #666666;
+    color: #000;
 }
 
 #notifications td {
@@ -45,4 +46,17 @@ nav li.notifications div.counter { /* the red notification counter */
 
 #notifications .dismiss { /* indicate clickable */
     cursor: pointer;
+}
+
+#notifications table td {
+    padding: 11px;
+    position: relative;
+}
+
+#notifications table tr:hover td {
+    background: #fafafa;
+}
+
+#notifications .new-indicator {
+    padding: 3px 0;
 }

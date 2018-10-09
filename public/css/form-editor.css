@@ -1,0 +1,162 @@
+/* Report header div table */
+
+form {
+  margin: 0;
+}
+
+td, th {
+  min-width: 1em;
+}
+
+button.fa-trash {
+  background: none;
+  border: none;
+  color: #990000;
+  padding: 1px;
+}
+
+button.fa-trash:hover {
+  cursor: pointer;
+}
+
+pre {
+  font: 0.8em monaco, Consolas, 'Lucida Console', monospace;
+  min-width: 48em;
+  padding: 0.4em;
+  margin: 15px;
+  height: calc(100vh - 180px);
+}
+
+.highlight {
+  background-color: #f5f5f5
+}
+
+main {
+  max-width: 100%;
+  padding: 0;
+}
+
+.pure-g.editor-container>div {
+    margin-left: 10px;
+    margin-top: 10px
+}
+
+.header-container, .bg-white {
+  background: #fff;
+}
+
+.content-header {
+  color: #000000;
+  font-weight: bold;
+}
+
+.card-header {
+  color: #6c949e;
+  font-weight: lighter;
+}
+
+.header-table-cell.report-header {
+  width: 40%;
+}
+
+.header-table-cell form {
+  padding: 0;
+  margin: 5px 0;
+}
+
+.header-table-cell select, .header-table-cell input {
+  width: 100%;
+}
+
+.header-table {
+  display: table;
+  width: 100%;
+}
+
+.header-table-row {
+  display: table-row;
+}
+
+.header-table-heading {
+  background-color: #eeeeee;
+  display: table-header-group;
+}
+
+.header-table-cell, .header-table-head {
+  border: 0;
+  display: table-cell;
+  padding: 20px 10px;
+}
+
+.header-table-heading {
+  background-color: #eeeeee;
+  display: table-header-group;
+  font-weight: bold;
+}
+
+.header-table-foot {
+  background-color: #eeeeee;
+  display: table-footer-group;
+  font-weight: bold;
+}
+
+.header-table-body {
+  display: table-row-group;
+}
+
+.border-right {
+  border-right: 1px solid #ebebeb;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #ebebeb;
+}
+
+.page-list table td, .page-list table th {
+  padding: 10px;
+}
+
+.page-list table tr {
+  border: 1px solid #ebebeb;
+  border-left: 0;
+  border-right: 0;
+  cursor: pointer;
+}
+
+.page-list table tr:hover td {
+  background: #f5f5f5;
+}
+
+.page-list table {
+  width: 100%;
+}
+
+.page-list .pure-button {
+  margin: 0 auto;
+}
+
+.new-button {
+  width: 100%;
+  text-align: center;
+  margin: 15px 0;
+}
+
+#page-name {
+    font-weight: bold;
+    padding: 10px;
+}
+
+.action-container {
+    padding: 10px;
+}
+
+.padding-10 {
+  padding: 10px;
+}
+
+.set-screen-height {
+ height: calc(100vh - 240px);
+}
+textarea#specification {
+    width: 100%;
+}

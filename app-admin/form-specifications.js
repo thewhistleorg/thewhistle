@@ -40,11 +40,13 @@ class FormSpecificationsHandlers {
     static async edit(ctx) {
         const db = ctx.state.user.db;
 
+        const formSpecs = await FormSpecification.getAll(db);
+
         const formSpec = await FormSpecification.get(db, ctx.params.id);
 
         if (!formSpec) ctx.throw(404, 'Form specification not found');
-
-        await ctx.render('form-specifications-edit', Object.assign(formSpec, ctx.flash.formdata));
+        const specs = { formSpec: Object.assign(formSpec, ctx.flash.formdata), formSpecs}
+        await ctx.render('form-specifications-edit', specs);
     }
 
 

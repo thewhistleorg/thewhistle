@@ -481,7 +481,6 @@ class Handlers {
             ctx.throw(500, e.message);
         }
 
-        const version = FormGenerator.forms[`${org}/${project}`].version;
         const nPages = Object.keys(FormGenerator.forms[`${org}/${project}`].steps).length;
 
         if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.response.redirect(`/${org}/${project}`); }
@@ -540,7 +539,7 @@ class Handlers {
             // save the skeleton report
             const ua = ctx.request.headers['user-agent'];
             const country = await Ip.getCountry(ctx.request.ip);
-            ctx.session.id = await Report.submissionStart(org, project, alias, version, ua, country);
+            ctx.session.id = await Report.submissionStart(org, project, alias, body['used-before']=='Yes', ua, country);
             // TODO: ?? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.id, 'incomplete', null);
 
             // notify users of 'new report submitted'

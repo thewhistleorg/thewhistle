@@ -39,7 +39,7 @@ import reports from './reports.js';
 
 router.get('/reports',                 reports.list);            // render reports search/list page
 router.get('/reports-map',             reports.map);             // render reports search/map page
-router.get('/reports/export-csv',      reports.exportCsv);       // download CSV list of reports
+router.get('/reports/export-xls',      reports.exportXls);       // download XLS list of reports
 router.get('/reports/export-pdf',      reports.exportPdf);       // download PDF list of reports
 router.get('/reports/export-pdf/:id',  reports.exportPdfSingle); // download PDF of report
 router.get('/reports/:id',             reports.viewReport);      // render view report tab

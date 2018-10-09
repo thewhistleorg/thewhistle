@@ -539,7 +539,7 @@ class Handlers {
             // save the skeleton report
             const ua = ctx.request.headers['user-agent'];
             const country = await Ip.getCountry(ctx.request.ip);
-            ctx.session.id = await Report.submissionStart(org, project, alias, ua, country);
+            ctx.session.id = await Report.submissionStart(org, project, alias, body['used-before']=='Yes', ua, country);
             // TODO: ?? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.id, 'incomplete', null);
 
             // notify users of 'new report submitted'

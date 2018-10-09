@@ -235,7 +235,7 @@ index:
             const response = await appAdmin.get('/form-specifications');
             expect(response.status).to.equal(200);
             const document = new JSDOM(response.text).window.document;
-            expect(document.querySelector('.content-header"]').textContent).to.equal('Form Specifications');
+            expect(document.querySelector('.content-header').textContent).to.equal('Form Specifications');
         });
 
         it('sees add form spec page', async function() {

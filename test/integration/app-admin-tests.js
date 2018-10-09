@@ -15,7 +15,7 @@ import { ObjectId }       from 'mongodb';            // MongoDB driver for Node.
 import dateFormat         from 'dateformat';         // Steven Levithan's dateFormat()
 import base64             from 'base-64';            // base64 encoder/decoder
 import fs         from 'fs';         // nodejs.org/api/fs.html
-import csvParse           from 'csv-parse/lib/sync'; // full featured CSV parser
+import XLSX               from 'xlsx';               // parser and writer for various spreadsheet formats
 
 import app from '../../app.js';
 
@@ -735,21 +735,20 @@ index:
             expect(matches.numberValue).to.equal(1);
         });
 
-        it('downloads reports list as CSV', async function() {
-            const response = await appAdmin.get('/reports/export-csv');
+        it('downloads reports list as XLS', async function() {
+            const response = await appAdmin.get('/reports/export-xls');
             expect(response.status).to.equal(200);
-            expect(response.headers['content-type']).to.equal('text/csv; charset=utf-8');
+            expect(response.headers['content-type']).to.equal('application/vnd.ms-excel');
             const timestamp = response.headers['x-timestamp'];
-            const filename = `the whistle incident reports ${timestamp.replace(':', '.')}.csv`;
+            const filename = `the whistle ${org} incident reports ${timestamp.replace(':', '.')}.xls`;
             expect(response.headers['content-disposition']).to.equal(`attachment; filename="${filename}"`);
-            const csv = csvParse(response.text);
-            // TODO: submitted fields test is suspended until the CSV code is revised to output
-            // TODO: separate CSV files or separate worksheets in spreadsheet for each variant of
-            // TODO: questions, in order to make test robustness not dependent of reports lurking in
-            // TODO: test db
-            // expect(csv[0].length).to.be.at.least(13); // header row should included submitted fields
-            const rpt = csv.filter(row => row[1]=='testy terrain'); // 2nd col is 'alias'
-            expect(rpt.length).to.equal(1, response.text); // submitted test report should be included
+            // unfortunately we can't inspect the spreadsheet contents, as all non-ascii characters
+            // in response.body get transformed to 'ef bf bd', which is the UTF-8 decoding of U+FFFD
+            // REPLACEMENT CHARACTER - my best guess is that for some reason SuperAgent is choking
+            // on non-ascii characters and substituting U+FFFD :(
+            const wb = XLSX.read(response.text);
+            // expect(wb.SheetNames).to.include('rape-is-a-crime – 1');
+            // expect(wb.Sheets['rape-is-a-crime – 1']['!cols']).to.include('Survivor gender');
         });
 
         it('downloads reports list as PDF', async function() {

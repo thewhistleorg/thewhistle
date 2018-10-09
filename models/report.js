@@ -295,12 +295,11 @@ class Report {
      * @param   {string}   db - Database to use.
      * @param   {string}   project - Project report is part of.
      * @param   {string}   alias - Alias to record for for submitter of report.
-     * @param   {number}   version - Version of form spec (to distinguish different format reports).
      * @param   {string}   userAgent - User agent from http request header.
      * @param   {string}   country - Country report was submitted from (obtained from IP address)
      * @returns {ObjectId} New report id.
      */
-    static async submissionStart(db, project, alias, version, userAgent, country) {
+    static async submissionStart(db, project, alias, userAgent, country) {
         debug('Report.submissionStart', 'db:'+db, 'p:'+project, alias);
 
         if (typeof alias != 'string' || alias.length == 0) throw new Error('Alias must be supplied');

@@ -23,9 +23,10 @@ const schema = {
         email:                { type: 'string' /* , format: 'email' */ },           // e-mail address used for logging in
         password:             { type: [ 'string', 'null' ] },                       // scrypt-encoded password
         username:             { type: 'string' /* , pattern: '[a-z0-9-_.]+' } */ }, // username for @mentions etc
-        roles:                { type: 'array', items: { type: 'string', enum: [ 'reporter', 'user', 'admin', 'su' ] }  },
+        roles:                { type: 'array', items: { type: 'string', enum: [ 'reporter', 'user', 'admin', 'su', 'group-leader' ] }  },
         databases:            { type: 'array', items: { type: 'string' }  },        // databases (organisations) user has access to
         passwordResetRequest: { type: [ 'string', 'null' ] },                       // token to validate password reset request
+        groups:               { type: 'array', items: { bsonType: 'objectId' } },
     },
     additionalProperties: false,
 };

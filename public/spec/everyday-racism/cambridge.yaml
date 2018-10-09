@@ -1,7 +1,5 @@
 title: The Whistle / Everyday Racism at Cambridge Incident Report
 
-version: 1
-
 pages:
   index:    { $ref: 'cambridge-0' }
   p1:       { $ref: 'cambridge-1' }

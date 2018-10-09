@@ -2,7 +2,7 @@ $schema: http://json-schema.org/draft-06/schema#
 
 description: The Whistle Form specification Schema
 
-# top-level object must contain 'pages' object, with optional title, version, and options
+# top-level object must contain 'pages' object, with optional title and options
 type: object
 required: [ pages ]
 properties:

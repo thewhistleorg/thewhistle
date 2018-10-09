@@ -47,6 +47,7 @@ const schema = {
         files:        { type:     'array',                   // uploaded files
             items: { type: 'object' },                       // ... 'formidable' File objects
         },
+        usedBefore:   { type: 'boolean' },                   // whether user has used service before
         ua:           { type: [ 'object', 'null' ] },        // user agent of browser used to report incident
         country:      { type: [ 'string', 'null' ] },        // country report was submitted from
         location:     { type: 'object',                      // geocoded incident location
@@ -295,12 +296,12 @@ class Report {
      * @param   {string}   db - Database to use.
      * @param   {string}   project - Project report is part of.
      * @param   {string}   alias - Alias to record for for submitter of report.
-     * @param   {number}   version - Version of form spec (to distinguish different format reports).
+     * @param   {boolean}  usedBefore - Whether user has used service before.
      * @param   {string}   userAgent - User agent from http request header.
      * @param   {string}   country - Country report was submitted from (obtained from IP address)
      * @returns {ObjectId} New report id.
      */
-    static async submissionStart(db, project, alias, version, userAgent, country) {
+    static async submissionStart(db, project, alias, usedBefore, userAgent, country) {
         debug('Report.submissionStart', 'db:'+db, 'p:'+project, alias);
 
         if (typeof alias != 'string' || alias.length == 0) throw new Error('Alias must be supplied');
@@ -312,6 +313,7 @@ class Report {
             submitted:    { Alias: alias },
             submittedRaw: {},
             alias:        alias,
+            usedBefore:   usedBefore,
             ua:           null, // done below
             country:      country,
             location:     { address: '', geocode: null, geojson: null },

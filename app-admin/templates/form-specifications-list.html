@@ -68,16 +68,16 @@
 
 <main>
   <!-- hidden for now -->
-  <div class="pure-u-1 header-container border-bottom hide">
+  <div class="pure-u-1 header-container border-bottom ">
               <div class="header-table">
                   <div class="header-table-body">
                       <div class="header-table-row">
-                          <div class="header-table-cell">
+                          <!-- <div class="header-table-cell">
                               <div class="content-header"><a class="bold" href="#"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back </a></div>
-                          </div>
+                          </div> -->
 
                           <div class="header-table-cell">
-                              <div class="content-header">Campaign name</div>
+                              <div class="content-header">Form Specifications</div>
                           </div>
 
                           <div class="header-table-cell">
@@ -98,7 +98,7 @@
 <div class="pure-g editor-container">
   <div class="pure-u-1-5 bg-white page-list boder-right ">
     <div class="new-button">
-      <a class="pure-button pure-button-primary filter-toggle" href="/form-specifications/add" title="Add new form spec"><i class="fa fa-plus"></i> New page</a>
+      <a class="pure-button pure-button-primary " href="/form-specifications/add" title="Add new form spec"><i class="fa fa-plus"></i> New page</a>
     </div>
     <table class="">
       {{#formSpecs}}
@@ -115,14 +115,16 @@
   </div>
   <div class="pure-u-3-5 bg-white border-right ">
     <div class="border-bottom editor-toolbox pure-g">
-      <div class="pure-u-21-24 bg-white " id="page-name"></div>
+      <div class="pure-u-21-24 bg-white " id="page-name">
+        <span class="grey-color"><i class="fa fa-long-arrow-left" aria-hidden="true"></i> Create a new page or select a page from the list to view or edit.</span>
+      </div>
       <div class="pure-u-1-24 bg-white padding-10">
         <div class="edit-button ">
-          <a id="page-id" class="pure-button hide pure-button-primary button-small filter-toggle" href="/form-specifications/{{_id}}/edit" title="Edit form spec"><i class="fa fa-pencil"></i> Edit</a>
+          <a id="page-id" class="pure-button hide pure-button-primary button-small " href="/form-specifications/{{_id}}/edit" title="Edit form spec"><i class="fa fa-pencil"></i> Edit</a>
         </div>
       </div>
     </div>
-    <pre id="spec"> <span class="grey-color"><i class="fa fa-long-arrow-left" aria-hidden="true"></i> Create a new page or select a page from the list to view or edit.</span> </pre>
+    <pre id="spec">  </pre>
   </div>
   <div class="pure-u-4-24 bg-white ">DOCS</div>
 </div>

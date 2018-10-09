@@ -59,4 +59,5 @@ nav li.notifications div.counter { /* the red notification counter */
 
 #notifications .new-indicator {
     padding: 3px 0;
+    color: #50addc;
 }

@@ -561,6 +561,7 @@ class Handlers {
         // if date specified, verify it is valid (to back up client-side validation)
         if (body.date) {
             // (note for some reason test suite leaves date as a string)
+            console.log(body.date);
             const d = typeof body.date=='object' ? body.date : JSON.parse(body.date);
             const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
             const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];

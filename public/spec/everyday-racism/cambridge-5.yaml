@@ -24,9 +24,78 @@
         other:
             label: I prefer to describe in my own words
             subsidiary:
-                - text: '## What were you doing? (in your own words)'
+                - text: '### What were you doing? (in your own words)'
                 - input:
                     name: doing-what-own-words
+                    type: textbox
+        skip:
+            label: Skip
+
+- text: '# Do you remember what were you doing when this racist incident occurred?'
+
+- input:
+    name: when
+    label: when
+    type: radio
+    options:
+        exact:
+            label: Yes, exact date this racist incident happened
+            subsidiary:
+                - text: Please select the date and approximate time
+                - input:
+                    name: date
+                    type: library-date
+                - input:
+                    name: time
+                    type: library-24hours
+        approximate:
+            label: Yes, approximate date this racist incident happened
+            subsidiary:
+                - input:
+                    name: within-options
+                    label: Within options
+                    type: select
+                    options:
+                        blank:
+                            label:
+                        lastweek:
+                            label: This week
+                        lastmonth:
+                            label: This month
+                        lasthalfyear:
+                            label: Within the last 6 months
+                        lastyear:
+                            label: 6-12 months ago
+                        other:
+                            label: Other #TODO: Add subsidiary of subsidiary
+        no: I do not remember
+        skip: Skip
+
+- text: '# How often have you experienced this type of racism?'
+
+- input:
+    name: frequency
+    label: Frequency
+    type: select
+    options:
+        blank:
+            label: ''
+        day:
+            label: Every day
+        week:
+            label: Several times a week
+        month:
+            label: Several times a month
+        year:
+            label: Several times a year
+        one-off:
+            label: One off incident
+        other:
+            label: Other
+            subsidiary:
+                - text: '### Please state'
+                - input:
+                    name: how-often-other
                     type: textbox
         skip:
             label: Skip

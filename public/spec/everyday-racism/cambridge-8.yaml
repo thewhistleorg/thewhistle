@@ -1,11 +1,89 @@
-- text: '# Are you reporting on behalf of yourself or someone else?'
+- text: Racism tends to generate (and it could emanate from) strong feelings and emotions but also experiences of affective intensity that are not necessarily easy to define. If this is the case for you and the incident you are reporting, please in answering the following questions, describe what you felt as much as you can in the spaces provided below.
+
+- text: '# What feelings or emotions were directed at you or at the victim(s) during this racist incident?'
 
 - input:
-    name: on-behalf-of
-    label: On behalf of
-    type: radio
+    name: emotions-directed
+    label: 'Tick all that apply and please elaborate in the box below:'
+    type: checkbox
     options:
-        self:
-            label: Myself
-            attributes: checked
-        other: Someone else
+        anger: Anger
+        contempt: Contempt
+        disgust: Disgust
+        fear: Fear
+        hostility: Hostility
+        rejection: Rejection
+        resentment: Resentment
+        other:
+            label: Prefer to add emotions directed at me to this list
+            subsidiary:
+                - text: Emotions
+                - input:
+                    name: emotions-directed-other
+                    type: text
+
+- input:
+    name: emotions-directed-elaborate
+    label: Please elaborate
+    type: textbox
+
+
+- text: '# What feelings and emotions did you experience during this racist incident?'
+
+- input:
+    name: emotions-experienced
+    label: 'Tick all that apply and please elaborate in the box below:'
+    type: checkbox
+    options:
+        anger: Anger
+        confusion: Confusion
+        disgust: Disgust
+        fear: Fear
+        threatened: Feeling threatened
+        humiliation: Humiliation
+        incredulity: Incredulity
+        indignation: indignation
+        numbness: Numbness
+        panic: Panic
+        sadness: Sadness
+        shame: Shame
+        other:
+            label: Prefer to add feelings and emotions to this list
+            subsidiary:
+                - text: Feelings and emotions
+                - input:
+                    name: emotions-experienced-other
+                    type: text
+
+- input:
+    name: emotions-experienced-elaborate
+    label: Please elaborate
+    type: textbox
+
+
+- text: '# What physical reactions did you have during or immediately after this incident?'
+
+- input:
+    name: physical-reactions
+    label: 'Tick all that apply and please elaborate in the box below:'
+    type: checkbox
+    options:
+        tension: Bodily tension
+        breathlessness: Breathlessness
+        frozen: Frozen (not able to move)
+        headache: Headache
+        nausea: Nausea
+        chest: Pressure in your chest
+        stomach: Stomach pain
+        other:
+            label: Prefer to add one or more bodily reactions to this list
+            subsidiary:
+                - text: Bodily reactions
+                - input:
+                    name: physical-reactions-other
+                    type: text
+
+- input:
+    name: physical-reactions-elaborate
+    label: Please elaborate
+    type: textbox

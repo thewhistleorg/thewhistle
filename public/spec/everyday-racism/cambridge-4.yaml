@@ -1,11 +1,6 @@
-- text: '# Please select where this particular incident happened.'
+- text: '# Please describe where this particular incident happened.'
 
 - input:
-    name: on-behalf-of
-    label: On behalf of
-    type: radio
-    options:
-        self:
-            label: Myself
-            attributes: checked
-        other: Someone else
+    name: where
+    label: Where
+    type: text

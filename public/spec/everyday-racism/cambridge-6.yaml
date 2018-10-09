@@ -1,11 +1,65 @@
-- text: '# Are you reporting on behalf of yourself or someone else?'
+- text: '# If the racist incident derived from an action, was it perpetrated by one person or a group of people?'
 
 - input:
-    name: on-behalf-of
-    label: On behalf of
+    name: no-of-perpetrators
+    label: Number of perpetrators
     type: radio
     options:
-        self:
-            label: Myself
-            attributes: checked
-        other: Someone else
+        one:
+            label: One person
+        group:
+            label: Group of people
+            subsidiary:
+                - text: '### How many?'
+                - input:
+                    name: no-of-perpetrators-text
+                    type: textbox
+        skip:
+            label: Skip
+
+- text: '# If the racist incident derived from an action, who carried out this racist act?'
+
+- input:
+    name: type-of-perpetrators
+    label: Perpetrators
+    type: select
+    options:
+        student:
+            label: Student
+        academic:
+            label: Academic staff
+        admin:
+            label: Admin staff
+        other:
+            label: Other
+            subsidiary:
+                - text: '### Please state'
+                - input:
+                    name: type-of-perpetrators-other
+                    type: textbox
+        unknown:
+            label: Not known
+        skip:
+            label: Skip
+
+- text: '# If the racist incident derived from an action, were the people who did this'
+
+- input:
+    name: perpetrators-gender
+    label: Gender
+    type: select
+    options:
+        female:
+            label: Female
+        male:
+            label: Academic staff
+        mixed:
+            label: Mixed group
+            subsidiary:
+                - text: "### Please give details of the perpetrators' genders"
+                - input:
+                    name: perpetrators-gender-mixed
+                    type: textbox
+        skip:
+            label: Skip
+# TODO: add rest of this page

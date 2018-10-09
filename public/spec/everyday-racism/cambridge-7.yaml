@@ -1,11 +1,18 @@
-- text: '# Are you reporting on behalf of yourself or someone else?'
+- text: '# What happened?'
+
+- text: |
+    Try to describe as much of what has happened as you can. You may wish to include what led up to the event or situation, as well as what happened and any subsequent events or implications. Please note that It makes it harder to use data if you use names of specific individuals. 
+
+    If the incident you want to report was not ‘an act’ committed by a particular individual, but it refers to a more structural or diffuse experience (such as a hostile atmosphere or seeing a problematic image) please describe it here.
+
 
 - input:
-    name: on-behalf-of
-    label: On behalf of
-    type: radio
-    options:
-        self:
-            label: Myself
-            attributes: checked
-        other: Someone else
+    name: description
+    label: Description
+    type: textbox
+
+- input:
+    name: document
+    type: library-file
+    label: |
+      **Please upload any evidence that could help.** This can be photos, videos or any other documents. We will store this safely. We will take all data into account for analysis and to inform advocacy, however we will not be able to make public any data that can lead to identifying particular individuals.

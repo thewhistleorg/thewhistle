@@ -13,7 +13,7 @@
     "test-node": "mocha --exit -r esm test/*/*.js",
     "test-unit": "mocha --exit -r esm test/unit/*.js",
     "test-intgn": "mocha --exit -r esm test/integration/*.js",
-    "test-frontend": "node -r esm app.js & pid=$!; cypress run; kill -9 $pid; rm -r ./cypress",
+    "test-frontend": "node -r esm app.js & pid=$!; cypress run; status=$?; kill -9 $pid; rm -r ./cypress; exit $status",
     "test-smoke": "mocha --exit -r esm test/staging-smoke-tests.js",
     "lint": "eslint .",
     "stylelint": "stylelint public/css/*.css",

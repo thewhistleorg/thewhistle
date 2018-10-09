@@ -4,19 +4,19 @@
 /* GET functions render template pages; POST functions process post requests then redirect.       */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import fetch                         from 'node-fetch';  // window.fetch in node.js
-import querystring                   from 'querystring'; // nodejs.org/api/querystring.html
-import dateFormat                    from 'dateformat';  // Steven Levithan's dateFormat()
-import { LatLonSpherical as LatLon } from 'geodesy';     // library of geodesy functions
-import Debug                         from 'debug';       // small debugging utility
-import crypto                        from 'crypto';
-import fs                            from 'fs-extra';
-import jwt    from 'jsonwebtoken'; // JSON Web Token implementation
-
+import fetch                         from 'node-fetch';   // window.fetch in node.js
+import querystring                   from 'querystring';  // nodejs.org/api/querystring.html
+import dateFormat                    from 'dateformat';   // Steven Levithan's dateFormat()
+import { LatLonSpherical as LatLon } from 'geodesy';      // library of geodesy functions
+import Debug                         from 'debug';        // small debugging utility
+import crypto                        from 'crypto';       // nodejs.org/api/crypto.html
+import fs                            from 'fs-extra';     // fs with extra functions & promise interface
+import jwt                           from 'jsonwebtoken'; // JSON Web Token implementation
+import { ObjectId }                  from 'mongodb';      // MongoDB driver for Node.js
 
 const debug = Debug('app:report'); // submission process
 
-
+import ReportPdf     from './report-pdf';
 import Report        from '../models/report.js';
 import Resource      from '../models/resource.js';
 import Submission    from '../models/submission.js';
@@ -31,13 +31,12 @@ import Db            from '../lib/db.js';
 
 
 class Handlers {
-    
 
     /**
      * Given the Raven issue string, returns the milliseconds since Raven verification
-     * 
+     *
      * @param {string} issue - String of the verification time (provided by Raven)
-     * 
+     *
      * @returns {number} - Milliseconds since verification
      */
     static timeSinceVerification(issue) {
@@ -61,7 +60,7 @@ class Handlers {
      * This is the latest version of the document at the time of development
      * (September 2018).
      * Document can be found here: https://raven.cam.ac.uk/project/waa2wls-protocol.txt
-     * 
+     *
      * @param {string} wlsResponse - Web Login Service response string.
      *                               Given following Raven authentication attempt.
      * @returns {boolean} - True if the data in the given wlsResponse string is valid
@@ -143,7 +142,7 @@ class Handlers {
 
     /**
      * Signs and stores the jwt token in a cookie
-     * 
+     *
      * @param {Object} ctx
      * @param {string} wlsResponse - Web Login Service response string.
      *                               Given following Raven authentication attempt.
@@ -180,9 +179,9 @@ class Handlers {
 
     /**
      * Determines whether a given token is valid
-     * 
+     *
      * @param {string} token - JWT token
-     * 
+     *
      * @returns {boolean} - True if the given token is valid and unused,
      *                      if authentication was for one session.
      *                      False otherwise.
@@ -224,7 +223,7 @@ class Handlers {
 
     /**
      * Removes all fields whose key string ends with 'no-store' from a given object
-     * 
+     *
      * @param {Object} obj - Can be any object
      */
     static removeNoStores(obj) {
@@ -313,7 +312,7 @@ class Handlers {
         try {
             await Db.connect(org);
         } catch (e) {
-            ctx.throw(404, `Submission form ${org}/${project} not found`)
+            ctx.throw(404, `Submission form ${org}/${project} not found`);
         }
 
         // clear previous session
@@ -599,6 +598,26 @@ class Handlers {
         ctx.response.redirect(`/${org}/${project}/${go}`);
     }
 
+
+    /**
+     * GET /:org/:project/pdf/:reportid - save PDF of submitted report.
+     */
+    static async downloadPdf(ctx) {
+        debug('downloadPdf', ctx.params);
+
+        const { database, project, reportid } = ctx.params;
+        const submissionDate = ObjectId(reportid).getTimestamp();
+        const rptDate = dateFormat(submissionDate, 'yyyy-mm-dd HH.MM');
+        const filename = `the whistle incident report ${database} ${project} ${rptDate}.pdf`;
+
+        const report = await ReportPdf.generate(database, project, reportid);
+
+        if (report == null) ctx.throw(404);
+
+        ctx.response.body = report;
+        ctx.response.attachment(filename);
+    }
+
 }
 
 
@@ -737,7 +756,7 @@ function formatReport(org, project, page, body) {
         if (inputName == 'when' && body.date) { // TODO: this is depending on naming within yaml, not on use of library-date!
             const d = typeof body.date=='object' ? body.date : JSON.parse(body.date);
             const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
-            const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
+            const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ];
             // const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, d.hour, d.minute);
             const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
             rpt[label] = date;

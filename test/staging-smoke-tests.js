@@ -13,13 +13,19 @@ import dotenv     from 'dotenv';    // load environment variables from a .env fi
 
 dotenv.config();
 
+// note there is a heroku postbuild script which invokes this test automatically when staging is
+// rebuilt: this script can also be invoked manually to check production (following promotion from
+// staging to production) with the command:
+//   NODE_ENV=production npm run test-smoke
+
 const domain = process.env.NODE_ENV == 'production' ? 'thewhistle.org' : 'staging.thewhistle.org';
+const protocol = process.env.NODE_ENV == 'production' ? 'https' : 'http';
 
-const adminApp = supertest.agent(`http://admin.${domain}`);
-const reportApp = supertest.agent(`http://report.${domain}`);
+const adminApp = supertest.agent(`${protocol}://admin.${domain}`);
+const reportApp = supertest.agent(`${protocol}://report.${domain}`);
 
-const testuser = process.env.TESTUSER; // note testuser must have access to ‘grn-test‘ organisation only
-const testpass = process.env.TESTPASS; // (for successful login)
+const testuser = process.env.TESTUSER; // note testuser must have access to ‘demo’ organisation
+const testpass = process.env.TESTPASS; // (for admin login test)
 
 
 describe(`Admin app (admin.${domain})`, function() {
@@ -32,7 +38,7 @@ describe(`Admin app (admin.${domain})`, function() {
     });
 
     it('redirects to / on login', async function() {
-        const values = { username: testuser, password: testpass, database: 'grn-test', 'remember-me': 'on' };
+        const values = { username: testuser, password: testpass, database: 'demo', 'remember-me': 'on' };
         const response = await adminApp.post('/login').send(values);
         expect(response.status).to.equal(302);
         expect(response.headers.location).to.equal('/');
@@ -64,35 +70,55 @@ describe(`Admin app (admin.${domain})`, function() {
 describe(`Report app (report.${domain})`, function() {
     this.timeout(30e3); // 30 sec - app can take some time to wake
 
-    it('sees grn-test/rape-is-a-crime (spec on filesys) home page', async function() {
-        const responseGet = await reportApp.get('/grn-test/rape-is-a-crime');
-        expect(responseGet.status).to.equal(200);
-        const document = new JSDOM(responseGet.text).window.document;
-        expect(document.querySelector('title').textContent).to.equal('The Whistle / Global Rights Nigeria Incident Report');
-        expect(document.querySelector('button').textContent.trim()).to.equal('Get started');
-    });
+    // organisations/projects to be checked: this checks both that environment variables are set up,
+    // and that expected projects are available
+    const projects = [
+        {
+            org:     'demo',
+            project: 'example-1',
+            note:    'core example spec',
+            title:   'The Whistle Example Reporting Form',
+        },
+        {
+            org:     'everyday-racism-test',
+            project: 'cambridge',
+            note:    'spec held in filesys',
+            title:   'The Whistle / Everyday Racism at Cambridge Incident Report',
+        },
+        {
+            org:     'grn-test',
+            project: 'rape-is-a-crime',
+            note:    'spec held on filesys',
+            title:   'The Whistle / Global Rights Nigeria Incident Report',
+        },
+        {
+            org:     'grn',
+            project: 'rape-is-a-crime',
+            note:    'LIVE REPORT',
+            title:   'The Whistle / Global Rights Nigeria Incident Report',
+        },
+        {
+            org:     'hfrn-test',
+            project: 'hfrn-en',
+            note:    'spec held in db',
+            title:   'The Whistle / Humans for Rights Network Incident Report',
+        },
+    ];
 
-    it('fails recaptcha check', async function() {
-        const values = { 'nav-next': 'next' };
-        const responsePost = await reportApp.post('/grn-test/rape-is-a-crime').send(values);
-        expect(responsePost.status).to.equal(302);
-        expect(responsePost.headers.location).to.equal('/grn-test/rape-is-a-crime');
-        expect(responsePost.headers['x-redirect-reason']).to.equal('reCAPTCHA verification failed');
-    });
+    for (const project of projects) {
+        it(`${project.org}/${project.project}: sees home page (${project.note})`, async function() {
+            const responseGet = await reportApp.get(`/${project.org}/${project.project}`);
+            expect(responseGet.status).to.equal(200);
+            const document = new JSDOM(responseGet.text).window.document;
+            expect(document.querySelector('title').textContent).to.equal(project.title);
+        });
 
-    it('sees hfrn-test/hfrn-en (spec in db) home page', async function() {
-        const responseGet = await reportApp.get('/hfrn-test/hfrn-en');
-        expect(responseGet.status).to.equal(200);
-        const document = new JSDOM(responseGet.text).window.document;
-        expect(document.querySelector('title').textContent).to.equal('The Whistle / Humans for Rights Network Incident Report');
-        expect(document.querySelector('button').textContent.trim()).to.equal('Get started');
-    });
-
-    it('fails recaptcha check', async function() {
-        const values = { 'nav-next': 'next' };
-        const responsePost = await reportApp.post('/hfrn-test/hfrn-en').send(values);
-        expect(responsePost.status).to.equal(302);
-        expect(responsePost.headers.location).to.equal('/hfrn-test/hfrn-en');
-        expect(responsePost.headers['x-redirect-reason']).to.equal('reCAPTCHA verification failed');
-    });
+        it(`${project.org}/${project.project}: fails recaptcha check`, async function() {
+            const values = { 'nav-next': 'next' };
+            const responsePost = await reportApp.post(`/${project.org}/${project.project}`).send(values);
+            expect(responsePost.status).to.equal(302);
+            expect(responsePost.headers.location).to.equal(`/${project.org}/${project.project}`);
+            expect(responsePost.headers['x-redirect-reason']).to.equal('reCAPTCHA verification failed');
+        });
+    }
 });

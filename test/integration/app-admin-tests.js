@@ -19,8 +19,8 @@ import csvParse           from 'csv-parse/lib/sync'; // full featured CSV parser
 
 import app from '../../app.js';
 
-const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn-test‘ organisation only
-const testpass = process.env.TESTPASS; // (for successful login & ‘rape-is-a-crime‘ report submission)
+const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn-test’ organisation
+const testpass = process.env.TESTPASS; // (for admin login test)
 
 const org = 'grn-test';         // the test organisation for the live ‘grn‘ organisation
 const proj = 'rape-is-a-crime'; // GRN's only project
@@ -37,7 +37,7 @@ describe(`Admin app (${org}/${app.env})`, function() {
     this.slow(250);
 
     before(async function() {
-        // check testuser 'tester' exists and has access to ‘grn-test’ org (only)
+        // check testuser 'tester' exists and has access to ‘grn-test’ org
         const responseUsr = await appAdmin.get(`/ajax/login/databases?user=${testuser}`);
         if (!responseUsr.body.databases.includes(org)) throw new Error(`${testuser} must have access to ‘${org}’ org`);
 
@@ -216,6 +216,65 @@ describe(`Admin app (${org}/${app.env})`, function() {
             const regexp = new RegExp(`${org}\\/${proj}\\/\\*$`);
             expect(document.querySelector('header nav > ul > li ul li a').href).to.match(regexp);
         });
+    });
+
+    describe('form specification', function() {
+        let specId = null;
+
+        const minimalSpec = `
+title: Minimal form spec (non-functional, but will validate)
+
+pages:
+  index: { $ref: '#/index' }
+
+index:
+- text: Minimal validating form.
+`;
+
+        it('sees list form specs page', async function() {
+            const response = await appAdmin.get('/form-specifications');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal('Form specifications');
+        });
+
+        it('sees add form spec page', async function() {
+            const response = await appAdmin.get('/form-specifications/add');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('h1').textContent).to.equal('Add Form specification');
+        });
+
+        it('adds minimal form spec', async function() {
+            const values = { project: 'integration-test', page: '', specification: minimalSpec };
+            const response = await appAdmin.post('/form-specifications/add').send(values);
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/form-specifications');
+            specId = response.headers['x-insert-id'];
+        });
+
+        it('sees form spec in list form specs page', async function() {
+            const response = await appAdmin.get('/form-specifications');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            const matches = document.evaluate('count(//td[text()="integration-test"])', document, null, 0, null);
+            expect(matches.numberValue).to.equal(1);
+        });
+
+        it('deletes form spec', async function() {
+            const response = await appAdmin.post(`/form-specifications/${specId}/delete`);
+            expect(response.status).to.equal(302);
+            expect(response.headers.location).to.equal('/form-specifications');
+        });
+
+        it('no longer sees form spec in list form specs page', async function() {
+            const response = await appAdmin.get('/form-specifications');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            const matches = document.evaluate('count(//td[text()="integration-test"])', document, null, 0, null);
+            expect(matches.numberValue).to.equal(0);
+        });
+
     });
 
     describe('submit (internal single-page) incident report', function() {

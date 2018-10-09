@@ -15,8 +15,8 @@ import dateFormat   from 'dateformat'; // Steven Levithan's dateFormat()
 
 import app from '../../app.js';
 
-const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn-test‘ organisation only
-const testpass = process.env.TESTPASS; // (for successful login & ‘rape-is-a-crime‘ report submission)
+const testuser = process.env.TESTUSER; // note testuser ‘tester‘ must have access to ‘grn-test’ organisation
+const testpass = process.env.TESTPASS; // (for admin login test)
 
 const org = 'grn-test';         // the test organisation for the live ‘grn‘ organisation
 const proj = 'rape-is-a-crime'; // GRN's only project
@@ -376,6 +376,14 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(200);
             const document = new JSDOM(response.text).window.document;
             expect(document.querySelector('h1').textContent.trim()).to.equal('✔ We’ve received your report');
+        });
+
+        it('gets PDF of report', async function() {
+            const response = await appReport.get(`/${org}/${proj}/pdf/${reportId}`);
+            expect(response.status).to.equal(200);
+            expect(response.headers['content-type']).to.equal('application/pdf');
+            const re = /attachment; filename="the whistle incident report grn-test rape-is-a-crime \d\d\d\d-\d\d-\d\d \d\d.\d\d.pdf/;
+            expect(response.headers['content-disposition']).to.match(re);
         });
 
         it('submits whatnext "back to start"', async function() {

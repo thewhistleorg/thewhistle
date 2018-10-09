@@ -246,7 +246,7 @@ router.get('/groups', groups.getGroupsPage);
 router.get('/create-group', groups.getCreateGroupPage);
 
 router.post('/create-group', groups.postCreateGroup);
-
+router.post('/delete-group/:group', groups.postDeleteGroup);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 export default router.middleware();

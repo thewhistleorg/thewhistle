@@ -145,6 +145,13 @@ class Group {
     static async delete(db, id) {
         debug('Group.delete', 'db:' + db, 'r:' + id);
 
+        const group = await Group.get(db, id);
+        if (!group) {
+            const err = new Error('Group doesn\'t exist');
+            err.status = 404;
+            throw err;
+        }
+
         await User.deleteForGroup(id);
 
         const groups = await Db.collection(db, 'groups');

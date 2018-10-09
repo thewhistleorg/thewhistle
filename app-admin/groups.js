@@ -7,6 +7,9 @@ import Group  from '../models/group.js';
 import User   from '../models/user.js';
 
 
+import { ObjectId } from 'mongodb';      // MongoDB driver for Node.js
+
+
 class GroupHandlers {
 
 
@@ -54,6 +57,19 @@ class GroupHandlers {
                 ctx.response.redirect('/create-group');
             }
             
+        });
+    }
+
+
+    static async postDeleteGroup(ctx) {
+        await GroupHandlers.callAdminFunction(ctx, async function() {
+            try {
+                await Group.delete(ctx.state.user.db, new ObjectId(ctx.params.group));
+                ctx.status = 200;
+            } catch (e) {
+                ctx.status = e.status ? e.status : 500;
+                ctx.flash = { _error: 'Error: Could not delete group.' };
+            }
         });
     }
 

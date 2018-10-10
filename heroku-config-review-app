@@ -15,8 +15,12 @@ source <(sed -nE "s/[^#]+/$cmd &/ p" .env | sed "s/[ ]*=[ ]*/=/")
 # set subapp to $subapp (admin/report)
 heroku config:set SUBAPP=$subapp --app thewhistle-staging-pr-$prnum
 
-# ensure NODE_ENV is set to development
-heroku config:set NODE_ENV=development --app thewhistle-staging-pr-$prnum
+# ensure NODE_ENV is set to staging
+heroku config:set NODE_ENV=staging --app thewhistle-staging-pr-$prnum
 
-# show config
+# enable labs for access to HEROKU_APP_NAME metadata
+heroku labs:enable runtime-dyno-metadata -a thewhistle-staging-pr-$prnum
+
+# show config & review app url
 heroku config --app thewhistle-staging-pr-$prnum
+echo Review app available at http://thewhistle-staging-pr-$prnum.herokuapp.com

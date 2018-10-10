@@ -10,7 +10,7 @@
 
 import dateFormat         from 'dateformat';  // Steven Levithan's dateFormat()
 import MarkdownIt         from 'markdown-it'; // markdown parser
-import json2csv           from 'json2csv';    // converts json into csv
+import XLSX               from 'xlsx';        // parser and writer for various spreadsheet formats
 import pdf                from 'html-pdf';    // HTML to PDF converter
 import fs           from 'fs-extra';    // fs with extra functions & promise interface
 import handlebars         from 'handlebars';  // logicless templating language
@@ -147,7 +147,7 @@ class ReportsHandlers {
             oldest:      oldest,            // to check for change
             latest:      latest,            // to check for change
             title:       title,             // page title indicating filtering
-            exportCsv:   ctx.request.href.replace('/reports', '/reports/export-csv'),
+            exportXls:   ctx.request.href.replace('/reports', '/reports/export-xls'),
             exportPdf:   ctx.request.href.replace('/reports', '/reports/export-pdf'),
             current:     ctx.request.query, // current filter
             sort:        sort,
@@ -235,7 +235,7 @@ class ReportsHandlers {
             title:           title,             // page title indicating filtering
             reportsByDay:    reportsByDay,      // for time-based chart
             maxReportsByDay: maxReportsByDay,   // for chart gridlines
-            exportCsv:       ctx.request.href.replace('/reports', '/reports/export-csv'),
+            exportXls:       ctx.request.href.replace('/reports', '/reports/export-xls'),
             count:           count,
         };
         await ctx.render('reports-map', context);
@@ -243,9 +243,9 @@ class ReportsHandlers {
 
 
     /**
-     * GET /reports/export-csv - download CSV file of current list of reports.
+     * GET /reports/export-xls - download XLS spreadsheet file of current list of reports.
      */
-    static async exportCsv(ctx) {
+    static async exportXls(ctx) {
         const db = ctx.state.user.db;
 
         // ---- filtering
@@ -258,10 +258,20 @@ class ReportsHandlers {
         // get list of users (indexed by id) for use in translating id's to usernames
         const users = await User.details(); // note users is a Map
 
-        // if list is for single project with homogeneous submitted details, include them in the CSV
-        const singleProject = isListSingleProject(rpts);
+        // get list of distinct report questions - each group of distinct questions will go in a separate worksheet
+        const questions = distinctQuestions(rpts);
 
-        const reports = [];
+        // sort reports in reverse chronological order (to match main list default) - this will put
+        // more recent reports at the top of each worksheet, and more recent worksheets at the start
+        // of the list of sheets
+        rpts.sort((a, b) => a._id.getTimestamp() < b._id.getTimestamp() ? 1 : -1);
+
+
+        // perform various mappings to prettify the listings - reports is an associative array
+        // indexed by project, each project being an associative array indexed by 'group' which is
+        // the report questions; each group will be a worksheet in the workbook, and the 'project'
+        // index is used to generate the worksheet name
+        const reports = {};
         for (const rpt of rpts) {
             const lastUpdate = await Update.lastForReport(db, rpt._id);
             const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
@@ -274,55 +284,65 @@ class ReportsHandlers {
                 'project':       rpt.project,
                 'alias':         rpt.alias,
                 'incident date': rpt.submitted.Happened ? incidentDate : '',
-                'reported on':   dateFormat(rpt._id.getTimestamp(), 'd mmm yyyy HH:MM'),
+                'reported on':   rpt._id.getTimestamp(),
                 'reported by':   rpt.by ? (await User.get(rpt.by)).username : '',
                 'assigned to':   assignedTo ? assignedTo.username : '', // replace 'assignedTo' ObjectId with username
                 'status':        rpt.status,
                 'tags':          rpt.tags.join(', '),
-                'updated on':    lastUpdate.on ? dateFormat(lastUpdate.on, 'd mmm yyyy HH:MM') : '',
+                'updated on':    lastUpdate.on,
                 'updated by':    lastUpdate.by,
                 'active?':       rpt.archived ? 'archived' : 'active',
                 'url':           ctx.request.origin + '/reports/'+rpt._id,
             };
-            if (singleProject) {
-                // we have homogeneous submitted fields, append them to the CSV
-                fields['submitted details'] = '';
-                Object.assign(fields, rpt.submitted);
-            }
-            reports.push(fields);
+            // get the questions in this report from the object keys (using wacky ␝/␟ separator
+            // characters as an easy guarantee they won't be included in question texts)
+            const rptQuestions = rpt.project+'␝'+Object.keys(rpt.submitted).join('␟');
+            // a 'group' is reports with the same questions (including partial submissions)
+            const group = questions.find(el => el.startsWith((rptQuestions)));
+            // add this report to the relevant group (with a blank column to separate metadata from submitted report)
+            if (!reports[rpt.project]) reports[rpt.project] = {};
+            if (!reports[rpt.project][group]) reports[rpt.project][group] = [];
+            reports[rpt.project][group].push(Object.assign(fields, { '—': '' }, rpt.submitted));
         }
 
-        reports.sort((a, b) => a['reported on'] < b['reported on'] ? 1 : -1); // sort in reverse chronological order (match main list default)
+        // create spreadsheet workbook from reports
+        const wb = XLSX.utils.book_new();
+        for (const project in reports) {
+            let wsNumber = 1;
+            for (const group in reports[project]) {
+                const ws = XLSX.utils.json_to_sheet(reports[project][group]);
+                XLSX.utils.book_append_sheet(wb, ws, `${project} – ${wsNumber}`);
+                wsNumber++;
+            }
+        }
 
-        const csv = json2csv.parse(reports);
         const filenameFilter = filterDesc.size>0 ? `(filtered by ${[ ...filterDesc ].join(', ')}) ` : '';
         const timestamp = dateFormat('yyyy-mm-dd HH:MM');
-        const filename = `the whistle incident reports ${filenameFilter}${timestamp.replace(':', '.')}.csv`;
-        ctx.response.status = 200;
-        ctx.response.body = csv;
+        const filename = `the whistle ${ctx.state.user.db} incident reports ${filenameFilter}${timestamp.replace(':', '.')}.xls`;
+        ctx.response.body = XLSX.write(wb, { type: 'buffer', bookType: 'biff8' });
         ctx.response.set('X-Timestamp', timestamp); // for integration tests
         ctx.response.attachment(filename);
 
-        // check whether current list of reports is for a single project, with homogeneous submitted details
-        // incomplete submissions are considered homogeneous: hence [ { a: 'x' }, {  a: 'x', b: 'y' } ] is ok,
-        // but [ { a: 'x' }, {  c: 'z' } ] is not
-        function isListSingleProject(rptsList) {
-            const fields = [];
+        // ------------
 
+        // return list of permutations of answered questions
+        function distinctQuestions(rptsList) {
+            const questions = new Set();
+
+            // build set of distinct questions: use wacky ␝ unit separator / ␟ group separator
+            // characters as an easy guarantee they won't be included in question texts
             for (const rpt of rptsList) {
-                const flds = Object.keys(rpt.submitted);
-                for (let f=0; f<flds.length; f++) {
-                    if (fields[f] == undefined) fields[f] = {};
-                    const fld = flds[f];
-                    fields[f][fld] = true;
+                questions.add(rpt.project+'␝'+Object.keys(rpt.submitted).join('␟'));
+            }
+
+            // eliminate question sets which are subsets of others (i.e. uncompleted reports)
+            for (const q of questions.values()) {
+                for (const r of questions.values()) {
+                    if (q.startsWith(r) && q!=r) questions.delete(r);
                 }
             }
 
-            for (let f=0; f<fields.length; f++) {
-                if (Object.keys(fields[f]).length > 1) return false; // differently named fields at same position in report
-            }
-
-            return true;
+            return [ ...questions ].sort(); // convert set to array and sort it
         }
     }
 

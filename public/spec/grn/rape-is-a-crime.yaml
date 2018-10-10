@@ -1,7 +1,5 @@
 title: The Whistle / Global Rights Nigeria Incident Report
 
-version: 1
-
 pages:
   index:    { $ref: 'rape-is-a-crime-0' }
   p1:       { $ref: 'rape-is-a-crime-1' }

@@ -77,7 +77,7 @@ describe(`Report model (${db})`, function() {
         it('starts submission', async function() {
             const ua = 'node-superagent/x.x.x';
 
-            reportId = await Report.submissionStart(db, 'test-project', 'test test', ua);
+            reportId = await Report.submissionStart(db, 'test-project', 'test test', false, ua);
 
             console.info('\treport id:', reportId);
             expect(reportId.constructor.name).to.equal('ObjectID');

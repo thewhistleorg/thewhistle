@@ -37,57 +37,59 @@ const schema = {
     type:       'object',
     required:   [ 'project', 'alias', 'submitted', 'location', 'analysis', 'assignedTo', 'status', 'tags', 'comments', 'archived', 'views' ],
     properties: {
-        _id:          { bsonType: 'objectId' },
-        project:      { type:     'string' },                // name of project report belongs to
-        by:           { bsonType: [ 'objectId', 'null' ] },  // user entering incident report
-        alias:        { type:     [ 'string', 'null' ] },    // auto-generated alias of victim/survivor
-        submitted:    { type:     'object' },                // originally submitted report (flexible format following incident reporting format)
-        submittedRaw: { type:     'object' },                // originally submitted report - fields as per HTML input field names
+        _id:            { bsonType: 'objectId' },
+        project:        { type:     'string' },                // name of project report belongs to
+        by:             { bsonType: [ 'objectId', 'null' ] },  // user entering incident report
+        alias:          { type:     [ 'string', 'null' ] },    // auto-generated alias of victim/survivor
+        submitted:      { type:     'object' },                // originally submitted report (flexible format following incident reporting format)
+        submittedRaw:   { type:     'object' },                // originally submitted report - fields as per HTML input field names
+        submittedTypes: { type:     'object' },                // types of submitted fields, for highlighting in reports
         submittedVersion: { type: 'object' }, // TODO: temporarily allow submittedVersion until existing reports cleaned
-        files:        { type:     'array',                   // uploaded files
-            items: { type: 'object' },                       // ... 'formidable' File objects
+        files:          { type:     'array',                   // uploaded files
+            items: { type: 'object' },                         // ... 'formidable' File objects
         },
-        usedBefore:   { type: 'boolean' },                   // whether user has used service before
-        ua:           { type: [ 'object', 'null' ] },        // user agent of browser used to report incident
-        country:      { type: [ 'string', 'null' ] },        // country report was submitted from
-        location:     { type: 'object',                      // geocoded incident location
+        usedBefore:     { type:     'boolean' },               // whether user has used service before
+        sessionId:      { bsonType: 'binData' },               // random UUID identifying session in which report was submitted
+        ua:             { type:     [ 'object', 'null' ] },    // user agent of browser used to report incident
+        country:        { type:     [ 'string', 'null' ] },    // country report was submitted from
+        location:       { type:     'object',                  // geocoded incident location
             properties: {
-                address: { type: 'string' },                 // ... entered address used for geocoding
-                geocode: { type: [ 'object', 'null' ] },     // ... google geocoding data
-                geojson: { type: [ 'object', 'null' ] },     // ... GeoJSON (with spatial index)
+                address: { type: 'string' },                   // ... entered address used for geocoding
+                geocode: { type: [ 'object', 'null' ] },       // ... google geocoding data
+                geojson: { type: [ 'object', 'null' ] },       // ... GeoJSON (with spatial index)
             },
         },
-        analysis:     { type: [ 'object', 'null' ],          // digital verification metadata
+        analysis:       { type:     [ 'object', 'null' ],      // digital verification metadata
             properties: {
                 files: { type:  'array',
                     items: { type: 'object',
                         properties: {
-                            exif:    { type: [ 'object' ] }, // ... image exif data: lat/lon, create date
+                            exif:    { type: [ 'object' ] },   // ... image exif data: lat/lon, create date
                         },
                     },
                 },
-                weather: { type: [ 'object' ] },             // ... wunderground weather info from report date/location
+                weather: { type: [ 'object' ] },               // ... wunderground weather info from report date/location
             },
         },
-        assignedTo:   { bsonType: [ 'objectId', 'null' ] },  // user report is assigned to
-        status:       { type:     [ 'string', 'null' ] },    // free-text status (to accomodate any workflow)
-        tags:         { type:     'array',                   // tags to classify/group reports
+        assignedTo:     { bsonType: [ 'objectId', 'null' ] },  // user report is assigned to
+        status:         { type:     [ 'string', 'null' ] },    // free-text status (to accomodate any workflow)
+        tags:           { type:     'array',                   // tags to classify/group reports
             items: { type: 'string' },
         },
-        comments:     { type: 'array',                       // notes/commentary documenting management of report
+        comments:       { type:     'array',                   // notes/commentary documenting management of report
             items: { type: 'object',
                 properties: {
-                    byId:    { bsonType: 'objectId' },       // ... user making comment
-                    byName:  { type:     'string' },         // ... username of user making comment (in case user gets deleted)
-                    on:      { bsonType: 'date' },           // ... timestamp comment added
-                    comment: { type:     'string' },         // ... comment in markdown format
+                    byId:    { bsonType: 'objectId' },         // ... user making comment
+                    byName:  { type:     'string' },           // ... username of user making comment (in case user gets deleted)
+                    on:      { bsonType: 'date' },             // ... timestamp comment added
+                    comment: { type:     'string' },           // ... comment in markdown format
                 },
             },
         },
-        views:         { type: [ 'object', 'null' ] },        // associative array of timestamps indexed by user id
-        archived:      { type: 'boolean' },                   // archived flag
-        lastUpdated:   { bsonType: 'date' },                  // date of when the user last made an edit to their submission
-        evidenceToken: { type: 'string' },                    // unique token which is used in a URL for a user to upload evidence
+        views:          { type:     [ 'object', 'null' ] },    // associative array of timestamps indexed by user id
+        archived:       { type:     'boolean' },               // archived flag
+        lastUpdated:    { bsonType: 'date' },                  // date of when the user last made an edit to their submission
+        evidenceToken:  { type:     'string' },                // unique token which is used in a URL for a user to upload evidence
     },
     additionalProperties: false,
 };

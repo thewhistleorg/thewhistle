@@ -18,9 +18,6 @@ heroku config:set SUBAPP=$subapp --app thewhistle-staging-pr-$prnum
 # ensure NODE_ENV is set to staging
 heroku config:set NODE_ENV=staging --app thewhistle-staging-pr-$prnum
 
-# enable labs for access to HEROKU_APP_NAME metadata
-heroku labs:enable runtime-dyno-metadata -a thewhistle-staging-pr-$prnum
-
 # show config & review app url
 heroku config --app thewhistle-staging-pr-$prnum
 echo Review app available at http://thewhistle-staging-pr-$prnum.herokuapp.com

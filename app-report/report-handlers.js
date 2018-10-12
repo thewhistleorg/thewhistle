@@ -393,7 +393,7 @@ class Handlers {
     static async getPage(ctx) {
         const org = ctx.params.database;
         const project = ctx.params.project;
-        debug('getPage ', `${org}/${project}/${ctx.params.page}`, 'id:'+ctx.session.id);
+        debug('getPage ', `${org}/${project}/${ctx.params.page}`, 'id:'+ctx.session.reportId);
         try {
             if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
         } catch (e) {
@@ -422,7 +422,7 @@ class Handlers {
         if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.response.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
 
         // fetch already entered information to fill in defaults for this page if it is being revisited
-        const report = await Report.get(org, ctx.session.id);
+        const report = await Report.get(org, ctx.session.reportId);
 
         // default the incident report date to today if 'exactly when it happened' is selected: this
         // is a natural default, is quite easy to change to yesterday, or to any other day
@@ -473,7 +473,7 @@ class Handlers {
     static async postPage(ctx) {
         const org = ctx.params.database;
         const project = ctx.params.project;
-        debug('postPage', `${org}/${project}/${ctx.params.page}`, 'id:'+ctx.session.id);
+        debug('postPage', `${org}/${project}/${ctx.params.page}`, 'id:'+ctx.session.reportId);
         try {
             if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
         } catch (e) {
@@ -507,7 +507,7 @@ class Handlers {
             debug('... files', ctx.request.files.map(f => f.name));
         }
 
-        if (page==1 & ctx.session.id) { ctx.flash = { error: 'Trying to save already saved report!' }; return ctx.response.redirect(ctx.request.url); }
+        if (page==1 & ctx.session.reportId) { ctx.flash = { error: 'Trying to save already saved report!' }; return ctx.response.redirect(ctx.request.url); }
 
         if (body['used-before']) { // create the skeleton report (with alias)
             let alias = null;
@@ -517,7 +517,7 @@ class Handlers {
                     // verify existing alias does exist
                     alias = body['used-before-existing-alias'];
                     const reportsY = await Report.getBy(org, 'alias', alias);
-                    const reportsYExclCurr = reportsY.filter(r => r._id != ctx.session.id); // exclude current report
+                    const reportsYExclCurr = reportsY.filter(r => r._id != ctx.session.reportId); // exclude current report
                     const errorY = `Used-before anonymous alias ‘${alias}’ not found`;
                     const flashY = Object.assign({ error: errorY }, { formdata: body }); // include formdata for single-page report
                     if (reportsYExclCurr.length == 0) { ctx.flash = flashY; return ctx.response.redirect(ctx.request.url); }
@@ -527,7 +527,7 @@ class Handlers {
                     if (body['used-before-generated-alias'] == null) { ctx.flash = { error: 'Not-used-before generated alias not given' }; return ctx.response.redirect(ctx.request.url); }
                     alias = body['used-before-generated-alias'];
                     const reportsN = await Report.getBy(org, 'alias', alias);
-                    const reportsNExclCurr = reportsN.filter(r => r._id != ctx.session.id); // exclude current report
+                    const reportsNExclCurr = reportsN.filter(r => r._id != ctx.session.reportId); // exclude current report
                     const errorN = `Generated alias ‘${alias}’ not available: please select another`;
                     const flashN = Object.assign({ error: errorN }, { formdata: body }); // include formdata for single-page report
                     if (reportsNExclCurr.length > 0) { ctx.flash = flashN; return ctx.response.redirect(ctx.request.url); }
@@ -539,15 +539,15 @@ class Handlers {
             // save the skeleton report
             const ua = ctx.request.headers['user-agent'];
             const country = await Ip.getCountry(ctx.request.ip);
-            ctx.session.id = await Report.submissionStart(org, project, alias, body['used-before']=='Yes', ua, country);
-            // TODO: ?? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.id, 'incomplete', null);
+            ctx.session.reportId = await Report.submissionStart(org, project, alias, body['used-before']=='Yes', ua, country);
+            // TODO: ?? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.reportId, 'incomplete', null);
 
             // notify users of 'new report submitted'
             const users = await User.getForDb(org);
-            await Notification.notifyMultiple(org, 'new report submitted', users.map(u => u._id), ctx.session.id);
+            await Notification.notifyMultiple(org, 'new report submitted', users.map(u => u._id), ctx.session.reportId);
 
-            ctx.response.set('X-Insert-Id', ctx.session.id); // for integration tests
-            debug('submissionStart', org, project, page, ctx.session.id);
+            ctx.response.set('X-Insert-Id', ctx.session.reportId); // for integration tests
+            debug('submissionStart', org, project, page, ctx.session.reportId);
         }
 
         // remember if we're going forward or back, then delete nav from body
@@ -570,12 +570,12 @@ class Handlers {
 
         const formattedReport = formatReport(org, project, page, body);
 
-        if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.id, formattedReport, body);
+        if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.reportId, formattedReport, body);
 
         if (ctx.request.files) {
             for (const file of ctx.request.files) {
                 try {
-                    await Report.submissionFile(org, ctx.session.id, file);
+                    await Report.submissionFile(org, ctx.session.reportId, file);
                 } catch (e) {
                     await Log.error(ctx, e);
                     ctx.flash = { error: e.message };
@@ -633,12 +633,12 @@ async function whatnext(ctx) {
 
     if (!ctx.session.isNew) {
         // TODO: ?? tag report as complete
-        // suspend complete/incomplete tags await Report.deleteTag(org, ctx.session.id, 'incomplete', null);
-        // suspend complete/incomplete tags await Report.insertTag(org, ctx.session.id, 'complete', null);
+        // suspend complete/incomplete tags await Report.deleteTag(org, ctx.session.reportId, 'incomplete', null);
+        // suspend complete/incomplete tags await Report.insertTag(org, ctx.session.reportId, 'complete', null);
 
         // record submission complete
         if (ctx.app.env == 'production' || ctx.request.headers['user-agent'].slice(0, 15)=='node-superagent') {
-            await Submission.complete(org, ctx.session.submissionId, ctx.session.id);
+            await Submission.complete(org, ctx.session.submissionId, ctx.session.reportId);
         }
 
         // remove all session data (to prevent duplicate submission)

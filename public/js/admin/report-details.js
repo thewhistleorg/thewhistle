@@ -3,7 +3,38 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 'use strict';
-/* exported setupMetadataAutosubmitListeners, setupTagsListeners, setupCommentaryListeners, setupLocationListeners, initialiseMap, resizeElementHeight */
+
+/* global $ */
+/* exported setReportId, setGroups, setupMetadataAutosubmitListeners, setupTagsListeners, setupCommentaryListeners, setupLocationListeners, initialiseMap, resizeElementHeight */
+
+
+let reportId = '';
+let selectedGroups = [];
+
+
+$(document).ready(function() {
+    setupGroupSelect();
+});
+
+
+function setReportId(id) {
+    reportId = id;
+}
+
+
+function setGroups(groups) {
+    selectedGroups = groups.split(',');
+    $('#groupSelect').val(selectedGroups);
+}
+
+
+function setupGroupSelect() {
+    $('#groupSelect').select2({
+        placeholder: 'Select groups',
+    });
+    $('#groupSelect').on('select2:select', selectGroup);
+    $('#groupSelect').on('select2:unselect', removeGroup);
+}
 
 
 /**
@@ -31,9 +62,8 @@ function setupMetadataAutosubmitListeners() {
 /**
  * Set up listeners for adding / saving / cancelling / deleting tags.
  *
- * @param {ObjectId} reportId - id of report being updated.
  */
-function setupTagsListeners(reportId) {
+function setupTagsListeners() {
     document.querySelector('#tag-add').onclick = openTagInputs;
     document.querySelector('#tag-save').onclick = saveTag;
     document.querySelector('#tag-cancel').onclick = cancelTagEntry;
@@ -120,11 +150,10 @@ function setupTagsListeners(reportId) {
 /**
  * Set up listeners for adding / editing / deleting notes (comments).
  *
- * @param {ObjectId} reportId - id of report being updated.
  * @param {string}   username - name of user making changes.
  * @param {ObjectId} userid - id of user making changes.
  */
-function setupCommentaryListeners(reportId, username, userid) {
+function setupCommentaryListeners(username, userid) {
 
     document.querySelector('#add-comment').onclick = postComment;
     document.querySelectorAll('div.by button.edit').forEach(btn => btn.onclick = editComment);
@@ -223,7 +252,48 @@ function setupCommentaryListeners(reportId, username, userid) {
 }
 
 
-function setupLocationListeners(reportId) {
+function selectGroup(e) {
+    const request = new XMLHttpRequest();
+    const groupId = e.params.data.id;
+    request.open('POST', `/add-group-to-report/${reportId}/${groupId}`);
+    request.onreadystatechange = function() {
+        if (request.readyState == 4) {
+            if (request.status == 200) {
+                selectedGroups.push(groupId);
+            } else {
+                //If POST didn't succeed
+                $('#groupSelect').val(selectedGroups);
+                alert('Error: Could not add group.');
+            }
+        }
+    };
+    request.send();
+}
+
+
+function removeGroup(e) {
+    const request = new XMLHttpRequest();
+    const groupId = e.params.data.id;
+    request.open('POST', `/remove-group-from-report/${reportId}/${groupId}`);
+    request.onreadystatechange = function() {
+        if (request.readyState == 4) {
+            if (request.status == 200) {
+                const groupIndex = selectedGroups.indexOf('groupId');
+                if (groupIndex != -1) {
+                    selectedGroups.splice(groupIndex, 1);
+                }
+            } else {
+                //If POST didn't succeed
+                $('#groupSelect').val(selectedGroups);
+                alert('Error: Could not remove group.');
+            }
+        }
+    };
+    request.send();
+}
+
+
+function setupLocationListeners() {
     document.querySelector('#location-edit').onclick = editLocation;
     document.querySelector('#location-cancel').onclick = cancelLocation;
     document.querySelector('#location-update').onclick = updateLocation;
@@ -302,14 +372,13 @@ function setupLocationListeners(reportId) {
  * zoomed / panned.
  *
  * @param {Object}   google - Google Map object returned by maps.googleapis.com/maps/api/js
- * @param {ObjectId} reportId - id of report being shown.
  * @param {string}   alias - anonymous identifier name of reporter
  * @param {number}   lat - latitude of incident
  * @param {number}   lon - longitude of incident
  * @param {string}   reportedOnDay - TODO: is this used?
  * @param {number}   highlight - opacity of marker, to indicate how long ago incident was reported
  */
-function initialiseMap(google, reportId, alias, lat, lon, reportedOnDay, highlight) {
+function initialiseMap(google, alias, lat, lon, reportedOnDay, highlight) {
     // initialise array of reports markers with 'this' report
     const reports = {
         [reportId]: { lat: lat, lng: lon, date: reportedOnDay, highlight: highlight, name: alias },

@@ -50,7 +50,7 @@ class Group {
 
         const groups = await Db.collection(db, 'groups');
 
-        groups.createIndex({ roles: 1 });
+        groups.createIndex({ reportIds: 1 });
 
         debug('Group.init', db, `${Date.now()-t1}ms`);
     }
@@ -172,6 +172,7 @@ class Group {
         try {
             const groups = await Db.collection(db, 'groups');
             await groups.updateOne({ _id: id }, { $addToSet: { reportIds: reportId } });
+            console.log('updated');
         } catch (e) {
             if (e.code == 121) {
                 throw new Error(`Group ${db}/${id} failed validation`);
@@ -202,6 +203,13 @@ class Group {
                 throw e;
             }
         }
+    }
+
+
+    static async getReportGroups(db, reportId) {
+        const groups = await Db.collection(db, 'groups');
+        const ret = await groups.find({ reportIds: reportId }).toArray();
+        return ret;
     }
 
 }

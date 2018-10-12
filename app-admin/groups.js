@@ -74,6 +74,30 @@ class GroupHandlers {
     }
 
 
+    static async postAddReportToGroup(ctx) {
+        await GroupHandlers.callAdminFunction(ctx, async function() {
+            try {
+                await Group.addReport(ctx.state.user.db, new ObjectId(ctx.params.group), new ObjectId(ctx.params.report));
+                ctx.status = 200;
+            } catch (e) {
+                ctx.status = e.status ? e.status : 500;
+            }
+        });
+    }
+
+
+    static async postRemoveReportFromGroup(ctx) {
+        await GroupHandlers.callAdminFunction(ctx, async function() {
+            try {
+                await Group.removeReport(ctx.state.user.db, new ObjectId(ctx.params.group), new ObjectId(ctx.params.report));
+                ctx.status = 200;
+            } catch (e) {
+                ctx.status = e.status ? e.status : 500;
+            }
+        });
+    }
+
+
 }
 
 

@@ -21,6 +21,7 @@ import { LatLonSpherical as LatLon, Dms } from 'geodesy';     // library of geod
 import Report from '../models/report.js';
 import User   from '../models/user.js';
 import Update from '../models/update.js';
+import Group  from '../models/group.js';
 
 import jsObjectToHtml from '../lib/js-object-to-html';
 import Geocoder       from '../lib/geocode';
@@ -830,7 +831,12 @@ class ReportsHandlers {
 
         // list of all available tags (for autocomplete input)
         const tagList = await Report.tags(db);
-
+        const groupList = await Group.getAll(db);
+        console.log(groupList);
+        let selectedGroups = await Group.getReportGroups(db, new ObjectId(reportId));
+        selectedGroups = selectedGroups.map(g => g._id);
+        console.log(selectedGroups);
+        //TODO: Send these
         // convert @mentions & #tags to links, and add various useful properties to comments
         const comments = report.comments.map(c => {
             if (!c.comment) return; // shouldn't happen, but...
@@ -883,6 +889,8 @@ class ReportsHandlers {
             statuses:         statuses,        // for datalist
             otherReports:     otherReports,
             tagList:          tagList,         // for autocomplete datalist
+            groupList:        groupList,
+            selectedGroups:   selectedGroups,
             updates:          updates,
             exportPdf:        ctx.request.href.replace('/reports', '/reports/export-pdf'),
             submittedDesc:    truncate(desc, 70) || `<i title="submitted description" class="grey">No Description</i>`, // eslint-disable-line quotes
@@ -939,7 +947,6 @@ class ReportsHandlers {
             await Log.error(ctx, e);
             extra.error = e.message; // validation failure
         }
-
         await ctx.render('reports-view', Object.assign(report, extra));
     }
 

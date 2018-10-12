@@ -12,6 +12,7 @@ import Debug                         from 'debug';        // small debugging uti
 import crypto                        from 'crypto';       // nodejs.org/api/crypto.html
 import fs                            from 'fs-extra';     // fs with extra functions & promise interface
 import jwt                           from 'jsonwebtoken'; // JSON Web Token implementation
+import MUUID                         from 'uuid-mongodb'; // generate/parse BSON UUIDs
 import { ObjectId }                  from 'mongodb';      // MongoDB driver for Node.js
 
 const debug = Debug('app:report'); // submission process
@@ -315,15 +316,10 @@ class Handlers {
             ctx.throw(404, `Submission form ${org}/${project} not found`);
         }
 
-        // clear previous session
-        ctx.session = null;
-
         // initialise session with various defaults
 
-        ctx.session = {
-            id:        null, // submitted report id
-            completed: 0,    // number of pages completed; used to prevent users jumping ahead
-        };
+        ctx.session.reportId = null; // submitted report id
+        ctx.session.completed = 0;   // number of pages completed; used to prevent users jumping ahead
 
         // record new submission has been started
         if (ctx.app.env == 'production' || ctx.request.headers['user-agent'].slice(0, 15)=='node-superagent') {
@@ -481,9 +477,11 @@ class Handlers {
             ctx.throw(500, e.message);
         }
 
-        const nPages = Object.keys(FormGenerator.forms[`${org}/${project}`].steps).length;
-
         if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.response.redirect(`/${org}/${project}`); }
+
+        if (ctx.params.page == 'whatnext') return ctx.response.redirect(`/${org}/${project}`); // TODO: generalise whatnext handling!
+
+        const nPages = Object.keys(FormGenerator.forms[`${org}/${project}`].steps).length;
 
         // page number, or '+' for single-page submission
         const page = ctx.params.page=='*' ? '+' : Number(ctx.params.page);
@@ -536,10 +534,13 @@ class Handlers {
                     ctx.flash = { error: 'used-before must be Yes or No' }; return ctx.response.redirect(ctx.request.url);
             }
 
-            // save the skeleton report
+            // ---- save the skeleton report
+
+            // any reports posted within 7 days of each other will be grouped in the same session
+            if (!ctx.session.sessionId) ctx.session.sessionId = MUUID.v4().toString();
             const ua = ctx.request.headers['user-agent'];
             const country = await Ip.getCountry(ctx.request.ip);
-            ctx.session.reportId = await Report.submissionStart(org, project, alias, body['used-before']=='Yes', ua, country);
+            ctx.session.reportId = await Report.submissionStart(org, project, alias, body['used-before']=='Yes', ctx.session.sessionId, ua, country);
             // TODO: ?? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.reportId, 'incomplete', null);
 
             // notify users of 'new report submitted'
@@ -631,18 +632,19 @@ async function whatnext(ctx) {
     const org = ctx.params.database;
     const project = ctx.params.project;
 
-    if (!ctx.session.isNew) {
+    if (ctx.session.reportId) { // (resources page can be invoked independently of a report submission)
         // TODO: ?? tag report as complete
         // suspend complete/incomplete tags await Report.deleteTag(org, ctx.session.reportId, 'incomplete', null);
         // suspend complete/incomplete tags await Report.insertTag(org, ctx.session.reportId, 'complete', null);
 
-        // record submission complete
+        // record submission complete (in production & within mocha tests only)
         if (ctx.app.env == 'production' || ctx.request.headers['user-agent'].slice(0, 15)=='node-superagent') {
             await Submission.complete(org, ctx.session.submissionId, ctx.session.reportId);
         }
 
-        // remove all session data (to prevent duplicate submission)
-        ctx.session = null; // note on next request, ctx.session will be {} not null, but session.isNew will be true
+        // reset session data (to prevent duplicate submission)
+        ctx.session.reportId = null;
+        ctx.session.completed = 0;
 
     }
     const context = { address: ctx.request.query.address };

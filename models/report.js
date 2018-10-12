@@ -8,6 +8,7 @@ import dateFormat         from 'dateformat';        // Steven Levithan's dateFor
 import { exiftool }       from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
 import useragent          from 'useragent';         // parse browser user agent string
 import { ObjectId }       from 'mongodb';           // MongoDB driver for Node.js
+import MUUID              from 'uuid-mongodb';      // generate/parse BSON UUIDs
 import Debug              from 'debug';             // small debugging utility
 
 const debug = Debug('app:db'); // db write ops
@@ -299,11 +300,12 @@ class Report {
      * @param   {string}   project - Project report is part of.
      * @param   {string}   alias - Alias to record for for submitter of report.
      * @param   {boolean}  usedBefore - Whether user has used service before.
+     * @param   {UUID}     sessionId - UUID identifying session report is submitted as part of.
      * @param   {string}   userAgent - User agent from http request header.
      * @param   {string}   country - Country report was submitted from (obtained from IP address)
      * @returns {ObjectId} New report id.
      */
-    static async submissionStart(db, project, alias, usedBefore, userAgent, country) {
+    static async submissionStart(db, project, alias, usedBefore, sessionId, userAgent, country) {
         debug('Report.submissionStart', 'db:'+db, 'p:'+project, alias);
 
         if (typeof alias != 'string' || alias.length == 0) throw new Error('Alias must be supplied');
@@ -316,6 +318,7 @@ class Report {
             submittedRaw: {},
             alias:        alias,
             usedBefore:   usedBefore,
+            sessionId:    typeof sessionId == 'string' ? MUUID.from(sessionId) : sessionId,
             ua:           null, // done below
             country:      country,
             location:     { address: '', geocode: null, geojson: null },

@@ -32,6 +32,31 @@ import Notification   from '../models/notification';
 
 class ReportsHandlers {
 
+
+    static async getReportsForGroups(db, groups) {
+        let ret = await Group.getReports(db, new ObjectId(groups[0]));
+        for (let i = 1; i < groups.length; i++) {
+            const reports = await Group.getReports(db, new ObjectId(groups[i]));
+            ret = ret.filter(value => String(reports).indexOf(String(value)) !== -1);
+        }
+        return ret;
+    }
+
+
+    static async getFilteredReports(db, query) {
+        const { filter, filterDesc, oldest, latest  } = await ReportsHandlers.buildFilter(db, query);
+        let rpts = await Report.find(db, filter.length==0 ? {} : { $and: filter });
+        if (query.group) {
+            if (!Array.isArray(query.group)) {
+                query.group = [ query.group ];
+            }
+            const reports = await ReportsHandlers.getReportsForGroups(db, query.group);
+            rpts = rpts.filter(value => String(reports).indexOf(String(value._id)) !== -1);
+        }
+        return { rpts, filterDesc, oldest, latest };
+    }
+
+
     /**
      * GET /reports - Render reports search/list page.
      *
@@ -45,15 +70,9 @@ class ReportsHandlers {
         const db = ctx.state.user.db;
 
         // ---- filtering
-        const { filter, filterDesc, oldest, latest } = await ReportsHandlers.buildFilter(db, ctx.request.query);
-
+        const { rpts, filterDesc, oldest, latest } = await ReportsHandlers.getFilteredReports(db, ctx.request.query);
         // indicate when filters applied in page title
         const title = 'Reports list' + (filterDesc.size>0 ? ` (filtered by ${[ ...filterDesc ].join(', ')})` : '');
-
-
-        // ------------ find reports matching search criteria
-
-        const rpts = await Report.find(db, filter.length==0 ? {} : { $and: filter });
 
         // get list of users (indexed by id) for use in translating id's to usernames
         const users = await User.details(); // note users is a Map
@@ -173,15 +192,11 @@ class ReportsHandlers {
         const db = ctx.state.user.db;
 
         // ---- filtering
-        const { filter, filterDesc } = await ReportsHandlers.buildFilter(db, ctx.request.query);
+        const { rpts, filterDesc } = await ReportsHandlers.getFilteredReports(db, ctx.request.query);
 
         // indicate when filters applied in page title
         const title = 'Reports map' + (filterDesc.size>0 ? ` (filtered by ${[ ...filterDesc ].join(', ')})` : '');
 
-
-        // ------------ find reports matching search criteria
-
-        const rpts = await Report.find(db, filter.length==0 ? {} : { $and: filter });
 
         // get list of users (indexed by id) for use in translating id's to usernames
         const users = await User.details(); // note users is a Map
@@ -250,11 +265,7 @@ class ReportsHandlers {
         const db = ctx.state.user.db;
 
         // ---- filtering
-        const { filter, filterDesc } = await ReportsHandlers.buildFilter(db, ctx.request.query);
-
-        // ------------ find reports matching search criteria
-
-        const rpts = await Report.find(db, { $and: filter });
+        const { rpts, filterDesc } = await ReportsHandlers.getFilteredReports(db, ctx.request.query);
 
         // get list of users (indexed by id) for use in translating id's to usernames
         const users = await User.details(); // note users is a Map
@@ -355,12 +366,7 @@ class ReportsHandlers {
         const db = ctx.state.user.db;
 
         // ---- filtering
-        const { filter, filterDesc } = await ReportsHandlers.buildFilter(db, ctx.request.query);
-
-
-        // ------------ find reports matching search criteria
-
-        const rpts = await Report.find(db, { $and: filter });
+        const { rpts, filterDesc } = await ReportsHandlers.getFilteredReports(db, ctx.request.query);
 
         // get list of users (indexed by id) for use in translating id's to usernames
         const users = await User.details(); // note users is a Map
@@ -631,6 +637,7 @@ class ReportsHandlers {
         }
         const tags = [ ...tagsSet ].sort();
 
+        const groups = await Group.getAll(db);
         // ---- list of report fields
 
         // all values in all reports fields
@@ -654,7 +661,7 @@ class ReportsHandlers {
         // sorted list of field names
         const fields = Object.keys(fieldValues).sort();
 
-        return { activeAlt, activeNow, projects, assignees, statuses, tags, fields };
+        return { activeAlt, activeNow, projects, assignees, statuses, tags, groups, fields };
     }
 
 
@@ -672,6 +679,7 @@ class ReportsHandlers {
      *  - assigned:    report.assignedTo = id of username given as argument
      *  - status:      report.status equals argument
      *  - tags:        report.tags array includes argument
+     *  - groups:      group (corresponding to argument) contains report._id in its reportId field
      *  - field:       identified field within report.submitted object includes argument
      *
      * @param   {string} db - Reports database to use.
@@ -683,7 +691,7 @@ class ReportsHandlers {
         const filterDesc = new Set();
 
         for (const arg in q) { // trap ?qry=a&qry=b, which will return an array
-            if ([ 'tag', 'summary' ].includes(arg)) continue; // multiple filters for tag & summary are allowed & catered for
+            if ([ 'tag', 'summary', 'group' ].includes(arg)) continue; // multiple filters for tag, summary and group are allowed & catered for
             if (Array.isArray(q[arg])) [ q[arg] ] = q[arg].slice(-1); // if query key multiply defined, use the last one
             if (typeof q[arg] != 'string') throw new Error(`query string argument ${arg} is not a string`); // !!
         }
@@ -832,11 +840,8 @@ class ReportsHandlers {
         // list of all available tags (for autocomplete input)
         const tagList = await Report.tags(db);
         const groupList = await Group.getAll(db);
-        console.log(groupList);
         let selectedGroups = await Group.getReportGroups(db, new ObjectId(reportId));
         selectedGroups = selectedGroups.map(g => g._id);
-        console.log(selectedGroups);
-        //TODO: Send these
         // convert @mentions & #tags to links, and add various useful properties to comments
         const comments = report.comments.map(c => {
             if (!c.comment) return; // shouldn't happen, but...

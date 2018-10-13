@@ -24,7 +24,7 @@
     <script> // list of reports
         'use strict';
         document.addEventListener('DOMContentLoaded', async function() { // reports list
-
+            
             // listener for click on tr to open report details page
             document.querySelectorAll('tr[id]').forEach(el => el.onclick = function() {
                 window.location.href = '/reports/'+this.id;

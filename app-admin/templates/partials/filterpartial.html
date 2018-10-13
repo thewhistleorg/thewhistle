@@ -67,6 +67,15 @@
                     </li>
 
                     <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                        <a href="#" class="pure-menu-link">groups</a>
+                        <ul class="pure-menu-children">
+                            {{#filterLists.groups}}
+                                <li id="group-filter-{{this._id}}" class="pure-menu-item" data-key="group" data-value="{{this._id}}"><a href="#" class="pure-menu-link">{{this.name}}</a></li>
+                            {{/filterLists.groups}}
+                        </ul>
+                    </li>
+
+                    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
                         <a href="#" class="pure-menu-link">report fields</a>
                         <ul class="pure-menu-children">
                             {{#filterLists.fields}}

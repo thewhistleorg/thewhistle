@@ -2,7 +2,10 @@
 /* JavaScript for managing filtering functions in reports-list.html                               */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+
 'use strict';
+
+
 /* global Qs, Slider, slider, dateFormat */
 
 
@@ -117,7 +120,11 @@ document.addEventListener('DOMContentLoaded', function() { // filtering
             const current = document.querySelector(`#search-display span[data-key="${key}"]`);
             if (current) current.remove();
         }
-        const displayText = key.slice(0, 6)=='field:' ? `field <i>${key.slice(6)}</i>: ${value}` : `${key}: ${value}`;
+        //Necessary to display group name instead of group id
+        const displayValue = key === 'group' ?
+            document.getElementById(`group-filter-${value}`).firstElementChild.innerHTML
+            : value;
+        const displayText = key.slice(0, 6)=='field:' ? `field <i>${key.slice(6)}</i>: ${displayValue}` : `${key}: ${displayValue}`;
         const removeLink = '<a href="#" class="remove-filter">×</a>';
         const filterSpan = `<span data-key="${key}" data-value="${value}"  class="selected-filter">${displayText} ${removeLink}</span>`;
         document.querySelector('#filter-container').insertAdjacentHTML('beforeend', filterSpan);

@@ -13,7 +13,6 @@ import crypto                        from 'crypto';       // nodejs.org/api/cryp
 import fs                            from 'fs-extra';     // fs with extra functions & promise interface
 import jwt                           from 'jsonwebtoken'; // JSON Web Token implementation
 import MUUID                         from 'uuid-mongodb'; // generate/parse BSON UUIDs
-import { ObjectId }                  from 'mongodb';      // MongoDB driver for Node.js
 
 const debug = Debug('app:report'); // submission process
 
@@ -547,7 +546,8 @@ class Handlers {
             const users = await User.getForDb(org);
             await Notification.notifyMultiple(org, 'new report submitted', users.map(u => u._id), ctx.session.reportId);
 
-            ctx.response.set('X-Insert-Id', ctx.session.reportId); // for integration tests
+            ctx.response.set('X-Insert-Id', ctx.session.reportId);   // for integration tests
+            ctx.response.set('X-Session-Id', ctx.session.sessionId); // for integration tests
             debug('submissionStart', org, project, page, ctx.session.reportId);
         }
 
@@ -599,21 +599,24 @@ class Handlers {
 
 
     /**
-     * GET /:org/:project/pdf/:reportid - save PDF of submitted report.
+     * GET /:org/:project/pdf/:sessionid - save PDF of submitted report(s).
      */
     static async downloadPdf(ctx) {
         debug('downloadPdf', ctx.params);
 
-        const { database, project, reportid } = ctx.params;
-        const submissionDate = ObjectId(reportid).getTimestamp();
-        const rptDate = dateFormat(submissionDate, 'yyyy-mm-dd HH.MM');
-        const filename = `the whistle incident report ${database} ${project} ${rptDate}.pdf`;
+        const { database, project, sessionid } = ctx.params;
 
-        const report = await ReportPdf.generate(database, project, reportid);
+        const reports = await Report.getBy(database, 'sessionId', MUUID.from(sessionid));
 
-        if (report == null) ctx.throw(404);
+        const lastRpt = reports.reduce((a, b) => a._id.getTimestamp() > b._id.getTimestamp() ? a : b);
+        const lastRptDate = dateFormat(lastRpt._id.getTimestamp(), 'yyyy-mm-dd HH.MM');
+        const filename = `the whistle incident report ${database} ${project} ${lastRptDate}.pdf`;
 
-        ctx.response.body = report;
+        const pdf = await ReportPdf.generate(database, project, reports);
+
+        if (pdf == null) ctx.throw(404);
+
+        ctx.response.body = pdf;
         ctx.response.attachment(filename);
     }
 

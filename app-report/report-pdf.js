@@ -6,12 +6,10 @@ import pdf          from 'html-pdf';   // HTML to PDF converter
 import fs           from 'fs-extra';   // fs with extra functions & promise interface
 import handlebars   from 'handlebars'; // handlebars templating
 import dateFormat   from 'dateformat'; // Steven Levithan's dateFormat()
-import { ObjectId } from 'mongodb';    // MongoDB driver for Node.js
 import Debug        from 'debug';      // small debugging utility
 
 const debug = Debug('app:report'); // submission process
 
-import Report         from '../models/report.js';
 import jsObjectToHtml from '../lib/js-object-to-html';
 
 
@@ -27,34 +25,25 @@ class ReportPdf {
      *
      * @param   {string} db
      * @param   {string} project
-     * @param   {string} reportId
-     * @returns {Buffer} PDF of submitted report
+     * @param   {Object[]} reports
+     * @returns {Buffer} PDF of submitted report(s)
      */
-    static async generate(db, project, reportId) {
-        debug('ReportPdf.generate', db, reportId);
+    static async generate(db, project, reports) {
+        debug('ReportPdf.generate', db, project, reports.map(rpt => rpt._id));
 
-        const rpt = await Report.get(db, reportId);
-
-        if (!rpt) return null;
-
-        // TODO: what security is worth including to restrict unauthorised access?
-        // The id has too much entropy to be guessed, but might be leaked; would it be worth
-        // requiring the alias to be supplied as an extra check, or would that be redundant (if the
-        // id has leaked, would the alias also be known?). In the meantime, having the project in
-        // the url matches the format for other urls, and provides slight extra security.
-        if (rpt.project != project) return null;
-
-        const reportHtmlTable = jsObjectToHtml.usingTable(rpt.submitted); // this is simply a <table>
-
-        const submissionDate = ObjectId(reportId).getTimestamp();
+        reports.sort((a, b) => a._id.getTimestamp() > b._id.getTimestamp() ? -1 : 1); // most recent first
 
         const context = {
-            database:   db,
-            project:    project,
-            timestamp:  dateFormat(submissionDate, 'd mmm yyyy HH:MM'),
-            alias:      rpt.alias,
-            reportHtml: reportHtmlTable,
-            root:       process.cwd(),
+            org:      db,
+            project:  project,
+            root:     process.cwd(),
+            lastdate: dateFormat(reports[0]._id.getTimestamp(), 'd mmm yyyy HH:MM'),
+            s:        reports.length > 1 ? 's' : '',
+            reports:  reports.map(rpt => ({
+                timestamp:  dateFormat(rpt._id.getTimestamp(), 'ddd d mmm yyyy HH:MM'),
+                alias:      rpt.alias,
+                reportHtml: jsObjectToHtml.usingTable(rpt.submitted), // this is simply a <table>
+            })),
         };
 
         // read, compile, and evaluate handlebars template
@@ -63,10 +52,7 @@ class ReportPdf {
         const html = templateHbs(context);
 
         // create PDF
-        const options = {
-            format: 'A4',
-        };
-        const reportPdfObj = pdf.create(html, options);
+        const reportPdfObj = pdf.create(html, { format: 'A4' });
 
         // promisify the toBuffer method
         reportPdfObj.__proto__.toBufferPromise = function() { // TODO: must be a cleaner way to do this!

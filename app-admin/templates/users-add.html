@@ -13,6 +13,13 @@
     <script src="/js/admin/notifications.js" defer></script>
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
     <script src="/js/admin/ga.js" async></script>
+    <script src="/js/admin/users-edit.js" defer></script>
+    <script>
+        'use strict;'
+        document.addEventListener('DOMContentLoaded', function() {
+            setCurrentDb('{{currentDb}}');
+        });
+    </script>
 </head>
 <body>
 
@@ -28,48 +35,7 @@
 
 {{>errpartial}}
 
-<form method="post" class="pure-form pure-form-aligned">
-    <ul>
-        <li class="pure-control-group">
-            <label for="firstname">First name</label>
-            <input type="text" name="firstname" id="firstname" value="{{firstname}}" required autofocus class="w12">
-        </li>
-        <li class="pure-control-group">
-            <label for="lastname">Last name</label>
-            <input type="text" name="lastname" id="lastname" value="{{lastname}}" class="w12">
-        </li>
-        <li class="pure-control-group">
-            <label for="email">E-mail</label>
-            <input type="email" name="email" id="email" value="{{email}}" required class="w16">
-        </li>
-        <li class="pure-control-group">
-            <label for="username">Username</label>
-            <input type="text" name="username" id="username" value="{{username}}" required pattern="[a-z0-9-_.]+" class="w8">
-            <span class="pure-form-message">Username must comprise lowercase alphanumerics, underscores, hyphens and periods.</span>
-        </li>
-        <li class="pure-control-group">
-            {{#checked roles}}
-            <label>Roles</label>
-            <input type="checkbox" name="roles" id="roles-admin" value="admin"> <label for="roles-admin">Admin</label>
-            <input type="checkbox" name="roles" id="roles-user" value="user"> <label for="roles-user">User</label>
-            <input type="checkbox" name="roles" id="roles-reporter" value="reporter"> <label for="roles-reporter">Reporter</label>
-            <input type="checkbox" name="roles" id="roles-su" value="su" class="{{isSuUser}}"> <label for="roles-su" class="{{isSuUser}}">SU</label>
-            {{/checked}}
-        </li>
-        <li class="pure-control-group {{isSuUser}}">
-            {{#checked databases}}
-            <label>Organisations<br><span class="small grey">only avail. to s/u</span></label>
-            {{#availableDatabases}}
-            <input type="checkbox" name="databases" id="databases-{{this}}" value="{{this}}"> <label for="databases-{{this}}">{{this}}</label>
-            {{/availableDatabases}}
-            {{/checked}}
-        </li>
-        <li class="pure-control-group">
-            <label></label>
-            <button type="submit" class="pure-button pure-button-primary">Add user</button>
-        </li>
-    </ul>
-</form>
+{{>useredit}}
 
 </main>
 

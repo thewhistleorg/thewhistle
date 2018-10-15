@@ -14,6 +14,7 @@
         {{#if @koa.state.user.isAdmin}}
         <li class="pure-menu-item {{#contains @koa.request.url '/users'}} pure-menu-active {{/contains}}"><a href="/users" class="pure-menu-link">Users</a></li>
         <li class="pure-menu-item {{#contains @koa.request.url '/resources'}} pure-menu-active {{/contains}}"><a href="/resources" class="pure-menu-link">Resources</a></li>
+        <li class="pure-menu-item {{#contains @koa.request.url '/groups'}} pure-menu-active {{/contains}}"><a href="/groups" class="pure-menu-link">Groups</a></li>
         {{/if}}
         <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover"><a href="#" class="pure-menu-link">Submit</a>
             <ul class="pure-menu-children">

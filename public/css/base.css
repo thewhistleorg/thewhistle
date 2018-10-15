@@ -33,6 +33,7 @@ nav li { display: inline-block; margin: 0.5em 1em; }
 tr     { vertical-align: baseline; }
 td, th { padding: 0.2em; }
 th     { color: #666666; font-style: italic; font-weight: normal; text-align: left; }
+tr:hover td { background: #d4f1f7; }
 
 /* standard short-hand styles */
 .align-center   { text-align: center; }

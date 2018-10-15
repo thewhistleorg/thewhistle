@@ -61,6 +61,7 @@ class User {
         users.createIndex({ username: 1 }, { unique: true });
         users.createIndex({ roles: 1 });
         users.createIndex({ databases: 1 });
+        users.createIndex({ groups: 1 });
         // TODO: can we do a compound unique index on username+databases? how would it operate?
 
         debug('User.init', `${Date.now()-t1}ms`);
@@ -137,8 +138,9 @@ class User {
 
         const users = await Db.collection('users', 'users');
 
-        try {
+        values.groups = User.processGroups(values.groups);
 
+        try {
             // note insertOne() adds an _id field to values, so pass a copy to leave the original clean
             const { insertedId } = await users.insertOne({ ...values });
             return insertedId;
@@ -164,10 +166,9 @@ class User {
         const users = await Db.collection('users', 'users');
         if (!(id instanceof ObjectId)) id = new ObjectId(id); // allow id as string
 
+        values.groups = User.processGroups(values.groups);
         try {
-
             await users.updateOne({ _id: id }, { $set: values });
-
         } catch (e) {
             if (e.code == 121) throw new Error(`User ${id} failed validation`);
             if (e.code == 11000) throw new Error(`email/username ${e.errmsg.split('"')[1]} already in use`);
@@ -175,6 +176,17 @@ class User {
         }
     }
 
+    static processGroups(groups) {
+        if (groups) {
+            if (!Array.isArray(groups)) {
+                groups = new Array(groups);
+            }
+            groups = groups.map(groupId => new ObjectId(groupId));
+        } else {
+            groups = [];
+        }
+        return groups;
+    }
 
     /**
      * Deletes User record.
@@ -218,6 +230,82 @@ class User {
         usrs.forEach(u => map.set(u._id.toString(), u.username));
         return map;
     }
+
+    
+    /**
+     * Returns Groups corresponding to a given user.
+     * 
+     * @param   {ObjectId} id - User id.
+     * 
+     * @returns {ObjectId[]}   Group ids. Returns an empty array if user isn't found.
+     */
+    static async getGroups(id) {
+        const user = await User.get(id);
+        return user ? user.groups : [];
+    }
+
+
+    /**
+     * Adds a group to a user.
+     *
+     * @param {ObjectId} id - User id.
+     * @param {string}   groupId - Group to be added.
+     */
+    static async addGroup(id, groupId) {
+        debug('User.addGroup', 'user:' + id, 'group:' + groupId);
+
+        try {
+            const users = await Db.collection('users', 'users');
+            await users.updateOne({ _id: id }, { $addToSet: { groups: groupId } });
+        } catch (e) {
+            if (e.code == 121) {
+                throw new Error(`User ${id} failed validation`);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+
+    /**
+     * Removes a group from a user.
+     *
+     * @param {ObjectId} id - User id.
+     * @param {string}   groupId - Group to be removed.
+     */
+    static async removeGroup(id, groupId) {
+        debug('User.addGroup', 'user:' + id, 'group:' + groupId);
+
+        try {
+            const users = await Db.collection('users', 'users');
+            await users.updateOne({ _id: id }, { $pull: { groups: groupId } });
+        } catch (e) {
+            if (e.code == 121) {
+                throw new Error(`User ${id} failed validation`);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+
+    static async getGroupLeaders(groupId) {
+        const users = await Db.collection('users', 'users');
+        const leaders = await users.find({ groups: { $in: [ groupId ] } });
+        return leaders.toArray();
+    }
+
+
+    /**
+     * Deletes a given group from all user instances
+     * 
+     * @param {ObjectId} groupId - Group being deleted
+     */
+    static async deleteForGroup(groupId) {
+        const leaders = await User.getGroupLeaders(groupId);
+        leaders.forEach(u => User.removeGroup(u._id, groupId));
+    }
+
 
 }
 

@@ -4,6 +4,7 @@
 
 
 import Twilio         from 'twilio';
+import MUUID          from 'uuid-mongodb'; // generate/parse BSON UUIDs
 
 import Report         from '../models/report.js';
 import autoIdentifier from '../lib/auto-identifier.js';
@@ -502,7 +503,7 @@ class SmsApp {
     async initiateSmsReport(ctx, twiml, alias) {
         try {
             //Adds skeleton report to the database
-            const sessionId = await Report.submissionStart(this.org, this.project, alias, false, ctx.headers['user-agent'], null);
+            const sessionId = await Report.submissionStart(this.org, this.project, alias, false, MUUID.v4(), ctx.headers['user-agent'], null);
             
             //Add first text to report
             await Report.submissionDetails(this.db, sessionId, { 'First Text': this.getCookie(ctx, constants.cookies.FIRST_TEXT, twiml) });

@@ -7,7 +7,7 @@ function reCaptchaSubmitCallback(token) { // eslint-disable-line no-unused-vars
 
 /**
  * Clears the values of given inputs
- * 
+ *
  * @param {Object[]} elements - Array of input elements to clear values from
  */
 function clearValues(elements) {
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /**
      *  Appropriately changes the visibility of branches when a checkbox value changes
-     * 
+     *
      * @param {HTMLInputElement} checkbox - Checkbox element whose value determines whether a branch shows
      */
     function manageCheckboxBranchVisibility(checkbox) {
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /**
      *  Appropriately changes the visibility of branches when a radio button value changes
-     * 
+     *
      * @param {HTMLInputElement} radio - Radio element whose value determines whether a branch shows
      */
     function manageRadioBranchVisibility(radio) {
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /**
      * Appropriately changes the visibility of branches when an input's value changes
-     * 
+     *
      * @param {HTMLInputElement} input - Input element whose value determines whether a branch shows
      */
     function manageBranchVisibility(input) {
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (showSubsidiary) {  // show && re-enable element
                         sub.classList.remove('hide');
                         sub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = false; });
-                        sub.querySelector('input,textarea,select').focus();
+                        if (sub.querySelector('input,textarea,select')) sub.querySelector('input,textarea,select').focus();
                     } else {               // hide & disable element
                         sub.classList.add('hide'); // hide element
                         sub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = true; });
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         otherCheckboxes.forEach(function(c) { c.checked = false; });
                     });
                 }
-                
+
                 manageBranchVisibility(this);
 
                 // if 'this' is a skip option, clear any selects of the same name (eg survivor-age)
@@ -226,51 +226,10 @@ document.addEventListener('DOMContentLoaded', function() {
             verifyExistingAlias(document.querySelector('input[name=used-before-existing-alias]').value);
         }
 
-        // listener to set focus to existing-alias if used-before-y selected
-        document.querySelector('#used-before-y').onclick = function() {
-            var usedBeforeY = document.querySelector('#used-before-y');
-            var usedBeforeN = document.querySelector('#used-before-n');
-            if (this.checked) {
-                usedBeforeY.parentElement.querySelector('.subsidiary').classList.remove('hide');
-                usedBeforeN.parentElement.querySelector('.subsidiary').classList.add('hide');
-                document.querySelector('input[name=used-before-existing-alias]').focus();
-                document.querySelector('input[name=used-before-existing-alias]').select();
-            } else { // TODO: possible?
-                document.querySelector('#use-existing').classList.add('hide');
-                document.querySelector('#use-generated').classList.remove('hide');
-                document.querySelector('input[name=used-before-existing-alias]').value = '';
-            }
-        };
-
-        // listener to display use-generated and clear existing-alias if used-before-n clicked
-        document.querySelector('#used-before-n').onclick = function() {
-            var usedBeforeY = document.querySelector('#used-before-y');
-            var usedBeforeN = document.querySelector('#used-before-n');
-            if (this.checked) {
-                usedBeforeN.parentElement.querySelector('.subsidiary').classList.remove('hide');
-                usedBeforeY.parentElement.querySelector('.subsidiary').classList.add('hide');
-                document.querySelector('input[name=used-before-existing-alias]').value = '';
-                document.querySelector('#alias-ok').classList.add('hide');
-                document.querySelector('#alias-nok').classList.add('hide');
-                if (this.setCustomValidity) this.setCustomValidity('');
-            } else { // TODO: possible?
-                document.querySelector('#use-generated').classList.add('hide');
-                document.querySelector('#use-existing').classList.remove('hide');
-                document.querySelector('input[name=used-before-existing-alias]').focus();
-                document.querySelector('input[name=used-before-existing-alias]').select();
-            }
-        };
-
         // listener to get alternative generated alias
-        document.querySelector('button[name=get-alt-alias]').onclick = function() {
+        document.querySelectorAll('button[name=get-alt-alias]').forEach(function(j) { j.onclick = function() {
             generateAlias();
-        };
-
-        // listener to check #used-before-y if existing-alias entered
-        document.querySelector('input[name=used-before-existing-alias]').addEventListener('change', function() {
-            document.querySelector('#used-before-y').checked = this.value != '';
-            document.querySelector('#use-generated').classList.add('hide');
-        });
+        }; });
 
         // check entered existing alias letter-by-letter
         document.querySelector('input[name=used-before-existing-alias]').oninput = function() {
@@ -286,8 +245,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (request.readyState == 4) {
                 if (request.status == 200) {
                     var data = JSON.parse(request.responseText);
-                    document.querySelector('output[name=used-before-generated-alias]').textContent = data.alias;
-                    document.querySelector('input[name=used-before-generated-alias]').value = data.alias;
+                    document.querySelectorAll('output[name=used-before-generated-alias]').forEach(function(j) { j.textContent = data.alias; });
+                    document.querySelector('#used-before-generated-alias').value = data.alias;
+                    if (document.querySelector('#used-before-generated-alias-forgotten')) {
+                        document.querySelector('#used-before-generated-alias-forgotten').value = data.alias;
+                    }
                 } // TODO: or?
             }
         };
@@ -299,7 +261,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.setCustomValidity) document.querySelector('input[name=used-before-existing-alias]').setCustomValidity('');
             document.querySelector('#alias-ok').classList.add('hide');
             document.querySelector('#alias-nok').classList.add('hide');
-            document.querySelector('#used-before-generated-alias').classList.remove('hide');
             return;
         }
         var db = window.location.pathname.split('/')[1]; // org'n/db is first part of the url path

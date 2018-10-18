@@ -24,12 +24,12 @@ router.get( '/', handlers.getHomePage); // home page
 
 // tmp: serve SMS test web app TODO: remove once sms app fully functional
 
-router.get( '/:database/:project/rebuild',       handlers.rebuild);     // rebuild report from spec
-router.get( '/:database/:project/pdf/:reportid', handlers.downloadPdf); // download report as PDF
-router.get( '/:database/:project',               handlers.getIndex);    // render incident report index page
-router.post('/:database/:project',               handlers.postIndex);   // process index page submission
-router.get( '/:database/:project/:page',         handlers.getPage);     // render report page
-router.post('/:database/:project/:page',         handlers.postPage);    // process page submission
+router.get( '/:database/:project/rebuild',        handlers.rebuild);     // rebuild report from spec
+router.get( '/:database/:project/pdf/:sessionid', handlers.downloadPdf); // download report(s) as PDF
+router.get( '/:database/:project',                handlers.getIndex);    // render incident report index page
+router.post('/:database/:project',                handlers.postIndex);   // process index page submission
+router.get( '/:database/:project/:page',          handlers.getPage);     // render report page
+router.post('/:database/:project/:page',          handlers.postPage);    // process page submission
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */

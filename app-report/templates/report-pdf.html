@@ -12,6 +12,9 @@
             line-height: 1.6;
             margin: 8em;
         }
+        div.report {
+            page-break-inside: avoid;
+        }
         table {
             border-collapse: collapse;
             border-spacing: 0 0;
@@ -41,6 +44,7 @@
         }
         h2 {
             padding-top: 2em;
+            border-top: 1px solid #cccccc;
         }
         .nowrap {
             white-space: nowrap;
@@ -52,16 +56,26 @@
 </head>
 <body>
 
-<header>
-    <h1>The Whistle submitted incident report <img src="file:///{{root}}/public/img/logo-32.png"></h1>
+<header id="pageHeader">
+    <h1>The Whistle {{org}}/{{project}} incident report{{s}} <img src="file://{{root}}/public/img/logo-32.png"></h1>
     <img src="/img/logo-32.png">
 </header>
 
 <main>
 
-    <h2>{{database}}/{{project}} submitted {{timestamp}} by {{alias}}</h2>
+    <p>Reports submitted in session ending {{lastdate}}</p>
+
+    {{#reports}}
+
+    <div class="report">
+
+    <h2>Submitted {{timestamp}} by {{alias}}</h2>
 
     {{{reportHtml}}}
+
+    </div>
+
+    {{/reports}}
 
 </main>
 

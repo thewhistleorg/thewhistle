@@ -12,7 +12,10 @@ import fs         from 'fs-extra';     // fs with extra functions & promise inte
 import crypto             from 'crypto';       // nodejs.org/api/crypto.html
 import dateFormat         from 'dateformat';   // Steven Levithan's dateFormat()
 
-import Db from '../lib/db.js';
+
+import Mail   from '../lib/mail.js';
+import Db     from '../lib/db.js';
+import Report from '../models/report.js';
 
 
 // nodemailer transporter config
@@ -29,6 +32,50 @@ const transporter = nodemailer.createTransport({
 });
 
 class Email {
+
+
+    /**
+     * Send e-mail using template.
+     *
+     * @param {string} to - E-mail recipient(s).
+     * @param {string} context - Context for mail-merge into template.
+     * @param {Object} ctx - Koa ctx object.
+     */
+    static async sendCamVerification(to, verificationCode) {
+        if (global.it) return; // don't send e-mails within mocha tests
+
+        // get password reset template, completed with generated token
+        const templateHtml = await fs.readFile('app-report/templates/email/verify-cam.email.html', 'utf8');
+        const templateHbs = handlebars.compile(templateHtml);
+        const html = templateHbs({ verificationCode: verificationCode });
+
+        // get e-mail subject from <title> element
+        const document = new JSDOM(html).window.document;
+        const subject = document.querySelector('title').textContent;
+        // prepare e-mail message
+        const message = {
+            to:      to,
+            from:    'noreply@thewhistle.org',
+            subject: subject,
+            html:    html,
+            text:    htmlToText.fromString(html),
+        };
+        // send out e-mail
+        const info = await Mail.transporter.sendMail(message);
+        console.info('Mail.send info', 'accepted:', info.accepted, 'response:', info.response);
+    }
+
+
+    static async verifyCamEmail(ctx) {
+        try {
+            const report = await Report.get(ctx.request.query.database, ctx.session.id);
+            await Email.sendCamVerification(ctx.request.query.email, report.verificationCode);
+            ctx.status = 200;
+        } catch (e) {
+            ctx.status = 500;
+        }
+    }
+
 
     /**
      * Process e-mail verification request: generate verification token & send e-mail to requester.

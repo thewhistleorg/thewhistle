@@ -1,18 +1,65 @@
-- text: '# What happened?'
-
-- text: |
-    Try to describe as much of what has happened as you can. You may wish to include what led up to the event or situation, as well as what happened and any subsequent events or implications. Please note that It makes it harder to use data if you use names of specific individuals. 
-
-    If the incident you want to report was not ‘an act’ committed by a particular individual, but it refers to a more structural or diffuse experience (such as a hostile atmosphere or seeing a problematic image) please describe it here.
-
+- text: '# If the racist incident derived from an action, was it perpetrated by one person or a group of people?'
 
 - input:
-    name: description
-    label: Description
-    type: textbox
+    name: no-of-perpetrators
+    label: Number of perpetrators
+    type: radio
+    options:
+        one:
+            label: One person
+        group:
+            label: Group of people
+            subsidiary:
+                - text: '### How many?'
+                - input:
+                    name: no-of-perpetrators-text
+                    type: textbox
+        skip:
+            label: Skip
+
+- text: '# If the racist incident derived from an action, who carried out this racist act?'
 
 - input:
-    name: document
-    type: library-file
-    label: |
-      **Please upload any evidence that could help.** This can be photos, videos or any other documents. We will store this safely. We will take all data into account for analysis and to inform advocacy, however we will not be able to make public any data that can lead to identifying particular individuals.
+    name: type-of-perpetrators
+    label: Perpetrators
+    type: select
+    options:
+        student:
+            label: Student
+        academic:
+            label: Academic staff
+        admin:
+            label: Admin staff
+        other:
+            label: Other
+            subsidiary:
+                - text: '### Please state'
+                - input:
+                    name: type-of-perpetrators-other
+                    type: textbox
+        unknown:
+            label: Not known
+        skip:
+            label: Skip
+
+- text: '# If the racist incident derived from an action, were the people who did this'
+
+- input:
+    name: perpetrators-gender
+    label: Gender
+    type: select
+    options:
+        female:
+            label: Female
+        male:
+            label: Academic staff
+        mixed:
+            label: Mixed group
+            subsidiary:
+                - text: "### Please give details of the perpetrators' genders"
+                - input:
+                    name: perpetrators-gender-mixed
+                    type: textbox
+        skip:
+            label: Skip
+# TODO: add rest of this page

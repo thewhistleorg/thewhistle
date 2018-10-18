@@ -32,6 +32,7 @@ import Db            from '../lib/db.js';
 
 class Handlers {
 
+
     /**
      * Given the Raven issue string, returns the milliseconds since Raven verification
      *
@@ -473,6 +474,7 @@ class Handlers {
     static async postPage(ctx) {
         const org = ctx.params.database;
         const project = ctx.params.project;
+
         debug('postPage', `${org}/${project}/${ctx.params.page}`, 'id:'+ctx.session.id);
         try {
             if (!FormGenerator.built(org, project)) await FormGenerator.build(org, project);
@@ -494,6 +496,19 @@ class Handlers {
         const body = ctx.request.body;
 
         Handlers.removeNoStores(body);
+
+        if (ctx.session.id && org.startsWith('everyday-racism') && project === 'cambridge') {
+            const verified = await Report.isVerified(org, ctx.session.id);
+            if (!verified) {
+                const verificationCode = body['verification-code'];
+                console.log(verificationCode);
+                const validCode = await Report.verifyCode(org, ctx.session.id, verificationCode);
+                if (!validCode) {
+                    ctx.flash = { error: 'Invalid verification code.' };
+                    return ctx.response.redirect(`/${org}/${project}/${ctx.session.completed+1}`);
+                }
+            }
+        }
 
         if (ctx.request.files) {
             // normalise files to be array of File objects (koa-body does not provide array if just 1 file uploaded)

@@ -14,7 +14,6 @@ router.get( '/:database/email',               ctx => ctx.render('email/index'));
 router.post('/:database/email',               handlers.requestVerification);
 router.get( '/:database/email/verify/:token', handlers.verify);
 
-
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 export default router.middleware();

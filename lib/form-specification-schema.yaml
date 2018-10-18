@@ -25,6 +25,7 @@ page:
     properties:                              #   text or input (or flash / notworking messages)
       text:       { $ref: '#/text' }         # any text to be displayed (questions, explanations, etc)
       input:      { $ref: '#/input' }        # what it's all about!
+      partial:    { $ref: '#/partial' }      # Good for code that will be replicated without change
       flash:      { $ref: '#/flash' }        # for displaying flash error messages
       notworking: { type: [ object, null ] } # TODO 'form not working?' message
     additionalProperties: false
@@ -54,6 +55,12 @@ input:
     placeholder: { type: string }  # TODO: use 'attributes' rather than separate property?
     subsidiary:  { type: array }   # TODO { $ref: '#/page' } note 'select' subsidiary is attached to the <select>
   additionalProperties: false
+
+partial:
+  type: object
+  required: [ name ]
+  properties:
+    name: { type: string, pattern: '^camEmailVerification$' }
 
 options:                                                              # for radio/checkbox/select inputs: either...
   oneOf:

@@ -8,6 +8,7 @@ import Router from 'koa-router'; // router middleware for koa
 const router = new Router();
 
 import handlers from './report-handlers.js';
+import emailHandlers from './email-handlers.js';
 
 // JUST FOR TESTING: supertest doesn't appear to manage to pass koa:jwt cookie between apps on
 // different ports, so provide a way for the test suite to explicitly log in to the report app
@@ -31,6 +32,7 @@ router.post('/:database/:project',               handlers.postIndex);   // proce
 router.get( '/:database/:project/:page',         handlers.getPage);     // render report page
 router.post('/:database/:project/:page',         handlers.postPage);    // process page submission
 
+router.post('/verify-cam-email',       emailHandlers.verifyCamEmail);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 

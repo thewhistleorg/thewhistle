@@ -16,6 +16,7 @@ pages:
   p12:      { $ref: 'cambridge-12' }
   p13:      { $ref: 'cambridge-13' }
   p14:      { $ref: 'cambridge-14' }
+  p15:      { $ref: 'cambridge-15' }
   whatnext: { $ref: 'cambridge-whatnext' }
 
 options:
@@ -53,6 +54,8 @@ options:
     p13:
       title: The Whistle / Everyday Racism at Cambridge Incident Report?
     p14:
+      title: The Whistle / Everyday Racism at Cambridge Incident Report?
+    p15:
       title: The Whistle / Everyday Racism at Cambridge Incident Report?
       next: Submit and continue to Resources
     whatnext:

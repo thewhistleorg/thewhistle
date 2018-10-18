@@ -15,7 +15,7 @@ import { ObjectId }       from 'mongodb';            // MongoDB driver for Node.
 import dateFormat         from 'dateformat';         // Steven Levithan's dateFormat()
 import base64             from 'base-64';            // base64 encoder/decoder
 import fs         from 'fs';         // nodejs.org/api/fs.html
-import XLSX               from 'xlsx';               // parser and writer for various spreadsheet formats
+// import XLSX            from 'xlsx';               // parser and writer for various spreadsheet formats
 
 import app from '../../app.js';
 
@@ -746,7 +746,7 @@ index:
             // in response.body get transformed to 'ef bf bd', which is the UTF-8 decoding of U+FFFD
             // REPLACEMENT CHARACTER - my best guess is that for some reason SuperAgent is choking
             // on non-ascii characters and substituting U+FFFD :(
-            const wb = XLSX.read(response.text);
+            // const wb = XLSX.read(response.text);
             // expect(wb.SheetNames).to.include('rape-is-a-crime – 1');
             // expect(wb.Sheets['rape-is-a-crime – 1']['!cols']).to.include('Survivor gender');
         });

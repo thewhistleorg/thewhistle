@@ -68,7 +68,7 @@ class Email {
 
     static async verifyCamEmail(ctx) {
         try {
-            const report = await Report.get(ctx.request.query.database, ctx.session.id);
+            const report = await Report.get(ctx.request.query.database, ctx.session.reportId);
             await Email.sendCamVerification(ctx.request.query.email, report.verificationCode);
             ctx.status = 200;
         } catch (e) {

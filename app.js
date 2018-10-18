@@ -75,8 +75,9 @@ app.use(body({ multipart: true }));
 const date = { y: new Date().getFullYear(), m: new Date().getMonth(), d: 1 };
 app.keys = [ 0, 1, 2 ].map(x => process.env.COOKIE_KEY + dateFormat(new Date(date.y, date.m-x, date.d), '-yyyy-mm'));
 
-// session for flash messages (uses signed session cookies, with no server storage)
-app.use(session(app));
+// ctx.session uses signed session cookies, with no server storage; it is used for holding submitted
+// report details in the report sub-app, and for flash messages across all apps
+app.use(session({ maxAge: 1000*60*60*24*7 }, app));
 
 
 // invoke model init() methods to ensure current validation is applied to all databases (in

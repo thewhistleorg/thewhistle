@@ -65,6 +65,7 @@ class PasswordResetHandlers {
             const context = { firstname: user.firstname, host: ctx.request.host, token: token };
             await Mail.send(`"${user.firstname} ${user.lastname}" <${email}>`, 'password-reset.email', context, ctx);
         } catch (e) {
+            console.error('PasswordResetHandlers.processRequest', e.message);
             await Log.error(ctx, e);
         }
 

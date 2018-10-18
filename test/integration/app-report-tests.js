@@ -30,6 +30,7 @@ describe(`Report app (${org}/${app.env})`, function() {
     this.slow(250);
 
     let reportId = null;
+    let sessionId = null;
     const imgFldr = 'test/img/';
     const imgFile = 's_gps.jpg';
     let notificationId = null;
@@ -157,7 +158,8 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(responsePost.status).to.equal(302);
             expect(responsePost.headers.location).to.equal(`/${org}/${proj}/2`);
             reportId = responsePost.headers['x-insert-id'];
-            console.info('\treport id', reportId);
+            sessionId = responsePost.headers['x-session-id'];
+            console.info('\treport id', reportId, sessionId);
         });
 
         it('sees/submits page 2 (on-behalf-of)', async function() {
@@ -379,7 +381,7 @@ describe(`Report app (${org}/${app.env})`, function() {
         });
 
         it('gets PDF of report', async function() {
-            const response = await appReport.get(`/${org}/${proj}/pdf/${reportId}`);
+            const response = await appReport.get(`/${org}/${proj}/pdf/${sessionId}`);
             expect(response.status).to.equal(200);
             expect(response.headers['content-type']).to.equal('application/pdf');
             const re = /attachment; filename="the whistle incident report grn-test rape-is-a-crime \d\d\d\d-\d\d-\d\d \d\d.\d\d.pdf/;
@@ -614,7 +616,8 @@ describe(`Report app (${org}/${app.env})`, function() {
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal(`/${org}/${proj}/whatnext`);
             reportId = response.headers['x-insert-id'];
-            console.info('\treport id', reportId);
+            sessionId = response.headers['x-session-id'];
+            console.info('\treport id', reportId, sessionId);
         });
 
         it('sees whatnext page', async function() {

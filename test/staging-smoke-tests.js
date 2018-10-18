@@ -57,8 +57,8 @@ describe(`Admin app (admin.${domain})`, function() {
         expect(response.status).to.equal(200);
         const document = new JSDOM(response.text).window.document;
         expect(document.querySelector('title').textContent).to.equal('Reports list');
-        // nav should be /, Reports, Form specs, Users, Resources, Submit – feedback, user-name, notifications, Logout
-        expect(document.querySelectorAll('header nav > ul > li').length).to.equal(10);
+        // nav should be /, Reports, Form specs, Users, Resources, Groups, Submit – feedback, user-name, notifications, Logout
+        expect(document.querySelectorAll('header nav > ul > li').length).to.equal(11);
     });
 
     it('sees list of users', async function() {

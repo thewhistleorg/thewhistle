@@ -10,6 +10,7 @@
 import { expect }         from 'chai';       // BDD/TDD assertion library
 import fs         from 'fs-extra';   // fs with extra functions & promise interface
 import dateFormat         from 'dateformat'; // Steven Levithan's dateFormat()
+import MUUID              from 'uuid-mongodb'; // generate/parse BSON UUIDs
 import dotenv             from 'dotenv';     // load environment variables from a .env file into process.env
 
 dotenv.config();
@@ -75,9 +76,10 @@ describe(`Report model (${db})`, function() {
 
     describe('report submission', function() {
         it('starts submission', async function() {
+            const sessionId = MUUID.v4();
             const ua = 'node-superagent/x.x.x';
 
-            reportId = await Report.submissionStart(db, 'test-project', 'test test', false, ua);
+            reportId = await Report.submissionStart(db, 'test-project', 'test test', false, sessionId, ua);
 
             console.info('\treport id:', reportId);
             expect(reportId.constructor.name).to.equal('ObjectID');
@@ -163,6 +165,7 @@ describe(`Report model (${db})`, function() {
             const rpt = await Report.get(db, reportId);
             expect(rpt).to.be.an('object');
             expect(rpt.alias).to.equal('test test');
+            expect(MUUID.from(rpt.sessionId).toString()).to.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/);
         });
         it('gets newly created report with string id', async function() {
             const rpt = await Report.get(db, reportId.toString());

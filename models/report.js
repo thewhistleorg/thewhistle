@@ -86,10 +86,12 @@ const schema = {
                 },
             },
         },
-        views:          { type:     [ 'object', 'null' ] },    // associative array of timestamps indexed by user id
-        archived:       { type:     'boolean' },               // archived flag
-        lastUpdated:    { bsonType: 'date' },                  // date of when the user last made an edit to their submission
-        evidenceToken:  { type:     'string' },                // unique token which is used in a URL for a user to upload evidence
+        views:            { type:     [ 'object', 'null' ] },    // associative array of timestamps indexed by user id
+        archived:         { type:     'boolean' },               // archived flag
+        lastUpdated:      { bsonType: 'date' },                  // date of when the user last made an edit to their submission
+        evidenceToken:    { type:     'string' },                // unique token which is used in a URL for a user to upload evidence
+        verificationCode: { type:     'string' },
+        verified:         { type:     'boolean' },
     },
     additionalProperties: false,
 };
@@ -292,6 +294,16 @@ class Report {
     }
 
 
+    static generateVerificationCode() {
+        const pool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let ret = '';
+        for (let i = 0; i < 6; i++) {
+            ret += pool.charAt(Math.floor(Math.random() * pool.length));
+        }
+        return ret;
+    }
+
+
     /**
      * Creates new skeleton Incident Report record.
      *
@@ -332,6 +344,11 @@ class Report {
         // record user agent for potential later analyses
         const ua = useragent.parse(userAgent);
         values.ua = Object.assign({}, ua, { os: ua.os }); // trigger on-demand parsing of os
+
+        if (db.startsWith('everyday-racism') && project === 'cambridge') {
+            values.verificationCode = Report.generateVerificationCode();
+            values.verified = false;
+        }
 
         try {
             const { insertedId } = await reports.insertOne(values);
@@ -894,6 +911,38 @@ class Report {
         const report = await reports.findOne(id);
 
         return report.views ? report.views[userId] : null;
+    }
+
+
+    static async isVerified(db, id) {
+        id = objectId(id);
+        
+        const reports = await Db.collection(db, 'reports');
+
+        const report = await reports.findOne(id);
+
+        return report.verified;
+    }
+
+
+    static async verifyCode(db, id, code) {
+        id = objectId(id);
+        
+        const reports = await Db.collection(db, 'reports');
+
+        const report = await reports.findOne(id);
+
+        if (report.verificationCode === code.toUpperCase()) {
+            try {
+                await reports.updateOne({ _id: id }, { $set: { verified: true } });
+            } catch (e) {
+                if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [flagView]`);
+                throw e;
+            }
+            return true;
+        }
+
+        return false;
     }
 
 }

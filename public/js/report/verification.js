@@ -3,11 +3,21 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     if (document.querySelector('div.cam-email-verification')) {
-        const nextBtns = document.getElementsByName('nav-next');
-        for (let i = 0; i < nextBtns.length; i++) {
-            nextBtns[i].disabled = true;
+        const errorMessages = document.getElementsByClassName('error-msg');
+        let invalidCode = false;
+        for (let i = 0; i < errorMessages.length; i++) {
+            invalidCode = invalidCode || errorMessages[i].innerHTML === 'Invalid verification code.';
         }
-        document.getElementById('send-code-btn').addEventListener('click', sendCodeListener);
+        if (invalidCode) {
+            document.getElementById('verification-code-block').classList.remove('hide');
+            document.getElementById('send-code-btn').value = "Resend Verification Code";
+        } else {
+            const nextBtns = document.getElementsByName('nav-next');
+            for (let i = 0; i < nextBtns.length; i++) {
+                nextBtns[i].disabled = true;
+            }
+            document.getElementById('send-code-btn').addEventListener('click', sendCodeListener);
+        }
     }
 });
 

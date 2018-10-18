@@ -509,20 +509,31 @@ class Handlers {
         if (body['used-before']) { // create the skeleton report (with alias)
             let alias = null;
 
-            switch (body['used-before']) {
+            switch (body['used-before']) { // TODO: this could do with some refactoring!
                 case 'Yes':
                     // verify existing alias does exist
                     alias = body['used-before-existing-alias'];
+                    if (alias == null) { ctx.flash = { error: 'Please give your alias' }; return ctx.response.redirect(ctx.request.url); }
                     const reportsY = await Report.getBy(org, 'alias', alias);
                     const reportsYExclCurr = reportsY.filter(r => r._id != ctx.session.reportId); // exclude current report
                     const errorY = `Used-before anonymous alias ‘${alias}’ not found`;
                     const flashY = Object.assign({ error: errorY }, { formdata: body }); // include formdata for single-page report
                     if (reportsYExclCurr.length == 0) { ctx.flash = flashY; return ctx.response.redirect(ctx.request.url); }
                     break;
+                case 'Yes, but I’ve forgotten my alias':
+                    // verify generated alias does not exist
+                    alias = body['used-before-generated-alias-forgotten'];
+                    if (alias == null) { ctx.flash = { error: 'Not-used-before generated alias not given' }; return ctx.response.redirect(ctx.request.url); }
+                    const reportsF = await Report.getBy(org, 'alias', alias);
+                    const reportsFExclCurr = reportsF.filter(r => r._id != ctx.session.reportId); // exclude current report
+                    const errorF = `Generated alias ‘${alias}’ not available: please select another`;
+                    const flashF = Object.assign({ error: errorF }, { formdata: body }); // include formdata for single-page report
+                    if (reportsFExclCurr.length > 0) { ctx.flash = flashF; return ctx.response.redirect(ctx.request.url); }
+                    break;
                 case 'No':
                     // verify generated alias does not exist
-                    if (body['used-before-generated-alias'] == null) { ctx.flash = { error: 'Not-used-before generated alias not given' }; return ctx.response.redirect(ctx.request.url); }
                     alias = body['used-before-generated-alias'];
+                    if (alias == null) { ctx.flash = { error: 'Not-used-before generated alias not given' }; return ctx.response.redirect(ctx.request.url); }
                     const reportsN = await Report.getBy(org, 'alias', alias);
                     const reportsNExclCurr = reportsN.filter(r => r._id != ctx.session.reportId); // exclude current report
                     const errorN = `Generated alias ‘${alias}’ not available: please select another`;
@@ -539,7 +550,7 @@ class Handlers {
             if (!ctx.session.sessionId) ctx.session.sessionId = MUUID.v4().toString();
             const ua = ctx.request.headers['user-agent'];
             const country = await Ip.getCountry(ctx.request.ip);
-            ctx.session.reportId = await Report.submissionStart(org, project, alias, body['used-before']=='Yes', ctx.session.sessionId, ua, country);
+            ctx.session.reportId = await Report.submissionStart(org, project, alias, body['used-before']!='No', ctx.session.sessionId, ua, country);
             // TODO: ?? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.reportId, 'incomplete', null);
 
             // notify users of 'new report submitted'

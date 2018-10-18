@@ -87,10 +87,12 @@ const schema = {
                 },
             },
         },
-        views:          { type:     [ 'object', 'null' ] },    // associative array of timestamps indexed by user id
-        archived:       { type:     'boolean' },               // archived flag
-        lastUpdated:    { bsonType: 'date' },                  // date of when the user last made an edit to their submission
-        evidenceToken:  { type:     'string' },                // unique token which is used in a URL for a user to upload evidence
+        views:            { type:     [ 'object', 'null' ] },    // associative array of timestamps indexed by user id
+        archived:         { type:     'boolean' },               // archived flag
+        lastUpdated:      { bsonType: 'date' },                  // date of when the user last made an edit to their submission
+        evidenceToken:    { type:     'string' },                // unique token which is used in a URL for a user to upload evidence
+        verificationCode: { type:     'string' },
+        verified:         { type:     'boolean' },
     },
     additionalProperties: false,
 };

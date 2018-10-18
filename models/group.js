@@ -64,7 +64,7 @@ class Group {
             name:      name,
             reportIds: [],
         };
-        
+
         try {
             const { insertedId } = await groups.insertOne(values);
             return insertedId;
@@ -82,7 +82,7 @@ class Group {
      *
      * @param   {string}   db - Database to use.
      * @param   {ObjectId} id - Group id.
-     * 
+     *
      * @returns {Object}   Group
      */
     static async get(db, id) {
@@ -94,9 +94,9 @@ class Group {
 
     /**
      * Returns all Groups on a given database.
-     * 
+     *
      * @param {ObjectId} db - Database to use.
-     * 
+     *
      * @returns {Object[]} Groups' details.
      */
     static async getAll(db) {
@@ -111,7 +111,7 @@ class Group {
      *
      * @param   {string}   db - Database to use.
      * @param   {ObjectId} id - Group id.
-     * 
+     *
      * @returns {string}   Group name or null if not found.
      */
     static async getName(db, id) {
@@ -125,7 +125,7 @@ class Group {
      *
      * @param   {string}   db - Database to use.
      * @param   {ObjectId} id - Group id.
-     * 
+     *
      * @returns {ObjectId[]}   Report ids. Returns an empty array if group isn't found.
      */
     static async getReports(db, id) {
@@ -139,7 +139,7 @@ class Group {
      *
      * @param  {string}   db - Database to use.
      * @param  {ObjectId} id - Group id.
-     * 
+     *
      * @throws Error if MongoDB delete fails or remove directory fails.
      */
     static async delete(db, id) {
@@ -172,7 +172,6 @@ class Group {
         try {
             const groups = await Db.collection(db, 'groups');
             await groups.updateOne({ _id: id }, { $addToSet: { reportIds: reportId } });
-            console.log('updated');
         } catch (e) {
             if (e.code == 121) {
                 throw new Error(`Group ${db}/${id} failed validation`);

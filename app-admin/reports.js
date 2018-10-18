@@ -339,22 +339,22 @@ class ReportsHandlers {
 
         // return list of permutations of answered questions
         function distinctQuestions(rptsList) {
-            const questions = new Set();
+            const qstns = new Set();
 
             // build set of distinct questions: use wacky ␝ unit separator / ␟ group separator
             // characters as an easy guarantee they won't be included in question texts
             for (const rpt of rptsList) {
-                questions.add(rpt.project+'␝'+Object.keys(rpt.submitted).join('␟'));
+                qstns.add(rpt.project+'␝'+Object.keys(rpt.submitted).join('␟'));
             }
 
             // eliminate question sets which are subsets of others (i.e. uncompleted reports)
-            for (const q of questions.values()) {
-                for (const r of questions.values()) {
-                    if (q.startsWith(r) && q!=r) questions.delete(r);
+            for (const q of qstns.values()) {
+                for (const r of qstns.values()) {
+                    if (q.startsWith(r) && q!=r) qstns.delete(r);
                 }
             }
 
-            return [ ...questions ].sort(); // convert set to array and sort it
+            return [ ...qstns ].sort(); // convert set to array and sort it
         }
     }
 

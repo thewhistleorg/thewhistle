@@ -156,21 +156,20 @@ document.addEventListener('DOMContentLoaded', function() {
                             sub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = true; });
                         }
                     }
-
-                    // if 'this' is a radio button, hide other subsidiary divs, and uncheck any checkbox
-                    // inputs of the same name (eg action-taken 'skip')
-                    if (this.type == 'radio') {
-                        inputs.forEach(function(input) {
-                            var otherSub = input.parentElement.querySelector('.subsidiary');
-                            if (otherSub && otherSub!=sub) {
-                                otherSub.classList.add('hide');
-                                otherSub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = true; });
-                            }
-                            var otherCheckboxes = document.querySelectorAll('input[type=checkbox][name='+inputName+']');
-                            otherCheckboxes.forEach(function(c) { c.checked = false; });
-                        });
-                    }
                 
+                }
+                // if 'this' is a radio button, hide other subsidiary divs, and uncheck any checkbox
+                // inputs of the same name (eg action-taken 'skip')
+                if (this.type == 'radio') {
+                    inputs.forEach(function(input) {
+                        var otherSub = input.parentElement.querySelector('.subsidiary');
+                        if (otherSub && !subs.includes(otherSub)) {
+                            otherSub.classList.add('hide');
+                            otherSub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = true; });
+                        }
+                        var otherCheckboxes = document.querySelectorAll('input[type=checkbox][name='+inputName+']');
+                        otherCheckboxes.forEach(function(c) { c.checked = false; });
+                    });
                 }
 
                 manageBranchVisibility(this);

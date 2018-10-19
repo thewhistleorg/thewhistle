@@ -128,37 +128,49 @@ document.addEventListener('DOMContentLoaded', function() {
         for (i=0; i<inputs.length; i++) {
             inputs[i].addEventListener('change', function() { // note cannot simply assign to .onchange due to alternate texts listener
                 // 'this' is changed element
-                var sub = this.parentElement.querySelector('.subsidiary'); // subsidiary within same <li>
-                // show current input's subsidiary, if any - unless it's a checked checkbox, in
-                // which case hide it TODO: ??
-                // also disable hidden inputs, so that they will not get submitted in POST data
-                if (sub) {
-                    var showSubsidiary = this.type=='radio'
-                        || (this.type=='checkbox' && this.checked)
-                        || (this.type=='select-one' && this.value!='' && sub.classList.contains('select-any-subsidiary')) // note front-end DOM gives 'select-one' rather than 'select'
-                        || (this.type=='select-one' && sub.classList.contains(this.value.replace(new RegExp(' ', 'g'), '_')+'-subsidiary'));
-                    if (showSubsidiary) {  // show && re-enable element
-                        sub.classList.remove('hide');
-                        sub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = false; });
-                        if (sub.querySelector('input,textarea,select')) sub.querySelector('input,textarea,select').focus();
-                    } else {               // hide & disable element
-                        sub.classList.add('hide'); // hide element
-                        sub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = true; });
+                var siblings = this.parentElement.childNodes;
+                var subs = [];
+                for (var j = 0; j < siblings.length; j++) {
+                    if (siblings[j].classList) {
+                        if (siblings[j].classList.contains('subsidiary')) {
+                            subs.push(siblings[j]);
+                        }
                     }
                 }
-
-                // if 'this' is a radio button, hide other subsidiary divs, and uncheck any checkbox
-                // inputs of the same name (eg action-taken 'skip')
-                if (this.type == 'radio') {
-                    inputs.forEach(function(input) {
-                        var otherSub = input.parentElement.querySelector('.subsidiary');
-                        if (otherSub && otherSub!=sub) {
-                            otherSub.classList.add('hide');
-                            otherSub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = true; });
+                for (var k = 0; k < subs.length; k++) {
+                    var sub = subs[k];
+                    // show current input's subsidiaries, if any - unless it's a checked checkbox, in
+                    // which case hide it TODO: ??
+                    // also disable hidden inputs, so that they will not get submitted in POST data
+                    if (sub) {
+                        var showSubsidiary = this.type=='radio'
+                            || (this.type=='checkbox' && this.checked)
+                            || (this.type=='select-one' && this.value!='' && sub.classList.contains('select-any-subsidiary')) // note front-end DOM gives 'select-one' rather than 'select'
+                            || (this.type=='select-one' && sub.classList.contains(this.value.replace(new RegExp(' ', 'g'), '_')+'-subsidiary'));
+                        if (showSubsidiary) {  // show && re-enable element
+                            sub.classList.remove('hide');
+                            sub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = false; });
+                            if (sub.querySelector('input,textarea,select')) sub.querySelector('input,textarea,select').focus();
+                        } else {               // hide & disable element
+                            sub.classList.add('hide'); // hide element
+                            sub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = true; });
                         }
-                        var otherCheckboxes = document.querySelectorAll('input[type=checkbox][name='+inputName+']');
-                        otherCheckboxes.forEach(function(c) { c.checked = false; });
-                    });
+                    }
+
+                    // if 'this' is a radio button, hide other subsidiary divs, and uncheck any checkbox
+                    // inputs of the same name (eg action-taken 'skip')
+                    if (this.type == 'radio') {
+                        inputs.forEach(function(input) {
+                            var otherSub = input.parentElement.querySelector('.subsidiary');
+                            if (otherSub && otherSub!=sub) {
+                                otherSub.classList.add('hide');
+                                otherSub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = true; });
+                            }
+                            var otherCheckboxes = document.querySelectorAll('input[type=checkbox][name='+inputName+']');
+                            otherCheckboxes.forEach(function(c) { c.checked = false; });
+                        });
+                    }
+                
                 }
 
                 manageBranchVisibility(this);

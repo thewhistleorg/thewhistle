@@ -582,7 +582,7 @@ class Handlers {
 
         const formattedReport = formatReport(org, project, page, body);
 
-        if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.reportId, formattedReport, body);
+        if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.reportId, formattedReport.values, body, formattedReport.types);
 
         if (ctx.request.files) {
             for (const file of ctx.request.files) {
@@ -728,12 +728,15 @@ async function whatnext(ctx) {
  * @returns {Object} Associative array of prettified-label : entered-value pairs.
  */
 function formatReport(org, project, page, body) {
-    const inputs = FormGenerator.forms[`${org}/${project}`].inputs;
+    const inputs = FormGenerator.forms[`${org}/${project}`].inputs; // input name/label mappings
+    const types = FormGenerator.forms[`${org}/${project}`].types;   // input types
+
     const pageInputs = page=='+'
         ? [ ...Object.values(inputs) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
         : inputs[page];                                                                  // inputs from this page
     Handlers.removeNoStores(pageInputs);
-    const rpt = {}; // the processed version of body
+    const rptValues = {}; // the processed version of body
+    const rptTypes = {};  // the types of fields in rptValues
 
     for (const inputName in pageInputs) {
         if (inputName.match(/-skip$/) && !body[inputName]) continue; // unless 'skip' option is selected, ignore it
@@ -742,28 +745,36 @@ function formatReport(org, project, page, body) {
 
         const label = pageInputs[inputName].label;
 
-        if (Array.isArray(body[inputName])) { // multiple inputs withe same name: multiple response to checkboxes or 'Skip'
+        rptTypes[label] = types[inputName];
+
+        if (Array.isArray(body[inputName])) { // multiple inputs with the same name: multiple response to checkboxes or 'Skip'
             // note copy body[inputName] rather than reference it otherwise it gets polluted with subsidiary value
-            rpt[label] = body[inputName].slice();
+            rptValues[label] = body[inputName].slice();
         } else {
             // plain string
-            rpt[label] = body[inputName];
+            rptValues[label] = body[inputName];
         }
 
         // multiple inputs of same name one of which is 'Skip'? - ignore other inputs & record 'Skip'
-        if (Array.isArray(rpt[label]) && body[inputName].filter(val => val=='Skip').length>0) {
-            rpt[label] = 'Skip';
+        if (Array.isArray(rptValues[label]) && body[inputName].filter(val => val=='Skip').length>0) {
+            rptValues[label] = 'Skip';
         }
 
         // check for any subsidiary inputs: if there are, append the subsidiary value within quotes
-        if (Array.isArray(rpt[label]) && pageInputs[inputName].subsidiary) { // multiple response to checkboxes
-            for (let i=0; i<rpt[label].length; i++) {
+        if (Array.isArray(rptValues[label]) && pageInputs[inputName].subsidiary) { // multiple response to checkboxes
+            for (let i=0; i<rptValues[label].length; i++) {
                 const subsidiaryFieldName = pageInputs[inputName].subsidiary[body[inputName][i]];
-                if (body[subsidiaryFieldName]) rpt[label][i] += ` (${body[subsidiaryFieldName]})`;
+                if (body[subsidiaryFieldName]) {
+                    rptValues[label][i] += ` (${body[subsidiaryFieldName]})`;
+                    rptTypes[label] += '+'+types[subsidiaryFieldName];
+                }
             }
         } else {                         // radio button or single checkbox, or select
             const subsidiaryFieldName = pageInputs[inputName].subsidiary ? pageInputs[inputName].subsidiary[body[inputName]] : '';
-            if (body[subsidiaryFieldName]) rpt[label] += ` (${body[subsidiaryFieldName]})`;
+            if (body[subsidiaryFieldName]) {
+                rptValues[label] += ` (${body[subsidiaryFieldName]})`;
+                rptTypes[label] += '+'+types[subsidiaryFieldName];
+            }
         }
 
         // special treatment for library-date
@@ -773,12 +784,13 @@ function formatReport(org, project, page, body) {
             const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ];
             // const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, d.hour, d.minute);
             const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
-            rpt[label] = date;
+            rptValues[label] = date;
         }
-        debug('...', `${inputName} => ${label}: “${rpt[label]}”`);
+
+        debug('...', `${inputName} => ${label}: “${rptValues[label]}” (${rptTypes[label]})`);
     }
 
-    return rpt;
+    return { values: rptValues, types: rptTypes };
 }
 
 

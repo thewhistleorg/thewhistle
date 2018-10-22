@@ -360,20 +360,20 @@ describe(`Submit ${org}/${proj} incident report covering various enter-next-back
             const actual = {};
             for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
             const expected = {
-                'Alias':              alias,
-                'On behalf of':       'Someone else',
-                'Survivor gender':    'Skip',
-                'Survivor age':       'Skip',
-                'Happened':           'Skip',
-                'Still happening?':   'Skip',
-                'Where':              'Skip',
-                'Who':                'Skip',
-                'Description':        'Cypress test '+date+',Skip', // TODO: note buggy behaviour! see 2f67a8
-                'Applicable':         '—',
-                'Spoken to anybody?': 'Skip',
-                'Extra notes':        '—',                          // TODO: broken functionality: no skip
-                'E-mail address':     'help@me.com',
-                'Phone number':       '01234 123456',
+                'Alias':               alias,
+                'On behalf ofo':       'Someone else',
+                'Survivor gendero':    'Skip',
+                'Survivor ageo':       'Skip',
+                'Happenedo':           'Skip',
+                'Still happening?o':   'Skip',
+                'Whereo':              'Skip',
+                'Whoo':                'Skip',
+                'DescriptionT':        'Cypress test '+date+',Skip', // TODO: note buggy behaviour! see 2f67a8
+                'Applicableo':         '—',
+                'Spoken to anybody?o': 'Skip',
+                'Extra notesT':        '—',                          // TODO: broken functionality: no skip
+                'E-mail addressT':     'help@me.com',
+                'Phone numberT':       '01234 123456',
             };
             expect(actual).to.deep.equal(expected);
         });

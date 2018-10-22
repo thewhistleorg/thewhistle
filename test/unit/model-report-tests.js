@@ -100,15 +100,23 @@ describe(`Report model (${db})`, function() {
                 'Where':            'Around the corner',
             };
             const detailsRaw = {
-                'on-belalf-of':    'myself',
+                'on-behalf-of':    'myself',
                 'survivor-gender': null,
                 'survivor-age':    null,
                 'date':            { day: dateFormat('d'), month: dateFormat('mmm'), year: dateFormat('yyyy'), time: '' },
                 'still-happening': 'n',
                 'where':           'Around the corner',
             };
+            const detailsTypes = {
+                'on-behalf-of':    'radio',
+                'survivor-gender': 'radio',
+                'survivor-age':    'select',
+                'date':            'library-date',
+                'still-happening': 'radio',
+                'where':           'text',
+            };
 
-            await Report.submissionDetails(db, reportId, details, detailsRaw);
+            await Report.submissionDetails(db, reportId, details, detailsRaw, detailsTypes);
 
             const report = await Report.get(db, reportId);
             expect(report.submitted).to.be.an('object');

@@ -1,11 +1,8 @@
-- text: '# Are you reporting on behalf of yourself or someone else?'
+- text: '# Is there any other information that you would like to share?'
+
+- text: '### If you have made this report on behalf of someone else or have reported something you observed, this is your opportunity to let us know why you decided to do this.'
 
 - input:
-    name: on-behalf-of
-    label: On behalf of
-    type: radio
-    options:
-        self:
-            label: Myself
-            attributes: checked
-        other: Someone else
+    name: other-info
+    label: Other information
+    type: textbox

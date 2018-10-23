@@ -1,11 +1,154 @@
-- text: '# Are you reporting on behalf of yourself or someone else?'
+- text: '# Status and affiliation at the University of Cambridge: please provide the following information to help us better understand your experience.'
+
+- text: '## Status at University'
 
 - input:
-    name: on-behalf-of
-    label: On behalf of
+    name: status
+    label: University status
     type: radio
     options:
-        self:
-            label: Myself
-            attributes: checked
-        other: Someone else
+        student:
+            label: Student
+            subsidiary:
+                - text: 'Please specify:'
+                - input:
+                    name: student-specify
+                    label: 'Type of student'
+                    type: select
+                    options:
+                        blank:
+                            label: ''
+                        undergrad:
+                            label: Undergraduate student
+                        masters:
+                            label: Masters student
+                        phd:
+                            label: PhD student
+                        undergrad-visiting:
+                            label: Visiting undergraduate student
+                        postgrad-visiting:
+                            label: Visiting postgraduate student
+        academic:
+            label: Academic staff
+            subsidiary:
+                - text: 'Please specify:'
+                - input:
+                    name: academic-specify
+                    label: 'Please specify:'
+                    type: select
+                    options:
+                        blank:
+                            label: ''
+                        postdoc:
+                            label: Post-doc
+                        full-time:
+                            label: Full time
+                        part-time:
+                            label: Part time
+                        visiting:
+                            label: Visiting scholar
+        non-academic:
+            label: Non-academic staff
+            subsidiary:
+                - text: 'Please specify:'
+                - input:
+                    name: non-academic-specify
+                    label: 'Please specify:'
+                    type: select
+                    options:
+                        blank:
+                            label: ''
+                        admin:
+                            label: Admin staff
+                        support:
+                            label: Support staff
+                        temp:
+                            label: Temp staff
+        other:
+            label: Other
+            subsidiary:
+                - input:
+                    name: status-other-specify
+                    label: 'Please specify:'
+                    type: text
+        skip: Skip
+
+- text: '## College Affiliation'
+
+- input:
+    name: reporter-college
+    label: College
+    type: select
+    options:
+        blank:
+            label: ''
+        christs:
+            label: Christ's College
+        churchill:
+            label: Churchill College
+        clare:
+            label: Clare College
+        clarehall:
+            label: Clare Hall
+        corpus:
+            label: Corpus Christi College
+        darwin:
+            label: Darwin College
+        downing:
+            label: Downing College
+        emma:
+            label: Emmanuel College
+        fitz:
+            label: Fitzwilliam College
+        girton:
+            label: Girton College
+        caius:
+            label: Gonville & Caius College
+        homerton:
+            label: Homerton College
+        hughes:
+            label: Hughes Hall
+        jesus:
+            label: Jesus College
+        kings:
+            label: King's College
+        lucy:
+            label: Lucy Cavendish
+        magdalene:
+            label: Magdalene College
+        medwards:
+            label: Murray Edwards College
+        newnham:
+            label: Newnham College
+        pembroke:
+            label: Pembroke College
+        peterhouse:
+            label: Peterhouse
+        queens:
+            label: Queens College
+        robinson:
+            label: Robinson College
+        selwyn:
+            label: Selwyn College
+        sidney:
+            label: Sidney Sussex College
+        catz:
+            label: St Catharine's College
+        eddies:
+            label: St Edmund's College
+        johns:
+            label: St John's College
+        trinity:
+            label: Trinity College
+        trinityhall:
+            label: Trinity Hall
+        wolfson:
+            label: Wolfson College
+
+- text: '## School/Faculty Department Affiliation'
+
+- text: '### Please tick what you feel comfortable with'
+
+- partial:
+    name: camDepartment
+

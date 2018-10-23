@@ -171,7 +171,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         otherCheckboxes.forEach(function(c) { c.checked = false; });
                     });
                 }
-
                 manageBranchVisibility(this);
 
                 // if 'this' is a skip option, clear any selects of the same name (eg survivor-age)

@@ -1,11 +1,95 @@
-- text: '# Are you reporting on behalf of yourself or someone else?'
+- text: '# What consequences has this racist incident had in your life?'
 
 - input:
-    name: on-behalf-of
-    label: On behalf of
+    name: consequences
+    label: 'Tick all that apply and please elaborate in the box below:'
+    type: checkbox
+    options:
+        mentalhealth:
+            label: Anxiety, depression, or other consequences to mental well-being
+        cautiousness:
+            label: Cautiousness
+        detachment:
+            label: Detachment or separation from peers/colleagues
+        discomfort:
+            label: Discomfort
+        goingout:
+            label: Fear of going out
+        repetition:
+            label: Fear of repetition of the incident
+        angry:
+            label: Feeling angry
+        belonging:
+            label: Feeling of 'not belonging' at Cambridge
+        resentment:
+            label: Feeling of resentment
+        motivation:
+            label: Lack of motivation
+        others:
+            label: Others
+            subsidiary:
+                - text: Add one or more consequences to this list
+                - input:
+                    name: others-details
+                    type: text
+
+- input:
+    name: consequences-elaborate
+    label: Please elaborate further
+    type: textbox
+
+- text: '# Has this incident made you feel that your job/study was at risk?'
+
+- text: '## for example: being reluctant to work in University/college spaces, fear of being fired, not able to attend lectures or supervisions, not able to be physically in the University, etc.'
+
+- input:
+    name: job-study-risk
+    label: Job/study at risk?
     type: radio
     options:
-        self:
-            label: Myself
-            attributes: checked
-        other: Someone else
+        yes:
+            label: Yes
+        no:
+            label: no
+        notsure:
+            label: Not sure
+        describe:
+            label: Prefer to describe
+            subsidiary:
+                - text: 'Please describe:'
+                - input:
+                    name: risk-description
+                    type: textbox
+        skip: Skip
+
+- input:
+    name: shaped-time
+    label: 'Please describe if this incident has shaped your overall time in Cambridge in any way:'
+    type: textbox
+
+- text: '# Has this incident made it difficult for you to perform well in your work/studies?'
+
+- input:
+    name: job-study-difficulty
+    label: Job/study made difficult?
+    type: radio
+    options:
+        yes:
+            label: Yes
+        no:
+            label: no
+        notsure:
+            label: Not sure
+        describe:
+            label: Prefer to describe
+            subsidiary:
+                - text: 'Please describe:'
+                - input:
+                    name: difficulty-description
+                    type: textbox
+        skip: Skip
+
+- input:
+    name: job-study-impact
+    label: 'Please describe the specific impact this incident has had on your work or studies:'
+    type: textbox

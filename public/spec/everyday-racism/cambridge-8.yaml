@@ -1,18 +1,104 @@
-- text: '# What happened?'
-
-- text: |
-    Try to describe as much of what has happened as you can. You may wish to include what led up to the event or situation, as well as what happened and any subsequent events or implications. Please note that It makes it harder to use data if you use names of specific individuals. 
-
-    If the incident you want to report was not ‘an act’ committed by a particular individual, but it refers to a more structural or diffuse experience (such as a hostile atmosphere or seeing a problematic image) please describe it here.
-
+- text: '# If the racist incident derived from an act or action, was it perpetrated by one person or a group of people?'
 
 - input:
-    name: description
-    label: Description
-    type: textbox
+    name: no-of-perpetrators
+    label: Number of perpetrators
+    type: radio
+    options:
+        one:
+            label: One person
+        group:
+            label: Group of people
+            subsidiary:
+                - text: '### How many?'
+                - input:
+                    name: no-of-perpetrators-text
+                    type: textbox
+        skip:
+            label: Skip
+
+- text: '# If the racist incident derived from an act or action, who carried out this racist act or action?'
 
 - input:
-    name: document
-    type: library-file
-    label: |
-      **Please upload any evidence that could help.** This can be photos, videos or any other documents. We will store this safely. We will take all data into account for analysis and to inform advocacy, however we will not be able to make public any data that can lead to identifying particular individuals.
+    name: type-of-perpetrators
+    label: Perpetrators
+    type: select
+    options:
+        student:
+            label: Student
+        academic:
+            label: Academic staff
+        admin:
+            label: Admin staff
+        other:
+            label: Other
+            subsidiary:
+                - text: '### Please state'
+                - input:
+                    name: type-of-perpetrators-other
+                    type: textbox
+        unknown:
+            label: Not known
+        skip:
+            label: Skip
+
+- text: '# To the best of your knowledge, were the people who carried out the incident...'
+
+- input:
+    name: perpetrators-gender
+    label: Gender
+    type: radio
+    options:
+        female:
+            label: Female
+        male:
+            label: Male
+        nonbinary:
+            label: Non-binary
+        mixed:
+            label: Mixed group
+            subsidiary:
+                - text: "### Please give details of the perpetrators' genders"
+                - input:
+                    name: perpetrators-gender-mixed
+                    type: textbox
+        skip:
+            label: Skip
+
+- text: '# If the racist incident derived from an act or action, what age bracket do you think the person or group of persons who carried it out belong to?'
+
+- input:
+    name: perpetrators-age
+    label: Age
+    type: select
+    options:
+        eighteen:
+            label: 18-22
+        twenty-three:
+            label: 23-29
+        thirty:
+            label: 30-39
+        fourty:
+            label: 40-49
+        fifty:
+            label: 50-59
+        sixty:
+            label: 60-69
+        seventy:
+            label: 70-79
+        older:
+            label: 80+
+        mixed:
+            label: Mixed group
+            subsidiary:
+                - text: "### Please give details of the perpetrators' ages"
+                - input:
+                    name: perpetrators-age-mixed
+                    type: textbox
+        skip:
+            label: Skip
+
+- text: '# !{If the racist incident derived from an act or action, what do you perceive to be the racial or ethnic identity of the people who carried out this racist act?}{Please note that we are aware of the limitations of ascribing an ethnic or racial identity to someone else. However, for the purposes of this report it would be useful to have an indication, which we will take as subjective and socially constructed. We have adapted this list from the official categories used by the UK National Office of Statistics and the University of Cambridge}'
+
+- partial:
+    name: camPerpetratorEthnicity

@@ -1,85 +1,23 @@
 - text: |
-    ### Please read and tick to acknowledge this information below and give your consent to participate in this project.
+    This incident report form is a safe and confidential way to share everyday racist occurrences that have happened to you, someone you know or that you have observed at the University of Cambridge.
+    
+      * Racism is an ideology and a set of practices based on ideas of inherit white ‘racial’ superiority that normalises control, domination and exclusion over people of colour, while legitimating privilege and oppression. In this way, racism has substantive effects on the organisation of our economic, political, and social lives.
+      * One of the ways in which racism is perpetuated as a system of oppression is through everyday manifestations and micro aggressions. 
+      * Expressions of racism include beliefs, feelings, attitudes, utterances, assumptions and actions that end up reproducing and re-establishing a system that offers dominant groups opportunities to thrive while contributing towards the marginalisation of minority groups.
+      * Forms of racism can also refer to structural processes, environments or atmospheres and less discrete or more diffuse experiences. Sometimes racism can even appear through apparently ‘well meaning’ comments or actions.
+      * We are aware that some forms of racism might be easier to capture in this format than others and that the term ‘racist incident’ might fall short for what you experienced or saw. 
+      * We also understand that everyday racism is so normalised that many will not even perceive it as such. However, the acknowledgement of racism as an important social problem is increasing and this project aims to contribute to its visibility and eradication while critically acknowledging the limitations that a format like this might have. 
+      * No incident is too ‘small’ to matter. 
+      * You can learn more information about racism here: [http://racismatcambridge.org/racism/](http://racismatcambridge.org/racism/)
 
-    <br><br>
-    ### University of Cambridge Official Reporting Procedures
-- input:
-    no-store: true
-    name: procedure
-    type: checkbox
-    required: true
-    options:
-      confirm:
-        label: I understand that this is not a formal reporting procedure within the University of Cambridge. I can also raise an official complaint following the University of Cambridge official reporting procedures [**here**](https://www.studentcomplaints.admin.cam.ac.uk/harassment-sexual-misconduct/reporting-harassment-bullying-discrimination-or-sexual-misconduct) or through its [**anonymous reporting procedure**](https://www.studentcomplaints.admin.cam.ac.uk/anonymous-reporting-harassment-hate-crime-sexual-misconduct).
-        branch:
-            in-box: false
-            body:
-                - text: |
-                    <br>
-                    
-                    ### How is this incident reporting anonymous?
-                - input:
-                    no-store: true
-                    name: anonymous
-                    type: checkbox
-                    required: true
-                    options:
-                        confirm:
-                            label: If you have concerns that providing detailed information might lead to your being identified, please note that we take the protection of your identity very seriously. We are also careful about collecting data pertaining only to members of the University of Cambridge. You will be asked to verify your link to the university by providing a current or alumni email address, to which an email will be sent that verifies your email address and gives you access to the report. After you do this, we will not keep your email and have no way to link it to your identity. The report will generate an alias which you must safeguard if you want to log into your report and add an incident to your file. You will also have the opportunity to create and download a PDF with your report at the end after you submit it. For our purposes, we will use your data by aggregating and crossing the details so your profile and report cannot be put together unless you explicitly ask for it using your alias.
-                            branch:
-                                in-box: false
-                                body:
-                                    - text: |
-                                        <br>
-                                        
-                                        ### Consent Statement
-                                    - input:
-                                        no-store: true
-                                        name: consent
-                                        type: checkbox
-                                        required: true
-                                        options:
-                                            confirm:
-                                                label: Any information you provide will be seen and analysed by the research team and volunteers of the Whistle – Everyday Racism Research Project. By filling in this Incident Report you agree to take part in this study; you understand that your participation is voluntary and that you are free to stop at anytime and your data will not be used unless you submit your whole report; you also agree that if you stop before submitting the whole report, your data will not be saved; you give your consent for the information to be used for academic purposes (i.e. reports, publications, presentations); you agree that your information informs antiracist activism in the University of Cambridge and beyond.
-                                                branch:
-                                                    in-box: false
-                                                    body:
-                                                        - text: |
-                                                            ### Have you used this reporting service before?
-                                                        - input:
-                                                            name: used-before
-                                                            label: Alias
-                                                            type: radio
-                                                            required: true
-                                                            options:
-                                                                y:
-                                                                    label: Yes
-                                                                    subsidiary:
-                                                                        - input:
-                                                                            name: existing-alias
-                                                                            type: text
-                                                                            label: Enter your anonymous alias
-                                                                        - html: |
-                                                                            <span id="alias-ok" title="alias available" class="alias-available hide">✓</span>
-                                                                            <span id="alias-nok" title="alias not available" class="alias-available hide">✗</span>
-                                                                n:
-                                                                    label: No
-                                                                    attributes: checked
-                                                                    subsidiary:
-                                                                        - option: show
-                                                                        - text: |
-                                                                            We make sure that your report is anonymous by creating a random identification alias.
-                                                                            If you want to follow up, use the anonymous alias below so we can access any relevant
-                                                                            information.
-                                                                        - html: |
-                                                                            <p>Your alias for this session is 
-                                                                                <b><output name="used-before-generated-alias">{{generated-alias}}</output></b>. Please make a note of this alias and keep it in a safe place so you can check back in with us if necessary. We are not able to retrieve your alias.</p>
-                                                                        - input:
-                                                                            type: hidden
-                                                                            name: generated-alias
-                                                                            value: {{generated-alias}}
-                                                                        - input:
-                                                                            type: button
-                                                                            name: get-alt-alias
-                                                                            class: inline-link
-                                                                            text: Generate another random alias
+    We think that a first step to inform policy and action is to offer analysis and information on the issues at stake and to get a better idea of who is affected within the University. 
+
+    **End Everyday Racism at Cambridge**
+
+    You can see more information about the project here: [www.racismatcambridge.org](www.racismatcambridge.org) 
+
+    As an on-going research project, we will be adjusting this incident report form in response to the contributions of participants and the continuous analysis of the data gathered. 
+
+    You can contact Everyday Racism at Cambridge for general enquiries by e-mailing: NEW EMAIL??
+
+    For reports use this form and please do not send them by email.

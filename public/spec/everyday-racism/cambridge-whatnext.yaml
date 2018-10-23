@@ -1,79 +1,26 @@
 - text:
     wrap: h1
     class: banner
-    text: ✔ We’ve received your report
+    text: ✔ Thank you - we have received your report.
+
+- text: 'You can download your report here:'
+
+- text: Please keep hold of your alias (which is XXXX XXXX) if you would like to make a further report later on so that we can link them together. If you loose it or forget it, you can still submit a new report under a new alias.
+
+- text: Your report will help us gather evidence to further research on the workings of racism and to sustain the work of student and staff antiracist activism in the University pushing the agenda for institutional change.
+
+- text: 'Results to date of End Everyday Racism project are available here: (link??). Note that it may take a few days to add your data to the Project’s results.'
+
+- text: '# What’s next? Where can you get further support?'
 
 - text: |
-    ## What happens now?
-
-    Your report will give us the information we need to help other people in the same situation.
-      Thank you.
-
-    ## For any further help...
-
-    If you'd like any more help, or would like to follow up, you can get in touch with us.
-
-    Make sure to mention your anonymous alias <output id="user-id">{{user-id}}</output> so we can
-      access any relevant information.
-
-    Contact *Rape Is A Crime* directly at (tel) +234 811-888-4144, or e-mail
-    [contact@rapeisacrime.org](mailto:contact@rapeisacrime.org?subject=Rape%20Is%20A%20Crime%20/%20The%20Whistle%20campaign)
-
-    ---
-
-    ## Local Resources
-
-    {{#if categories}}
-
-    Based on what you have told us, we have gathered the closest and most helpful organisations and
-      services for you. These can be of immediate help in concerns regarding health, mental health,
-      legal issues and any other concerns. They are free, anonymous, and almost always available.
-
-    Resources found close to <i>{{formattedAddress}}</i>:
-
-    <table>
-        {{#each categories}}
-        <tr>
-            <td colspan="2"><h3>{{@key}}</h3></td>
-        </tr>
-        {{#each this}}
-        <tr>
-            <td>{{distKm}}km</td>
-            <td><b>{{name}}</b></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>{{address}}</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>{{{phone}}} {{email}} {{{website}}}</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="grey"><i>services offered: {{services}}</i></td>
-        </tr>
-        {{/each}}
-        {{/each}}
-    </table>
-
-    {{else}}
-
-    {{#if address}}
-    No resources found close to <i>{{address}}</i>.
-    {{/if}}
-
-    To see local organisations and services which may be helpful for you, enter your address here.
-
-    We will not record your address or your request for resources.
-    {{/if}}
-
-- input:
-    name: address
-    type: text
-    label: Address
-    class: w16
-
-- input: # note no name so nothing added to URL query
-    type: button
-    text: Get resources
+    ### Support for Students is available via:
+      * Student Union Advice Service (from Cambridge University Student Union and Graduate Union) [**CUSU**](https://www.cusu.co.uk/), Email: [advice@studentadvice.cam.ac.uk](mailto:advice@studentadvice.cam.ac.uk), Tel, 01223 333313.
+      * BME Campaign, Cambridge University Student Union: [www.cusu.co.uk/about/liberation-campaigns/the-black-and-minority-ethnic-campaign](https://www.cusu.co.uk/about/liberation-campaigns/the-black-and-minority-ethnic-campaign/)
+      * FLY, Cambridge University's network and forum for women and non-binary people of colour: [www.facebook.com/FLYcambridge](https://www.facebook.com/FLYcambridge/), [flygirlsofcambridge.com](https://flygirlsofcambridge.com/)
+      * Student Counselling Services: [www.counselling.cam.ac.uk](https://www.counselling.cam.ac.uk/)
+      * Look out for your BME contacts in your College.
+      * Community-wide services such as [Nightline](https://linkline.org.uk/) and [Samaritans Cambridge](https://www.samaritans.org/branches/cambridge-samaritans).
+    ### Support for Academic, Academic-Related and Professional Services Staff is available via:
+      * University and College Union, University of Cambridge Branch: [Cambridge UCU](http://www.ucu.cam.ac.uk/), [admin@ucu.cam.ac.uk](mailto:admin@ucu.cam.ac.uk), Tel, 01223 764944
+      * Support Services at the University: [www.hr.admin.cam.ac.uk/hr-services/wellbeing/support-services-university](https://www.hr.admin.cam.ac.uk/hr-services/wellbeing/support-services-university)

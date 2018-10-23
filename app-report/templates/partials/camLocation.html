@@ -1,0 +1,531 @@
+<div id="cam-location">
+    <h1>Please describe where this particular incident happened.</h1>
+
+    <ul class="question-location">
+        <li>
+            <input type="radio" name="location" id="location-college" value="College">
+            <label for="location-college"><p>College</p></label>
+            <div class="location-college-branch hide">
+                <ul class="question-college">
+                    <li>
+                        <h3>Which college?</h3>
+                        <select name="college" id="college">
+                            <option></option>
+                            <option>Christ's College</option>
+                            <option>Churchill College</option>
+                            <option>Clare College</option>
+                            <option>Clare Hall</option>
+                            <option>Corpus Christi College</option>
+                            <option>Darwin College</option>
+                            <option>Downing College</option>
+                            <option>Emmanuel College</option>
+                            <option>Fitzwilliam College</option>
+                            <option>Girton College</option>
+                            <option>Gonville &amp; Caius College</option>
+                            <option>Homerton College</option>
+                            <option>Hughes Hall</option>
+                            <option>Jesus College</option>
+                            <option>King's College</option>
+                            <option>Lucy Cavendish</option>
+                            <option>Magdalene College</option>
+                            <option>Murray Edwards College</option>
+                            <option>Newnham College</option>
+                            <option>Pembroke College</option>
+                            <option>Peterhouse</option>
+                            <option>Queens' College</option>
+                            <option>Robinson College</option>
+                            <option>Selwyn College</option>
+                            <option>Sidney Sussex College</option>
+                            <option>St Catharine's College</option>
+                            <option>St Edmund's College</option>
+                            <option>St John's College</option>
+                            <option>Trinity College</option>
+                            <option>Trinity Hall</option>
+                            <option>Wolfson College</option>
+                        </select>
+                    </li>
+                </ul>
+                <ul class="question-college-specific">
+                    <li>
+                        <h3>Can you be more specific within the college?</h3>
+                        <select name="college-specific" id="college-specific">
+                            <option></option>
+                            <option>College accommodation</option>
+                            <option>College office</option>
+                            <option>College JCR</option>
+                            <option>College MCR</option>
+                            <option>College Porters Lodge</option>
+                            <option>College cafe</option>
+                            <option>Dining area</option>
+                            <option>College-sponsored event (formal/mixer/bop/seminar room)</option>
+                            <option>Administrative office in college (tutorial office, bursar, IT department, etc.)</option>
+                            <option>Outside space</option>
+                            <option>Other</option>
+                        </select>
+                        <div class="subsidiary hide Other-subsidiary">
+                            <h4>Where within the college (in your own words)?</h4>
+                            <textarea name="college-specific-own-words" id="college-specific-own-words"  class="pure-input-1"></textarea>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </li>
+        <li>
+          <input type="radio" name="location" id="location-department" value="Department">
+          <label for="location-department"><p>Department/Centre/Institute</p></label>
+          <div class="location-department-branch hide">
+              <ul class="question-school">
+                  <li>
+                      <h3>Which department?</h3>
+                      <select name="school" id="school">
+                            <option class="l1-select-option">Arts and Humanities</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Architecture and History of Art</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Architecture</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of History of Art</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Asian and Middle Eastern Studies</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of East Asian Studies</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Middle Eastern Studies</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Classics</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Museum of Classical Archaeology</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Divinity</option>
+                                <option class="l2-select-option">&nbsp;Faculty of English</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Anglo-Saxon, Norse and Celtic</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Modern and Medieval Languages</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of French</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of German &amp; Dutch</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Italian</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Slavonic Studies</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Spanish and Portuguese</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Theoretical and Applied Linguistics</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Modern Greek</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Neo-Latin</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Music</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Philosophy</option>
+                                <option class="l2-select-option">&nbsp;Centre for Research in Arts, Humanities and Social Sciences</option>
+                                <option class="l2-select-option">&nbsp;Language Centre</option>
+                                <option class="l1-select-option">Humanities & Social Sciences</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Human, Social and Political Science (HSPS)</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Archaeology</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Biological Anthropology</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Leverhulme Centre for Human Evolutionary Studies</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;McDonald Institute for Archaeological Research</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Social Anthropology</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Mongolian and Inner Asian Studies Unit</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Museum of Archaeology &amp; Anthropology</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Politics and International Studies</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Centre of African Studies</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Centre of Development Studies</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Centre for Gender Studies</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Centre of Latin American Studies</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Centre of South Asian Studies</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Sociology</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Economics</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Education</option>
+                                <option class="l2-select-option">&nbsp;Faculty of History</option>
+                                <option class="l2-select-option">&nbsp;History and Philosophy of Science</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Whipple Museum of the History of Science</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Law</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Lauterpacht Centre for International Law</option>
+                                <option class="l2-select-option">&nbsp;Institute of Criminology</option>
+                                <option class="l2-select-option">&nbsp;Land Economy</option>
+                                <option class="l1-select-option">Biological Sciences</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Biology</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Biochemistry</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Centre for Family Research</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Genetics</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Pathology</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Pharmacology</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Physiology, Development and Neuroscience</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Plant Sciences</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Botanic Garden</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Psychology</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Zoology</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Museum of Zoology</option>
+                                <option class="l2-select-option">&nbsp;Department of Veterinary Medicine</option>
+                                <option class="l2-select-option">&nbsp;Wellcome – MRC Cambridge Stem Cell Institute</option>
+                                <option class="l2-select-option">&nbsp;Wellcome Trust/Cancer Research UK Gurdon Institute</option>
+                                <option class="l2-select-option">&nbsp;Cambridge Systems Biology Centre (CSBC) </option>
+                                <option class="l2-select-option">&nbsp;MRC Toxicology Unit</option>
+                                <option class="l2-select-option">&nbsp;Sainsbury Laboratory</option>
+                                <option class="l1-select-option">Physical Sciences</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Earth Sciences &amp; Geography</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Earth Sciences</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Sedgwick Museum of Earth Sciences</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Geography</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Scott Polar Research Institute</option>
+                                            <option class="l5-select-option">&nbsp;&nbsp;&nbsp;&nbsp;The Polar Museum</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Mathematics</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Applied Mathematics and Theoretical Physics</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Pure Mathematics and Mathematical Statistics</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Statistical Laboratory</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Physics &amp; Chemistry</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Astronomy</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Chemistry</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Materials Science and Metallurgy</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Physics</option>
+                                <option class="l2-select-option">&nbsp;Isaac Newton Institute for Mathematical Sciences</option>
+                                <option class="l1-select-option">Clinical Medicine</option>
+                                <option class="l2-select-option">&nbsp;Clinical Biochemistry</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Metabolic Research Laboratories</option>
+                                <option class="l2-select-option">&nbsp;Clinical Neurosciences</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Cambridge Centre for Brain Repair</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Neurology Unit</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Neurosurgery</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Wolfson Brain Imaging Centre</option>
+                                <option class="l2-select-option">&nbsp;Haematology</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Transfusion medicine</option>
+                                <option class="l2-select-option">&nbsp;Medical Genetics</option>
+                                <option class="l2-select-option">&nbsp;Medicine</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Anaesthesia</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Experimental Medicine and Immunotherapeutics (EMIT)</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Renal medicine</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;MRC Biostatistics Unit</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;MRC Cancer Unit</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;MRC Epidemiology Unit</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;MRC Mitochondrial Biology Unit</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Obstetrics &amp; Gynaecology</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Oncology</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Paediatrics</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Psychiatry</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Brain mapping unit</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Developmental psychiatry</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Public Health &amp; Primary Care</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;General Practice &amp; Primary Care Research</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Clinical Gerontology</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Radiology</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Surgery</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Trauma and Orthopaedic Surgery</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Cambridge Institute for Medical Research (CIMR)</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Cancer Research UK Cambridge Institute</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Institute of Public Health</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;MRC Cognition and Brain Sciences Unit</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Welcome Trust - MRC Institute of Metabolic Science</option>
+                                <option class="l1-select-option">Technology</option>
+                                <option class="l2-select-option">&nbsp;Faculty of Engineering</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Engineering</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Energy, fluid mechanics, and turbomachinery</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Electrical engineering</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Mechanics, materials and design</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Civil engineering</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Manufacturing and management</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Information engineering</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Faculty of Business &amp; Management</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Cambridge Judge Business School</option>
+                                            <option class="l5-select-option">&nbsp;&nbsp;&nbsp;&nbsp;Centre for Business Research</option>
+                                            <option class="l5-select-option">&nbsp;&nbsp;&nbsp;&nbsp;The Psychometrics Centre</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Faculty of Computer Science &amp; Technology</option>
+                                        <option class="l4-select-option">&nbsp;&nbsp;&nbsp;Department of Computer Science</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Department of Chemical Engineering &amp; Biotechnology</option>
+                                    <option class="l3-select-option">&nbsp;&nbsp;Cambridge Institute for Sustainability Leadership</option>
+                                <option class="l1-select-option">Cambridge University Library (CUL)</option>
+                                <option class="l1-select-option">Cambridge University Development and Alumni Relations</option>
+                                <option class="l1-select-option">Fitzwilliam Museum</option>
+                                <option class="l1-select-option">Institute of Continuing Education (ICE)</option>
+                                <option class="l1-select-option">Cambridge Enterprise</option>
+                                <option class="l1-select-option">Careers Service</option>
+                                <option class="l1-select-option">Gates Trust</option>
+                                <option class="l1-select-option">University Information Services</option>
+                                <option class="l1-select-option">Other</option>
+                          </select>
+                          <div class="subsidiary hide Other-subsidiary">
+                              <h4>Please specify:</h4>
+                              <input type="text" name="department-own-words" id="department-own-words"  class="pure-input-1">
+                          </div>
+                    </li>
+                </ul>
+                <ul class="question-own-department">
+                    <li>
+                        <h3>Did this incident occur at a department that you study at?</h3>
+                        <input type="radio" name="own-department" id="own-department-yes" value="Yes">
+                        <label for="own-department-yes"><p>Yes</p></label>
+                        <input type="radio" name="own-department" id="own-department-no" value="No">
+                        <label for="own-department-no"><p>No</p></label>
+                    </li>
+                </ul>
+            </div>
+        </li>
+        <li>
+            <input type="radio" name="location" id="location-other" value="Somewhere else">
+            <label for="location-other"><p>Somewhere else</p></label>
+            <div class="location-other-branch hide">
+                <ul class="question-location-other">
+                    <li>
+                        <h3>Where did the incident happen?</h3>
+                        <input type="radio" name="location-other" id="location-other-library" value="Library">
+                        <label for="location-other-library"><p>Library</p></label>
+                        <div class="location-other-library-branch hide">
+                            <ul class="question-library">
+                                <li>
+                                    <h3>Which library?</h3>
+                                    <select name="library" id="library">
+                                        <option></option>
+                                        <option>African Studies</option>
+                                        <option>Ancient India and Iran Trust</option>
+                                        <option>Anglo-Saxon, Norse and Celtic Library</option>
+                                        <option>Applied Economics Department Library</option>
+                                        <option>Applied Mathematics and Theoretical Physics Library</option>
+                                        <option>Art and Architecture</option>
+                                        <option>Asian & Middle Eastern Studies</option>
+                                        <option>Astronomy Library</option>
+                                        <option>Balfour and Newton</option>
+                                        <option>Biochemistry (Colman Library)</option>
+                                        <option>Blackfriars</option>
+                                        <option>Botanic Gardens (Cory Library)</option>
+                                        <option>British Antarctic Survey</option>
+                                        <option>Bullard Laboratories Library</option>
+                                        <option>Cambridge Arctic Shelf Programme</option>
+                                        <option>Cambridge Assessment</option>
+                                        <option>Cambridge Centre for Christianity Worldwide (Henry Martyn Centre)</option>
+                                        <option>Cambridge Lehrhaus: Centre for Jewish Thought</option>
+                                        <option>Cambridge Theological Federation</option>
+                                        <option>Cambridge University Collection of Aerial Photography (CUCAP)</option>
+                                        <option>Careers Service Library</option>
+                                        <option>Casimir Lewy Library</option>
+                                        <option>Central Science Library</option>
+                                        <option>Centre for International Law (Lauterpacht Research Centre)</option>
+                                        <option>Centre of International Studies</option>
+                                        <option>Chemical Engineering and Biotechnology</option>
+                                        <option>Chemistry Library</option>
+                                        <option>Christ's College</option>
+                                        <option>Churchill College</option>
+                                        <option>Clare College (Forbes Mellon Library)</option>
+                                        <option>Classics</option>
+                                        <option>Colman Library</option>
+                                        <option>Computer Laboratory</option>
+                                        <option>Corpus Christi College (Taylor Library) (Parker Library)</option>
+                                        <option>Cory Library</option>
+                                        <option>Criminology Library (Radzinowicz Library)</option>
+                                        <option>CUCAP</option>
+                                        <option>Darwin College</option>
+                                        <option>Department of Psychology Library (Experimental Psychology)</option>
+                                        <option>Development Studies</option>
+                                        <option>Divinity</option>
+                                        <option>Downing College (Maitland Robinson Library)</option>
+                                        <option>Earth Sciences</option>
+                                        <option>Education</option>
+                                        <option>Emmanuel College</option>
+                                        <option>Engineering Library</option>
+                                        <option>English</option>
+                                        <option>Experimental Psychology</option>
+                                        <option>Fitzwilliam College</option>
+                                        <option>Fitzwilliam Museum</option>
+                                        <option>Fitzwilliam Museum: Department of Coins and Medals</option>
+                                        <option>Fitzwilliam Museum: Department of Manuscripts and Printed Books</option>
+                                        <option>Forbes Mellon Library</option>
+                                        <option>Genetics Library</option>
+                                        <option>Geography Library</option>
+                                        <option>Girton College</option>
+                                        <option>Gonville & Caius College</option>
+                                        <option>Haddon Library</option>
+                                        <option>Hamilton Kerr Institute</option>
+                                        <option>Henry Martyn Centre</option>
+                                        <option>Herbarium Library</option>
+                                        <option>History and Philosophy of Science</option>
+                                        <option>History of Population and Social Structure</option>
+                                        <option>Homerton College</option>
+                                        <option>Hughes Hall</option>
+                                        <option>Institute for Orthodox Christian Studies</option>
+                                        <option>Institute of Continuing Education</option>
+                                        <option>Interdisciplinary Research Centre in Superconductivity</option>
+                                        <option>Isaac Newton Institute for Mathematical Sciences</option>
+                                        <option>Jesus College (Quincentenary Library)</option>
+                                        <option>Judge Business School Information Centre</option>
+                                        <option>King's College</option>
+                                        <option>Land Economy</option>
+                                        <option>Language Centre</option>
+                                        <option>Latin American Studies Centre</option>
+                                        <option>Lauterpacht Research Centre</option>
+                                        <option>Lee Library</option>
+                                        <option>Lucy Cavendish College</option>
+                                        <option>Magdalene College</option>
+                                        <option>Maitland Robinson Library</option>
+                                        <option>Margaret Beaufort Institute of Theology</option>
+                                        <option>Marshall Library</option>
+                                        <option>Materials Science Library</option>
+                                        <option>Medical Library</option>
+                                        <option>Mill Lane Library</option>
+                                        <option>Modern & Medieval Languages Library</option>
+                                        <option>Moore Library</option>
+                                        <option>MRC Cognition and Brain Sciences Unit</option>
+                                        <option>MRC Laboratory of Molecular Biology</option>
+                                        <option>Murray Edwards College (Rosemary Murray Library) (New Hall)</option>
+                                        <option>Needham Research Institute</option>
+                                        <option>New Hall</option>
+                                        <option>Newnham College</option>
+                                        <option>Parker Library</option>
+                                        <option>Pembroke College</option>
+                                        <option>Pendlebury Library of Music</option>
+                                        <option>Peterhouse College</option>
+                                        <option>Philosophy (Casimir Lewy Library)</option>
+                                        <option>Physiology Development and Neuroscience Library</option>
+                                        <option>Plant Sciences</option>
+                                        <option>Pure Mathematics and Mathematical Statistics Library</option>
+                                        <option>Queens' College</option>
+                                        <option>Quincentenary Library</option>
+                                        <option>Radzinowicz Library</option>
+                                        <option>Rayleigh Library (Physics)</option>
+                                        <option>Richard Powell Library</option>
+                                        <option>Ridley Hall</option>
+                                        <option>Robinson College</option>
+                                        <option>Rosemary Murray Library</option>
+                                        <option>Scott Polar Research Institute Library</option>
+                                        <option>Seeley Historical Library</option>
+                                        <option>Selwyn College</option>
+                                        <option>Sidney Sussex College (Richard Powell Library)</option>
+                                        <option>Social Anthropology Library</option>
+                                        <option>South Asian Studies</option>
+                                        <option>SPS - Sociology, Land Economy</option>
+                                        <option>Squire Law Library</option>
+                                        <option>St Catharine's College</option>
+                                        <option>St Edmund's College</option>
+                                        <option>St John's College</option>
+                                        <option>Strangeways Research Laboratory</option>
+                                        <option>Taylor Library</option>
+                                        <option>Trinity College</option>
+                                        <option>Trinity Hall</option>
+                                        <option>Tyndale House</option>
+                                        <option>UCLES Library (Cambridge Assessment)</option>
+                                        <option>Union Society</option>
+                                        <option>University Library</option>
+                                        <option>Veterinary Anatomy Library</option>
+                                        <option>Veterinary Medicine</option>
+                                        <option>Wesley House</option>
+                                        <option>Westcott House</option>
+                                        <option>Westfield House</option>
+                                        <option>Westminster College</option>
+                                        <option>Whipple Library (History and Philosophy of Science)</option>
+                                        <option>Wolfson College (Lee Library)</option>
+                                        <option>Woolf Institute</option>
+                                        <option>Zoology (Balfour and Newton)</option>
+                                        <option>Other</option>
+                                    </select>
+                                    <div class="subsidiary hide Other-subsidiary">
+                                        <h4>Please specify:</h4>
+                                        <input type="text" name="library-own-words" id="library-own-words"  class="pure-input-1">
+                                    </div> 
+                                </li>
+                            </ul>
+                        </div>
+                        <input type="radio" name="location-other" id="location-other-admin" value="Admin">
+                        <label for="location-other-admin"><p>Admin Offices</p></label>
+                        <div class="location-other-admin-branch hide">
+                            <h3>Please specify:</h3>
+                            <input type="text" name="location-other-admin-specify">
+                        </div>
+                        <input type="radio" name="location-other" id="location-other-site" value="Grounds within a University site">
+                        <label for="location-other-site"><p>Grounds within a University site</p></label>
+                        <div class="location-other-site-branch hide">
+                            <ul class="question-site">
+                                <li>
+                                    <h3>Which University site?</h3>
+                                    <select name="site" id="site">
+                                        <option></option>
+                                        <option>Silver Street/Mill Lane Site</option>
+                                        <option>Cambridge University Press</option>
+                                        <option>Downing Site</option>
+                                        <option>Old Addenbrooke's Site</option>
+                                        <option>New Museums Site</option>
+                                        <option>Mullard Radio Astronomy Observatory (MRAO)</option>
+                                        <option>Sidgwick Site</option>
+                                        <option>Madingley Rise Site</option>
+                                        <option>West Cambridge Site</option>
+                                        <option>Other</option>
+                                    </select>
+                                    <div class="subsidiary hide Other-subsidiary">
+                                        <h4>Please specify:</h4>
+                                        <input type="text" name="site-own-words" id="site-own-words"  class="pure-input-1">
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <input type="radio" name="location-other" id="location-other-cafe" value="Café/restaurant">
+                        <label for="location-other-cafe"><p>Café/restaurant (if this is in a College, please tick option above)</p></label>
+                        
+                        <div class="location-other-cafe-branch hide">
+                            <ul class="question-location-cafe">
+                                <li>
+                                    <h3>Name/location:</h3>
+                                    <input type="text" name="location-other-cafe-specify">
+                                </li>
+                            </ul>
+                        </div>
+
+                        <input type="radio" name="location-other" id="location-other-party" value="Club/Night out/Party">
+                        <label for="location-other-party"><p>Club/Night out/Party</p></label>
+                        
+                        <div class="location-other-party-branch hide">
+                            <ul class="question-location-party">
+                                <li>
+                                    <h3>Name/location/details:</h3>
+                                    <input type="text" name="location-other-party-specify">
+                                </li>
+                            </ul>
+                        </div>
+                        <input type="radio" name="location-other" id="location-other-gp" value="GP surgery/hospital">
+                        <label for="location-other-gp"><p>GP surgery/hospital</p></label>
+                        
+                        <div class="location-other-gp-branch hide">
+                            <ul class="question-location-gp">
+                                <li>
+                                    <h3>Name/location:</h3>
+                                    <input type="text" name="location-other-gp-specify">
+                                </li>
+                            </ul>
+                        </div>
+
+                        
+
+                        <input type="radio" name="location-other" id="location-other-online" value="Online">
+                        <label for="location-other-online"><p>Online</p></label>
+                        <div class="location-other-online-branch hide">
+                            <ul class="question-location-online">
+                                <li>
+                                    <h3>Where online?</h3>
+                                    <input type="radio" name="location-online" id="location-online-email" value="Email">
+                                    <label for="location-online-email"><p>Email</p></label>
+
+                                    <input type="radio" name="location-online" id="location-online-socialmedia" value="Social media platforms">
+                                    <label for="location-online-socialmedia"><p>Social media platforms</p></label>
+                                    <div class="location-online-socialmedia-branch hide">
+                                        <ul class="question-socialmedia-specify">
+                                            <li>
+                                                <h3>Please specify:</h3>
+                                                <input type="text" name="socialmedia-specify">
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <input type="radio" name="location-online" id="location-online-other" value="Other">
+                                    <label for="location-online-other"><p>Other</p></label>
+                                    <div class="location-online-other-branch hide">
+                                        <ul class="question-online-other-specify">
+                                            <li>
+                                                <h3>Please specify:</h3>
+                                                <input type="text" name="online-other-specify">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <input type="radio" name="location-other" id="location-other-city" value="Another place within the city of Cambridge">
+                        <label for="location-other-city"><p>Another place within the city of Cambridge</p></label>
+                        
+                        <div class="location-other-city-branch hide">
+                            <ul class="question-location-city">
+                                <li>
+                                    <h3>Please specify:</h3>
+                                    <input type="text" name="location-other-city-specify">
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+        <li>
+            <input type="radio" name="location" id="location-skip" value="Skip">
+            <label for="location-skip"><p>Skip</p></label>
+        </li>
+    </ul>
+</div>

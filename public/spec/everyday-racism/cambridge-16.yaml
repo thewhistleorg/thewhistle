@@ -1,0 +1,10 @@
+- text: '# Do you have any feedback on this questionnaire?'
+
+- input:
+    name: feedback
+    label: Feedback
+    type: textbox
+
+- text: Thank you for completing this report.
+
+- text: A draft of your report will be available as a PDF once you submit your report below.

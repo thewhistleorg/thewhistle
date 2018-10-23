@@ -490,14 +490,12 @@ class Handlers {
         if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.response.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
 
         const body = ctx.request.body;
-
         Handlers.removeNoStores(body);
 
         if (ctx.session.reportId && org.startsWith('everyday-racism') && project === 'cambridge') {
             const verified = await Report.isVerified(org, ctx.session.reportId);
             if (!verified) {
                 const verificationCode = body['verification-code'];
-                console.log(verificationCode);
                 const validCode = await Report.verifyCode(org, ctx.session.reportId, verificationCode);
                 if (!validCode) {
                     ctx.flash = { error: 'Invalid verification code.' };
@@ -585,7 +583,6 @@ class Handlers {
         // if date specified, verify it is valid (to back up client-side validation)
         if (body.date) {
             // (note for some reason test suite leaves date as a string)
-            console.log(body.date);
             const d = typeof body.date=='object' ? body.date : JSON.parse(body.date);
             const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
             const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'nov', 'dec' ];
@@ -596,9 +593,7 @@ class Handlers {
         }
 
         const formattedReport = formatReport(org, project, page, body);
-
         if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.reportId, formattedReport, body);
-
         if (ctx.request.files) {
             for (const file of ctx.request.files) {
                 try {

@@ -1,65 +1,133 @@
-- text: '# If the racist incident derived from an action, was it perpetrated by one person or a group of people?'
+- text: '# Do you remember what were you doing when this racist incident occurred?'
 
 - input:
-    name: no-of-perpetrators
-    label: Number of perpetrators
-    type: radio
-    options:
-        one:
-            label: One person
-        group:
-            label: Group of people
-            subsidiary:
-                - text: '### How many?'
-                - input:
-                    name: no-of-perpetrators-text
-                    type: textbox
-        skip:
-            label: Skip
-
-- text: '# If the racist incident derived from an action, who carried out this racist act?'
-
-- input:
-    name: type-of-perpetrators
-    label: Perpetrators
+    name: doing-what
+    label: Doing what
     type: select
     options:
-        student:
-            label: Student
-        academic:
-            label: Academic staff
-        admin:
-            label: Admin staff
+        blank:
+            label: ''
+        lecture:
+            label: I was in a lecture
+        supervision:
+            label: I was in a supervision
+        seminar:
+            label: I was in a seminar/conference
+        food:
+            label: I was in a lunch/dinner context
+        work:
+            label: I was in my place of work
+        accommodation:
+            label: I was in my accommodation
+        meeting:
+            label: I was at a society meeting
+        transit:
+            label: I was in transit (walking, cycling, etc)
         other:
             label: Other
             subsidiary:
-                - text: '### Please state'
+                - text: '### Please describe in your own words what you were doing:'
                 - input:
-                    name: type-of-perpetrators-other
+                    name: doing-what-own-words
                     type: textbox
-        unknown:
-            label: Not known
         skip:
             label: Skip
 
-- text: '# If the racist incident derived from an action, were the people who did this'
+- text: '# Do you remember what were you doing when this racist incident occurred?'
 
 - input:
-    name: perpetrators-gender
-    label: Gender
+    name: when
+    label: when
+    type: radio
+    options:
+        exact:
+            label: Yes, exact date this racist incident happened
+            subsidiary:
+                - text: Please select the date and approximate time
+                - input:
+                    name: date
+                    type: library-date
+                - input:
+                    name: time
+                    type: library-24hours
+        approximate:
+            label: Yes, approximate date this racist incident happened
+            subsidiary:
+                - input:
+                    name: within-options
+                    label: Within options
+                    type: select
+                    options:
+                        blank:
+                            label:
+                        lastweek:
+                            label: This week
+                        lastmonth:
+                            label: This month
+                        lasthalfyear:
+                            label: Within the last 6 months
+                        lastyear:
+                            label: 6-12 months ago
+                        longer:
+                            label: More than 12 months ago
+        no: I do not remember
+        skip: Skip
+
+- text: '# Thinking of this incident, how often have you experienced this type of racism?'
+
+- input:
+    name: type-frequency
+    label: Frequency
     type: select
     options:
-        female:
-            label: Female
-        male:
-            label: Academic staff
-        mixed:
-            label: Mixed group
+        blank:
+            label: ''
+        one-off:
+            label: It is a one off incident
+        year:
+            label: Several times a year
+        month:
+            label: Several times a month
+        week:
+            label: Several times a week
+        day:
+            label: Every day
+        other:
+            label: Other
             subsidiary:
-                - text: "### Please give details of the perpetrators' genders"
+                - text: '### Please specify:'
                 - input:
-                    name: perpetrators-gender-mixed
+                    name: type-frequency-other
                     type: textbox
         skip:
             label: Skip
-# TODO: add rest of this page
+
+
+- text: '# How often do you experience racism outside the University?'
+
+- input:
+    name: overall-frequency
+    label: Frequency
+    type: select
+    options:
+        blank:
+            label: ''
+        one-off:
+            label: Once
+        year:
+            label: Several times a year
+        month:
+            label: Several times a month
+        week:
+            label: Several times a week
+        day:
+            label: Every day
+        other:
+            label: Other
+            subsidiary:
+                - text: '### Please specify:'
+                - input:
+                    name: overall-frequency-other
+                    type: textbox
+        skip:
+            label: Skip

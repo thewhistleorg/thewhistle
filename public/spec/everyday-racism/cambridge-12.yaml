@@ -127,6 +127,16 @@
                         label: 'Elaborate:'
                         name: spoken-to-others-details
                         type: text
+        official:
+            label: Made an official report
+            branch:
+                in-box: true
+                body:
+                    - text: 'Please elaborate, if you wish:'
+                    - input:
+                        label: 'Elaborate:'
+                        name: spoken-to-official-details
+                        type: text
             
 - input:
     name: spoken-to-useful

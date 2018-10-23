@@ -8,14 +8,15 @@
 /* admin exception handler which would return an html page).                                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import dateFormat         from 'dateformat';  // Steven Levithan's dateFormat()
-import MarkdownIt         from 'markdown-it'; // markdown parser
-import XLSX               from 'xlsx';        // parser and writer for various spreadsheet formats
-import pdf                from 'html-pdf';    // HTML to PDF converter
-import fs           from 'fs-extra';    // fs with extra functions & promise interface
-import handlebars         from 'handlebars';  // logicless templating language
-import moment             from 'moment';      // date library for manipulating dates
-import { ObjectId }                       from 'mongodb';     // MongoDB driver for Node.js
+import dateFormat   from 'dateformat';  // Steven Levithan's dateFormat()
+import MarkdownIt   from 'markdown-it'; // markdown parser
+import XLSX         from 'xlsx';        // parser and writer for various spreadsheet formats
+import pdf          from 'html-pdf';    // HTML to PDF converter
+import fs     from 'fs-extra';    // fs with extra functions & promise interface
+import handlebars   from 'handlebars';  // logicless templating language
+import moment       from 'moment';      // date library for manipulating dates
+import { JSDOM }    from 'jsdom';       // JavaScript implementation of DOM and HTML standards
+import { ObjectId } from 'mongodb';     // MongoDB driver for Node.js
 import { LatLonSpherical as LatLon, Dms } from 'geodesy';     // library of geodesy functions
 
 import Report from '../models/report.js';
@@ -875,6 +876,20 @@ class ReportsHandlers {
         // audit trail
         const updates = await Update.getByReport(db, reportId);
 
+        // convert stored JavaScript objects for submitted report details & geocoding to HTML
+        const reportHtml1 = jsObjectToHtml.usingTable(report.submitted, [ 'Anonymous id', 'files' ], 'h3');
+        const geocodeHtml = jsObjectToHtml.usingTable(report.location.geocode);
+
+        // annotate reportHtml with abbreviated input types (o=option, T=text, etc)
+        const document = new JSDOM(reportHtml1).window.document;
+        for (const input in report.submittedTypes) {
+            const [ th ] = [ ...document.querySelectorAll('th') ].filter(el => el.textContent == input);
+            const abbrType = abbreviatedType(report.submittedTypes[input]);
+            th.innerHTML += `<sup class="input-type" title="${report.submittedTypes[input]}">${abbrType}</sup>`;
+        }
+        const reportHtml = document.documentElement.outerHTML;
+
+
         const y = 1000*60*60*24*365;
         const desc = report.submitted['Description'] || report.submitted['brief-description']; // TODO: transition code until all early test report are deleted
         const reportedBy = report.by ? await User.get(report.by) : '';
@@ -882,8 +897,8 @@ class ReportsHandlers {
             reportedOnDay:    dateFormat(report.reported, 'd mmm yyyy'),
             reportedOnTz:     dateFormat(report.reported, 'Z'),
             reportedBy:       report.by ? `${report.alias} / @${reportedBy.username}` : report.alias,
-            reportHtml:       jsObjectToHtml.usingTable(report.submitted, [ 'Anonymous id', 'files' ], 'h3'),
-            geocodeHtml:      jsObjectToHtml.usingTable(report.location.geocode),
+            reportHtml:       reportHtml,
+            geocodeHtml:      geocodeHtml,
             formattedAddress: report.location.geocode ? encodeURIComponent(report.location.geocode.formattedAddress) : 'report.location.address',
             lat:              report.location.geojson ? report.location.geojson.coordinates[1]  : 0,
             lon:              report.location.geojson ? report.location.geojson.coordinates[0] : 0,
@@ -953,6 +968,51 @@ class ReportsHandlers {
             extra.error = e.message; // validation failure
         }
         await ctx.render('reports-view', Object.assign(report, extra));
+
+
+        /**
+         * Converts full input types to abbreviated forms: 'T' for text, 'o' for option, 'n' for
+         * number, 'l' for library, '-' for tel/email.
+         */
+        function abbreviatedType(type) {
+            if (!type) return '';
+
+            const types = type.split('+'); // inputs with subsidiaries will have both types separated by '+'
+            let abbr = null;
+            const map = {
+                text:     'T',
+                number:   'n',
+                tel:      '-',
+                email:    '-',
+                textbox:  'T',
+                select:   'o',
+                radio:    'o',
+                checkbox: 'o',
+            };
+            // simple input / parent input
+            if (Object.keys(map).includes(types[0])) {
+                abbr = map[types[0]];
+            } else if (types[0].match(/button$/)) {
+                abbr = 'b';
+            } else if (types[0].match(/^library/)) {
+                abbr = 'l';
+            } else {
+                abbr = '?';
+            }
+            // subsidiary input
+            if (types[1]) {
+                if (Object.keys(map).includes(types[1])) {
+                    abbr += map[types[1]];
+                } else if (types[1].match(/button$/)) {
+                    abbr += 'b';
+                } else if (types[1].match(/^library/)) {
+                    abbr += 'l';
+                } else {
+                    abbr += '?';
+                }
+            }
+            return abbr;
+        }
     }
 
 

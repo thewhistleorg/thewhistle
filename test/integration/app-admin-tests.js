@@ -466,20 +466,20 @@ index:
             for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
             const d = new Date(Date.now() - 1000*60*60*24);
             const expected = {
-                'Alias':              'testy terrain',
-                'On behalf of':       'Myself',
-                'Survivor gender':    'Female',
-                'Survivor age':       '20–24',
-                'Happened':           dateFormat(d, 'd mmm yyyy'),
-                'Still happening?':   'No',
-                'Where':              'Neighbourhood (Around the corner)',
-                'Who':                'Not known (Big fat guy)',
-                'Description':        'Admin submission test',
-                'Applicable':         '—',
-                'Spoken to anybody?': 'Teacher/tutor/lecturer; Friends, family',
-                'Extra notes':        '—',
-                'E-mail address':     'help@me.com',
-                'Phone number':       '01234 123456',
+                'Alias':               'testy terrain',
+                'On behalf ofo':       'Myself',
+                'Survivor gendero':    'Female',
+                'Survivor ageo':       '20–24',
+                'Happenedo':           dateFormat(d, 'd mmm yyyy'),
+                'Still happening?o':   'No',
+                'WhereoT':             'Neighbourhood (Around the corner)',
+                'WhooT':               'Not known (Big fat guy)',
+                'DescriptionT':        'Admin submission test',
+                'Applicableo':         '—',
+                'Spoken to anybody?o': 'Teacher/tutor/lecturer; Friends, family',
+                'Extra notesT':        '—',
+                'E-mail addressT':     'help@me.com',
+                'Phone numberT':       '01234 123456',
             };
             expect(actual).to.deep.equal(expected);
         });

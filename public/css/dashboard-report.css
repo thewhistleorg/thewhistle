@@ -266,6 +266,10 @@ textarea {
     /* border-bottom: 1px solid #f0f3f4; */
 }
 
+.js-obj-to-html th sup.input-type {
+    color: #c5dbe0; /* make input type indicators visible but not too prominent */
+}
+
 #submitted p {
     color: #52727a;
 }

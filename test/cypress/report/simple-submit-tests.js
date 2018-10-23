@@ -52,10 +52,10 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
         cy.url().should('include', `/${org}/${proj}/5`); // who
         cy.get('input.who-relationship').should('not.be.visible');
         cy.get('textarea.who-description').should('not.be.visible');
-        cy.get('.question-who label').contains('No').click();
-        cy.get('input.who-relationship').should('not.be.visible');
+        cy.get('.question-who label').contains('Not known').click();
+        cy.get('input.who-relationship').should('not.be.visible'); // who-relationship is for Y
         // cy.get('textarea.who-description').should('be.visible'); // TODO why does this fail?
-        cy.get('#who-description').type('Big fat guy');
+        cy.get('#who-description').type('Big fat guy');            // who-description is for N
         cy.contains('Submit and continue').click();
 
         cy.url().should('include', `/${org}/${proj}/6`); // description
@@ -104,20 +104,20 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
             const actual = {};
             for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
             const expected = {
-                'Alias':              alias,
-                'On behalf of':       'Myself',
-                'Survivor gender':    'Female',
-                'Survivor age':       '20–24',
-                'Happened':           dateFormat('d mmm yyyy'),
-                'Still happening?':   'Yes',
-                'Where':              'Neighbourhood (Around the corner)',
-                'Who':                'Not known (Big fat guy)',
-                'Description':        'Cypress test '+date,
-                'Applicable':         '—',
-                'Spoken to anybody?': 'Teacher/tutor/lecturer (Miss Brodie); Friends, family',
-                'Extra notes':        'Nothing more',
-                'E-mail address':     'help@me.com',
-                'Phone number':       '01234 123456',
+                'Alias':                alias,
+                'On behalf ofo':        'Myself',
+                'Survivor gendero':     'Female',
+                'Survivor ageo':        '20–24',
+                'Happenedo':            dateFormat('d mmm yyyy'),
+                'Still happening?o':    'Yes',
+                'WhereoT':              'Neighbourhood (Around the corner)',
+                'WhooT':                'Not known (Big fat guy)',
+                'DescriptionT':         'Cypress test '+date,
+                'Applicableo':          '—',
+                'Spoken to anybody?oT': 'Teacher/tutor/lecturer (Miss Brodie); Friends, family',
+                'Extra notesT':         'Nothing more',
+                'E-mail addressT':      'help@me.com',
+                'Phone numberT':        '01234 123456',
             };
             expect(actual).to.deep.equal(expected);
         });

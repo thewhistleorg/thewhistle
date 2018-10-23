@@ -353,10 +353,11 @@ class Report {
      *
      * @param {string}   db - Database to use.
      * @param {ObjectId} id - Report Id.
-     * @param {Object}   details - Report details to be added/updated, prettified for attractive display
-     * @param {Object}   [detailsRaw] - Report details to be added/updated, as per HTML input elements
+     * @param {Object}   details - Report details to be added/updated, prettified for attractive display.
+     * @param {Object}   [detailsRaw] - Report details to be added/updated, as per HTML input elements.
+     * @param {Object}   [detailsTypes] - types of report details fields (properties matching 'details' object).
      */
-    static async submissionDetails(db, id, details, detailsRaw={}) {
+    static async submissionDetails(db, id, details, detailsRaw={}, detailsTypes={}) {
         debug('Report.submissionDetails', 'db:'+db, 'r:'+id, details);
 
         id = objectId(id);  // allow id as string
@@ -371,6 +372,9 @@ class Report {
             }
             for (const field in detailsRaw) {
                 await reports.updateOne({ _id: id }, { $set: { [`submittedRaw.${field}`]: detailsRaw[field] } });
+            }
+            for (const field in detailsTypes) {
+                await reports.updateOne({ _id: id }, { $set: { [`submittedTypes.${field}`]: detailsTypes[field] } });
             }
 
         } catch (e) {

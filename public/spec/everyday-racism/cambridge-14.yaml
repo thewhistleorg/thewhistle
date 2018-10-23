@@ -9,6 +9,8 @@
     label: Age
     type: select
     options:
+        blank:
+            label: ''
         eighteen:
             label: 18-22
         twenty-three:

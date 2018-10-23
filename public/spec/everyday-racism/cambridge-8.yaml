@@ -24,6 +24,8 @@
     label: Perpetrators
     type: select
     options:
+        blank:
+            label: ''
         student:
             label: Student
         academic:
@@ -72,6 +74,8 @@
     label: Age
     type: select
     options:
+        blank:
+            label: ''
         eighteen:
             label: 18-22
         twenty-three:

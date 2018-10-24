@@ -935,7 +935,8 @@ class Report {
 
         const report = await reports.findOne(id);
 
-        if (report.verificationCode === code.toUpperCase()) {
+        
+        if (code && report.verificationCode === code.toUpperCase()) {
             try {
                 await reports.updateOne({ _id: id }, { $set: { verified: true } });
             } catch (e) {

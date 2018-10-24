@@ -498,7 +498,9 @@ class Handlers {
                 const verificationCode = body['verification-code'];
                 const validCode = await Report.verifyCode(org, ctx.session.reportId, verificationCode);
                 if (!validCode) {
-                    ctx.flash = { error: 'Invalid verification code.' };
+                    if (verificationCode) {
+                        ctx.flash = { error: 'Invalid verification code.' };
+                    }
                     return ctx.response.redirect(`/${org}/${project}/${ctx.session.completed+1}`);
                 }
             }

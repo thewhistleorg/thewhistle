@@ -596,6 +596,7 @@ class Handlers {
         }
 
         const formattedReport = formatReport(org, project, page, body);
+
         if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.reportId, formattedReport, body);
         if (ctx.request.files) {
             for (const file of ctx.request.files) {
@@ -748,19 +749,29 @@ async function whatnext(ctx) {
  * @returns {Object} Associative array of prettified-label : entered-value pairs.
  */
 function formatReport(org, project, page, body) {
-    const inputs = FormGenerator.forms[`${org}/${project}`].inputs;
-    const pageInputs = page=='+'
-        ? [ ...Object.values(inputs) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
-        : inputs[page];                                                                  // inputs from this page
-    Handlers.removeNoStores(pageInputs);
+    const yamlInputs = FormGenerator.forms[`${org}/${project}`].inputs;
+    const partialInputs = FormGenerator.forms[`${org}/${project}`].partials;
+    const pageYamlInputs = page=='+'
+        ? [ ...Object.values(yamlInputs) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
+        : yamlInputs[page];                                                                  // inputs from this page
+    const pagePartialInputs = page=='+'
+        ? [ ...Object.values(partialInputs) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
+        : partialInputs[page];                                                                  // inputs from this page
+    Handlers.removeNoStores(pageYamlInputs);
     const rpt = {}; // the processed version of body
 
-    for (const inputName in pageInputs) {
+    for (let i = 0; i < pagePartialInputs.length; i++) {
+        if (body[pagePartialInputs[i]]) {
+            rpt[pagePartialInputs[i]] = body[pagePartialInputs[i]];
+        }
+    }
+
+    for (const inputName in pageYamlInputs) {
         if (inputName.match(/-skip$/) && !body[inputName]) continue; // unless 'skip' option is selected, ignore it
         if (inputName == 'used-before') continue;                    // 'used-before' (Alias) is handled separately
         if (inputName == 'address') continue;                        // 'address' (from whatnext) is ignored
 
-        const label = pageInputs[inputName].label;
+        const label = pageYamlInputs[inputName].label;
 
         if (Array.isArray(body[inputName])) { // multiple inputs withe same name: multiple response to checkboxes or 'Skip'
             // note copy body[inputName] rather than reference it otherwise it gets polluted with subsidiary value
@@ -776,13 +787,13 @@ function formatReport(org, project, page, body) {
         }
 
         // check for any subsidiary inputs: if there are, append the subsidiary value within quotes
-        if (Array.isArray(rpt[label]) && pageInputs[inputName].subsidiary) { // multiple response to checkboxes
+        if (Array.isArray(rpt[label]) && pageYamlInputs[inputName].subsidiary) { // multiple response to checkboxes
             for (let i=0; i<rpt[label].length; i++) {
-                const subsidiaryFieldName = pageInputs[inputName].subsidiary[body[inputName][i]];
+                const subsidiaryFieldName = pageYamlInputs[inputName].subsidiary[body[inputName][i]];
                 if (body[subsidiaryFieldName]) rpt[label][i] += ` (${body[subsidiaryFieldName]})`;
             }
         } else {                         // radio button or single checkbox, or select
-            const subsidiaryFieldName = pageInputs[inputName].subsidiary ? pageInputs[inputName].subsidiary[body[inputName]] : '';
+            const subsidiaryFieldName = pageYamlInputs[inputName].subsidiary ? pageYamlInputs[inputName].subsidiary[body[inputName]] : '';
             if (body[subsidiaryFieldName]) rpt[label] += ` (${body[subsidiaryFieldName]})`;
         }
 
@@ -797,7 +808,6 @@ function formatReport(org, project, page, body) {
         }
         debug('...', `${inputName} => ${label}: “${rpt[label]}”`);
     }
-
     return rpt;
 }
 

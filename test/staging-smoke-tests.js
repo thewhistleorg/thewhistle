@@ -95,7 +95,7 @@ describe(`Report app (report.${domain})`, function() {
             org:     'everyday-racism-test',
             project: 'cambridge',
             note:    'spec held in filesys',
-            title:   'The Whistle / Everyday Racism at Cambridge Incident Report',
+            title:   'The Whistle / End Everyday Racism Incident Report',
         },
         {
             org:     'grn-test',

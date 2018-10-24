@@ -1,5 +1,6 @@
 'use strict';
 
+
 function reCaptchaSubmitCallback(token) { // eslint-disable-line no-unused-vars
     document.querySelector('form').submit();
 }

@@ -503,7 +503,9 @@ class SmsApp {
     async initiateSmsReport(ctx, twiml, alias) {
         try {
             //Adds skeleton report to the database
-            const sessionId = await Report.submissionStart(this.org, this.project, alias, false, MUUID.v4(), ctx.headers['user-agent'], null);
+
+            const ids = await Report.startSession(this.org, this.project, alias, false, ctx.headers['user-agent'], null);
+            const sessionId = ids.reportId; //TODO: Change naming convention in SMS app so session doesn't mean 2 different things
             
             //Add first text to report
             await Report.submissionDetails(this.db, sessionId, { 'First Text': this.getCookie(ctx, constants.cookies.FIRST_TEXT, twiml) });

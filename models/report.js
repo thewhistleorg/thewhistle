@@ -8,17 +8,17 @@ import dateFormat         from 'dateformat';        // Steven Levithan's dateFor
 import { exiftool }       from 'exiftool-vendored'; // cross-platform Node.js access to ExifTool
 import useragent          from 'useragent';         // parse browser user agent string
 import { ObjectId }       from 'mongodb';           // MongoDB driver for Node.js
-import MUUID              from 'uuid-mongodb';      // generate/parse BSON UUIDs
 import Debug              from 'debug';             // small debugging utility
 
 const debug = Debug('app:db'); // db write ops
 
-import User         from '../models/user.js';
-import Notification from '../models/notification.js';
-import Submission   from '../models/submission.js';
-import AwsS3        from '../lib/aws-s3.js';
-import Db           from '../lib/db.js';
-import Update       from './update.js';
+import User          from '../models/user.js';
+import Notification  from '../models/notification.js';
+import Submission    from '../models/submission.js';
+import ReportSession from '../models/report-session.js';
+import AwsS3         from '../lib/aws-s3.js';
+import Db            from '../lib/db.js';
+import Update        from './update.js';
 
 
 /*
@@ -50,7 +50,7 @@ const schema = {
             items: { type: 'object' },                         // ... 'formidable' File objects
         },
         usedBefore:     { type:     'boolean' },               // whether user has used service before
-        sessionId:      { bsonType: 'binData' },               // random UUID identifying session in which report was submitted
+        sessionId:      { bsonType: 'objectId' },
         ua:             { type:     [ 'object', 'null' ] },    // user agent of browser used to report incident
         country:        { type:     [ 'string', 'null' ] },    // country report was submitted from
         location:       { type:     'object',                  // geocoded incident location
@@ -306,18 +306,40 @@ class Report {
 
 
     /**
+     * Creates new skeleton Incident Report record and ReportSession.
+     *
+     * @param   {string}   db - Database to use.
+     * @param   {string}   project - Project report is part of.
+     * @param   {string}   alias - Alias to record for for submitter of report.
+     * @param   {boolean}  usedBefore - Whether user has used service before.
+     * @param   {string}   userAgent - User agent from http request header.
+     * @param   {string}   country - Country report was submitted from (obtained from IP address)
+     * @returns {Object}   Object containing both report and session ids.
+     */
+    static async startSession(db, project, alias, usedBefore, userAgent, country) {
+        const sessionId = await ReportSession.start(db);
+        const reportId = await Report.submissionStart(db, project, alias, usedBefore, userAgent, country, sessionId);
+        return {
+            sessionId: sessionId,
+            reportId:  reportId,
+        };
+    }
+
+
+    /**
      * Creates new skeleton Incident Report record.
      *
      * @param   {string}   db - Database to use.
      * @param   {string}   project - Project report is part of.
      * @param   {string}   alias - Alias to record for for submitter of report.
      * @param   {boolean}  usedBefore - Whether user has used service before.
-     * @param   {UUID}     sessionId - UUID identifying session report is submitted as part of.
      * @param   {string}   userAgent - User agent from http request header.
      * @param   {string}   country - Country report was submitted from (obtained from IP address)
+     * @param   {ObjectId} sessionId - ReportSession id for the new report
+     * 
      * @returns {ObjectId} New report id.
      */
-    static async submissionStart(db, project, alias, usedBefore, sessionId, userAgent, country) {
+    static async submissionStart(db, project, alias, usedBefore, userAgent, country, sessionId) {
         debug('Report.submissionStart', 'db:'+db, 'p:'+project, alias);
 
         if (typeof alias != 'string' || alias.length == 0) throw new Error('Alias must be supplied');
@@ -330,7 +352,6 @@ class Report {
             submittedRaw: {},
             alias:        alias,
             usedBefore:   usedBefore,
-            sessionId:    typeof sessionId == 'string' ? MUUID.from(sessionId) : sessionId,
             ua:           null, // done below
             country:      country,
             location:     { address: '', geocode: null, geojson: null },
@@ -355,6 +376,7 @@ class Report {
 
         try {
             const { insertedId } = await reports.insertOne(values);
+            await ReportSession.addReport(db, sessionId, insertedId);
             return insertedId; // TODO: toString()?
         } catch (e) {
             if (e.code == 121) throw new Error(`Report submitted by ${alias} failed validation [submissionStart]`);

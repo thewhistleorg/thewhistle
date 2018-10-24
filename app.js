@@ -30,6 +30,7 @@ import Submission        from './models/submission.js';
 import Update            from './models/update.js';
 import User              from './models/user.js';
 import Group             from './models/group.js';
+import ReportSession     from './models/report-session.js';
 
 
 const app = new Koa();
@@ -103,6 +104,7 @@ async function initModels() {
         initMethods.push(Submission.init(db));
         initMethods.push(Update.init(db));
         initMethods.push(Group.init(db));
+        initMethods.push(ReportSession.init(db));
     }
     initMethods.push(User.init());
 

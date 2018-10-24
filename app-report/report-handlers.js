@@ -28,6 +28,7 @@ import Geocoder      from '../lib/geocode.js';
 import Log           from '../lib/log.js';
 import Ip            from '../lib/ip.js';
 import Db            from '../lib/db.js';
+import ReportSession from '../models/report-session';
 
 
 class Handlers {
@@ -560,11 +561,11 @@ class Handlers {
 
             // ---- save the skeleton report
 
-            // any reports posted within 7 days of each other will be grouped in the same session
-            if (!ctx.session.sessionId) ctx.session.sessionId = MUUID.v4().toString();
             const ua = ctx.request.headers['user-agent'];
             const country = await Ip.getCountry(ctx.request.ip);
-            ctx.session.reportId = await Report.submissionStart(org, project, alias, body['used-before']!='No', ctx.session.sessionId, ua, country);
+            const ids = await Report.startSession(org, project, alias, body['used-before']!='No', ua, country);
+            ctx.session.sessionId = ids.sessionId;
+            ctx.session.reportId = ids.reportId;
             // TODO: ?? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.reportId, 'incomplete', null);
 
             // notify users of 'new report submitted'
@@ -629,9 +630,16 @@ class Handlers {
 
         const { database, project, sessionid } = ctx.params;
 
-        const reports = await Report.getBy(database, 'sessionId', MUUID.from(sessionid));
+        const reportIds = await ReportSession.getReports(database, sessionid);
 
-        const lastRpt = reports.reduce((a, b) => a._id.getTimestamp() > b._id.getTimestamp() ? a : b);
+        const reports = [];
+
+        for (let i = 0; i < reportIds.length; i++) {
+            const report = await Report.get(database, reportIds[i]);
+            reports.push(report);
+        }
+
+        const lastRpt = reports[0];
         const lastRptDate = dateFormat(lastRpt._id.getTimestamp(), 'yyyy-mm-dd HH.MM');
         const filename = `the whistle incident report ${database} ${project} ${lastRptDate}.pdf`;
 

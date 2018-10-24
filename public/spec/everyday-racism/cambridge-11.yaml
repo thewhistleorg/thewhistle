@@ -40,7 +40,7 @@
 
 - text: '# Has this incident made you feel that your job/study was at risk?'
 
-- text: '### for example: being reluctant to work in University/college spaces, fear of being fired, not able to attend lectures or supervisions, not able to be physically in the University, etc.'
+- text: 'For example: being reluctant to work in University/college spaces, fear of being fired, not able to attend lectures or supervisions, not able to be physically in the University, etc.'
 
 - input:
     name: job-study-risk

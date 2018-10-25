@@ -1,4 +1,5 @@
 <ul class="question-reporters-ethnicity">
+    {{#checked reporters-ethnicity}}
     <li>
         <input type="radio" name="reporters-ethnicity" id="reporters-ethnicity-describe" value="Prefer to describe the racial/ethnic background">
         <label for="reporters-ethnicity-describe">
@@ -6,7 +7,7 @@
         </label>
         <div class="subsidiary  hide Prefer_to_describe_the_racial/ethnic_background-subsidiary">
             <h3>Please describe:</h3>
-            <textarea name="reporters-ethnicity-describe-ethnicity" id="reporters-ethnicity-describe-ethnicity" class="pure-input-1"></textarea>
+            <textarea name="reporters-ethnicity-describe-ethnicity" id="reporters-ethnicity-describe-ethnicity" class="pure-input-1" value="{{reporters-ethnicity-describe-ethnicity}}"></textarea>
         </div>
     </li>
     <li>
@@ -18,6 +19,7 @@
             <ul class="question-reporters-ethnicity-asian">
                 <li>
                     <h3>Please specify:</h3>
+                    {{#checked reporters-ethnicity-asian}}
                     <input type="radio" name="reporters-ethnicity-asian" id="reporter-arab" value="Arab">
                     <label for="reporter-arab">Arab</label>
                     <input type="radio" name="reporters-ethnicity-asian" id="reporter-bangladeshi" value="Asian/Asian British - Bangladeshi">
@@ -36,13 +38,14 @@
                     <label for="reporter-middleeastern">Middle Eastern</label>
                     <div class="reporter-middleeastern-branch hide">
                         <h3>Please specify further if you wish:</h3>
-                        <input type="text" name="middleeastern-specify">
+                        <input type="text" name="middleeastern-specify" value="{{middleeastern-specify}}">
                     </div>
                     <input type="radio" name="reporters-ethnicity-asian" id="reporter-otherasian" value="Any other Asian">
+                    {{/checked}}
                     <label for="reporter-otherasian">Any other Asian (North, East, West, Central, South or Southeast Asian) background you prefer to describe?</label>
                     <div class="reporter-otherasian-branch hide">
                         <h3>Please specify:</h3>
-                        <input type="text" name="otherasian-specify">
+                        <input type="text" name="otherasian-specify" value="{{otherasian-specify}}">
                     </div>
                 </li>
             </ul>
@@ -57,6 +60,7 @@
             <ul class="question-reporters-ethnicity-black">
                 <li>
                     <h3>Please specify:</h3>
+                    {{#checked reporters-ethnicity-black}}
                     <input type="radio" name="reporters-ethnicity-black" id="reporter-african" value="Black African">
                     <label for="reporter-african">Black African</label>
                     <input type="radio" name="reporters-ethnicity-black" id="reporter-caribbean" value="Black Caribbean">
@@ -72,10 +76,11 @@
                     <input type="radio" name="reporters-ethnicity-black" id="reporter-africanamerican" value="African American">
                     <label for="reporter-africanamerican">African American</label>
                     <input type="radio" name="reporters-ethnicity-black" id="reporter-otherblack" value="Any other Black">
+                    {{/checked}}
                     <label for="reporter-otherblack">Any other Black background you prefer to describe?</label>
                     <div class="reporter-otherblack-branch hide">
                         <h3>Please specify:</h3>
-                        <input type="text" name="otherblack-specify">
+                        <input type="text" name="otherblack-specify" value="{{otherblack-specify}}">
                     </div>
                 </li>
             </ul>
@@ -94,7 +99,7 @@
         </label>
         <div class="subsidiary hide Indigenous,_Native_or_Aboriginal_background-subsidiary">
             <h3>Please describe:</h3>
-            <input type="text" name="reporters-ethnicity-indigenous">
+            <input type="text" name="reporters-ethnicity-indigenous" value="{{reporters-ethnicity-indigenous}}">
         </div>
     </li>
     <li>
@@ -106,6 +111,7 @@
             <ul class="question-reporters-ethnicity-mixedrace">
                 <li>
                     <h3>Please specify:</h3>
+                    {{#checked reporters-ethnicity-mixedrace}}
                     <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mestizo" value="Mestizo (Latin American)">
                     <label for="reporter-mestizo">Mestizo (Latin American)</label>
                     <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedarab" value="Mixed Arab">
@@ -127,10 +133,11 @@
                     <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedafricanwhite" value="Mixed Black British African and White">
                     <label for="reporter-mixedafricanwhite">Mixed Black British African and White</label>
                     <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedother" value="Any other Mixed">
+                    {{/checked}}
                     <label for="reporter-mixedother">Any other Mixed background you prefer to describe?</label>
                     <div class="reporter-mixedother-branch hide">
                         <h3>Please specify:</h3>
-                        <input type="text" name="mixedother-specify">
+                        <input type="text" name="mixedother-specify" value="{{mixedother-specify}}">
                     </div>
                 </li>
             </ul>
@@ -145,6 +152,7 @@
             <ul class="question-reporters-ethnicity-white">
                 <li>
                     <h3>Please specify:</h3>
+                    {{#checked reporters-ethnicity-white}}
                     <input type="radio" name="reporters-ethnicity-white" id="reporter-british" value="British">
                     <label for="reporter-british">British</label>
                     <input type="radio" name="reporters-ethnicity-white" id="reporter-english" value="English">
@@ -162,10 +170,11 @@
                     <input type="radio" name="reporters-ethnicity-white" id="reporter-usa" value="USA">
                     <label for="reporter-usa">USA</label>
                     <input type="radio" name="reporters-ethnicity-white" id="reporter-otherwhite" value="Any other White">
+                    {{/checked}}
                     <label for="reporter-otherwhite">Any other White background</label>
                     <div class="reporter-otherwhite-branch hide">
                         <h3>Please describe:</h3>
-                        <input type="text" name="otherwhite-specify">
+                        <input type="text" name="otherwhite-specify" value="{{otherwhite-specify}}">
                     </div>
                 </li>
             </ul>
@@ -178,7 +187,7 @@
         </label>
         <div class="subsidiary hide Any_other_ethnic_group-subsidiary">
             <h3>Please describe:</h3>
-            <input type="text" name="reporters-ethnicity-other">
+            <input type="text" name="reporters-ethnicity-other" value="{{reporters-ethnicity-other}}">
         </div>
     </li>
     <li>
@@ -187,4 +196,5 @@
             <p>Skip</p>
         </label>
     </li>
+    {{/checked}}
 </ul>

@@ -1,4 +1,5 @@
 <ul class="question-perpetrators-ethnicity">
+    {{#checked perpetrators-ethnicity}}
     <li>
         <input type="radio" name="perpetrators-ethnicity" id="perpetrators-ethnicity-describe" value="Prefer to describe the racial/ethnic background">
         <label for="perpetrators-ethnicity-describe">
@@ -6,7 +7,7 @@
         </label>
         <div class="subsidiary  hide Prefer_to_describe_the_racial/ethnic_background-subsidiary">
             <h3>Please describe:</h3>
-            <textarea name="perpetrators-ethnicity-describe-ethnicity" id="perpetrators-ethnicity-describe-ethnicity" class="pure-input-1"></textarea>
+            <textarea name="perpetrators-ethnicity-describe-ethnicity" id="perpetrators-ethnicity-describe-ethnicity" class="pure-input-1" value="{{perpetrators-ethnicity-describe-ethnicity}}"></textarea>
         </div>
     </li>
     <li>
@@ -18,6 +19,7 @@
             <ul class="question-perpetrators-ethnicity-asian">
                 <li>
                     <h3>Please specify:</h3>
+                    {{#checked perpetrators-ethnicity-asian}}
                     <input type="radio" name="perpetrators-ethnicity-asian" id="perpetrator-arab" value="Arab">
                     <label for="perpetrator-arab">Arab</label>
                     <input type="radio" name="perpetrators-ethnicity-asian" id="perpetrator-bangladeshi" value="Asian/Asian British - Bangladeshi">
@@ -36,13 +38,14 @@
                     <label for="perpetrator-middleeastern">Middle Eastern</label>
                     <div class="perpetrator-middleeastern-branch hide">
                         <h3>Please specify further if you wish:</h3>
-                        <input type="text" name="middleeastern-specify">
+                        <input type="text" name="middleeastern-specify" value="{{middleeastern-specify}}">
                     </div>
                     <input type="radio" name="perpetrators-ethnicity-asian" id="perpetrator-otherasian" value="Any other Asian">
+                    {{/checked}}
                     <label for="perpetrator-otherasian">Any other Asian (North, East, West, Central, South or Southeast Asian) background you prefer to describe?</label>
                     <div class="perpetrator-otherasian-branch hide">
                         <h3>Please specify:</h3>
-                        <input type="text" name="otherasian-specify">
+                        <input type="text" name="otherasian-specify" value="{{otherasian-specify}}">
                     </div>
                 </li>
             </ul>
@@ -57,6 +60,7 @@
             <ul class="question-perpetrators-ethnicity-black">
                 <li>
                     <h3>Please specify:</h3>
+                    {{#checked perpetrators-ethnicity-black}}
                     <input type="radio" name="perpetrators-ethnicity-black" id="perpetrator-african" value="Black African">
                     <label for="perpetrator-african">Black African</label>
                     <input type="radio" name="perpetrators-ethnicity-black" id="perpetrator-caribbean" value="Black Caribbean">
@@ -72,10 +76,11 @@
                     <input type="radio" name="perpetrators-ethnicity-black" id="perpetrator-africanamerican" value="African American">
                     <label for="perpetrator-africanamerican">African American</label>
                     <input type="radio" name="perpetrators-ethnicity-black" id="perpetrator-otherblack" value="Any other Black">
+                    {{/checked}}
                     <label for="perpetrator-otherblack">Any other Black background you prefer to describe?</label>
                     <div class="perpetrator-otherblack-branch hide">
                         <h3>Please specify:</h3>
-                        <input type="text" name="otherblack-specify">
+                        <input type="text" name="otherblack-specify" value="{{otherblack-specify}}">
                     </div>
                 </li>
             </ul>
@@ -94,7 +99,7 @@
         </label>
         <div class="subsidiary hide Indigenous,_Native_or_Aboriginal_background-subsidiary">
             <h3>Please describe:</h3>
-            <input type="text" name="perpetrators-ethnicity-indigenous">
+            <input type="text" name="perpetrators-ethnicity-indigenous" value="{{perpetrators-ethnicity-indigenous}}">
         </div>
     </li>
     <li>
@@ -106,6 +111,7 @@
             <ul class="question-perpetrators-ethnicity-mixedrace">
                 <li>
                     <h3>Please specify:</h3>
+                    {{#checked perpetrators-ethnicity-mixedrace}}
                     <input type="radio" name="perpetrators-ethnicity-mixedrace" id="perpetrator-mestizo" value="Mestizo (Latin American)">
                     <label for="perpetrator-mestizo">Mestizo (Latin American)</label>
                     <input type="radio" name="perpetrators-ethnicity-mixedrace" id="perpetrator-mixedarab" value="Mixed Arab">
@@ -127,10 +133,11 @@
                     <input type="radio" name="perpetrators-ethnicity-mixedrace" id="perpetrator-mixedafricanwhite" value="Mixed Black British African and White">
                     <label for="perpetrator-mixedafricanwhite">Mixed Black British African and White</label>
                     <input type="radio" name="perpetrators-ethnicity-mixedrace" id="perpetrator-mixedother" value="Any other Mixed">
+                    {{/checked}}
                     <label for="perpetrator-mixedother">Any other Mixed background you prefer to describe?</label>
                     <div class="perpetrator-mixedother-branch hide">
                         <h3>Please specify:</h3>
-                        <input type="text" name="mixedother-specify">
+                        <input type="text" name="mixedother-specify" value="{{mixedother-specify}}">
                     </div>
                 </li>
             </ul>
@@ -145,6 +152,7 @@
             <ul class="question-perpetrators-ethnicity-white">
                 <li>
                     <h3>Please specify:</h3>
+                    {{#checked perpetrators-ethnicity-white}}
                     <input type="radio" name="perpetrators-ethnicity-white" id="perpetrator-british" value="British">
                     <label for="perpetrator-british">British</label>
                     <input type="radio" name="perpetrators-ethnicity-white" id="perpetrator-english" value="English">
@@ -162,10 +170,11 @@
                     <input type="radio" name="perpetrators-ethnicity-white" id="perpetrator-usa" value="USA">
                     <label for="perpetrator-usa">USA</label>
                     <input type="radio" name="perpetrators-ethnicity-white" id="perpetrator-otherwhite" value="Any other White">
+                    {{/checked}}
                     <label for="perpetrator-otherwhite">Any other White background</label>
                     <div class="perpetrator-otherwhite-branch hide">
                         <h3>Please describe:</h3>
-                        <input type="text" name="otherwhite-specify">
+                        <input type="text" name="otherwhite-specify" value="{{otherwhite-specify}}">
                     </div>
                 </li>
             </ul>
@@ -178,7 +187,7 @@
         </label>
         <div class="subsidiary hide Any_other_ethnic_group-subsidiary">
             <h3>Please describe:</h3>
-            <input type="text" name="perpetrators-ethnicity-other">
+            <input type="text" name="perpetrators-ethnicity-other" value="{{perpetrators-ethnicity-other}}">
         </div>
     </li>
     <li>
@@ -188,7 +197,7 @@
         </label>
         <div class="subsidiary  hide Mixed_group-subsidiary">
             <h3>Please give details of the perpetrators' ethnicities:</h3>
-            <textarea name="perpetrators-ethnicity-perpetrators-ethnicity-mixedgroup" id="perpetrators-ethnicity-perpetrators-ethnicity-mixedgroup" class="pure-input-1"></textarea>
+            <textarea name="perpetrators-ethnicity-perpetrators-ethnicity-mixedgroup" id="perpetrators-ethnicity-perpetrators-ethnicity-mixedgroup" class="pure-input-1" value="{{perpetrators-ethnicity-perpetrators-ethnicity-mixedgroup}}"></textarea>
         </div>
     </li>
     <li>
@@ -197,4 +206,5 @@
             <p>Skip</p>
         </label>
     </li>
+    {{/checked}}
 </ul>

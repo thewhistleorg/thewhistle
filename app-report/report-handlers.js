@@ -345,8 +345,9 @@ class Handlers {
             ctx.throw(500, e.message);
         }
 
+
         // verify client-side reCAPTCHA: developers.google.com/recaptcha/docs/verify
-        if (ctx.app.env != 'development') {
+        if (FormGenerator.forms[`${org}/${project}`].recaptcha && ctx.app.env != 'development') {
             const params = {
                 secret:   process.env.RECAPTCHA_SECRET_KEY,
                 response: ctx.request.body['g-recaptcha-response'],

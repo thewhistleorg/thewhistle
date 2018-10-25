@@ -475,9 +475,7 @@ index:
                 'Where':              'Neighbourhood (Around the corner)',
                 'Who':                'Not known (Big fat guy)',
                 'Description':        'Admin submission test',
-                'Applicable':         '—',
                 'Spoken to anybody?': 'Teacher/tutor/lecturer; Friends, family',
-                'Extra notes':        '—',
                 'E-mail address':     'help@me.com',
                 'Phone number':       '01234 123456',
             };

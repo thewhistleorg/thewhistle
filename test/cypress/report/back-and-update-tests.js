@@ -369,9 +369,7 @@ describe(`Submit ${org}/${proj} incident report covering various enter-next-back
                 'Where':              'Skip',
                 'Who':                'Skip',
                 'Description':        'Cypress test '+date+',Skip', // TODO: note buggy behaviour! see 2f67a8
-                'Applicable':         '—',
                 'Spoken to anybody?': 'Skip',
-                'Extra notes':        '—',                          // TODO: broken functionality: no skip
                 'E-mail address':     'help@me.com',
                 'Phone number':       '01234 123456',
             };

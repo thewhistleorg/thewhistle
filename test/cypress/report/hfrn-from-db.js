@@ -75,26 +75,16 @@ describe(`Submit ${org}/${proj} incident (from form spec in db)`, function () {
             const actual = {};
             for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
             const expected = {
-                'Alias':                                            alias,
-                'Consent to record?':                               'Yes',
-                'Name of person filling out form':                  'Da boss',
-                'Organisation':                                     'HFRN',
-                'Organisation reference':                           '—',
-                'Contact details':                                  '—',
-                'Name of person giving statement':                  'Alice',
+                'Alias':                            alias,
+                'Consent to record?':               'Yes',
+                'Name of person filling out form':  'Da boss',
+                'Organisation':                     'HFRN',
+                'Name of person giving statement':  'Alice',
                 // TODO: 'What date did the incident occur?':                dateFormat('d mmm yyyy'),
-                'Location':                                         'Around the corner',
-                'Did this incident happen to you?':                 'Yes - This incident happened to me',
-                'Description':                                      'Cypress test '+date,
-                'Type of incident':                                 '—',
-                'Who is the perpetrator?':                          '—',
-                'Form of violence':                                 '—',
-                'Reported?':                                        '—',
-                'Medical attention required?':                      '—',
-                'Did the incident involve an unaccompanied minor?': '—',
-                'Consent to being contacted?':                      '—',
-                'Consent to media testimony?':                      '—',
-                'Consent to information?':                          'Yes',
+                'Location':                         'Around the corner',
+                'Did this incident happen to you?': 'Yes - This incident happened to me',
+                'Description':                      'Cypress test '+date,
+                'Consent to information?':          'Yes',
             };
             expect(actual).to.deep.equal(expected);
         });

@@ -113,7 +113,6 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
                 'Where':              'Neighbourhood (Around the corner)',
                 'Who':                'Not known (Big fat guy)',
                 'Description':        'Cypress test '+date,
-                'Applicable':         '—',
                 'Spoken to anybody?': 'Teacher/tutor/lecturer (Miss Brodie); Friends, family',
                 'Extra notes':        'Nothing more',
                 'E-mail address':     'help@me.com',

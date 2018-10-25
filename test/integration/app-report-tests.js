@@ -449,11 +449,7 @@ describe(`Report app (${org}/${app.env})`, function() {
                 'Where':              'Neighbourhood (Around the corner)',
                 'Who':                'Not known (Big fat guy)',
                 'Description':        'Submission test',
-                'Applicable':         '—',
                 'Spoken to anybody?': 'Teacher/tutor/lecturer; Friends, family',
-                'Extra notes':        '—',
-                'E-mail address':     '—', // TODO
-                'Phone number':       '—', // TODO
             };
             expect(actual).to.deep.equal(expected);
         });
@@ -659,9 +655,7 @@ describe(`Report app (${org}/${app.env})`, function() {
                 'Where':              'Neighbourhood (Around the corner)',
                 'Who':                'Not known (Big fat guy)',
                 'Description':        'Single-page submission test',
-                'Applicable':         '—',
                 'Spoken to anybody?': 'Teacher/tutor/lecturer; Friends, family',
-                'Extra notes':        '—',
                 'E-mail address':     'help@me.com',
                 'Phone number':       '01234 123456',
             };

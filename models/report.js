@@ -404,10 +404,18 @@ class Report {
 
             // TODO: is there any way to do this as atomic updates rather than multiple calls?
             for (const field in details) {
-                await reports.updateOne({ _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
+                if (details[field]) {
+                    await reports.updateOne({ _id: id }, { $set: { [`submitted.${field}`]: details[field] } });
+                } else {
+                    await reports.update({ _id: id }, { $unset: { [`submitted.${field}`]: '' } });
+                }
             }
             for (const field in detailsRaw) {
-                await reports.updateOne({ _id: id }, { $set: { [`submittedRaw.${field}`]: detailsRaw[field] } });
+                if (detailsRaw[field]) {
+                    await reports.updateOne({ _id: id }, { $set: { [`submittedRaw.${field}`]: detailsRaw[field] } });
+                } else {
+                    await reports.update({ _id: id }, { $unset: { [`submittedRaw.${field}`]: '' } });
+                }
             }
 
         } catch (e) {

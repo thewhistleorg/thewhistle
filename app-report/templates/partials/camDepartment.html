@@ -1,4 +1,4 @@
-<ul class="question-department">
+<ul class="question-department-select">
     <li>
         <select name="department-select" id="department-select">
             {{#selected department-select}}
@@ -155,7 +155,7 @@
             </select>
             <div class="subsidiary hide Other-subsidiary">
                 <h4>Please specify:</h4>
-                <input type="text" name="department-own-words" id="department-own-words"  class="pure-input-1">
+                <input type="text" name="department-own-words" id="department-own-words"  class="pure-input-1" value="{{department-own-words}}">
             </div>
     </li>
 </ul>

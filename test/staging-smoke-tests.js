@@ -11,6 +11,10 @@ import { expect } from 'chai';      // BDD/TDD assertion library
 import { JSDOM }  from 'jsdom';     // JavaScript implementation of DOM and HTML standards
 import dotenv     from 'dotenv';    // load environment variables from a .env file into process.env
 
+
+import FormGenerator from '../lib/form-generator.js';
+
+
 dotenv.config();
 
 // note there is a heroku postbuild script which invokes this test automatically when staging is
@@ -75,7 +79,7 @@ describe(`Admin app (admin.${domain})`, function() {
     });
 });
 
-describe(`Report app (report.${domain})`, function() {
+describe(`Report app (report.${domain})`, async function() {
     // if (process.env.SUBAPP && process.env.SUBAPP != 'report') return;
     console.info('heroku app name', process.env.HEROKU_APP_NAME, process.env.HEROKU_PARENT_APP_NAME);
     if (process.env.HEROKU_APP_NAME && process.env.HEROKU_APP_NAME.startsWith('thewhistle-staging-pr')) return; // suspend review-app smoke-tests until they can be make to work!
@@ -124,13 +128,15 @@ describe(`Report app (report.${domain})`, function() {
             const document = new JSDOM(responseGet.text).window.document;
             expect(document.querySelector('title').textContent).to.equal(project.title);
         });
-
-        it(`${project.org}/${project.project}: fails recaptcha check`, async function() {
-            const values = { 'nav-next': 'next' };
-            const responsePost = await reportApp.post(`/${project.org}/${project.project}`).send(values);
-            expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal(`/${project.org}/${project.project}`);
-            expect(responsePost.headers['x-redirect-reason']).to.equal('reCAPTCHA verification failed');
-        });
+        await FormGenerator.buildAll();
+        if (FormGenerator.forms[`${project.org}/${project.project}`].recaptcha) {
+            it(`${project.org}/${project.project}: fails recaptcha check`, async function() {
+                const values = { 'nav-next': 'next' };
+                const responsePost = await reportApp.post(`/${project.org}/${project.project}`).send(values);
+                expect(responsePost.status).to.equal(302);
+                expect(responsePost.headers.location).to.equal(`/${project.org}/${project.project}`);
+                expect(responsePost.headers['x-redirect-reason']).to.equal('reCAPTCHA verification failed');
+            });
+        }
     }
 });

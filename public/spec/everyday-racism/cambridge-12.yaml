@@ -9,134 +9,108 @@
     options:
         friends-cambridge:
             label: Friends (within Cambridge)
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-friends-cambridge-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-friends-cambridge-details
+                    type: text
         friends-elsewhere:
             label: Friends (outside of Cambridge)
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-friends-elsewhere-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-friends-elsewhere-details
+                    type: text
         partner:
             label: Partner/Boyfriend/Girlfriend/Spouse
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-partner-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-partner-details
+                    type: text
         family:
             label: Family
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-family-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-family-details
+                    type: text
         coworkers:
             label: Co-workers
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-coworkers-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-coworkers-details
+                    type: text
         group:
             label: Member of anti-racist group
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-group-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-group-details
+                    type: text
         perpetrator:
             label: Perpetrator
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-perpetrator-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-perpetrator-details
+                    type: text
         friends-perpetrator:
             label: Perpetrator's friends
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-friends-perpetrator-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-friends-perpetrator-details
+                    type: text
         staff:
             label: Academic and College staff (including Director of Studies or Supervisor)
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-staff-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-staff-details
+                    type: text
         counsellor:
             label: Counsellor
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-counsellor-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-counsellor-details
+                    type: text
         manager:
             label: Line-manager
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-manager-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-manager-details
+                    type: text
         others:
             label: Others
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-others-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-others-details
+                    type: text
         official:
             label: Made an official report
-            branch:
-                in-box: true
-                body:
-                    - text: 'Please elaborate, if you wish:'
-                    - input:
-                        label: 'Elaborate:'
-                        name: spoken-to-official-details
-                        type: text
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-official-details
+                    type: text
             
 - input:
     name: spoken-to-useful

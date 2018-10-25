@@ -1,5 +1,5 @@
 - text: |
-    ### Please read and tick to acknowledge this information below and give your consent to participate in this project.
+    ### Please read and tick to acknowledge the information below and to give your consent to participate in this project.
 
     <br><br>
     ### University of Cambridge Official Reporting Procedures
@@ -25,7 +25,7 @@
                     required: true
                     options:
                         confirm:
-                            label: If you have concerns that providing detailed information might lead to your being identified, please note that we take the protection of your identity very seriously. We are also careful about collecting data pertaining only to members of the University of Cambridge. You will be asked to verify your membership to the university community by providing a current or alumni email address, to which an email will be sent that verifies your email address and gives you code to access to the report. After you input the code, we will not keep your email and have no way to link it to your identity. The report will generate an alias which we ask you to safeguard so that if you submit another report we can link them together.  If you forget or lose your alias you just need to submit a new report with a new alias. There is no way we can retrieve your alias. You will also have the opportunity to create and download a PDF with your report at the end after you submit it.
+                            label: If you have concerns that providing detailed information might lead to being identified, please note that we take the protection of your identity very seriously. We are also careful about collecting data only from members of the University of Cambridge. This only serves to verify your email address through a code you will be emailed to access the report. After you input the code, we will not keep a record of your email address have no way to link the code your identity. The report will also generate an alias which we ask you to safeguard so that if you submit another report we can link them together. If you forget or lose your alias, we cannot retrieve it for you, but you can get a new alias. You will have the opportunity to download a PDF of your report after you submit it.
                             branch:
                                 in-box: false
                                 body:
@@ -40,7 +40,7 @@
                                         required: true
                                         options:
                                             confirm:
-                                                label: Any information you provide will be seen and analysed by the research team and volunteers of the Whistle – End Everyday Racism Research Project. By filling in this Incident Report you agree to take part in this study; you understand that your participation is voluntary and that you are free to stop at anytime. You understand that your report is automatically saved as you fill it in and if you do not complete it we will be recorded as incomplete. You agree that if you stop before submitting the whole report we can still use your data; You understand that it is not possible to withdraw your report once you have submitted it as we do not have any way to confirm that an alias is linked to a particular email. You give your consent for the information to be used for academic purposes (i.e. reports, publications, presentations); you agree that your information informs antiracist activism in the University of Cambridge and beyond.
+                                                label: Any information you provide will be seen and analysed by the research team and volunteers of the Whistle – End Everyday Racism Research Project. By filling in this Incident Report you agree to take part in this study; you understand that your participation is voluntary and that you are free to stop at anytime. You understand that your report is automatically saved as you fill it in and that, if you do not complete it, your report will be recorded as incomplete. You agree that if you stop before submitting the whole report we can still use your data; You understand that it is not possible to withdraw your report once you have submitted it. You give your consent for the information to be used for academic purposes (i.e. reports, publications, presentations); you agree that your information informs antiracist activism in the University of Cambridge and beyond.
                                                 branch:
                                                     in-box: false
                                                     body:

@@ -750,19 +750,20 @@ async function whatnext(ctx) {
  */
 function formatReport(org, project, page, body) {
     const yamlInputs = FormGenerator.forms[`${org}/${project}`].inputs;
-    const partialInputs = FormGenerator.forms[`${org}/${project}`].partials;
+    const partials = FormGenerator.forms[`${org}/${project}`].partials;
     const pageYamlInputs = page=='+'
         ? [ ...Object.values(yamlInputs) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
         : yamlInputs[page];                                                                  // inputs from this page
-    const pagePartialInputs = page=='+'
-        ? [ ...Object.values(partialInputs) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
-        : partialInputs[page];                                                                  // inputs from this page
+    const pagePartials = page=='+'
+        ? [ ...Object.values(partials) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
+        : partials[page];                                                                  // inputs from this page
     Handlers.removeNoStores(pageYamlInputs);
     const rpt = {}; // the processed version of body
 
-    for (let i = 0; i < pagePartialInputs.length; i++) {
-        if (body[pagePartialInputs[i]]) {
-            rpt[pagePartialInputs[i]] = body[pagePartialInputs[i]];
+    for (const partialName in pagePartials) {
+        const partialInputs = pagePartials[partialName];
+        for (let i = 0; i < partialInputs.length; i++) {
+            rpt[partialInputs[i]] = body[partialInputs[i]];
         }
     }
 

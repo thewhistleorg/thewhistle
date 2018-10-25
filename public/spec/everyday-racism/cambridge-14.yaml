@@ -27,8 +27,6 @@
             label: 70-79
         older:
             label: 80+
-        skip:
-            label: Skip
 
 - text: '## Gender identifier'
 

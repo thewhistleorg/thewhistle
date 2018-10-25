@@ -25,7 +25,7 @@ options:
     index:
       prev: false
       step: false
-      next: false
+      next: Next
     p1:
       title: The Whistle / End Everyday Racism Incident Report
       next: Next

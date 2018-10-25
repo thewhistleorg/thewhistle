@@ -1,4 +1,4 @@
-- text: '# Do you have any feedback on this questionnaire?'
+- text: '# Do you have any feedback on this form?'
 
 - input:
     name: feedback

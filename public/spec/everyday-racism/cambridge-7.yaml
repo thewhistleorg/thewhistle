@@ -1,4 +1,4 @@
-- text: '# Do you remember what were you doing when this racist incident occurred?'
+- text: '# What were you doing when this racist incident occurred?'
 
 - input:
     name: doing-what
@@ -30,8 +30,6 @@
                 - input:
                     name: doing-what-own-words
                     type: textbox
-        skip:
-            label: Skip
 
 - text: '# When did the racist incident occur?'
 
@@ -76,12 +74,12 @@
             subsidiary:
                 - input:
                     name: time-period
-                    label: When was this period?
+                    label: When was this period of time?
                     type: textbox
         no: I do not remember
         skip: Skip
 
-- text: '# Thinking of this incident, how often have you experienced this type of racism?'
+- text: '# Thinking of this incident, how often have you experienced/witnessed this type of racism?'
 
 - input:
     name: type-frequency
@@ -107,11 +105,9 @@
                 - input:
                     name: type-frequency-other
                     type: textbox
-        skip:
-            label: Skip
 
 
-- text: '# How often do you experience racism outside the University?'
+- text: '# How often do you experience/witness racism outside the University?'
 
 - input:
     name: overall-frequency
@@ -120,6 +116,8 @@
     options:
         blank:
             label: ''
+        never:
+            label: Never
         one-off:
             label: Once
         year:
@@ -137,5 +135,3 @@
                 - input:
                     name: overall-frequency-other
                     type: textbox
-        skip:
-            label: Skip

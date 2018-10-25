@@ -38,16 +38,16 @@ class Email {
      * Send e-mail using template.
      *
      * @param {string} to - E-mail recipient(s).
-     * @param {string} context - Context for mail-merge into template.
-     * @param {Object} ctx - Koa ctx object.
+     * @param {string} verificationCode
+     * @param {string} alias
      */
-    static async sendCamVerification(to, verificationCode) {
+    static async sendCamVerification(to, verificationCode, alias) {
         if (global.it) return; // don't send e-mails within mocha tests
 
         // get password reset template, completed with generated token
         const templateHtml = await fs.readFile('app-report/templates/email/verify-cam.email.html', 'utf8');
         const templateHbs = handlebars.compile(templateHtml);
-        const html = templateHbs({ verificationCode: verificationCode });
+        const html = templateHbs({ verificationCode: verificationCode, alias: alias });
 
         // get e-mail subject from <title> element
         const document = new JSDOM(html).window.document;
@@ -69,7 +69,8 @@ class Email {
     static async verifyCamEmail(ctx) {
         try {
             const report = await Report.get(ctx.request.query.database, ctx.session.reportId);
-            await Email.sendCamVerification(ctx.request.query.email, report.verificationCode);
+            console.log(report.alias);
+            await Email.sendCamVerification(ctx.request.query.email, report.verificationCode, report.alias);
             ctx.status = 200;
         } catch (e) {
             ctx.status = 500;

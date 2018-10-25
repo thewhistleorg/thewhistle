@@ -27,6 +27,8 @@
             label: Feeling of resentment
         motivation:
             label: Lack of motivation
+        esteem:
+            label: Lowered self-esteem
         others:
             label: Others
             subsidiary:
@@ -54,7 +56,7 @@
         yes:
             label: Yes
         no:
-            label: no
+            label: No
         notsure:
             label: Not sure
         describe:
@@ -80,7 +82,7 @@
         yes:
             label: Yes
         no:
-            label: no
+            label: No
         notsure:
             label: Not sure
         describe:

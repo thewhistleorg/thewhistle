@@ -4,6 +4,43 @@
     <ul class="question-location">
         <li>
             {{#checked location}}
+            <input type="radio" name="location" id="location-online" value="Online">
+            <label for="location-online"><p>Online</p></label>
+            <div class="location-online-branch hide">
+                <ul class="question-location-online">
+                    <li>
+                        <h3>Where online?</h3>
+                        {{#checked location-online}}
+                        <input type="radio" name="location-online" id="location-online-email" value="Email">
+                        <label for="location-online-email"><p>Email</p></label>
+
+                        <input type="radio" name="location-online" id="location-online-socialmedia" value="Social media platforms">
+                        <label for="location-online-socialmedia"><p>Social media platforms</p></label>
+                        <div class="location-online-socialmedia-branch hide">
+                            <ul class="question-socialmedia-specify">
+                                <li>
+                                    <h3>Please specify:</h3>
+                                    <input type="text" name="socialmedia-specify" value="{{socialmedia-specify}}">
+                                </li>
+                            </ul>
+                        </div>
+
+                        <input type="radio" name="location-online" id="location-online-other" value="Other">
+                        {{/checked}}
+                        <label for="location-online-other"><p>Other</p></label>
+                        <div class="location-online-other-branch hide">
+                            <ul class="question-online-other-specify">
+                                <li>
+                                    <h3>Please specify:</h3>
+                                    <input type="text" name="online-other-specify" value="{{online-other-specify}}">
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </li>
+        <li>
             <input type="radio" name="location" id="location-college" value="College">
             <label for="location-college"><p>College</p></label>
             <div class="location-college-branch hide">
@@ -82,6 +119,7 @@
               <ul class="question-school">
                   <li>
                       <h3>Which department?</h3>
+                      <p>Please be as specific or as general as your like</p>
                       <select name="department-where-select" id="department-where-select">
                             {{#selected department-where-select}}
                             <option></option>
@@ -489,43 +527,6 @@
                             </ul>
                         </div>
 
-                        
-
-                        <input type="radio" name="location-other" id="location-other-online" value="Online">
-                        <label for="location-other-online"><p>Online</p></label>
-                        <div class="location-other-online-branch hide">
-                            <ul class="question-location-online">
-                                <li>
-                                    <h3>Where online?</h3>
-                                    {{#checked location-online}}
-                                    <input type="radio" name="location-online" id="location-online-email" value="Email">
-                                    <label for="location-online-email"><p>Email</p></label>
-
-                                    <input type="radio" name="location-online" id="location-online-socialmedia" value="Social media platforms">
-                                    <label for="location-online-socialmedia"><p>Social media platforms</p></label>
-                                    <div class="location-online-socialmedia-branch hide">
-                                        <ul class="question-socialmedia-specify">
-                                            <li>
-                                                <h3>Please specify:</h3>
-                                                <input type="text" name="socialmedia-specify" value="{{socialmedia-specify}}">
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <input type="radio" name="location-online" id="location-online-other" value="Other">
-                                    {{/checked}}
-                                    <label for="location-online-other"><p>Other</p></label>
-                                    <div class="location-online-other-branch hide">
-                                        <ul class="question-online-other-specify">
-                                            <li>
-                                                <h3>Please specify:</h3>
-                                                <input type="text" name="online-other-specify" value="{{online-other-specify}}">
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
                         <input type="radio" name="location-other" id="location-other-city" value="Another place within the city of Cambridge">
                         {{/checked}}
                         <label for="location-other-city"><p>Another place within the city of Cambridge</p></label>

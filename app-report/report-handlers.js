@@ -500,7 +500,11 @@ class Handlers {
                 const validCode = await Report.verifyCode(org, ctx.session.reportId, verificationCode);
                 if (!validCode) {
                     if (verificationCode) {
-                        ctx.flash = { error: 'Invalid verification code.' };
+                        let errorText = 'Invalid verification code.';
+                        if (verificationCode.match(/^[A-Za-z]* [A-Za-z]*$/)) {
+                            errorText += ' It looks like you might have entered your alias instead.';
+                        }
+                        ctx.flash = { error: errorText };
                     }
                     return ctx.response.redirect(`/${org}/${project}/${ctx.session.completed+1}`);
                 }

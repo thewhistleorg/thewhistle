@@ -33,7 +33,7 @@
         skip:
             label: Skip
 
-- text: '# Do you remember what were you doing when this racist incident occurred?'
+- text: '# When did the racist incident occur?'
 
 - input:
     name: when
@@ -41,7 +41,7 @@
     type: radio
     options:
         exact:
-            label: Yes, exact date this racist incident happened
+            label: I remember the exact date
             subsidiary:
                 - text: Please select the date and approximate time
                 - input:
@@ -51,8 +51,9 @@
                     name: time
                     type: library-24hours
         approximate:
-            label: Yes, approximate date this racist incident happened
+            label: I remember the approximate date
             subsidiary:
+                - text: 'Please select when this happened:'
                 - input:
                     name: within-options
                     label: Within options
@@ -70,6 +71,13 @@
                             label: 6-12 months ago
                         longer:
                             label: More than 12 months ago
+        period:
+            label: It happened over a period of time
+            subsidiary:
+                - input:
+                    name: time-period
+                    label: When was this period?
+                    type: textbox
         no: I do not remember
         skip: Skip
 

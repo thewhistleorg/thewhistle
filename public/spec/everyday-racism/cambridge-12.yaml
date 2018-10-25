@@ -2,6 +2,8 @@
 
 - text: '### Pick all options that apply. For each, please explain if further action was taken as a result of these conversations. Please do not provide names of individuals.'
 
+- text: 'Tick all that apply and please elaborate in the box below:'
+
 - input:
     name: spoken-to
     label: Who have you spoken to?

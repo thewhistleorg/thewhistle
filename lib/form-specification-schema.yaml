@@ -60,7 +60,7 @@ partial:
   type: object
   required: [ name ]
   properties:
-    name: { type: string, pattern: '^camEmailVerification|camLocation|camPerpetratorEthnicity|camReporterEthnicity|camDepartment$' }
+    name: { type: string, pattern: '^camEmailVerification|camLocation|camPerpetratorDetails|camReporterEthnicity|camDepartment$' }
 
 options:                                                              # for radio/checkbox/select inputs: either...
   oneOf:

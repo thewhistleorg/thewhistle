@@ -1,5 +1,7 @@
 - text: '# What consequences has this racist incident had in your life?'
 
+- text: 'Tick all that apply and please elaborate in the box below:'
+
 - input:
     name: consequences
     label: 'Tick all that apply and please elaborate in the box below:'
@@ -33,9 +35,11 @@
                     name: others-details
                     type: text
 
+- text: '# Please elaborate further:'
+
 - input:
     name: consequences-elaborate
-    label: Please elaborate further
+    label: 'Consequences:'
     type: textbox
 
 - text: '# Has this incident made you feel that your job/study was at risk?'
@@ -56,15 +60,14 @@
         describe:
             label: Prefer to describe
             subsidiary:
-                - text: 'Please describe:'
-                - input:
-                    name: risk-description
-                    type: textbox
+                - text: 'Please describe in the box below'
         skip: Skip
+
+- text: '# Please describe if this incident has shaped your overall time in Cambridge in any way:'
 
 - input:
     name: shaped-time
-    label: 'Please describe if this incident has shaped your overall time in Cambridge in any way:'
+    label: How has the incident shaped your time?
     type: textbox
 
 - text: '# Has this incident made it difficult for you to perform well in your work/studies?'
@@ -83,13 +86,12 @@
         describe:
             label: Prefer to describe
             subsidiary:
-                - text: 'Please describe:'
-                - input:
-                    name: difficulty-description
-                    type: textbox
+                - text: 'Please describe in the box below'
         skip: Skip
+
+- text: '# Please describe the specific impact this incident has had on your work or studies:'
 
 - input:
     name: job-study-impact
-    label: 'Please describe the specific impact this incident has had on your work or studies:'
+    label: Work/study impact
     type: textbox

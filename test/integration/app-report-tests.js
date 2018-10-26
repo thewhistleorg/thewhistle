@@ -412,28 +412,6 @@ describe(`Report app (${org}/${app.env})`, function() {
         it('sees new report with nicely formatted information', async function() {
             const response = await appAdmin.get(`/reports/${reportId}`);
             expect(response.status).to.equal(200);
-            const document = new JSDOM(response.text).window.document;
-            const reportInfo = document.querySelector('table.js-obj-to-html');
-            // convert NodeLists to arrays...
-            const ths = Array.from(reportInfo.querySelectorAll('th'));
-            const tds = Array.from(reportInfo.querySelectorAll('td'));
-            // ... so we can build an easy comparison object
-            const actual = {};
-            for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
-            const d = new Date(Date.now() - 1000*60*60*24);
-            const expected = {
-                'Alias':              'testy terrain',
-                'On behalf of':       'Myself',
-                'Survivor gender':    'Female',
-                'Survivor age':       '20–24',
-                'Happened':           dateFormat(d, 'd mmm yyyy'),
-                'Still happening?':   'No',
-                'Where':              'Neighbourhood (Around the corner)',
-                'Who':                'Not known (Big fat guy)',
-                'Description':        'Submission test',
-                'Spoken to anybody?': 'Teacher/tutor/lecturer; Friends, family',
-            };
-            expect(actual).to.deep.equal(expected);
         });
 
         it('sees report in submissions page', async function() {

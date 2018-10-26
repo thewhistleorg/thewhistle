@@ -16,8 +16,6 @@ pages:
   p12:      { $ref: 'cambridge-12' }
   p13:      { $ref: 'cambridge-13' }
   p14:      { $ref: 'cambridge-14' }
-  p15:      { $ref: 'cambridge-15' }
-  p16:      { $ref: 'cambridge-16'}
   whatnext: { $ref: 'cambridge-whatnext' }
 
 options:
@@ -28,21 +26,17 @@ options:
       next: Next
     p1:
       title: The Whistle / End Everyday Racism Incident Report
-      next: Next
       prev: false
     p2:
       title: The Whistle / End Everyday Racism Incident Report
-      next: Start
       prev: false
     p3:
       title: The Whistle / End Everyday Racism Incident Report
       prev: false
     p4:
       title: The Whistle / End Everyday Racism Incident Report
-      prev: false
     p5:
       title: The Whistle / End Everyday Racism Incident Report
-      prev: false
     p6:
       title: The Whistle / End Everyday Racism Incident Report
     p7:

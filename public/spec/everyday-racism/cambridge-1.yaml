@@ -1,24 +1,99 @@
-- text: |
-    Tell us as little or as much as you feel comfortable doing.
+- text: Please read and tick to acknowledge the information below and to give your consent to participate in this project. <br>
 
-    **We want to know what the racist incident was and how and where it happened.  As this is not a formal university reporting procedure, we do not wish to know your identity or the identity of others involved; be mindful that your identity may be discoverable through other data such as location data. You will not be named in public documents or presentations. There will be no formal responses for any individuals involved, as this is a research and advocacy project.**
+- text: '### Nature of this reporting form'
 
-    _Please be aware that this is not a formal reporting procedure of the University of Cambridge. You may learn more about specific reporting procedures for staff and students [**here**](https://www.race-equality.admin.cam.ac.uk/help-and-advice)._ This project, End Everyday Racism at Cambridge, differs from the anonymous reporting that the University offers because we want more detail about the nature of the event that took place as well as the location and because our aim is to highlight how racism is normalised. Our anonymous reporting tool is not actionable in individual terms—no action will be taken to address this specific instance of racism you report, because the university cannot identify any individuals or location.
-
-    If you are experiencing a crisis and need medical attention, call 111. We understand the difficult relationship between people of colour and the police but please note you could decide to report a hate crime at 999 or [http://report-it.org.uk/your_police_force](http://report-it.org.uk/your_police_force) or reach out to organizations such as [http://www.stophateuk.org/](http://www.stophateuk.org/) and [http://www.report-it.org.uk/organisations_that_can_help](http://www.report-it.org.uk/organisations_that_can_help).
-
-    Please take care of yourself, reach out if you are struggling and try and find support from people you trust if you can.
-
-    ## Where can you get further support?
-    ### Support for students is available via:
-      * Student Union Advice Service (from [**Cambridge University Student Union**](https://www.cusu.co.uk/) and Graduate Union), Email: [advice@studentadvice.cam.ac.uk](mailto:advice@studentadvice.cam.ac.uk), Tel, 01223 333313.
-      * BME Campaign, Cambridge University Student Union: [www.cusu.co.uk/about/liberation-campaigns/the-black-and-minority-ethnic-campaign](https://www.cusu.co.uk/about/liberation-campaigns/the-black-and-minority-ethnic-campaign/)
-      * FLY, Cambridge University's network and forum for women and non-binary people of colour: [www.facebook.com/FLYcambridge](https://www.facebook.com/FLYcambridge/), [flygirlsofcambridge.com](https://flygirlsofcambridge.com/)
-      * Look out for your BME contacts in your College.
-      * [Student Counselling Service](https://www.counselling.cam.ac.uk/)
-      * [Mental Health Advisors](https://www.counselling.cam.ac.uk/studentcouns/mha)
-      * [University's Race Equality website](https://www.race-equality.admin.cam.ac.uk/)
-      * Community-wide services such as [Nightline](https://linkline.org.uk/) and [Samaritans Cambridge](https://www.samaritans.org/branches/cambridge-samaritans).
-    ### Support for academic, academic-related and assistant staff is available via:
-      * University and College Union, University of Cambridge Branch: [Cambridge UCU](http://www.ucu.cam.ac.uk/), [admin@ucu.cam.ac.uk](mailto:admin@ucu.cam.ac.uk), Tel, 01223 764944
-      * [Support Services for staff at the University's Race Equality website](https://www.race-equality.admin.cam.ac.uk/help-and-advice/staff-support-and-reporting)
+- input:
+    no-store: true
+    name: procedure
+    type: checkbox
+    required: true
+    options:
+      confirm:
+        label: I understand that this is not a formal reporting procedure within the University of Cambridge. I can also raise an official complaint following the University of Cambridge official reporting procedures [**here**](https://www.race-equality.admin.cam.ac.uk/help-and-advice).
+        branch:
+            in-box: false
+            body:
+                - text: '### How is this incident reporting made as anonymous as possible?'
+                - input:
+                    no-store: true
+                    name: anonymous
+                    type: checkbox
+                    required: true
+                    options:
+                        confirm:
+                            label: If you have concerns that providing detailed information might lead to being identified, please note that we take the protection of your identity very seriously. We are also careful about collecting data only from members of the University of Cambridge. This only serves to verify your email address through a code you will be emailed to access the report. After you input the code, we will not keep a record of your email address have no way to link the code your identity. The report will also generate an alias which we ask you to safeguard so that if you submit another report we can link them together. If you forget or lose your alias, we cannot retrieve it for you, but you can get a new alias. You will have the opportunity to download a PDF of your report after you submit it.
+                            branch:
+                                in-box: false
+                                body:
+                                    - text: '### Consent Statement'
+                                    - input:
+                                        no-store: true
+                                        name: consent
+                                        type: checkbox
+                                        required: true
+                                        options:
+                                            confirm:
+                                                label: Any information you provide will be seen and analysed by the research team and volunteers of the Whistle – End Everyday Racism Research Project. By filling in this Incident Report you agree to take part in this study; you understand that your participation is voluntary and that you are free to stop at anytime. You understand that your report is automatically saved as you fill it in and that, if you do not complete it, your report will be recorded as incomplete. You agree that if you stop before submitting the whole report we can still use your data; You understand that it is not possible to withdraw your report once you have submitted it. You give your consent for the information to be used for academic purposes (i.e. reports, publications, presentations); you agree that your information informs antiracist activism in the University of Cambridge and beyond.
+                                                branch:
+                                                    in-box: false
+                                                    body:
+                                                        - text: '### Have you used this reporting service before?'
+                                                        - input:
+                                                            name: used-before
+                                                            label: Alias
+                                                            type: radio
+                                                            options:
+                                                                y:
+                                                                    label: Yes
+                                                                    subsidiary:
+                                                                        - input:
+                                                                            name: existing-alias
+                                                                            type: text
+                                                                            label: Enter your anonymous alias
+                                                                            required: true
+                                                                        - html: |
+                                                                            <span id="alias-ok" title="alias available" class="alias-available hide">✓</span>
+                                                                            <span id="alias-nok" title="alias not available" class="alias-available hide">✗</span>
+                                                                f:
+                                                                    label: Yes, but I’ve forgotten my alias
+                                                                    subsidiary:
+                                                                        - text: |
+                                                                            We like to be able to connect reports from the same person, but the most important
+                                                                            thing is to have your report!
+                                                                        - html: |
+                                                                            <p>Your alias for this session is
+                                                                                <b><output name="used-before-generated-alias">{{generated-alias}}</output></b>.
+                                                                                Please make a note of this alias and keep it in a safe place so you can check back
+                                                                                in with us if necessary. We are not able to retrieve your alias.</p>
+                                                                        - input:
+                                                                            type: hidden
+                                                                            name: generated-alias-forgotten
+                                                                            value: '{{generated-alias-forgotten}}'
+                                                                        - input:
+                                                                            type: button
+                                                                            name: get-alt-alias
+                                                                            class: inline-link
+                                                                            text: Generate another random alias
+                                                                n:
+                                                                    label: No
+                                                                    attributes: checked
+                                                                    subsidiary:
+                                                                        - option: show
+                                                                        - text: |
+                                                                            We make sure that your report is anonymous by creating a random identification alias.
+                                                                            If you want to follow up, use the anonymous alias below so we can access any relevant
+                                                                            information.
+                                                                        - html: |
+                                                                            <p>Your alias for this session is
+                                                                                <b><output name="used-before-generated-alias">{{generated-alias}}</output></b>.
+                                                                                Please make a note of this alias and keep it in a safe place so you can check back
+                                                                                in with us if necessary. We are not able to retrieve your alias.</p>
+                                                                        - input:
+                                                                            type: hidden
+                                                                            name: generated-alias
+                                                                            value: '{{generated-alias}}'
+                                                                        - input:
+                                                                            type: button
+                                                                            name: get-alt-alias
+                                                                            class: inline-link
+                                                                            text: Generate another random alias

@@ -1,106 +1,181 @@
-- text: Racism tends to generate (and could emanate from) strong feelings and emotions that are not necessarily easy to define. If this is the case for you and the incident you are reporting, please describe what you felt as much as you can in the spaces provided below.
+- text: '# Have you spoken to anybody about what happened?'
 
-- text: '# What feelings or emotions were directed at you or at the victim(s) during this racist incident?'
+- text: '### Pick all options that apply. For each, please explain if further action was taken as a result of these conversations. Please do not provide names of individuals.'
 
-- text: <br> If reporting on behalf of someone else or as a witness, please describe your perceptions of the emotions that were directed at that person.
-
-- text: 'Tick all that apply and please elaborate in the box below:'
-
-- input:
-    name: emotions-directed
-    label: 'Tick all that apply and please elaborate in the box below:'
-    type: checkbox
-    options:
-        anger: Anger
-        contempt: Contempt
-        disgust: Disgust
-        fear: Fear
-        hostility: Hostility
-        indifference: Indifference
-        rejection: Rejection
-        resentment: Resentment
-        well-meaning: Well-meaning-ness (feelings of admiration, exoticisation, or too much attention or perceiving humour, ignorance or cluelessness)
-        other:
-            label: Prefer to add emotions directed at me to this list
-            subsidiary:
-                - text: Emotions
-                - input:
-                    name: emotions-directed-other
-                    type: text
-
-- input:
-    name: emotions-directed-elaborate
-    label: Please elaborate
-    type: textbox
-
-
-- text: '# What feelings and emotions did you experience during this racist incident?'
-
-- text: <br> If you are reporting on behalf of someone else who has shared their experience with you, please describe their feelings. If this was an incident that you witnessed, please describe your feelings as a witness.
+- text: If reporting on behalf of someone else who has shared their experience with you, please describe who else they have spoken to. If this was an incident that you witnessed, please describe who you have spoken to about it.
 
 - text: 'Tick all that apply and please elaborate in the box below:'
 
 - input:
-    name: emotions-experienced
-    label: 'Tick all that apply and please elaborate in the box below:'
+    name: spoken-to
+    label: Who have you spoken to?
     type: checkbox
     options:
-        anger: Anger
-        confusion: Confusion
-        embarrassment: Embarrassment
-        disgust: Disgust
-        fear: Fear
-        threatened: Feeling threatened
-        guilt: Guilt
-        humiliation: Humiliation
-        incredulity: Incredulity
-        indignation: Indignation
-        numbness: Numbness
-        panic: Panic
-        sadness: Sadness
-        shame: Shame
-        other:
-            label: Prefer to add feelings and emotions to this list
+        friends-cambridge:
+            label: Friends (within Cambridge)
             subsidiary:
-                - text: Feelings and emotions
+                - text: 'Please elaborate, if you wish:'
                 - input:
-                    name: emotions-experienced-other
+                    label: 'Elaborate:'
+                    name: spoken-to-friends-cambridge-details
+                    type: text
+        friends-elsewhere:
+            label: Friends (outside of Cambridge)
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-friends-elsewhere-details
+                    type: text
+        partner:
+            label: Partner/Boyfriend/Girlfriend/Spouse
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-partner-details
+                    type: text
+        family:
+            label: Family
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-family-details
+                    type: text
+        coworkers:
+            label: Co-workers
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-coworkers-details
+                    type: text
+        group:
+            label: Member of anti-racist group
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-group-details
+                    type: text
+        perpetrator:
+            label: Perpetrator
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-perpetrator-details
+                    type: text
+        friends-perpetrator:
+            label: Perpetrator's friends
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-friends-perpetrator-details
+                    type: text
+        staff:
+            label: Academic and College staff (including Director of Studies or Supervisor)
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-staff-details
+                    type: text
+        counsellor:
+            label: Counsellor
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-counsellor-details
+                    type: text
+        manager:
+            label: Line-manager
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-manager-details
+                    type: text
+        others:
+            label: Others
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-others-details
+                    type: text
+        official:
+            label: Made an official report
+            subsidiary:
+                - text: 'Please elaborate, if you wish:'
+                - input:
+                    label: 'Elaborate:'
+                    name: spoken-to-official-details
                     type: text
 
+- text: '# If you did speak to someone else about this racist incident, what was most useful in talking about it?'
+
 - input:
-    name: emotions-experienced-elaborate
-    label: Please elaborate
+    name: spoken-to-useful
+    label: Who was it most useful to talk to? 
     type: textbox
 
-
-- text: '# What physical reactions did you have during or immediately after this incident?'
-
-- text: <br> If reporting on behalf of someone else who has shared their experience with you, please describe their reactions. If this was an incident that you witnessed, please describe your reactions as a witness.
-
-- text: 'Tick all that apply and please elaborate in the box below:'
+- text: '# Thinking of this incident, how often have you experienced/witnessed this type of racism?'
 
 - input:
-    name: physical-reactions
-    label: 'Tick all that apply and please elaborate in the box below:'
-    type: checkbox
+    name: type-frequency
+    label: Frequency
+    type: select
     options:
-        tension: Bodily tension
-        breathlessness: Breathlessness
-        frozen: Frozen (not able to move)
-        headache: Headache
-        nausea: Nausea
-        nervousness: Nervousness
-        chest: Pressure in your chest
-        stomach: Stomach pain
+        blank:
+            label: ''
+        one-off:
+            label: It was a one off incident
+        year:
+            label: Several times a year
+        month:
+            label: Several times a month
+        week:
+            label: Several times a week
+        day:
+            label: Every day
         other:
-            label: Prefer to add one or more bodily reactions to this list
+            label: Other
             subsidiary:
-                - text: Bodily reactions
+                - text: '### Please specify:'
                 - input:
-                    name: physical-reactions-other
-                    type: text
+                    name: type-frequency-other
+                    type: textbox
+
+
+- text: '# How often do you experience/witness racism outside the University?'
 
 - input:
-    name: physical-reactions-elaborate
-    label: Please elaborate
-    type: textbox
+    name: overall-frequency
+    label: Frequency
+    type: select
+    options:
+        blank:
+            label: ''
+        never:
+            label: Never
+        one-off:
+            label: Once
+        year:
+            label: Several times a year
+        month:
+            label: Several times a month
+        week:
+            label: Several times a week
+        day:
+            label: Every day
+        other:
+            label: Other
+            subsidiary:
+                - text: '### Please specify:'
+                - input:
+                    name: overall-frequency-other
+                    type: textbox

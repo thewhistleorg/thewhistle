@@ -1,67 +1,26 @@
-- text: '# What were you doing when this racist incident occurred?'
+- text: '# What happened?'
+
+- text: |
+    Try to describe as much of what has happened as you can. You may wish to include what led up to the event or situation, as well as what happened and any subsequent events or implications. Please note that it makes it harder to use data if you use names of specific individuals. 
+
+    If the incident you want to report was not ‘an act’ committed by a particular individual, but it refers instead to a more structural or diffuse experience (such as a hostile atmosphere or seeing a problematic image) please describe it here.
+
+- text: '# What happened? Please also describe the lead up to the event.'
 
 - input:
-    name: doing-what
-    label: Doing what
-    type: select
-    options:
-        blank:
-            label: ''
-        lecture:
-            label: I was in a lecture
-        supervision:
-            label: I was in a supervision
-        seminar:
-            label: I was in a seminar/conference
-        food:
-            label: I was in a lunch/dinner context
-        work:
-            label: I was in my place of work
-        accommodation:
-            label: I was in my accommodation
-        meeting:
-            label: I was at a society meeting
-        transit:
-            label: I was in transit (walking, cycling, etc)
-        other:
-            label: Other
-            subsidiary:
-                - text: '### Please describe in your own words what you were doing:'
-                - input:
-                    name: doing-what-own-words
-                    type: textbox
+    name: happened
+    type: textbox
+    label: Event description
 
-- text: '# When did the racist incident occur?'
+- text: '# Were there any subsequent events or implications?'
 
 - input:
-    name: when
-    label: when
-    type: radio
-    options:
-        exact:
-            label: I remember the exact date
-            subsidiary:
-                - text: Please select the date and approximate time
-                - input:
-                    name: date
-                    type: library-date
-                - input:
-                    name: time
-                    type: library-24hours
-        approximate:
-            label: I remember the approximate date
-            subsidiary:
-                - text: 'As well as you can remember, when did this happen?'
-                - input:
-                    name: time-over-year
-                    label: When?
-                    type: textbox
-        period:
-            label: It happened over a period of time
-            subsidiary:
-                - input:
-                    name: time-period
-                    label: When was this period of time?
-                    type: textbox
-        no: I do not remember
-        skip: Skip
+    name: subsequent
+    type: textbox
+    label: Subsequent events or implications
+
+- input:
+    name: document
+    type: library-file
+    label: |
+      **Please upload any evidence that could help.** This can be photos, videos or any other documents. We will store this safely. We will take all data into account for analysis and to inform advocacy; however we will not be able to make public any data that can lead to identifying particular individuals. Please only use evidence that belongs to you or that you have permission to use.

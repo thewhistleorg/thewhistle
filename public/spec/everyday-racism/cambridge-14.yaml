@@ -1,41 +1,10 @@
-- text: For the questions on this page, if you are reporting on behalf of someone else who has shared their experience with you or if you are reporting about an incident that you witnessed, please describe yourself, the reporter.
-
-- text: 'Please help us to better understand how you might have experienced this incident by answering the following questions. While we understand that some of these details are socially constructed as well as the object of academic and political debate, we are interested in providing data that can more easily speak to public policy bodies and institutional change. We think that the power of every person’s experiences of racism will be more strongly represented with the aid of the profiles of the individuals that these incidents are happening to.'
-
-- text: '# Age'
+- text: '# Do you have any feedback on this form?'
 
 - input:
-    name: age
-    label: Age
-    type: select
-    options:
-        blank:
-            label: ''
-        eighteen:
-            label: 18-22
-        twenty-three:
-            label: 23-29
-        thirty:
-            label: 30-39
-        fourty:
-            label: 40-49
-        fifty:
-            label: 50-59
-        sixty:
-            label: 60-69
-        seventy:
-            label: 70-79
-        older:
-            label: 80+
-
-- text: '# Please let us know if you have other intersecting identities (e.g. gender, sexual orientation, ability, class background, nationality) that you feel is relevant to the report.'
-
-- input:
-    name: relevant-identities
-    label: Relevant identities
+    name: feedback
+    label: Feedback
     type: textbox
 
-- text: '# !{What is your racial or ethnic identity?}{Please note that we are aware of the limitations of ascribing an ethnic or racial identity to one self. However, for the purposes of this report it would be useful to have an indication, which we will take as subjective and socially constructed. We have adapted this list from the official categories used by the UK National Office of Statistics and the University of Cambridge}'
+- text: Thank you for completing this report.
 
-- partial:
-    name: camReporterEthnicity
+- text: A draft of your report will be available as a PDF once you submit your report below.

@@ -1,181 +1,41 @@
-- text: '# Have you spoken to anybody about what happened?'
+- text: For the questions on this page, if you are reporting on behalf of someone else who has shared their experience with you or if you are reporting about an incident that you witnessed, please describe yourself, the reporter.
 
-- text: '### Pick all options that apply. For each, please explain if further action was taken as a result of these conversations. Please do not provide names of individuals.'
+- text: 'Please help us to better understand how you might have experienced this incident by answering the following questions. While we understand that some of these details are socially constructed as well as the object of academic and political debate, we are interested in providing data that can more easily speak to public policy bodies and institutional change. We think that the power of every person’s experiences of racism will be more strongly represented with the aid of the profiles of the individuals that these incidents are happening to.'
 
-- text: If reporting on behalf of someone else who has shared their experience with you, please describe who else they have spoken to. If this was an incident that you witnessed, please describe who you have spoken to about it.
-
-- text: 'Tick all that apply and please elaborate in the box below:'
+- text: '# Age'
 
 - input:
-    name: spoken-to
-    label: Who have you spoken to?
-    type: checkbox
+    name: age
+    label: Age
+    type: select
     options:
-        friends-cambridge:
-            label: Friends (within Cambridge)
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-friends-cambridge-details
-                    type: text
-        friends-elsewhere:
-            label: Friends (outside of Cambridge)
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-friends-elsewhere-details
-                    type: text
-        partner:
-            label: Partner/Boyfriend/Girlfriend/Spouse
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-partner-details
-                    type: text
-        family:
-            label: Family
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-family-details
-                    type: text
-        coworkers:
-            label: Co-workers
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-coworkers-details
-                    type: text
-        group:
-            label: Member of anti-racist group
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-group-details
-                    type: text
-        perpetrator:
-            label: Perpetrator
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-perpetrator-details
-                    type: text
-        friends-perpetrator:
-            label: Perpetrator's friends
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-friends-perpetrator-details
-                    type: text
-        staff:
-            label: Academic and College staff (including Director of Studies or Supervisor)
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-staff-details
-                    type: text
-        counsellor:
-            label: Counsellor
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-counsellor-details
-                    type: text
-        manager:
-            label: Line-manager
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-manager-details
-                    type: text
-        others:
-            label: Others
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-others-details
-                    type: text
-        official:
-            label: Made an official report
-            subsidiary:
-                - text: 'Please elaborate, if you wish:'
-                - input:
-                    label: 'Elaborate:'
-                    name: spoken-to-official-details
-                    type: text
+        blank:
+            label: ''
+        eighteen:
+            label: 18-22
+        twenty-three:
+            label: 23-29
+        thirty:
+            label: 30-39
+        fourty:
+            label: 40-49
+        fifty:
+            label: 50-59
+        sixty:
+            label: 60-69
+        seventy:
+            label: 70-79
+        older:
+            label: 80+
 
-- text: '# If you did speak to someone else about this racist incident, what was most useful in talking about it?'
+- text: '# Please let us know if you have other intersecting identities (e.g. gender, sexual orientation, ability, class background, nationality) that you feel is relevant to the report.'
 
 - input:
-    name: spoken-to-useful
-    label: Who was it most useful to talk to? 
+    name: relevant-identities
+    label: Relevant identities
     type: textbox
 
-- text: '# Thinking of this incident, how often have you experienced/witnessed this type of racism?'
+- text: '# !{What is your racial or ethnic identity?}{Please note that we are aware of the limitations of ascribing an ethnic or racial identity to one self. However, for the purposes of this report it would be useful to have an indication, which we will take as subjective and socially constructed. We have adapted this list from the official categories used by the UK National Office of Statistics and the University of Cambridge}'
 
-- input:
-    name: type-frequency
-    label: Frequency
-    type: select
-    options:
-        blank:
-            label: ''
-        one-off:
-            label: It was a one off incident
-        year:
-            label: Several times a year
-        month:
-            label: Several times a month
-        week:
-            label: Several times a week
-        day:
-            label: Every day
-        other:
-            label: Other
-            subsidiary:
-                - text: '### Please specify:'
-                - input:
-                    name: type-frequency-other
-                    type: textbox
-
-
-- text: '# How often do you experience/witness racism outside the University?'
-
-- input:
-    name: overall-frequency
-    label: Frequency
-    type: select
-    options:
-        blank:
-            label: ''
-        never:
-            label: Never
-        one-off:
-            label: Once
-        year:
-            label: Several times a year
-        month:
-            label: Several times a month
-        week:
-            label: Several times a week
-        day:
-            label: Every day
-        other:
-            label: Other
-            subsidiary:
-                - text: '### Please specify:'
-                - input:
-                    name: overall-frequency-other
-                    type: textbox
+- partial:
+    name: camReporterEthnicity

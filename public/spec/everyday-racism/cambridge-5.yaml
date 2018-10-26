@@ -1,36 +1,67 @@
-- text: |
-    # Are you reporting on behalf of yourself, someone else or as an observer/witness?
+- text: '# What were you doing when this racist incident occurred?'
 
 - input:
-    name: on-behalf-of
-    label: On behalf of
+    name: doing-what
+    label: Doing what
+    type: select
+    options:
+        blank:
+            label: ''
+        lecture:
+            label: I was in a lecture
+        supervision:
+            label: I was in a supervision
+        seminar:
+            label: I was in a seminar/conference
+        food:
+            label: I was in a lunch/dinner context
+        work:
+            label: I was in my place of work
+        accommodation:
+            label: I was in my accommodation
+        meeting:
+            label: I was at a society meeting
+        transit:
+            label: I was in transit (walking, cycling, etc)
+        other:
+            label: Other
+            subsidiary:
+                - text: '### Please describe in your own words what you were doing:'
+                - input:
+                    name: doing-what-own-words
+                    type: textbox
+
+- text: '# When did the racist incident occur?'
+
+- input:
+    name: when
+    label: when
     type: radio
     options:
-        self:
-            label: Myself
-            attributes: checked
-        else: 
-            label: Someone else
-            branch:
-                in-box: true
-                body:
-                    - text: Please fill in the report to the best of your knowledge following the other person’s request. Do not mind that the form will still use the language ‘you’.
-        witness: 
-            label: As an observer/witness
-            branch:
-                in-box: true
-                body:
-                    - text: Please fill in the report to the best of your knowledge following your observations. Do not mind that the form will still use the language ‘you’.
-            
-- text: |
-    # Racist Incident
-
-    We understand this can be difficult. Please take your time and tell us as much as you want about what happened to you or the person you are writing about. Support services are available for you, and a list of those can be found at the end of the reporting form or in our website here: [http://racismatcambridge.org/further-support/](http://racismatcambridge.org/further-support/).
-
-    You can also report an incident you witnessed even if you were not asked to do so. You will have the opportunity to write about this circumstance at the end of the report.
-
-    Experiences of racism can be so ordinary that it might be difficult to isolate particular incidents. In this report we are aiming to capture different ‘types’ (from the more subtle and everyday to the most obvious and deliberate) and frequencies of forms of racism. We are calling them ‘incidents’ although we are aware this term might limit the complex forms in which racism is expressed and experienced. 
-
-    You will have the option to add different incidents under this same report or create a new one. You can write about a cluster of incidents that are similar in nature, if they have happened in the same place and with the same people. If there are variations and differences, please register each incident separately.
-    
-    You will be able to create and download a PDF with your information.
+        exact:
+            label: I remember the exact date
+            subsidiary:
+                - text: Please select the date and approximate time
+                - input:
+                    name: date
+                    type: library-date
+                - input:
+                    name: time
+                    type: library-24hours
+        approximate:
+            label: I remember the approximate date
+            subsidiary:
+                - text: 'As well as you can remember, when did this happen?'
+                - input:
+                    name: time-over-year
+                    label: When?
+                    type: textbox
+        period:
+            label: It happened over a period of time
+            subsidiary:
+                - input:
+                    name: time-period
+                    label: When was this period of time?
+                    type: textbox
+        no: I do not remember
+        skip: Skip

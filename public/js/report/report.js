@@ -1,6 +1,16 @@
 'use strict';
 
 
+/* global $ */
+
+
+$(document).ready(function() {
+    $('#department-where-select').delay(500).select2({
+        placeholder: 'Select department',
+    });
+});
+
+
 function reCaptchaSubmitCallback(token) { // eslint-disable-line no-unused-vars
     document.querySelector('form').submit();
 }

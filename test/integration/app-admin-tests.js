@@ -466,18 +466,19 @@ index:
             for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
             const d = new Date(Date.now() - 1000*60*60*24);
             const expected = {
-                'Alias':              'testy terrain',
-                'On behalf of':       'Myself',
-                'Survivor gender':    'Female',
-                'Survivor age':       '20–24',
-                'Happened':           dateFormat(d, 'd mmm yyyy'),
-                'Still happening?':   'No',
-                'Where':              'Neighbourhood (Around the corner)',
-                'Who':                'Not known (Big fat guy)',
-                'Description':        'Admin submission test',
-                'Spoken to anybody?': 'Teacher/tutor/lecturer; Friends, family',
-                'E-mail address':     'help@me.com',
-                'Phone number':       '01234 123456',
+                'Alias':               'testy terrain',
+                'On behalf of':        'Myself',
+                'Survivor gender':     'Female',
+                'Survivor age':        '20–24',
+                'Happened':            dateFormat(d, 'd mmm yyyy'),
+                'Still happening?':    'No',
+                'Where':               'Neighbourhood (Around the corner)',
+                'Who':                 'Not known (Big fat guy)',
+                'Description':         'Admin submission test',
+                'Spoken to anybody?':  'Teacher/tutor/lecturer; Friends, family',
+                'E-mail address':      'help@me.com',
+                'Phone number':        '01234 123456',
+                'Uploaded file names': 's_gps.jpg',
             };
             expect(actual).to.deep.equal(expected);
         });

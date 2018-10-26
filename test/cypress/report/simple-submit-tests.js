@@ -104,19 +104,20 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
             const actual = {};
             for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
             const expected = {
-                'Alias':              alias,
-                'On behalf of':       'Myself',
-                'Survivor gender':    'Female',
-                'Survivor age':       '20–24',
-                'Happened':           dateFormat('d mmm yyyy'),
-                'Still happening?':   'Yes',
-                'Where':              'Neighbourhood (Around the corner)',
-                'Who':                'Not known (Big fat guy)',
-                'Description':        'Cypress test '+date,
-                'Spoken to anybody?': 'Teacher/tutor/lecturer (Miss Brodie); Friends, family',
-                'Extra notes':        'Nothing more',
-                'E-mail address':     'help@me.com',
-                'Phone number':       '01234 123456',
+                'Alias':               alias,
+                'On behalf of':        'Myself',
+                'Survivor gender':     'Female',
+                'Survivor age':        '20–24',
+                'Happened':            dateFormat('d mmm yyyy'),
+                'Still happening?':    'Yes',
+                'Where':               'Neighbourhood (Around the corner)',
+                'Who':                 'Not known (Big fat guy)',
+                'Description':         'Cypress test '+date,
+                'Spoken to anybody?':  'Teacher/tutor/lecturer (Miss Brodie); Friends, family',
+                'Extra notes':         'Nothing more',
+                'E-mail address':      'help@me.com',
+                'Phone number':        '01234 123456',
+                'Uploaded file names': 's_gps.jpg',
             };
             expect(actual).to.deep.equal(expected);
         });

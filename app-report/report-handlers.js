@@ -527,17 +527,6 @@ class Handlers {
             }
         }
 
-        if (ctx.request.files) {
-            // normalise files to be array of File objects (koa-body does not provide array if just 1 file uploaded)
-            if (!Array.isArray(ctx.request.files)) ctx.request.files = [ ctx.request.files ];
-
-            // file input fields are named 'documents'; move File objects up to be immediately under 'files'
-            ctx.request.files = ctx.request.files.map(f => f.documents);
-
-            // strip out any 0-size files
-            ctx.request.files = ctx.request.files.filter(f => f.size > 0);
-            debug('... files', ctx.request.files.map(f => f.name));
-        }
 
         if (page==1 & ctx.session.reportId) { ctx.flash = { error: 'Trying to save already saved report!' }; return ctx.response.redirect(ctx.request.url); }
 
@@ -616,18 +605,33 @@ class Handlers {
         }
 
         const formattedReport = formatReport(org, project, page, body);
-
-        if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.reportId, formattedReport, body);
+        
         if (ctx.request.files) {
-            for (const file of ctx.request.files) {
+            //Input name is 'documents' in HTML
+            let files = ctx.request.files.documents;
+            //If there is only one file, store it in an array (so it reflects the standard files structure)
+            files = Array.isArray(files) ? files : [ files ];
+
+            //If there are no files, files will contain 1 file object of size 0, so remove this (thus making files an empty array)
+            files = files.filter(f => f && f.size > 0);
+
+            const fileNames = [];
+
+            for (const file of files) {
                 try {
                     await Report.submissionFile(org, ctx.session.reportId, file);
+                    fileNames.push(file.name);
                 } catch (e) {
                     await Log.error(ctx, e);
                     ctx.flash = { error: e.message };
                 }
             }
+            if (files.length > 0) {
+                formattedReport['Uploaded file names'] = fileNames.join(', ');
+            }
         }
+
+        if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.reportId, formattedReport, body);
 
         // record user-agent
         await UserAgent.log(org, ctx.request.ip, ctx.request.headers);

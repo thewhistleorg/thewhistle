@@ -1,8 +1,8 @@
 - text: |
-    ### Please read and tick to acknowledge the information below and to give your consent to participate in this project.
+    Please read and tick to acknowledge the information below and to give your consent to participate in this project.
 
     <br><br>
-    ### University of Cambridge Official Reporting Procedures
+    ### Nature of this reporting form
 - input:
     no-store: true
     name: procedure
@@ -17,7 +17,7 @@
                 - text: |
                     <br>
                     
-                    ### How is this incident reporting anonymous?
+                    ### How is this incident reporting made as anonymous as possible?
                 - input:
                     no-store: true
                     name: anonymous

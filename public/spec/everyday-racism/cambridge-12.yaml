@@ -2,6 +2,8 @@
 
 - text: '### Pick all options that apply. For each, please explain if further action was taken as a result of these conversations. Please do not provide names of individuals.'
 
+- text: If reporting on behalf of someone else who has shared their experience with you, please describe who else they have spoken to. If this was an incident that you witnessed, please describe who you have spoken to about it.
+
 - text: 'Tick all that apply and please elaborate in the box below:'
 
 - input:
@@ -113,8 +115,67 @@
                     label: 'Elaborate:'
                     name: spoken-to-official-details
                     type: text
-            
+
+- text: '# If you did speak to someone else about this racist incident, what was most useful in talking about it?'
+
 - input:
     name: spoken-to-useful
-    label: If you did speak to someone else about this racist incident, what was most useful in talking about it? 
+    label: Who was it most useful to talk to? 
     type: textbox
+
+- text: '# Thinking of this incident, how often have you experienced/witnessed this type of racism?'
+
+- input:
+    name: type-frequency
+    label: Frequency
+    type: select
+    options:
+        blank:
+            label: ''
+        one-off:
+            label: It was a one off incident
+        year:
+            label: Several times a year
+        month:
+            label: Several times a month
+        week:
+            label: Several times a week
+        day:
+            label: Every day
+        other:
+            label: Other
+            subsidiary:
+                - text: '### Please specify:'
+                - input:
+                    name: type-frequency-other
+                    type: textbox
+
+
+- text: '# How often do you experience/witness racism outside the University?'
+
+- input:
+    name: overall-frequency
+    label: Frequency
+    type: select
+    options:
+        blank:
+            label: ''
+        never:
+            label: Never
+        one-off:
+            label: Once
+        year:
+            label: Several times a year
+        month:
+            label: Several times a month
+        week:
+            label: Several times a week
+        day:
+            label: Every day
+        other:
+            label: Other
+            subsidiary:
+                - text: '### Please specify:'
+                - input:
+                    name: overall-frequency-other
+                    type: textbox

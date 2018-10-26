@@ -51,24 +51,11 @@
         approximate:
             label: I remember the approximate date
             subsidiary:
-                - text: 'Please select when this happened:'
+                - text: 'As well as you can remember, when did this happen?'
                 - input:
-                    name: within-options
-                    label: Within options
-                    type: select
-                    options:
-                        blank:
-                            label:
-                        lastweek:
-                            label: This week
-                        lastmonth:
-                            label: This month
-                        lasthalfyear:
-                            label: Within the last 6 months
-                        lastyear:
-                            label: 6-12 months ago
-                        longer:
-                            label: More than 12 months ago
+                    name: time-over-year
+                    label: When?
+                    type: textbox
         period:
             label: It happened over a period of time
             subsidiary:
@@ -78,60 +65,3 @@
                     type: textbox
         no: I do not remember
         skip: Skip
-
-- text: '# Thinking of this incident, how often have you experienced/witnessed this type of racism?'
-
-- input:
-    name: type-frequency
-    label: Frequency
-    type: select
-    options:
-        blank:
-            label: ''
-        one-off:
-            label: It is a one off incident
-        year:
-            label: Several times a year
-        month:
-            label: Several times a month
-        week:
-            label: Several times a week
-        day:
-            label: Every day
-        other:
-            label: Other
-            subsidiary:
-                - text: '### Please specify:'
-                - input:
-                    name: type-frequency-other
-                    type: textbox
-
-
-- text: '# How often do you experience/witness racism outside the University?'
-
-- input:
-    name: overall-frequency
-    label: Frequency
-    type: select
-    options:
-        blank:
-            label: ''
-        never:
-            label: Never
-        one-off:
-            label: Once
-        year:
-            label: Several times a year
-        month:
-            label: Several times a month
-        week:
-            label: Several times a week
-        day:
-            label: Every day
-        other:
-            label: Other
-            subsidiary:
-                - text: '### Please specify:'
-                - input:
-                    name: overall-frequency-other
-                    type: textbox

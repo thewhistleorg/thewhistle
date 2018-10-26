@@ -3,16 +3,9 @@
 - text: |
     Try to describe as much of what has happened as you can. You may wish to include what led up to the event or situation, as well as what happened and any subsequent events or implications. Please note that it makes it harder to use data if you use names of specific individuals. 
 
-    If the incident you want to report was not ‘an act’ committed by a particular individual, but it refers to a more structural or diffuse experience (such as a hostile atmosphere or seeing a problematic image) please describe it here.
+    If the incident you want to report was not ‘an act’ committed by a particular individual, but it refers instead to a more structural or diffuse experience (such as a hostile atmosphere or seeing a problematic image) please describe it here.
 
-- text: '# What led up to the event or situation you are reporting?'
-
-- input:
-    name: lead-up
-    type: textbox
-    label: Lead-up description
-
-- text: '# What happened?'
+- text: '# What happened? Please also describe the lead up to the event.'
 
 - input:
     name: happened
@@ -30,4 +23,4 @@
     name: document
     type: library-file
     label: |
-      **Please upload any evidence that could help.** This can be photos, videos or any other documents. We will store this safely. We will take all data into account for analysis and to inform advocacy, however we will not be able to make public any data that can lead to identifying particular individuals. Please only use evidence that belongs to you or that you have permission to use.
+      **Please upload any evidence that could help.** This can be photos, videos or any other documents. We will store this safely. We will take all data into account for analysis and to inform advocacy; however we will not be able to make public any data that can lead to identifying particular individuals. Please only use evidence that belongs to you or that you have permission to use.

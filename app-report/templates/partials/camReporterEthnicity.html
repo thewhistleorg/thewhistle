@@ -1,7 +1,7 @@
 <ul class="question-reporters-ethnicity">
     {{#checked reporters-ethnicity}}
     <li>
-        <input type="radio" name="reporters-ethnicity" id="reporters-ethnicity-describe" value="Prefer to describe the racial/ethnic background">
+        <input type="checkbox" name="reporters-ethnicity" id="reporters-ethnicity-describe" value="Prefer to describe the racial/ethnic background">
         <label for="reporters-ethnicity-describe">
             <p>Prefer to describe the racial/ethnic background</p>
         </label>
@@ -11,7 +11,17 @@
         </div>
     </li>
     <li>
-        <input type="radio" name="reporters-ethnicity" id="reporters-ethnicity-asian" value="Asian">
+        <input type="checkbox" name="reporters-ethnicity" id="reporters-ethnicity-arab" value="Arab/Middle Eastern">
+        <label for="reporters-ethnicity-arab">
+            <p>Arab/Middle Eastern</p>
+        </label>
+        <div class="subsidiary hide Arab/Middle_Eastern-subsidiary">
+            <h3>Please describe:</h3>
+            <input type="text" name="reporters-ethnicity-arab" value="{{reporters-ethnicity-arab}}">
+        </div>
+    </li>
+    <li>
+        <input type="checkbox" name="reporters-ethnicity" id="reporters-ethnicity-asian" value="Asian">
         <label for="reporters-ethnicity-asian">
             <p>Asian</p>
         </label>
@@ -20,39 +30,51 @@
                 <li>
                     <h3>Please specify:</h3>
                     {{#checked reporters-ethnicity-asian}}
-                    <input type="radio" name="reporters-ethnicity-asian" id="reporter-arab" value="Arab">
-                    <label for="reporter-arab">Arab</label>
-                    <input type="radio" name="reporters-ethnicity-asian" id="reporter-bangladeshi" value="Asian/Asian British - Bangladeshi">
-                    <label for="reporter-bangladeshi">Asian/Asian British - Bangladeshi</label>
-                    <input type="radio" name="reporters-ethnicity-asian" id="reporter-indian" value="Asian/Asian British - Indian">
-                    <label for="reporter-indian">Asian/Asian British - Indian</label>
-                    <input type="radio" name="reporters-ethnicity-asian" id="reporter-pakistani" value="Asian/Asian British - Pakistani">
-                    <label for="reporter-pakistani">Asian/Asian British - Pakistani</label>
-                    <input type="radio" name="reporters-ethnicity-asian" id="reporter-srilankan" value="Asian/Asian British - Sri Lankan">
-                    <label for="reporter-srilankan">Asian/Asian British - Sri Lankan</label>
-                    <input type="radio" name="reporters-ethnicity-asian" id="reporter-chinese" value="Chinese">
-                    <label for="reporter-chinese">Chinese</label>
-                    <input type="radio" name="reporters-ethnicity-asian" id="reporter-japanese" value="Japanese">
-                    <label for="reporter-japanese">Japanese</label>
-                    <input type="radio" name="reporters-ethnicity-asian" id="reporter-middleeastern" value="Middle Eastern">
-                    <label for="reporter-middleeastern">Middle Eastern</label>
-                    <div class="reporter-middleeastern-branch hide">
-                        <h3>Please specify further if you wish:</h3>
-                        <input type="text" name="middleeastern-specify" value="{{middleeastern-specify}}">
-                    </div>
-                    <input type="radio" name="reporters-ethnicity-asian" id="reporter-otherasian" value="Any other Asian">
-                    {{/checked}}
-                    <label for="reporter-otherasian">Any other Asian (North, East, West, Central, South or Southeast Asian) background you prefer to describe?</label>
-                    <div class="reporter-otherasian-branch hide">
-                        <h3>Please specify:</h3>
-                        <input type="text" name="otherasian-specify" value="{{otherasian-specify}}">
-                    </div>
+                    <ul>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-asian" id="reporter-bangladeshi" value="Bangladeshi">
+                            <label for="reporter-bangladeshi">Bangladeshi</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-asian" id="reporter-indian" value="Indian">
+                            <label for="reporter-indian">Indian</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-asian" id="reporter-pakistani" value="Pakistani">
+                            <label for="reporter-pakistani">Pakistani</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-asian" id="reporter-srilankan" value="Sri Lankan">
+                            <label for="reporter-srilankan">Sri Lankan</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-asian" id="reporter-chinese" value="Chinese">
+                            <label for="reporter-chinese">Chinese</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-asian" id="reporter-japanese" value="Japanese">
+                            <label for="reporter-japanese">Japanese</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-asian" id="reporter-korean" value="Korean">
+                            <label for="reporter-korean">Korean</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-asian" id="reporter-otherasian" value="Any other Asian">
+                            <label for="reporter-otherasian">Any other Asian background you prefer to describe?</label>
+                            <div class="reporter-otherasian-branch hide">
+                                <h3>Please describe:</h3>
+                                <input type="text" name="otherasian-specify" value="{{otherasian-specify}}">
+                            </div>
+                        </li>
+                        {{/checked}}
+                    </ul>
                 </li>
             </ul>
         </div>
     </li>
     <li>
-        <input type="radio" name="reporters-ethnicity" id="reporters-ethnicity-black" value="Black">
+        <input type="checkbox" name="reporters-ethnicity" id="reporters-ethnicity-black" value="Black">
         <label for="reporters-ethnicity-black">
             <p>Black</p>
         </label>
@@ -60,40 +82,46 @@
             <ul class="question-reporters-ethnicity-black">
                 <li>
                     <h3>Please specify:</h3>
-                    {{#checked reporters-ethnicity-black}}
-                    <input type="radio" name="reporters-ethnicity-black" id="reporter-african" value="Black African">
-                    <label for="reporter-african">Black African</label>
-                    <input type="radio" name="reporters-ethnicity-black" id="reporter-caribbean" value="Black Caribbean">
-                    <label for="reporter-caribbean">Black Caribbean</label>
-                    <input type="radio" name="reporters-ethnicity-black" id="reporter-blackbritish" value="Black British">
-                    <label for="reporter-blackbritish">Black British</label>
-                    <input type="radio" name="reporters-ethnicity-black" id="reporter-blackbritishafrican" value="Black British - African">
-                    <label for="reporter-blackbritishafrican">Black British - African</label>
-                    <input type="radio" name="reporters-ethnicity-black" id="reporter-blackbritishcaribbean" value="Black British - Caribbean">
-                    <label for="reporter-blackbritishcaribbean">Black British - Caribbean</label>
-                    <input type="radio" name="reporters-ethnicity-black" id="reporter-blackbritishlatin" value="Black British - Latin American">
-                    <label for="reporter-blackbritishlatin">Black British - Latin American</label>
-                    <input type="radio" name="reporters-ethnicity-black" id="reporter-africanamerican" value="African American">
-                    <label for="reporter-africanamerican">African American</label>
-                    <input type="radio" name="reporters-ethnicity-black" id="reporter-otherblack" value="Any other Black">
-                    {{/checked}}
-                    <label for="reporter-otherblack">Any other Black background you prefer to describe?</label>
-                    <div class="reporter-otherblack-branch hide">
-                        <h3>Please specify:</h3>
-                        <input type="text" name="otherblack-specify" value="{{otherblack-specify}}">
-                    </div>
+                    <ul>
+                        <li>
+                            {{#checked reporters-ethnicity-black}}
+                            <input type="checkbox" name="reporters-ethnicity-black" id="reporter-african" value="Black African">
+                            <label for="reporter-african">Black African</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-black" id="reporter-caribbean" value="Black Caribbean">
+                            <label for="reporter-caribbean">Black Caribbean</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-black" id="reporter-blackbritish" value="Black British">
+                            <label for="reporter-blackbritish">Black British</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-black" id="reporter-africanamerican" value="African American">
+                            <label for="reporter-africanamerican">African American</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-black" id="reporter-otherblack" value="Any other Black">
+                            <label for="reporter-otherblack">Any other Black background you prefer to describe?</label>
+                            <div class="reporter-otherblack-branch hide">
+                                <h3>Please specify:</h3>
+                                <input type="text" name="otherblack-specify" value="{{otherblack-specify}}">
+                            </div>
+                            {{/checked}}
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </div>
     </li>
     <li>
-        <input type="radio" name="reporters-ethnicity" id="reporters-ethnicity-traveller" value="Romani/Roma or Irish Traveller">
+        <input type="checkbox" name="reporters-ethnicity" id="reporters-ethnicity-traveller" value="Romani/Roma or Irish Traveller">
         <label for="reporters-ethnicity-traveller">
             <p>Romani/Roma or Irish Traveller</p>
         </label>
     </li>
     <li>
-        <input type="radio" name="reporters-ethnicity" id="reporters-ethnicity-indigenous" value="Indigenous, Native or Aboriginal background">
+        <input type="checkbox" name="reporters-ethnicity" id="reporters-ethnicity-indigenous" value="Indigenous, Native or Aboriginal background">
         <label for="reporters-ethnicity-indigenous">
             <p>Indigenous, Native or Aboriginal background</p>
         </label>
@@ -103,48 +131,17 @@
         </div>
     </li>
     <li>
-        <input type="radio" name="reporters-ethnicity" id="reporters-ethnicity-mixedrace" value="Mixed race/mixed or multiple ethnic origin">
+        <input type="checkbox" name="reporters-ethnicity" id="reporters-ethnicity-mixedrace" value="Mixed race/mixed or multiple ethnic origin">
         <label for="reporters-ethnicity-mixedrace">
             <p>Mixed race/mixed or multiple ethnic origin</p>
         </label>
         <div class="subsidiary hide Mixed_race/mixed_or_multiple_ethnic_origin-subsidiary">
-            <ul class="question-reporters-ethnicity-mixedrace">
-                <li>
-                    <h3>Please specify:</h3>
-                    {{#checked reporters-ethnicity-mixedrace}}
-                    <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mestizo" value="Mestizo (Latin American)">
-                    <label for="reporter-mestizo">Mestizo (Latin American)</label>
-                    <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedarab" value="Mixed Arab">
-                    <label for="reporter-mixedarab">Mixed Arab</label>
-                    <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedasian" value="Mixed Asian">
-                    <label for="reporter-mixedasian">Mixed Asian</label>
-                    <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedblack" value="Mixed Black">
-                    <label for="reporter-mixedblack">Mixed Black</label>
-                    <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedwhite" value="Mixed White">
-                    <label for="reporter-mixedwhite">Mixed White</label>
-                    <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedarabwhite" value="Mixed Arab and White">
-                    <label for="reporter-mixedarabwhite">Mixed Arab and White</label>
-                    <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedasianwhite" value="Mixed Asian and White">
-                    <label for="reporter-mixedasianwhite">Mixed Asian and White</label>
-                    <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedblackwhite" value="Mixed Black British and White">
-                    <label for="reporter-mixedblackwhite">Mixed Black British and White</label>
-                    <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedcaribbeanwhite" value="Mixed Black British Caribbean and White">
-                    <label for="reporter-mixedcaribbeanwhite">Mixed Black British Caribbean and White</label>
-                    <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedafricanwhite" value="Mixed Black British African and White">
-                    <label for="reporter-mixedafricanwhite">Mixed Black British African and White</label>
-                    <input type="radio" name="reporters-ethnicity-mixedrace" id="reporter-mixedother" value="Any other Mixed">
-                    {{/checked}}
-                    <label for="reporter-mixedother">Any other Mixed background you prefer to describe?</label>
-                    <div class="reporter-mixedother-branch hide">
-                        <h3>Please specify:</h3>
-                        <input type="text" name="mixedother-specify" value="{{mixedother-specify}}">
-                    </div>
-                </li>
-            </ul>
+            <h3>Please describe:</h3>
+            <input type="text" name="reporters-ethnicity-mixedrace" value="{{reporters-ethnicity-mixedrace}}">
         </div>
     </li>
     <li>
-        <input type="radio" name="reporters-ethnicity" id="reporters-ethnicity-white" value="White">
+        <input type="checkbox" name="reporters-ethnicity" id="reporters-ethnicity-white" value="White">
         <label for="reporters-ethnicity-white">
             <p>White</p>
         </label>
@@ -152,36 +149,56 @@
             <ul class="question-reporters-ethnicity-white">
                 <li>
                     <h3>Please specify:</h3>
-                    {{#checked reporters-ethnicity-white}}
-                    <input type="radio" name="reporters-ethnicity-white" id="reporter-british" value="British">
-                    <label for="reporter-british">British</label>
-                    <input type="radio" name="reporters-ethnicity-white" id="reporter-english" value="English">
-                    <label for="reporter-english">English</label>
-                    <input type="radio" name="reporters-ethnicity-white" id="reporter-european" value="European">
-                    <label for="reporter-european">European</label>
-                    <input type="radio" name="reporters-ethnicity-white" id="reporter-irish" value="Irish">
-                    <label for="reporter-irish">Irish</label>
-                    <input type="radio" name="reporters-ethnicity-white" id="reporter-northernirish" value="Northern Irish">
-                    <label for="reporter-northernirish">Northern Irish</label>
-                    <input type="radio" name="reporters-ethnicity-white" id="reporter-scottish" value="Scottish">
-                    <label for="reporter-scottish">Scottish</label>
-                    <input type="radio" name="reporters-ethnicity-white" id="reporter-welsh" value="Welsh">
-                    <label for="reporter-welsh">Welsh</label>
-                    <input type="radio" name="reporters-ethnicity-white" id="reporter-usa" value="USA">
-                    <label for="reporter-usa">USA</label>
-                    <input type="radio" name="reporters-ethnicity-white" id="reporter-otherwhite" value="Any other White">
-                    {{/checked}}
-                    <label for="reporter-otherwhite">Any other White background</label>
-                    <div class="reporter-otherwhite-branch hide">
-                        <h3>Please describe:</h3>
-                        <input type="text" name="otherwhite-specify" value="{{otherwhite-specify}}">
-                    </div>
+                    <ul>
+                        <li>
+                            {{#checked reporters-ethnicity-white}}
+                            <input type="checkbox" name="reporters-ethnicity-white" id="reporter-british" value="British">
+                            <label for="reporter-british">British</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-white" id="reporter-english" value="English">
+                            <label for="reporter-english">English</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-white" id="reporter-european" value="European">
+                            <label for="reporter-european">European</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-white" id="reporter-irish" value="Irish">
+                            <label for="reporter-irish">Irish</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-white" id="reporter-northernirish" value="Northern Irish">
+                            <label for="reporter-northernirish">Northern Irish</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-white" id="reporter-scottish" value="Scottish">
+                            <label for="reporter-scottish">Scottish</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-white" id="reporter-welsh" value="Welsh">
+                            <label for="reporter-welsh">Welsh</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-white" id="reporter-usa" value="USA">
+                            <label for="reporter-usa">USA</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="reporters-ethnicity-white" id="reporter-otherwhite" value="Any other White">
+                            <label for="reporter-otherwhite">Any other White background</label>
+                            <div class="reporter-otherwhite-branch hide">
+                                <h3>Please describe:</h3>
+                                <input type="text" name="otherwhite-specify" value="{{otherwhite-specify}}">
+                            </div>
+                            {{/checked}}
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </div>
     </li>
     <li>
-        <input type="radio" name="reporters-ethnicity" id="reporters-ethnicity-other" value="Any other ethnic group">
+        <input type="checkbox" name="reporters-ethnicity" id="reporters-ethnicity-other" value="Any other ethnic group">
         <label for="reporters-ethnicity-other">
             <p>Any other ethnic group</p>
         </label>
@@ -189,12 +206,6 @@
             <h3>Please describe:</h3>
             <input type="text" name="reporters-ethnicity-other" value="{{reporters-ethnicity-other}}">
         </div>
-    </li>
-    <li>
-        <input type="radio" name="reporters-ethnicity" id="reporters-ethnicity-skip" value="Skip">
-        <label for="reporters-ethnicity-skip">
-            <p>Skip</p>
-        </label>
     </li>
     {{/checked}}
 </ul>

@@ -1,8 +1,8 @@
-- text: '# Age, gender, sexual orientation, racial/ethnic identity and religion'
+- text: For the questions on this page, if you are reporting on behalf of someone else who has shared their experience with you or if you are reporting about an incident that you witnessed, please describe yourself, the reporter.
 
-- text: '### Please help us to better understand how you might have experienced this incident by answering the following questions. While we understand that some of these details are socially constructed as well as the object of academic and political debate, we are interested in providing data that can more easily speak to public policy bodies and institutional change. We think that the power of every person’s experiences of racism will be more strongly represented with the aid of the profiles of the individuals that these incidents are happening to.'
+- text: 'Please help us to better understand how you might have experienced this incident by answering the following questions. While we understand that some of these details are socially constructed as well as the object of academic and political debate, we are interested in providing data that can more easily speak to public policy bodies and institutional change. We think that the power of every person’s experiences of racism will be more strongly represented with the aid of the profiles of the individuals that these incidents are happening to.'
 
-- text: '## Age'
+- text: '# Age'
 
 - input:
     name: age
@@ -28,69 +28,12 @@
         older:
             label: 80+
 
-- text: '## Gender identifier'
+- text: '# Please let us know if you have other intersecting identities (e.g. gender, sexual orientation, ability, class background, nationality) that you feel is relevant to the report.'
 
 - input:
-    name: gender
-    label: Gender
-    type: radio
-    options:
-        describe:
-            label: Prefer to self-describe
-            subsidiary:
-                - text: "### Please describe:"
-                - input:
-                    name: gender-description
-                    type: textbox
-        female:
-            label: Female
-        male:
-            label: Male
-        nonbinary:
-            label: Non-binary
-        other:
-            label: Other
-        skip:
-            label: Skip
-
-- text: '## Does your gender identity match your sex as registered at birth?'
-
-- input:
-    name: gender-registered
-    label: Gender identity
-    type: radio
-    options:
-        yes:
-            label: Yes
-        no:
-            label: No
-        skip:
-            label: Skip
-
-- text: '## What is your Sexual Orientation?'
-
-- input:
-    name: sexual-orientation
-    label: Sexual Orientation
-    type: radio
-    options:
-        describe:
-            label: Prefer to self-describe
-            subsidiary:
-                - text: "### Please describe:"
-                - input:
-                    name: sexual-orientation-description
-                    type: textbox
-        straight:
-            label: Straight/Heterosexual
-        gay:
-            label: Gay or Lesbian
-        bisexual:
-            label: Bisexual
-        other:
-            label: Other
-        skip:
-            label: Skip
+    name: relevant-identities
+    label: Relevant identities
+    type: textbox
 
 - text: '# !{What is your racial or ethnic identity?}{Please note that we are aware of the limitations of ascribing an ethnic or racial identity to one self. However, for the purposes of this report it would be useful to have an indication, which we will take as subjective and socially constructed. We have adapted this list from the official categories used by the UK National Office of Statistics and the University of Cambridge}'
 

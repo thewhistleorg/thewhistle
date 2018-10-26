@@ -95,7 +95,7 @@
                             <option>College office</option>
                             <option>College JCR</option>
                             <option>College MCR</option>
-                            <option>College Porters Lodge</option>
+                            <option>College porters lodge</option>
                             <option>College cafe</option>
                             <option>Dining area</option>
                             <option>College-sponsored event (formal/mixer/bop/seminar room)</option>
@@ -119,7 +119,7 @@
               <ul class="question-school">
                   <li>
                       <h3>Which department?</h3>
-                      <p>Please be as specific or as general as your like</p>
+                      <p>Please be as specific or as general as you like</p>
                       <select name="department-where-select" id="department-where-select">
                             {{#selected department-where-select}}
                             <option></option>
@@ -277,17 +277,6 @@
                               <h4>Please specify:</h4>
                               <input type="text" name="department-own-words" id="department-own-words"  class="pure-input-1" value="{{department-own-words}}">
                           </div>
-                    </li>
-                </ul>
-                <ul class="question-own-department">
-                    <li>
-                        {{#checked own-department}}
-                        <h3>Did this incident occur at a department that you work or study at?</h3>
-                        <input type="radio" name="own-department" id="own-department-yes" value="Yes">
-                        <label for="own-department-yes"><p>Yes</p></label>
-                        <input type="radio" name="own-department" id="own-department-no" value="No">
-                        <label for="own-department-no"><p>No</p></label>
-                        {{/checked}}
                     </li>
                 </ul>
             </div>
@@ -457,8 +446,8 @@
                                 </li>
                             </ul>
                         </div>
-                        <input type="radio" name="location-other" id="location-other-admin" value="Admin">
-                        <label for="location-other-admin"><p>Admin Offices</p></label>
+                        <input type="radio" name="location-other" id="location-other-admin" value="Admin offices">
+                        <label for="location-other-admin"><p>Admin offices</p></label>
                         <div class="location-other-admin-branch hide">
                             <h3>Please specify:</h3>
                             <input type="text" name="location-other-admin-specify" value="{{location-other-admin-specify}}">
@@ -492,6 +481,18 @@
                             </ul>
                         </div>
 
+                        <input type="radio" name="location-other" id="location-other-street" value="In the street">
+                        <label for="location-other-street"><p>In the street</p></label>
+                        
+                        <div class="location-other-street-branch hide">
+                            <ul class="question-location-street">
+                                <li>
+                                    <h3>Please specify:</h3>
+                                    <input type="text" name="location-other-street-specify" value="{{location-other-street-specify}}">
+                                </li>
+                            </ul>
+                        </div>
+
                         <input type="radio" name="location-other" id="location-other-cafe" value="Café/restaurant">
                         <label for="location-other-cafe"><p>Café/restaurant (if this is in a College, please tick option above)</p></label>
                         
@@ -504,8 +505,8 @@
                             </ul>
                         </div>
 
-                        <input type="radio" name="location-other" id="location-other-party" value="Club/Night out/Party">
-                        <label for="location-other-party"><p>Club/Night out/Party</p></label>
+                        <input type="radio" name="location-other" id="location-other-party" value="Club/night out/Party">
+                        <label for="location-other-party"><p>Club/night out/Party</p></label>
                         
                         <div class="location-other-party-branch hide">
                             <ul class="question-location-party">

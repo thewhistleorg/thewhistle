@@ -1,6 +1,8 @@
-- text: Racism tends to generate (and it could emanate from) strong feelings and emotions but also experiences of affective intensity that are not necessarily easy to define. If this is the case for you and the incident you are reporting, please describe what you felt as much as you can in the spaces provided below.
+- text: Racism tends to generate (and could emanate from) strong feelings and emotions that are not necessarily easy to define. If this is the case for you and the incident you are reporting, please describe what you felt as much as you can in the spaces provided below.
 
 - text: '# What feelings or emotions were directed at you or at the victim(s) during this racist incident?'
+
+- text: <br> If reporting on behalf of someone else or as a witness, please describe your perceptions of the emotions that were directed at that person.
 
 - text: 'Tick all that apply and please elaborate in the box below:'
 
@@ -33,6 +35,8 @@
 
 
 - text: '# What feelings and emotions did you experience during this racist incident?'
+
+- text: <br> If you are reporting on behalf of someone else who has shared their experience with you, please describe their feelings. If this was an incident that you witnessed, please describe your feelings as a witness.
 
 - text: 'Tick all that apply and please elaborate in the box below:'
 
@@ -70,6 +74,8 @@
 
 
 - text: '# What physical reactions did you have during or immediately after this incident?'
+
+- text: <br> If reporting on behalf of someone else who has shared their experience with you, please describe their reactions. If this was an incident that you witnessed, please describe your reactions as a witness.
 
 - text: 'Tick all that apply and please elaborate in the box below:'
 

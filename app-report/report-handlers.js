@@ -241,8 +241,8 @@ class Handlers {
      * GET / - (home page) list available reporting apps
      */
     static async getHomePage(ctx) {
-        // temporarily(?) redirect to /grn/rape-is-a-crime
-        return ctx.response.redirect('/grn/rape-is-a-crime');
+        
+        return ctx.render('landing');
 
         const reportApps = { // eslint-disable-line no-unreachable
             GB: [

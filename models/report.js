@@ -495,6 +495,7 @@ class Report {
             if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [submissionFile]`);
             throw e;
         }
+        console.log(formidableFile.name);
     }
 
 

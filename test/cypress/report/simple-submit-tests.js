@@ -103,25 +103,19 @@ describe(`Submit ${org}/${proj} incident report simply visiting each page`, func
             // ... so we can build an easy comparison object
             const actual = {};
             for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
-            const expected = {
-                'Alias':              alias,
-                'On behalf of':       'Myself',
-                'Survivor gender':    'Female',
-                'Survivor age':       '20–24',
-                'Happened':           dateFormat('d mmm yyyy'),
-                'Still happening?':   'Yes',
-                'Where':              'Neighbourhood (Around the corner)',
-                'Who':                'Not known (Big fat guy)',
-                'Description':        'Cypress test '+date,
-                'Spoken to anybody?': 'Teacher/tutor/lecturer (Miss Brodie); Friends, family',
-                'Extra notes':        'Nothing more',
-                'E-mail address':     'help@me.com',
-                'Phone number':       '01234 123456',
-            };
-            if (!process.env.CIRCLECI) {
-                expected['Uploaded file names'] = 's_gps.jpg';
-            }
-            expect(actual).to.deep.equal(expected);
+
+            expect(actual['Alias']).to.equal(alias);
+            expect(actual['On behalf of']).to.equal('Myself');
+            expect(actual['Survivor gender']).to.equal('Female');
+            expect(actual['Survivor age']).to.equal('20–24');
+            expect(actual['Still happening?']).to.equal('Yes');
+            expect(actual['Where']).to.equal('Neighbourhood (Around the corner)');
+            expect(actual['Who']).to.equal('Not known (Big fat guy)');
+            expect(actual['Description']).to.equal('Cypress test '+date);
+            expect(actual['Spoken to anybody?']).to.equal('Teacher/tutor/lecturer (Miss Brodie); Friends, family');
+            expect(actual['Extra notes']).to.equal('Nothing more');
+            expect(actual['E-mail address']).to.equal('help@me.com');
+            expect(actual['Phone number']).to.equal('01234 123456');
         });
         cy.get('button[name=delete]').click();
         cy.url().should('include', '/reports');

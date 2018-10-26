@@ -63,6 +63,5 @@ options:
     whatnext:
       handler: resources
       method: get
-      prev: false
       step: false
       next: false

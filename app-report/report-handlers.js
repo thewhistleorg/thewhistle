@@ -682,10 +682,6 @@ async function whatnext(ctx) {
             await Submission.complete(org, ctx.session.submissionId, ctx.session.reportId);
         }
 
-        // reset session data (to prevent duplicate submission)
-        ctx.session.reportId = null;
-        ctx.session.completed = 0;
-
     }
     const context = { address: ctx.request.query.address };
 

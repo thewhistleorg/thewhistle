@@ -155,7 +155,7 @@
 
 - input:
     name: overall-frequency
-    label: Frequency
+    label: Frequency outside the University
     type: select
     options:
         blank:

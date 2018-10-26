@@ -435,3 +435,13 @@ div.bumper {
     font-weight: bold;
     margin-top: 1em;
 }
+
+select {
+    width: 80%;
+}
+
+@media screen and (max-width: 500px) {
+    #page-title-text {
+        font-size: 10px;
+    }
+}

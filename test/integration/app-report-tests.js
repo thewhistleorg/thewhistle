@@ -50,11 +50,12 @@ describe(`Report app (${org}/${app.env})`, function() {
         if (responseTestRpt.status != 404) throw new Error('Previous test report was not deleted');
     });
 
-    describe('report app home page redirects to /grn/rape-is-a-crime', function() {
+    describe('report app home page shows ‘The Whistle - Reports’ page', function() {
         it('sees home page', async function() {
             const response = await appReport.get('/');
-            expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/grn/rape-is-a-crime');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('h3').textContent).to.equal('The Whistle - Reports'); // H3 !!
         });
     });
 

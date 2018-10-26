@@ -379,6 +379,19 @@ class Handlers {
     }
 
 
+    static getProgressText(steps) {
+        let noOfSteps = 0;
+        let currentStep = '';
+        for (const step in steps) {
+            noOfSteps++;
+            if (steps[step].class === 'current') {
+                currentStep = step;
+            }
+        }
+        return `Step ${currentStep} of ${noOfSteps}`;
+    }
+
+
     /**
      * GET /:database/:project/:page - render report page.
      *
@@ -451,8 +464,10 @@ class Handlers {
 
         // record 'defaults' for default selections (for alternate texts)
         const defaults = FormGenerator.forms[`${org}/${project}`].defaults;
+        
+        const progressText = Handlers.getProgressText(steps);
 
-        const context = Object.assign({ steps: steps }, defaults, submitted, { incidentDate: incidentDate });
+        const context = Object.assign({ steps: steps }, { progressText: progressText }, defaults, submitted, { incidentDate: incidentDate });
 
         // users are not allowed to go 'back' to 'used-before' page
         if (page==1 && ctx.session.saved) { ctx.flash = { error: 'Please continue with your current alias' }; return ctx.response.redirect(`/${org}/${project}/2`); }

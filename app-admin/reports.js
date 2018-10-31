@@ -949,8 +949,9 @@ class ReportsHandlers {
             await Report.flagView(db, reportId, ctx.state.user.id);
         } catch (e) {
             ctx.response.status = 500; // force notification e-mail
-            await Log.error(ctx, e);
-            extra.error = e.message; // validation failure
+            // for failed validations, log the report instead of the error stack trace
+            await Log.error(ctx, e.message.match(/failed validation/) ? { stack: report } : e);
+            extra.error = e.message; // display the error similarly to flash errors
         }
         await ctx.render('reports-view', Object.assign(report, extra));
     }

@@ -42,7 +42,7 @@ input:
   properties:
     name:        { type: string, pattern: '^[a-z][a-z0-9-]+$' }           # alphanum + hyphen
     label:       { type: [ string, boolean ] }                            # any string or 'false'
-    type:        { type: string, pattern: '^text|number|tel|email|textbox|select|radio|checkbox|button|hidden|recaptcha-button|pdf-button|library-[a-z0-9]+$' }
+    type:        { type: string, pattern: '^text|number|tel|url|email|textbox|select|radio|checkbox|button|hidden|recaptcha-button|pdf-button|library-[a-z0-9]+$' }
     value:       { type: string, pattern: '^({{)?[a-z][a-z0-9-]+(}})?$' } # alphanum + hyphen with optional handlebars escapes
     text:        { type: string }
     options:     { $ref: '#/options' }                                    # for radio/checkbox/select inputs

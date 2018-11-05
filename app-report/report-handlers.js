@@ -507,6 +507,9 @@ class Handlers {
         if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.response.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
 
         const body = ctx.request.body;
+
+        const anotherIncident = body['another-incident-nostore'] === 'Yes';
+
         Handlers.removeNoStores(body);
 
         if (ctx.session.reportId && org.startsWith('everyday-racism') && project === 'cambridge') {
@@ -575,6 +578,7 @@ class Handlers {
             const ids = await Report.startSession(org, project, alias, body['used-before']!='No', ua, country);
             ctx.session.sessionId = ids.sessionId;
             ctx.session.reportId = ids.reportId;
+            ctx.session.reportIds = [ ids.reportId ];
             // TODO: ?? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.reportId, 'incomplete', null);
 
             // notify users of 'new report submitted'
@@ -636,7 +640,13 @@ class Handlers {
             }
         }
 
-        if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.reportId, formattedReport, body);
+        if (page > FormGenerator.forms[`${org}/${project}`].incidentPages) {
+            for (let i = 0; i < ctx.session.reportIds.length; i++) {
+                await Report.submissionDetails(org, ctx.session.reportIds[i], formattedReport, body);    
+            }
+        } else if (page > 1 || page=='+') {
+            await Report.submissionDetails(org, ctx.session.reportId, formattedReport, body);
+        }
 
         // record user-agent
         await UserAgent.log(org, ctx.request.ip, ctx.request.headers);
@@ -648,6 +658,19 @@ class Handlers {
             await Submission.progress(org, ctx.session.submissionId, page);
         }
 
+        if (anotherIncident) {
+            const ua = ctx.request.headers['user-agent'];
+            const country = await Ip.getCountry(ctx.request.ip);
+            const rpt = await Report.get(org, ctx.session.reportId);
+            const alias = rpt.alias;
+            const onBehalfOf = rpt.submittedRaw['on-behalf-of'];
+            ctx.session.reportId = await Report.submissionStart(org, project, alias, body['used-before']!='No', ua, country, ctx.session.sessionId);
+            ctx.session.reportIds.push(ctx.session.reportId);
+            await Report.setVerified(org, ctx.session.reportId);
+            await Report.setUsedBefore(org, ctx.session.reportId);
+            await Report.submissionDetails(org, ctx.session.reportId, { 'On behalf of': onBehalfOf }, { 'on-behalf-of': onBehalfOf });
+            return ctx.response.redirect(`/${org}/${project}/${FormGenerator.forms[`${org}/${project}`].newIncidentPage}`);
+        }
         ctx.response.redirect(`/${org}/${project}/${go}`);
     }
 

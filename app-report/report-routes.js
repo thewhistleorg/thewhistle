@@ -25,8 +25,8 @@ router.get( '/', handlers.getHomePage); // home page
 
 // tmp: serve SMS test web app TODO: remove once sms app fully functional
 
-router.get('/everyday-racism',                     ctx => ctx.response.redirect('/everyday-racism/cambridge'));
-router.get('/everyday-racism-test',                ctx => ctx.response.redirect('/everyday-racism-test/cambridge'));
+router.get('/everyday-racism',                    ctx => ctx.response.redirect('/everyday-racism/cambridge'));
+router.get('/everyday-racism-test',               ctx => ctx.response.redirect('/everyday-racism-test/cambridge'));
 router.get( '/:database/:project/rebuild',        handlers.rebuild);     // rebuild report from spec
 router.get( '/:database/:project/pdf/:sessionid', handlers.downloadPdf); // download report(s) as PDF
 router.get( '/:database/:project',                handlers.getIndex);    // render incident report index page

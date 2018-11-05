@@ -322,6 +322,7 @@ class ReportsHandlers {
         for (const project in reports) {
             let wsNumber = 1;
             for (const group in reports[project]) {
+                console.log(group);
                 const ws = XLSX.utils.json_to_sheet(reports[project][group]);
                 XLSX.utils.book_append_sheet(wb, ws, `${project} – ${wsNumber}`);
                 wsNumber++;

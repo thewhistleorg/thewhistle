@@ -19,6 +19,8 @@ pages:
   whatnext: { $ref: 'cambridge-whatnext' }
 
 options:
+  incidentPages: 11
+  newIncidentPage: 4
   pages:
     index:
       prev: false

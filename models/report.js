@@ -497,7 +497,6 @@ class Report {
             if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [submissionFile]`);
             throw e;
         }
-        console.log(formidableFile.name);
     }
 
 
@@ -980,6 +979,34 @@ class Report {
         }
 
         return false;
+    }
+
+    
+    static async setVerified(db, id) {
+        id = objectId(id);
+
+        const reports = await Db.collection(db, 'reports');
+
+        try {
+            await reports.updateOne({ _id: id }, { $set: { verified: true } });
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [flagView]`);
+            throw e;
+        }
+    }
+
+
+    static async setUsedBefore(db, id) {
+        id = objectId(id);
+
+        const reports = await Db.collection(db, 'reports');
+
+        try {
+            await reports.updateOne({ _id: id }, { $set: { usedBefore: true } });
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [flagView]`);
+            throw e;
+        }
     }
 
 }

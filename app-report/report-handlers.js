@@ -241,7 +241,7 @@ class Handlers {
      * GET / - (home page) list available reporting apps
      */
     static async getHomePage(ctx) {
-        
+
         return ctx.render('landing');
 
         const reportApps = { // eslint-disable-line no-unreachable
@@ -464,7 +464,7 @@ class Handlers {
 
         // record 'defaults' for default selections (for alternate texts)
         const defaults = FormGenerator.forms[`${org}/${project}`].defaults;
-        
+
         const progressText = Handlers.getProgressText(steps);
 
         const context = Object.assign({ steps: steps }, { progressText: progressText }, defaults, submitted, { incidentDate: incidentDate });
@@ -604,8 +604,12 @@ class Handlers {
             if (date.getTime() > Date.now()) { ctx.flash = { validation: [ 'Date is in the future' ] }; return ctx.response.redirect(ctx.request.url); }
         }
 
+        // ---- reformat fields & record submitted details
+
         const formattedReport = formatReport(org, project, page, body);
-        
+
+
+        // any files to upload?
         if (ctx.request.files) {
             //Input name is 'documents' in HTML
             let files = ctx.request.files.documents;
@@ -623,7 +627,8 @@ class Handlers {
                     fileNames.push(file.name);
                 } catch (e) {
                     await Log.error(ctx, e);
-                    ctx.flash = { error: e.message };
+                    ctx.flash = { formdata: body, error: e.message };
+                    return ctx.response.redirect(ctx.request.url);
                 }
             }
             if (files.length > 0) {

@@ -1,5 +1,16 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* User model; users allowed to access the system.                            C.Veness 2017-2018  */
+/*                                                                                                */
+/* Users are held in a separate database from the organisation-specific databases, as users may   */
+/* have rights to access more than one organisation. This simplifies user management, but means   */
+/* that there is less clean separation between organisations. If users were held in individual    */
+/* organisation databases, user details would have to be fetched from all such databases at app   */
+/* startup and held in memory, in order to present the option of different organisations to log   */
+/* in to on the login page. This would have implications for the startup period between app       */
+/* startup and display of the login page. Also, a password change would have to be saved to all   */
+/* organisation databases a user had access to. There may be further complications, too; in view  */
+/* of all these considerations, user details continue to be held in a separate database for the   */
+/* time being.                                                                                    */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js
@@ -231,12 +242,12 @@ class User {
         return map;
     }
 
-    
+
     /**
      * Returns Groups corresponding to a given user.
-     * 
+     *
      * @param   {ObjectId} id - User id.
-     * 
+     *
      * @returns {ObjectId[]}   Group ids. Returns an empty array if user isn't found.
      */
     static async getGroups(id) {
@@ -298,7 +309,7 @@ class User {
 
     /**
      * Deletes a given group from all user instances
-     * 
+     *
      * @param {ObjectId} groupId - Group being deleted
      */
     static async deleteForGroup(groupId) {

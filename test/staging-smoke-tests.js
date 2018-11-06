@@ -86,34 +86,39 @@ describe(`Report app (report.${domain})`, function() {
     // and that expected projects are available
     const projects = [
         {
-            org:     'demo',
-            project: 'example-1',
-            note:    'core example spec',
-            title:   'The Whistle Example Reporting Form',
+            org:       'demo',
+            project:   'example-1',
+            note:      'core example spec',
+            title:     'The Whistle Example Reporting Form',
+            recaptcha: true,
         },
         {
-            org:     'everyday-racism-test',
-            project: 'cambridge',
-            note:    'spec held in filesys',
-            title:   'The Whistle / End Everyday Racism Incident Report',
+            org:       'everyday-racism-test',
+            project:   'cambridge',
+            note:      'spec held in filesys',
+            title:     'The Whistle / End Everyday Racism Incident Report',
+            recaptcha: false,
         },
         {
-            org:     'grn-test',
-            project: 'rape-is-a-crime',
-            note:    'spec held on filesys',
-            title:   'The Whistle / Global Rights Nigeria Incident Report',
+            org:       'grn-test',
+            project:   'rape-is-a-crime',
+            note:      'spec held on filesys',
+            title:     'The Whistle / Global Rights Nigeria Incident Report',
+            recaptcha: true,
         },
         {
-            org:     'grn',
-            project: 'rape-is-a-crime',
-            note:    'LIVE REPORT',
-            title:   'The Whistle / Global Rights Nigeria Incident Report',
+            org:       'grn',
+            project:   'rape-is-a-crime',
+            note:      'LIVE REPORT',
+            title:     'The Whistle / Global Rights Nigeria Incident Report',
+            recaptcha: true,
         },
         {
-            org:     'hfrn-test',
-            project: 'hfrn-en',
-            note:    'spec held in db',
-            title:   'The Whistle / Humans for Rights Network Incident Report',
+            org:       'hfrn-test',
+            project:   'hfrn-en',
+            note:      'spec held in db',
+            title:     'The Whistle / Humans for Rights Network Incident Report',
+            recaptcha: true,
         },
     ];
 
@@ -125,12 +130,21 @@ describe(`Report app (report.${domain})`, function() {
             expect(document.querySelector('title').textContent).to.equal(project.title);
         });
 
-        it(`${project.org}/${project.project}: fails recaptcha check`, async function() {
-            const values = { 'nav-next': 'next' };
-            const responsePost = await reportApp.post(`/${project.org}/${project.project}`).send(values);
-            expect(responsePost.status).to.equal(302);
-            expect(responsePost.headers.location).to.equal(`/${project.org}/${project.project}`);
-            expect(responsePost.headers['x-redirect-reason']).to.equal('reCAPTCHA verification failed');
-        });
+        if (!project.recaptcha) {
+            it(`${project.org}/${project.project}: goes to p1`, async function() {
+                const values = { 'nav-next': 'next' };
+                const responsePost = await reportApp.post(`/${project.org}/${project.project}`).send(values);
+                expect(responsePost.status).to.equal(302);
+                expect(responsePost.headers.location).to.equal(`/${project.org}/${project.project}/1`);
+            });
+        } else {
+            it(`${project.org}/${project.project}: fails recaptcha check`, async function() {
+                const values = { 'nav-next': 'next' };
+                const responsePost = await reportApp.post(`/${project.org}/${project.project}`).send(values);
+                expect(responsePost.status).to.equal(302);
+                expect(responsePost.headers.location).to.equal(`/${project.org}/${project.project}`);
+                expect(responsePost.headers['x-redirect-reason']).to.equal('reCAPTCHA verification failed');
+            });
+        }
     }
 });

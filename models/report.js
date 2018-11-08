@@ -336,7 +336,7 @@ class Report {
      * @param   {string}   userAgent - User agent from http request header.
      * @param   {string}   country - Country report was submitted from (obtained from IP address)
      * @param   {ObjectId} sessionId - ReportSession id for the new report
-     * 
+     *
      * @returns {ObjectId} New report id.
      */
     static async submissionStart(db, project, alias, usedBefore, userAgent, country, sessionId) {
@@ -448,6 +448,8 @@ class Report {
         if (formidableFile.size == 0) return;
 
         const rpt = await Report.get(db, id);
+        if (!rpt) throw new Error(`Report ${db}/${id} not found`);
+
         const project = rpt.project;
 
         // store uploaded files in AWS S3
@@ -949,7 +951,7 @@ class Report {
 
     static async isVerified(db, id) {
         id = objectId(id);
-        
+
         const reports = await Db.collection(db, 'reports');
 
         const report = await reports.findOne(id);
@@ -960,12 +962,12 @@ class Report {
 
     static async verifyCode(db, id, code) {
         id = objectId(id);
-        
+
         const reports = await Db.collection(db, 'reports');
 
         const report = await reports.findOne(id);
 
-        
+
         if (code && report.verificationCode === code.toUpperCase()) {
             try {
                 await reports.updateOne({ _id: id }, { $set: { verified: true } });
@@ -977,6 +979,34 @@ class Report {
         }
 
         return false;
+    }
+
+    
+    static async setVerified(db, id) {
+        id = objectId(id);
+
+        const reports = await Db.collection(db, 'reports');
+
+        try {
+            await reports.updateOne({ _id: id }, { $set: { verified: true } });
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [flagView]`);
+            throw e;
+        }
+    }
+
+
+    static async setUsedBefore(db, id) {
+        id = objectId(id);
+
+        const reports = await Db.collection(db, 'reports');
+
+        try {
+            await reports.updateOne({ _id: id }, { $set: { usedBefore: true } });
+        } catch (e) {
+            if (e.code == 121) throw new Error(`Report ${db}/${id} failed validation [flagView]`);
+            throw e;
+        }
     }
 
 }

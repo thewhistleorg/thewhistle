@@ -241,8 +241,8 @@ class Handlers {
      * GET / - (home page) list available reporting apps
      */
     static async getHomePage(ctx) {
-        // temporarily(?) redirect to /grn/rape-is-a-crime
-        return ctx.response.redirect('/grn/rape-is-a-crime');
+
+        return ctx.render('landing');
 
         const reportApps = { // eslint-disable-line no-unreachable
             GB: [
@@ -465,7 +465,7 @@ class Handlers {
 
         // record 'defaults' for default selections (for alternate texts)
         const defaults = FormGenerator.forms[`${org}/${project}`].defaults;
-        
+
         const progressText = Handlers.getProgressText(steps);
 
         const context = Object.assign({ steps: steps }, { progressText: progressText }, defaults, submitted, { incidentDate: incidentDate });
@@ -508,6 +508,9 @@ class Handlers {
         if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.response.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
 
         const body = ctx.request.body;
+
+        const anotherIncident = body['another-incident-nostore'] === 'Yes';
+
         Handlers.removeNoStores(body);
 
         if (ctx.session.reportId && org.startsWith('everyday-racism') && project === 'cambridge') {
@@ -528,17 +531,6 @@ class Handlers {
             }
         }
 
-        if (ctx.request.files) {
-            // normalise files to be array of File objects (koa-body does not provide array if just 1 file uploaded)
-            if (!Array.isArray(ctx.request.files)) ctx.request.files = [ ctx.request.files ];
-
-            // file input fields are named 'documents'; move File objects up to be immediately under 'files'
-            ctx.request.files = ctx.request.files.map(f => f.documents);
-
-            // strip out any 0-size files
-            ctx.request.files = ctx.request.files.filter(f => f.size > 0);
-            debug('... files', ctx.request.files.map(f => f.name));
-        }
 
         if (page==1 & ctx.session.reportId) { ctx.flash = { error: 'Trying to save already saved report!' }; return ctx.response.redirect(ctx.request.url); }
 
@@ -587,6 +579,7 @@ class Handlers {
             const ids = await Report.startSession(org, project, alias, body['used-before']!='No', ua, country);
             ctx.session.sessionId = ids.sessionId;
             ctx.session.reportId = ids.reportId;
+            ctx.session.reportIds = [ ids.reportId ];
             // TODO: ?? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.reportId, 'incomplete', null);
 
             // notify users of 'new report submitted'
@@ -617,18 +610,43 @@ class Handlers {
         }
 
         // ---- reformat fields & record submitted details
+
         const formattedReport = formatReport(org, project, page, body);
 
-        if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.reportId, formattedReport, body);
+
+        // any files to upload?
         if (ctx.request.files) {
-            for (const file of ctx.request.files) {
+            //Input name is 'documents' in HTML
+            let files = ctx.request.files.documents;
+            //If there is only one file, store it in an array (so it reflects the standard files structure)
+            files = Array.isArray(files) ? files : [ files ];
+
+            //If there are no files, files will contain 1 file object of size 0, so remove this (thus making files an empty array)
+            files = files.filter(f => f && f.size > 0);
+
+            const fileNames = [];
+
+            for (const file of files) {
                 try {
                     await Report.submissionFile(org, ctx.session.reportId, file);
+                    fileNames.push(file.name);
                 } catch (e) {
                     await Log.error(ctx, e);
-                    ctx.flash = { error: e.message };
+                    ctx.flash = { formdata: body, error: e.message };
+                    return ctx.response.redirect(ctx.request.url);
                 }
             }
+            if (files.length > 0) {
+                formattedReport['Uploaded file names'] = fileNames.join(', ');
+            }
+        }
+
+        if (page > FormGenerator.forms[`${org}/${project}`].incidentPages) {
+            for (let i = 0; i < ctx.session.reportIds.length; i++) {
+                await Report.submissionDetails(org, ctx.session.reportIds[i], formattedReport, body);    
+            }
+        } else if (page > 1 || page=='+') {
+            await Report.submissionDetails(org, ctx.session.reportId, formattedReport, body);
         }
 
         // record user-agent
@@ -641,6 +659,19 @@ class Handlers {
             await Submission.progress(org, ctx.session.submissionId, page);
         }
 
+        if (anotherIncident) {
+            const ua = ctx.request.headers['user-agent'];
+            const country = await Ip.getCountry(ctx.request.ip);
+            const rpt = await Report.get(org, ctx.session.reportId);
+            const alias = rpt.alias;
+            const onBehalfOf = rpt.submittedRaw['on-behalf-of'];
+            ctx.session.reportId = await Report.submissionStart(org, project, alias, body['used-before']!='No', ua, country, ctx.session.sessionId);
+            ctx.session.reportIds.push(ctx.session.reportId);
+            await Report.setVerified(org, ctx.session.reportId);
+            await Report.setUsedBefore(org, ctx.session.reportId);
+            await Report.submissionDetails(org, ctx.session.reportId, { 'On behalf of': onBehalfOf }, { 'on-behalf-of': onBehalfOf });
+            return ctx.response.redirect(`/${org}/${project}/${FormGenerator.forms[`${org}/${project}`].newIncidentPage}`);
+        }
         ctx.response.redirect(`/${org}/${project}/${go}`);
     }
 

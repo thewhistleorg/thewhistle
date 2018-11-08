@@ -19,6 +19,8 @@ pages:
   whatnext: { $ref: 'cambridge-whatnext' }
 
 options:
+  incidentPages: 11
+  newIncidentPage: 4
   pages:
     index:
       prev: false
@@ -41,6 +43,7 @@ options:
       title: The Whistle / End Everyday Racism Incident Report
     p7:
       title: The Whistle / End Everyday Racism Incident Report
+      enctype: multipart/form-data
     p8:
       title: The Whistle / End Everyday Racism Incident Report
     p9:
@@ -63,5 +66,6 @@ options:
     whatnext:
       handler: resources
       method: get
+      prev: false
       step: false
       next: false

@@ -286,8 +286,6 @@ class ReportsHandlers {
         if (db.startsWith('everyday-racism')) {
             ReportsHandlers.exportUngroupedXls(rpts);
         } else {
-        
-
             // get list of users (indexed by id) for use in translating id's to usernames
             const users = await User.details(); // note users is a Map
 
@@ -970,8 +968,9 @@ class ReportsHandlers {
             await Report.flagView(db, reportId, ctx.state.user.id);
         } catch (e) {
             ctx.response.status = 500; // force notification e-mail
-            await Log.error(ctx, e);
-            extra.error = e.message; // validation failure
+            // for failed validations, log the report instead of the error stack trace
+            await Log.error(ctx, e.message.match(/failed validation/) ? { stack: report } : e);
+            extra.error = e.message; // display the error similarly to flash errors
         }
         await ctx.render('reports-view', Object.assign(report, extra));
     }

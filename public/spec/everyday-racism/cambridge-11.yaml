@@ -6,3 +6,17 @@
     name: other-info
     label: Other information
     type: textbox
+
+- text: '# Would you like to report another incident?'
+
+- text: "### If you select yes, you will be able to submit another report and not have to enter information about the victim multiple times. Therefore, please only select 'Yes' if you want to submit another report with the same victim (this can be either you, or someone you're reporting on behalf of)."
+
+- input:
+    name: 'another-incident'
+    no-store: true
+    type: 'radio'
+    options:
+        y:
+            label: 'Yes'
+        n:
+            label: 'No'

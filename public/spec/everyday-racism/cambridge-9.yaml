@@ -64,7 +64,7 @@
         describe:
             label: Prefer to describe
             subsidiary:
-                - text: 'Please describe in the box below'
+                - text: 'Please describe in the box below: "How has the incident shaped your time?"'
         skip: Skip
 
 - text: '# Please describe if this incident has shaped your overall time in Cambridge in any way:'
@@ -90,7 +90,7 @@
         describe:
             label: Prefer to describe
             subsidiary:
-                - text: 'Please describe in the box below'
+                - text: 'Please describe in the box below: "Work/study impact"'
         skip: Skip
 
 - text: '# Please describe the specific impact this incident has had on your work or studies:'

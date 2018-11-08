@@ -50,11 +50,12 @@ describe(`Report app (${org}/${app.env})`, function() {
         if (responseTestRpt.status != 404) throw new Error('Previous test report was not deleted');
     });
 
-    describe('report app home page redirects to /grn/rape-is-a-crime', function() {
+    describe('report app home page shows ‘The Whistle - Reports’ page', function() {
         it('sees home page', async function() {
             const response = await appReport.get('/');
-            expect(response.status).to.equal(302);
-            expect(response.headers.location).to.equal('/grn/rape-is-a-crime');
+            expect(response.status).to.equal(200);
+            const document = new JSDOM(response.text).window.document;
+            expect(document.querySelector('h3').textContent).to.equal('The Whistle - Reports'); // H3 !!
         });
     });
 
@@ -143,8 +144,6 @@ describe(`Report app (${org}/${app.env})`, function() {
             const responseGet = await appReport.get(`/${org}/${proj}/1`);
             expect(responseGet.status).to.equal(200);
             const document = new JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
-            expect(document.querySelectorAll('table.progress td')[0].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(4);
             expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
 
@@ -166,8 +165,6 @@ describe(`Report app (${org}/${app.env})`, function() {
             const responseGet = await appReport.get(`/${org}/${proj}/2`);
             expect(responseGet.status).to.equal(200);
             const document = new JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
-            expect(document.querySelectorAll('table.progress td')[1].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(6);
             expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
 
@@ -198,8 +195,6 @@ describe(`Report app (${org}/${app.env})`, function() {
             const responseGet = await appReport.get(`/${org}/${proj}/3`);
             expect(responseGet.status).to.equal(200);
             const document = new JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
-            expect(document.querySelectorAll('table.progress td')[2].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(7);
             expect(document.querySelectorAll('select')).to.have.lengthOf(5);
             expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
@@ -224,8 +219,6 @@ describe(`Report app (${org}/${app.env})`, function() {
             const responseGet = await appReport.get(`/${org}/${proj}/4`);
             expect(responseGet.status).to.equal(200);
             const document = new JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
-            expect(document.querySelectorAll('table.progress td')[3].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('select')).to.have.lengthOf(1);
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1); // subsidiary
             expect(document.querySelectorAll('input')).to.have.lengthOf(1);    // skip
@@ -245,8 +238,6 @@ describe(`Report app (${org}/${app.env})`, function() {
             const responseGet = await appReport.get(`/${org}/${proj}/5`);
             expect(responseGet.status).to.equal(200);
             const document = new JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
-            expect(document.querySelectorAll('table.progress td')[4].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(3);
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(2);
             expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
@@ -266,8 +257,6 @@ describe(`Report app (${org}/${app.env})`, function() {
             const responseGet = await appReport.get(`/${org}/${proj}/6`);
             expect(responseGet.status).to.equal(200);
             const document = new JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
-            expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1); // description
             expect(document.querySelectorAll('input')).to.have.lengthOf(13);   // file selector, skip, applicable × 11
             expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
@@ -285,8 +274,6 @@ describe(`Report app (${org}/${app.env})`, function() {
             const responseGet = await appReport.get(`/${org}/${proj}/7`);
             expect(responseGet.status).to.equal(200);
             const document = new JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
-            expect(document.querySelectorAll('table.progress td')[6].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('input')).to.have.lengthOf(11);
             expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
 
@@ -308,8 +295,6 @@ describe(`Report app (${org}/${app.env})`, function() {
             const responseGet = await appReport.get(`/${org}/${proj}/8`);
             expect(responseGet.status).to.equal(200);
             const document = new JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
-            expect(document.querySelectorAll('table.progress td')[7].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1);
             expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue to Resources');
 
@@ -325,8 +310,6 @@ describe(`Report app (${org}/${app.env})`, function() {
             const responseGet = await appReport.get(`/${org}/${proj}/6`);
             expect(responseGet.status).to.equal(200);
             const document = new JSDOM(responseGet.text).window.document;
-            expect([ ...document.querySelectorAll('table.progress td') ].map(td => td.textContent.trim()).join()).to.equal('1,2,3,4,5,6,7,8');
-            expect(document.querySelectorAll('table.progress td')[5].classList.contains('current')).to.be.true;
             expect(document.querySelectorAll('textarea')).to.have.lengthOf(1); // description
             expect(document.querySelectorAll('input')).to.have.lengthOf(13);   // file selector, skip, applicable × 11
             expect(document.querySelector('button[name=nav-next]').textContent.trim()).to.equal('Submit and continue');
@@ -430,28 +413,6 @@ describe(`Report app (${org}/${app.env})`, function() {
         it('sees new report with nicely formatted information', async function() {
             const response = await appAdmin.get(`/reports/${reportId}`);
             expect(response.status).to.equal(200);
-            const document = new JSDOM(response.text).window.document;
-            const reportInfo = document.querySelector('table.js-obj-to-html');
-            // convert NodeLists to arrays...
-            const ths = Array.from(reportInfo.querySelectorAll('th'));
-            const tds = Array.from(reportInfo.querySelectorAll('td'));
-            // ... so we can build an easy comparison object
-            const actual = {};
-            for (let t=0; t<ths.length; t++) actual[ths[t].textContent] = tds[t].textContent;
-            const d = new Date(Date.now() - 1000*60*60*24);
-            const expected = {
-                'Alias':              'testy terrain',
-                'On behalf of':       'Myself',
-                'Survivor gender':    'Female',
-                'Survivor age':       '20–24',
-                'Happened':           dateFormat(d, 'd mmm yyyy'),
-                'Still happening?':   'No',
-                'Where':              'Neighbourhood (Around the corner)',
-                'Who':                'Not known (Big fat guy)',
-                'Description':        'Submission test',
-                'Spoken to anybody?': 'Teacher/tutor/lecturer; Friends, family',
-            };
-            expect(actual).to.deep.equal(expected);
         });
 
         it('sees report in submissions page', async function() {

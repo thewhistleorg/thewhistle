@@ -444,6 +444,7 @@ class Handlers {
         const alias = report ? report.alias : null;
 
         // default input values from entered information (with today as default for incident date if not entered)
+
         const submitted = Object.assign(defaultIncidentDate, { alias: alias }, report ? report.submittedRaw : {});
 
         // if e.g. 'anonymous alias not found' is thrown on single-page report, there is no
@@ -615,6 +616,7 @@ class Handlers {
             if (date.getTime() > Date.now()) { ctx.flash = { validation: [ 'Date is in the future' ] }; return ctx.response.redirect(ctx.request.url); }
         }
 
+        // ---- reformat fields & record submitted details
         const formattedReport = formatReport(org, project, page, body);
 
         if (page>1 || page=='+') await Report.submissionDetails(org, ctx.session.reportId, formattedReport, body);
@@ -742,6 +744,46 @@ async function whatnext(ctx) {
 }
 
 
+function formatExtraInfo(body, fields, used) {
+    let info = body[fields['name']];
+    used.push(fields['name']);
+    if (!Array.isArray(info)) {
+        info = [ info ];
+    }
+    if (fields['extra-info']) {
+        for (let option = 0; option < info.length; option++) {
+            const extraInfo = fields['extra-info'][info[option]];
+            if (extraInfo) {
+                const optionInfo = [];
+                for (let input = 0; input < extraInfo.length; input++) {
+                    optionInfo.push(formatExtraInfo(body, extraInfo[input], used));
+                }
+                info[option] += ` (${optionInfo.join('. ')})`;
+            }
+        }
+    }
+    return info.join('; ');
+}
+
+
+function formatFromJson(body, format) {
+    const bodyCopy = JSON.parse(JSON.stringify(body));
+    const rpt = {};
+    const fields = format.fields;
+    const used = [];
+    for (let i = 0; i < fields.length; i++) {
+        rpt[fields[i].name] = formatExtraInfo(bodyCopy, fields[i], used);
+    }
+    for (const field in body) {
+        if (!used.includes(field)) {
+            rpt[field] = body[field];
+        }
+    }
+    return rpt;
+}
+
+
+
 /**
  * Convert fields as defined in form input fields to presentation-friendly fields.
  *
@@ -765,67 +807,72 @@ async function whatnext(ctx) {
  * @returns {Object} Associative array of prettified-label : entered-value pairs.
  */
 function formatReport(org, project, page, body) {
-    const yamlInputs = FormGenerator.forms[`${org}/${project}`].inputs;
-    const partials = FormGenerator.forms[`${org}/${project}`].partials;
-    const pageYamlInputs = page=='+'
-        ? [ ...Object.values(yamlInputs) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
-        : yamlInputs[page];                                                                  // inputs from this page
-    const pagePartials = page=='+'
-        ? [ ...Object.values(partials) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
-        : partials[page];                                                                  // inputs from this page
-    Handlers.removeNoStores(pageYamlInputs);
-    const rpt = {}; // the processed version of body
+    const format = FormGenerator.forms[`${org.replace('-test', '')}/${project}`].format[page];
+    if (format) {
+        return formatFromJson(body, format);
+    } else {
+        const yamlInputs = FormGenerator.forms[`${org}/${project}`].inputs;
+        const partials = FormGenerator.forms[`${org}/${project}`].partials;
+        const pageYamlInputs = page=='+'
+            ? [ ...Object.values(yamlInputs) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
+            : yamlInputs[page];                                                                  // inputs from this page
+        const pagePartials = page=='+'
+            ? [ ...Object.values(partials) ].reduce((acc, val) => Object.assign(acc, val), {}) // inputs from all pages
+            : partials[page];                                                                  // inputs from this page
+        Handlers.removeNoStores(pageYamlInputs);
+        const rpt = {}; // the processed version of body
 
-    for (const partialName in pagePartials) {
-        const partialInputs = pagePartials[partialName];
-        for (let i = 0; i < partialInputs.length; i++) {
-            rpt[partialInputs[i]] = body[partialInputs[i]];
-        }
-    }
-
-    for (const inputName in pageYamlInputs) {
-        if (inputName.match(/-skip$/) && !body[inputName]) continue; // unless 'skip' option is selected, ignore it
-        if (inputName == 'used-before') continue;                    // 'used-before' (Alias) is handled separately
-        if (inputName == 'address') continue;                        // 'address' (from whatnext) is ignored
-
-        const label = pageYamlInputs[inputName].label;
-
-        if (Array.isArray(body[inputName])) { // multiple inputs withe same name: multiple response to checkboxes or 'Skip'
-            // note copy body[inputName] rather than reference it otherwise it gets polluted with subsidiary value
-            rpt[label] = body[inputName].slice();
-        } else {
-            // plain string
-            rpt[label] = body[inputName];
-        }
-
-        // multiple inputs of same name one of which is 'Skip'? - ignore other inputs & record 'Skip'
-        if (Array.isArray(rpt[label]) && body[inputName].filter(val => val=='Skip').length>0) {
-            rpt[label] = 'Skip';
-        }
-
-        // check for any subsidiary inputs: if there are, append the subsidiary value within quotes
-        if (Array.isArray(rpt[label]) && pageYamlInputs[inputName].subsidiary) { // multiple response to checkboxes
-            for (let i=0; i<rpt[label].length; i++) {
-                const subsidiaryFieldName = pageYamlInputs[inputName].subsidiary[body[inputName][i]];
-                if (body[subsidiaryFieldName]) rpt[label][i] += ` (${body[subsidiaryFieldName]})`;
+        for (const partialName in pagePartials) {
+            const partialInputs = pagePartials[partialName];
+            for (let i = 0; i < partialInputs.length; i++) {
+                rpt[partialInputs[i]] = body[partialInputs[i]];
             }
-        } else {                         // radio button or single checkbox, or select
-            const subsidiaryFieldName = pageYamlInputs[inputName].subsidiary ? pageYamlInputs[inputName].subsidiary[body[inputName]] : '';
-            if (body[subsidiaryFieldName]) rpt[label] += ` (${body[subsidiaryFieldName]})`;
         }
 
-        // special treatment for library-date
-        if (inputName == 'when' && body.date) { // TODO: this is depending on naming within yaml, not on use of library-date!
-            const d = typeof body.date=='object' ? body.date : JSON.parse(body.date);
-            const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
-            const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ];
-            // const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, d.hour, d.minute);
-            const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
-            rpt[label] = date;
+        for (const inputName in pageYamlInputs) {
+            if (inputName.match(/-skip$/) && !body[inputName]) continue; // unless 'skip' option is selected, ignore it
+            if (inputName == 'used-before') continue;                    // 'used-before' (Alias) is handled separately
+            if (inputName == 'address') continue;                        // 'address' (from whatnext) is ignored
+
+            const label = pageYamlInputs[inputName].label;
+
+            if (Array.isArray(body[inputName])) { // multiple inputs withe same name: multiple response to checkboxes or 'Skip'
+                // note copy body[inputName] rather than reference it otherwise it gets polluted with subsidiary value
+                rpt[label] = body[inputName].slice();
+            } else {
+                // plain string
+                rpt[label] = body[inputName];
+            }
+
+            // multiple inputs of same name one of which is 'Skip'? - ignore other inputs & record 'Skip'
+            if (Array.isArray(rpt[label]) && body[inputName].filter(val => val=='Skip').length>0) {
+                rpt[label] = 'Skip';
+            }
+
+            // check for any subsidiary inputs: if there are, append the subsidiary value within quotes
+            if (Array.isArray(rpt[label]) && pageYamlInputs[inputName].subsidiary) { // multiple response to checkboxes
+                for (let i=0; i<rpt[label].length; i++) {
+                    const subsidiaryFieldName = pageYamlInputs[inputName].subsidiary[body[inputName][i]];
+                    if (body[subsidiaryFieldName]) rpt[label][i] += ` (${body[subsidiaryFieldName]})`;
+                }
+            } else {                         // radio button or single checkbox, or select
+                const subsidiaryFieldName = pageYamlInputs[inputName].subsidiary ? pageYamlInputs[inputName].subsidiary[body[inputName]] : '';
+                if (body[subsidiaryFieldName]) rpt[label] += ` (${body[subsidiaryFieldName]})`;
+            }
+
+            // special treatment for library-date
+            if (inputName == 'when' && body.date) { // TODO: this is depending on naming within yaml, not on use of library-date!
+                const d = typeof body.date=='object' ? body.date : JSON.parse(body.date);
+                const time = d.time ? d.time.split(':') : [ '00', '00', '00' ];
+                const months = [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ];
+                // const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, d.hour, d.minute);
+                const date = new Date(d.year, months.indexOf(d.month.toLowerCase()), d.day, time[0], time[1]);
+                rpt[label] = date;
+            }
+            debug('...', `${inputName} => ${label}: “${rpt[label]}”`);
         }
-        debug('...', `${inputName} => ${label}: “${rpt[label]}”`);
+        return rpt;
     }
-    return rpt;
 }
 
 

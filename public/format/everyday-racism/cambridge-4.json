@@ -1,0 +1,41 @@
+{
+    "fields": [
+        {
+            "name": "location",
+            "extra-info": {
+                "Online": [
+                    {
+                        "name": "location-online",
+                        "extra-info": {
+                            "Social media platforms": [
+                                {
+                                    "name": "socialmedia-specify"
+                                }
+                            ],
+                            "Other": [
+                                {
+                                    "name": "online-other-specify"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "College": [
+                    {
+                        "name": "college"
+                    },
+                    {
+                        "name": "college-specific",
+                        "extra-info": {
+                            "Other": [
+                                {
+                                    "name": "college-specific-own-words"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

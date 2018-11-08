@@ -258,6 +258,22 @@ class ReportsHandlers {
     }
 
 
+    static getAllQuestions(rpts) {
+        const questions = new Set();
+        for (let i = 0; i < rpts.length; i++) {
+            for (const question in rpts[i].submitted) {
+                questions.add(question);
+            }
+        }
+        console.log(questions);
+    }
+
+
+    static exportUngroupedXls(rpts) {
+        ReportsHandlers.getAllQuestions(rpts);
+    }
+
+
     /**
      * GET /reports/export-xls - download XLS spreadsheet file of current list of reports.
      */
@@ -267,74 +283,79 @@ class ReportsHandlers {
         // ---- filtering
         const { rpts, filterDesc } = await ReportsHandlers.getFilteredReports(db, ctx.request.query);
 
-        // get list of users (indexed by id) for use in translating id's to usernames
-        const users = await User.details(); // note users is a Map
+        if (db.startsWith('everyday-racism')) {
+            ReportsHandlers.exportUngroupedXls(rpts);
+        } else {
+        
 
-        // get list of distinct report questions - each group of distinct questions will go in a separate worksheet
-        const questions = distinctQuestions(rpts);
+            // get list of users (indexed by id) for use in translating id's to usernames
+            const users = await User.details(); // note users is a Map
 
-        // sort reports in reverse chronological order (to match main list default) - this will put
-        // more recent reports at the top of each worksheet, and more recent worksheets at the start
-        // of the list of sheets
-        rpts.sort((a, b) => a._id.getTimestamp() < b._id.getTimestamp() ? 1 : -1);
+            // get list of distinct report questions - each group of distinct questions will go in a separate worksheet
+            const questions = distinctQuestions(rpts);
+
+            // sort reports in reverse chronological order (to match main list default) - this will put
+            // more recent reports at the top of each worksheet, and more recent worksheets at the start
+            // of the list of sheets
+            rpts.sort((a, b) => a._id.getTimestamp() < b._id.getTimestamp() ? 1 : -1);
 
 
-        // perform various mappings to prettify the listings - reports is an associative array
-        // indexed by project, each project being an associative array indexed by 'group' which is
-        // the report questions; each group will be a worksheet in the workbook, and the 'project'
-        // index is used to generate the worksheet name
-        const reports = {};
-        for (const rpt of rpts) {
-            const lastUpdate = await Update.lastForReport(db, rpt._id);
-            const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
-            // rpt.submitted.Happened may be undefined, null, a date, or a description; if it's a date,
-            // format will depend on whether time was recorded or not (midnight is assumed to be no time)
-            const isDate = !isNaN(rpt.submitted.Happened) && rpt.submitted.Happened!=null;
-            const dateFmt = dateFormat(isDate ? rpt.submitted.Happened : null, 'HH:MM:ss:l') == '00:00:00:000' ? 'd mmm yyyy' : 'd mmm yyyy HH:MM';
-            const incidentDate = isDate ? dateFormat(rpt.submitted.Happened, dateFmt) : rpt.submitted.Happened;
-            const fields = {
-                'project':       rpt.project,
-                'alias':         rpt.alias,
-                'incident date': rpt.submitted.Happened ? incidentDate : '',
-                'reported on':   rpt._id.getTimestamp(),
-                'reported by':   rpt.by ? (await User.get(rpt.by)).username : '',
-                'assigned to':   assignedTo ? assignedTo.username : '', // replace 'assignedTo' ObjectId with username
-                'status':        rpt.status,
-                'tags':          rpt.tags.join(', '),
-                'updated on':    lastUpdate.on,
-                'updated by':    lastUpdate.by,
-                'active?':       rpt.archived ? 'archived' : 'active',
-                'url':           ctx.request.origin + '/reports/'+rpt._id,
-            };
-            // get the questions in this report from the object keys (using wacky ␝/␟ separator
-            // characters as an easy guarantee they won't be included in question texts)
-            const rptQuestions = rpt.project+'␝'+Object.keys(rpt.submitted).join('␟');
-            // a 'group' is reports with the same questions (including partial submissions)
-            const group = questions.find(el => el.startsWith((rptQuestions)));
-            // add this report to the relevant group (with a blank column to separate metadata from submitted report)
-            if (!reports[rpt.project]) reports[rpt.project] = {};
-            if (!reports[rpt.project][group]) reports[rpt.project][group] = [];
-            reports[rpt.project][group].push(Object.assign(fields, { '—': '' }, rpt.submitted));
-        }
-
-        // create spreadsheet workbook from reports
-        const wb = XLSX.utils.book_new();
-        for (const project in reports) {
-            let wsNumber = 1;
-            for (const group in reports[project]) {
-                const ws = XLSX.utils.json_to_sheet(reports[project][group]);
-                XLSX.utils.book_append_sheet(wb, ws, `${project} – ${wsNumber}`);
-                wsNumber++;
+            // perform various mappings to prettify the listings - reports is an associative array
+            // indexed by project, each project being an associative array indexed by 'group' which is
+            // the report questions; each group will be a worksheet in the workbook, and the 'project'
+            // index is used to generate the worksheet name
+            const reports = {};
+            for (const rpt of rpts) {
+                const lastUpdate = await Update.lastForReport(db, rpt._id);
+                const assignedTo = rpt.assignedTo ? users.get(rpt.assignedTo.toString()) : null;
+                // rpt.submitted.Happened may be undefined, null, a date, or a description; if it's a date,
+                // format will depend on whether time was recorded or not (midnight is assumed to be no time)
+                const isDate = !isNaN(rpt.submitted.Happened) && rpt.submitted.Happened!=null;
+                const dateFmt = dateFormat(isDate ? rpt.submitted.Happened : null, 'HH:MM:ss:l') == '00:00:00:000' ? 'd mmm yyyy' : 'd mmm yyyy HH:MM';
+                const incidentDate = isDate ? dateFormat(rpt.submitted.Happened, dateFmt) : rpt.submitted.Happened;
+                const fields = {
+                    'project':       rpt.project,
+                    'alias':         rpt.alias,
+                    'incident date': rpt.submitted.Happened ? incidentDate : '',
+                    'reported on':   rpt._id.getTimestamp(),
+                    'reported by':   rpt.by ? (await User.get(rpt.by)).username : '',
+                    'assigned to':   assignedTo ? assignedTo.username : '', // replace 'assignedTo' ObjectId with username
+                    'status':        rpt.status,
+                    'tags':          rpt.tags.join(', '),
+                    'updated on':    lastUpdate.on,
+                    'updated by':    lastUpdate.by,
+                    'active?':       rpt.archived ? 'archived' : 'active',
+                    'url':           ctx.request.origin + '/reports/'+rpt._id,
+                };
+                // get the questions in this report from the object keys (using wacky ␝/␟ separator
+                // characters as an easy guarantee they won't be included in question texts)
+                const rptQuestions = rpt.project+'␝'+Object.keys(rpt.submitted).join('␟');
+                // a 'group' is reports with the same questions (including partial submissions)
+                const group = questions.find(el => el.startsWith((rptQuestions)));
+                // add this report to the relevant group (with a blank column to separate metadata from submitted report)
+                if (!reports[rpt.project]) reports[rpt.project] = {};
+                if (!reports[rpt.project][group]) reports[rpt.project][group] = [];
+                reports[rpt.project][group].push(Object.assign(fields, { '—': '' }, rpt.submitted));
             }
+
+            // create spreadsheet workbook from reports
+            const wb = XLSX.utils.book_new();
+            for (const project in reports) {
+                let wsNumber = 1;
+                for (const group in reports[project]) {
+                    const ws = XLSX.utils.json_to_sheet(reports[project][group]);
+                    XLSX.utils.book_append_sheet(wb, ws, `${project} – ${wsNumber}`);
+                    wsNumber++;
+                }
+            }
+
+            const filenameFilter = filterDesc.size>0 ? `(filtered by ${[ ...filterDesc ].join(', ')}) ` : '';
+            const timestamp = dateFormat('yyyy-mm-dd HH:MM');
+            const filename = `the whistle ${ctx.state.user.db} incident reports ${filenameFilter}${timestamp.replace(':', '.')}.xls`;
+            ctx.response.body = XLSX.write(wb, { type: 'buffer', bookType: 'biff8' });
+            ctx.response.set('X-Timestamp', timestamp); // for integration tests
+            ctx.response.attachment(filename);
         }
-
-        const filenameFilter = filterDesc.size>0 ? `(filtered by ${[ ...filterDesc ].join(', ')}) ` : '';
-        const timestamp = dateFormat('yyyy-mm-dd HH:MM');
-        const filename = `the whistle ${ctx.state.user.db} incident reports ${filenameFilter}${timestamp.replace(':', '.')}.xls`;
-        ctx.response.body = XLSX.write(wb, { type: 'buffer', bookType: 'biff8' });
-        ctx.response.set('X-Timestamp', timestamp); // for integration tests
-        ctx.response.attachment(filename);
-
         // ------------
 
         // return list of permutations of answered questions

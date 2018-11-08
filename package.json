@@ -87,7 +87,7 @@
     "base-64": "^0.1.0",
     "chai": "^4.1.2",
     "csv-parse": "^2.5.0",
-    "cypress": "^3.1.1",
+    "cypress": "3.1.0",
     "eslint": "^5.4.0",
     "eslint-plugin-promise": "^4.0.0",
     "espree": "^4.0.0",

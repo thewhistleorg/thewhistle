@@ -838,7 +838,8 @@ function formatFromJson(body, format) {
  * @returns {Object} Associative array of prettified-label : entered-value pairs.
  */
 function formatReport(org, project, page, body) {
-    const format = FormGenerator.forms[`${org.replace('-test', '')}/${project}`].format[page];
+    const forms = FormGenerator.forms[`${org.replace('-test', '')}/${project}`];
+    const format = forms ? forms.format[page] : null;
     if (format) {
         return formatFromJson(body, format);
     } else {

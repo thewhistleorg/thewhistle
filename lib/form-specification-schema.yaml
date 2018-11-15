@@ -9,6 +9,7 @@ properties:
   title:   { type: string }    # overall title of project (page titles if not over-ridden in options)
   pages:   { $ref: '#/pages' } # the individual pages
   options: { type: object }    # TODO: customisation of individual pages (title, prev/next, etc)
+  publish: { type: object }    # TODO: metrics to be published e.g. for WikiRate
 # additional properties are allowed as they are individual pages in single-file spec
 
 pages:

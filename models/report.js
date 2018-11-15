@@ -72,6 +72,7 @@ const schema = {
                 weather: { type: [ 'object' ] },               // ... wunderground weather info from report date/location
             },
         },
+        publish:        { type: 'object' },                    // metrics to be published e.g. for WikiRate
         assignedTo:     { bsonType: [ 'objectId', 'null' ] },  // user report is assigned to
         status:         { type:     [ 'string', 'null' ] },    // free-text status (to accomodate any workflow)
         tags:           { type:     'array',                   // tags to classify/group reports
@@ -981,7 +982,7 @@ class Report {
         return false;
     }
 
-    
+
     static async setVerified(db, id) {
         id = objectId(id);
 

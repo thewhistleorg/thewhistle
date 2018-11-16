@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>The Whistle Public Reports</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/publish.css">
+    <style>
+        main {
+            margin: 0;
+        }
+        table {
+            font-size: 0.9em;
+            margin-left: 2em;
+        }
+        code {
+            font-size: 0.9em;
+        }
+        td, th {
+            white-space: nowrap;
+        }
+    </style>
+    <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
+    <script src="/js/admin/ga.js" async></script>
+</head>
+<body>
+
+<header>
+    <nav class="pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item">The Whistle Public Reports</li>
+            <li class="pure-menu-item"><img alt="powered by the Whistle" src="/img/powered-by-the-whistle-horiz-white-180x20.png" height="20" width="180"></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+    <h1>The Whistle Public Reports</h1>
+
+    <p>The <a href="{{@koa.request.origin}}">publish.thewhistle.org</a> resource makes available aggregated metrics and
+        supply-chain data from The Whistle submitted reports which have been flagged as being
+        suitable for public dissemination.</p>
+    <p>These reports are formatted so as to be suitable for import into WikiRate.</p>
+    <p>The format of requests is</p>
+    <ul>
+        <li><code>publish.thewhistle.org/:organisation/:project/wikirate/metrics/:year?metric=:metric</code></li>
+        <li><code>publish.thewhistle.org/:organisation/:project/wikirate/supply/:year</code></li>
+    </ul>
+    <p>Where <code>:organisation</code>, <code>:project</code>, <code>:year</code>, and
+        <code>:metric</code> have to be replaced with the relevant organisation, project, and
+        metric – for example,</p>
+    <ul>
+        <li><code>publish.thewhistle.org/demo/trial/metrics/2018?metric=Basic+hourly+wage</code></li>
+    </ul>
+
+    <p>Metrics are returned as tabular data in comma-separated-values format. Each metric is
+        aggregated to <i>mean</i>, <i>median</i>, <i>min</i>, and <i>max</i> values for each
+        company; e.g.:</p>
+    <table>
+        <tr>
+            <th>Metric</th>
+            <th>Company</th>
+            <th>Year</th>
+            <th>Value</th>
+            <th>Source</th>
+            <th>Comment</th>
+        </tr>
+        <tr>
+            <td>Basic hourly wage – mean</td>
+            <td>Megalith Inc</td>
+            <td>2018</td>
+            <td class="align-right">12.97</td>
+            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>from 14 submissions</td>
+        </tr>
+        <tr>
+            <td>Basic hourly wage – median</td>
+            <td>Megalith Inc</td>
+            <td>2018</td>
+            <td class="align-right">11.48</td>
+            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>from 14 submissions</td>
+        </tr>
+        <tr>
+            <td>Basic hourly wage – min</td>
+            <td>Megalith Inc</td>
+            <td>2018</td>
+            <td class="align-right">8.45</td>
+            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>from 14 submissions</td>
+        </tr>
+        <tr>
+            <td>Basic hourly wage – max</td>
+            <td>Megalith Inc</td>
+            <td>2018</td>
+            <td class="align-right">17.89</td>
+            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>from 14 submissions</td>
+        </tr>
+        <tr>
+            <td>Basic hourly wage – mean</td>
+            <td>Top Supplies Ltd</td>
+            <td>2018</td>
+            <td class="align-right">10.14</td>
+            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>from 9 submissions</td>
+        </tr>
+        <tr>
+            <td>Basic hourly wage – median</td>
+            <td>Top Supplies Ltd</td>
+            <td>2018</td>
+            <td class="align-right">9.21</td>
+            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>from 9 submissions</td>
+        </tr>
+        <tr>
+            <td>Basic hourly wage – min</td>
+            <td>Top Supplies Ltd</td>
+            <td>2018</td>
+            <td class="align-right">7.89</td>
+            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>from 9 submissions</td>
+        </tr>
+        <tr>
+            <td>Basic hourly wage – max</td>
+            <td>Top Supplies Ltd</td>
+            <td>2018</td>
+            <td class="align-right">16.64</td>
+            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>from 9 submissions</td>
+        </tr>
+    </table>
+
+    <p>Supply-chain data are also returned as tabular data in comma-separated-values format.
+        e.g.:</p>
+    <table>
+        <tr>
+            <th>Designer</th>
+            <th>Title</th>
+            <th>Company</th>
+            <th>Related company</th>
+            <th>Year</th>
+            <th>Value</th>
+            <th>Source</th>
+            <th>Comment</th>
+        </tr>
+        <tr>
+            <td>Commons</td>
+            <td>Supplied By</td>
+            <td>Megalith Inc</td>
+            <td>Top Supplies Ltd</td>
+            <td>2018</td>
+            <td>Tier 1 Supplier</td>
+            <td>https://publish.thewhistle.org/demo/trial/wikirate/supply/2018</td>
+            <td>from 23 submissions</td>
+        </tr>
+        <tr>
+            <td>Commons</td>
+            <td>Supplier of</td>
+            <td>Top Supplies Ltd</td>
+            <td>Megalith Inc</td>
+            <td>2018</td>
+            <td>Tier 1 Supplier</td>
+            <td>https://publish.thewhistle.org/demo/trial/wikirate/supply/2018</td>
+            <td>from 23 submissions</td>
+        </tr>
+    </table>
+
+    <p>Currently available metrics &amp; supply-chain data are available from</p>
+    <ul>
+        <li><a href="{{@koa.request.origin}}/metrics.html">publish.thewhistle.org/metrics.html</a></li>
+        <li><a href="{{@koa.request.origin}}/supply.html">publish.thewhistle.org/supply.html</a></li>
+    </ul>
+    or for programmatic use,
+    <ul>
+        <li>publish.thewhistle.org/metrics.json [TBC]</li>
+        <li>publish.thewhistle.org/supply.json [TBC]</li>
+    </ul>
+
+</main>
+
+</body>
+</html>

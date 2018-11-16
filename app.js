@@ -1,10 +1,12 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* The Whistle technology trial app.                                          C.Veness 2017-2018  */
 /*                                                                                                */
-/* App comprises three (composed) sub-apps:                                                       */
-/*  - report. (public incident reporting pages)                                                   */
-/*  - admin.  (pages for interactively managing data)                                             */
-/*  - twilio. (RESTful API for Twilio webhooks)                                                   */
+/* App comprises following (composed) sub-apps:                                                   */
+/*  - report.  (public incident reporting pages)                                                  */
+/*  - admin.   (pages for interactively managing data)                                            */
+/*  - publish. (publicly available aggregated metreics)                                           */
+/*  - sms.     (sms incident reporting)                                                           */
+/*  - twilio.  (RESTful API for Twilio webhooks)                                                  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 /* eslint no-shadow:off *//* app is already declared in the upper scope */
@@ -149,10 +151,11 @@ app.use(async function subApp(ctx, next) {
     await next();
 });
 
-import appAdmin  from './app-admin/app-admin.js';
-import appReport from './app-report/app-report.js';
-import appSms    from './app-sms/app-sms.js';
-import appTexit  from './app-textit/app-textit.js';
+import appAdmin   from './app-admin/app-admin.js';
+import appReport  from './app-report/app-report.js';
+import appSms     from './app-sms/app-sms.js';
+import appTextit  from './app-textit/app-textit.js';
+import appPublish from './app-publish/app-publish.js';
 
 
 app.use(async function composeSubapp(ctx) { // note no 'next' after composed subapp
@@ -160,7 +163,8 @@ app.use(async function composeSubapp(ctx) { // note no 'next' after composed sub
         case 'admin':  await compose(appAdmin.middleware)(ctx);   break;
         case 'report': await compose(appReport.middleware)(ctx); break;
         case 'sms': await compose(appSms.middleware)(ctx); break;
-        case 'textit': await compose(appTexit.middleware)(ctx); break;
+        case 'textit': await compose(appTextit.middleware)(ctx); break;
+        case 'publish': await compose(appPublish.middleware)(ctx); break;
         default: // no recognised subdomain
             if (process.env.SUBAPP) {
                 // eg for Heroku review apps where subdomain cannot be supplied, take subapp from env

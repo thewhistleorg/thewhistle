@@ -25,11 +25,17 @@
 
     <h1>The Whistle Public Reports – supply-chain data</h1>
 
+    <p><a href="{{@koa.request.href}}?type=csv">⇒ CSV</a> <a href="{{@koa.request.href}}?type=json">⇒ JSON</a></p>
+
+    {{#if supply.length}}
     <ul>
         {{#supply}}
-        <li><a href="{{@koa.request.origin}}/{{org}}/{{project}}/wikirate/supply/{{year}}">publish.thewhistle.org/{{org}}/{{project}}/wikirate/supply/{{year}}</a></li>
+        <li><a href="{{@koa.request.origin}}/{{organisation}}/{{project}}/wikirate/supply/{{year}}">publish.thewhistle.org/{{organisation}}/{{project}}/wikirate/supply/{{year}}</a></li>
         {{/supply}}
     </ul>
+    {{else}}
+    <p>No supply-chain data found.</p>
+    {{/if}}
 
 </main>
 

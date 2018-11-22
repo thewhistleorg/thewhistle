@@ -6,12 +6,16 @@
 import json2csv from 'json2csv'; // converts json into csv
 import process  from 'process';  // nodejs.org/api/process.html
 
-import Report from '../models/report.js';
+import Report         from '../models/report.js';
+
+
+// note CSV responses are returned with Content-Type: text/plain; setting Content-Type to text/csv
+// would prompt the browser to automatically download the file, which is not what we want
 
 class AppPublishHandlers {
 
     /**
-     * GET /metrics.html - list available metrics
+     * GET /metrics[/:org[/:project[/:year]]] - list available metrics
      */
     static async getMetricsList(ctx) {
         // get all available organisations from db connection string environment variables
@@ -19,6 +23,7 @@ class AppPublishHandlers {
         const organisations = Object.keys(process.env)
             .filter(env => env.slice(0, 3)=='DB_' && env!='DB_USERS')
             .map(db => db.slice(3).toLowerCase().replace(/_/g, '-'));
+        if (ctx.params.org && !organisations.includes(ctx.params.org)) ctx.throw(404); // Not Found
 
         // use a set to get a list of distinct metrics
         const metricsSet = new Set();
@@ -26,30 +31,46 @@ class AppPublishHandlers {
             const reports = await Report.find(org, { publish: { $exists: true } });
 
             for (const rpt of reports) {
+                const year = rpt._id.getTimestamp().getFullYear();
                 // limit to WikiRate for the moment - this can be generalised later if required
                 if (!rpt.publish.wikirate) continue;
+                if (ctx.params.org && org != ctx.params.org) continue;
+                if (ctx.params.project && rpt.project != ctx.params.project) continue;
+                if (ctx.params.year && year != ctx.params.year) continue;
                 for (const metricName in rpt.publish.wikirate.metrics) {
                     const metric = {
-                        org:     org,
-                        project: rpt.project,
-                        year:    rpt._id.getTimestamp().getFullYear(),
-                        metric:  encodeURI(metricName).replace(/%20/g, '+'),
+                        organisation: org,
+                        project:      rpt.project,
+                        year:         year,
+                        metric:       encodeURI(metricName).replace(/%20/g, '+'),
                     };
                     metricsSet.add(JSON.stringify(metric));
                 }
             }
         }
 
-        const context = {
-            metrics: [ ...metricsSet ].map(metric => JSON.parse(metric)),
-        };
+        const metrics = [ ...metricsSet ].map(metric => JSON.parse(metric));
 
-        await ctx.render('list-metrics', context);
+        switch (ctx.request.query.type || ctx.accepts('html', 'json', 'csv')) {
+            case 'html':
+                await ctx.render('list-metrics', { metrics });
+                break;
+            case 'json':
+                ctx.response.body = metrics;
+                break;
+            case 'csv':
+                ctx.response.body = json2csv.parse(metrics);
+                break;
+            default:
+                ctx.response.status = 406; // Not Acceptable
+        }
+
+
     }
 
 
     /**
-     * GET /supply.html - list available supply-chain data
+     * GET /supply[/:org[/:project[/:year]]] - list available supply-chain data
      */
     static async getSupplyList(ctx) {
         // get all available organisations from db connection string environment variables
@@ -67,19 +88,30 @@ class AppPublishHandlers {
                 // limit to WikiRate for the moment - this can be generalised later if required
                 if (!rpt.publish.wikirate) continue;
                 const supply = {
-                    org:     org,
-                    project: rpt.project,
-                    year:    rpt._id.getTimestamp().getFullYear(),
+                    organisation: org,
+                    project:      rpt.project,
+                    year:         rpt._id.getTimestamp().getFullYear(),
                 };
                 supplySet.add(JSON.stringify(supply));
             }
         }
 
-        const context = {
-            supply: [ ...supplySet ].map(supply => JSON.parse(supply)),
-        };
+        const supply = [ ...supplySet ].map(s => JSON.parse(s));
 
-        await ctx.render('list-supply', context);
+        switch (ctx.request.query.type || ctx.accepts('html', 'json', 'csv')) {
+            case 'html':
+                await ctx.render('list-supply', { supply });
+                break;
+            case 'json':
+                ctx.response.body = supply;
+                break;
+            case 'csv':
+                ctx.response.body = json2csv.parse(supply);
+                break;
+            default:
+                ctx.response.status = 406; // Not Acceptable
+        }
+
     }
 
 
@@ -120,13 +152,13 @@ class AppPublishHandlers {
         const metrics = [];
 
         for (const company in groupedRpts) {
-            const values = groupedRpts[company].map(rpt => Number(rpt[metric]));
+            const values = groupedRpts[company].map(rpt => Number(rpt.metrics[metric]));
             const metricBase = {
-                Metric:  null,
+                Metric:  null, // set below
                 Company: company,
                 Year:    year,
-                Value:   null,
-                Source:  `https://${ctx.request.host}/${org}/${org}/wikirate/metrics/${year}/${metric}.csv`,
+                Value:   null, // set below
+                Source:  `${ctx.request.host}/${org}/${org}/wikirate/metrics/${year}/${encodeURI(metric).replace(/%20/g, '+')}`,
                 Comment: `${groupedRpts[company].length} submissions`,
             };
             metrics.push(Object.assign({}, metricBase, { Metric: `${metric} – mean`, Value: mean(values) }));
@@ -135,12 +167,20 @@ class AppPublishHandlers {
             metrics.push(Object.assign({}, metricBase, { Metric: `${metric} – max`, Value: Math.max(...values) }));
         }
 
-        // convert the metrics to CSV
-        const csv = json2csv.parse(metrics);
-
-        ctx.response.body = csv;
-        // note this returns Content-Type: text/plain; setting Content-Type to text/csv
-        // automatically downloads the file
+        switch (ctx.request.query.type || ctx.accepts('html', 'json', 'csv')) {
+            case 'html':
+                // note metrics-table template is used for both metrics and supply-chain
+                await ctx.render('metrics', { 'metrics-table': metricsToHtml(metrics), 'q-type': '&type' });
+                break;
+            case 'json':
+                ctx.response.body = metrics;
+                break;
+            case 'csv':
+                ctx.response.body = json2csv.parse(metrics);
+                break;
+            default:
+                ctx.response.status = 406; // Not Acceptable
+        }
     }
 
 
@@ -185,20 +225,45 @@ class AppPublishHandlers {
                 'Related company': null,
                 Year:              year,
                 Value:             'Tier 1 Supplier',
-                Source:            `https://${ctx.request.host}/${org}/${org}/wikirate/metrics/${year}.csv`,
+                Source:            `${ctx.request.host}/${org}/${org}/wikirate/metrics/${year}`,
                 Comment:           `${groupedRpts[grp].length} submissions`,
             };
             metrics.push(Object.assign({}, supplyBase, { Title: 'Supplied By', Company: company, 'Related company': supplier }));
             metrics.push(Object.assign({}, supplyBase, { Title: 'Supplier of', Company: supplier, 'Related company': company }));
         }
 
-        // convert the metrics to CSV
-        const csv = json2csv.parse(metrics);
-
-        ctx.response.status = 200;
-        ctx.response.body = csv;
+        switch (ctx.request.query.type || ctx.accepts('html', 'json', 'csv')) {
+            case 'html':
+                // note metrics-table template is used for both metrics and supply-chain
+                await ctx.render('metrics', { 'metrics-table': metricsToHtml(metrics), 'q-type': '?type' });
+                break;
+            case 'json':
+                ctx.response.body = metrics;
+                break;
+            case 'csv':
+                ctx.response.body = json2csv.parse(metrics);
+                break;
+            default:
+                ctx.response.status = 406; // Not Acceptable
+        }
     }
 }
+
+
+function metricsToHtml(metrics) { // convert array of objects to html table with keys as column headers
+    let html = '<table>';
+    html += '<tr>';
+    for (const col of Object.keys(metrics[0])) html += `<th>${col}</th>`;
+    html += '</tr>';
+    for (const metric of metrics) {
+        html += '<tr>';
+        for (const val of Object.values(metric)) html += `<td>${val}</td>`;
+        html += '</tr>';
+    }
+    html += '</table>';
+    return html;
+}
+
 
 function isNumeric(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);

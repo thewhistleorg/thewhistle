@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/publish.css">
+    <style>
+        main  { max-width: 100%; }
+        table { font-size: 0.9em; }
+    </style>
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
     <script src="/js/admin/ga.js" async></script>
 </head>
@@ -25,17 +29,9 @@
 
     <h1>The Whistle Public Reports – metrics</h1>
 
-    <p><a href="{{@koa.request.href}}?type=csv">⇒ CSV</a> <a href="{{@koa.request.href}}?type=json">⇒ JSON</a></p>
+    <p><a href="{{@koa.request.href}}{{q-type}}=csv">⇒ CSV</a> <a href="{{@koa.request.href}}{{q-type}}=json">⇒ JSON</a></p>
 
-    {{#if metrics.length}}
-    <ul>
-        {{#metrics}}
-        <li><a href="{{@koa.request.origin}}/{{organisation}}/{{project}}/wikirate/metrics/{{year}}?metric={{metric}}">publish.thewhistle.org/{{organisation}}/{{project}}/wikirate/metrics/{{year}}?metric={{metric}}</a></li>
-        {{/metrics}}
-    </ul>
-    {{else}}
-    <p>No metrics found.</p>
-    {{/if}}
+    {{{metrics-table}}}
 
 </main>
 

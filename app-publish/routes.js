@@ -11,13 +11,17 @@ import handlers from './handlers.js';
 
 router.get('/', async function(ctx) { await ctx.render('index'); }); // home page
 
-router.get('/metrics.html',                         handlers.getMetricsList); //
-router.get('/supply.html',                          handlers.getSupplyList);  //
-router.get('/metrics.json',                         handlers.getMetricsList); // TODO
-router.get('/supply.json',                          handlers.getSupplyList);  // TODO
+router.get('/metrics',                              handlers.getMetricsList);
+router.get('/metrics/:org',                         handlers.getMetricsList);
+router.get('/metrics/:org/:project',                handlers.getMetricsList);
+router.get('/metrics/:org/:project/:year',          handlers.getMetricsList);
+router.get('/supply',                               handlers.getSupplyList);
+router.get('/supply/:org',                          handlers.getSupplyList);
+router.get('/supply/:org/:project',                 handlers.getSupplyList);
+router.get('/supply/:org/:project/:year',           handlers.getSupplyList);
 
-router.get('/:org/:project/wikirate/metrics/:year', handlers.getMetrics);     //
-router.get('/:org/:project/wikirate/supply/:year',  handlers.getSupply);      //
+router.get('/:org/:project/wikirate/metrics/:year', handlers.getMetrics);
+router.get('/:org/:project/wikirate/supply/:year',  handlers.getSupply);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 

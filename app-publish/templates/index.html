@@ -73,7 +73,7 @@
             <td>Megalith Inc</td>
             <td>2018</td>
             <td class="align-right">12.97</td>
-            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
             <td>from 14 submissions</td>
         </tr>
         <tr>
@@ -81,7 +81,7 @@
             <td>Megalith Inc</td>
             <td>2018</td>
             <td class="align-right">11.48</td>
-            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
             <td>from 14 submissions</td>
         </tr>
         <tr>
@@ -89,7 +89,7 @@
             <td>Megalith Inc</td>
             <td>2018</td>
             <td class="align-right">8.45</td>
-            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
             <td>from 14 submissions</td>
         </tr>
         <tr>
@@ -97,7 +97,7 @@
             <td>Megalith Inc</td>
             <td>2018</td>
             <td class="align-right">17.89</td>
-            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
             <td>from 14 submissions</td>
         </tr>
         <tr>
@@ -105,7 +105,7 @@
             <td>Top Supplies Ltd</td>
             <td>2018</td>
             <td class="align-right">10.14</td>
-            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
             <td>from 9 submissions</td>
         </tr>
         <tr>
@@ -113,7 +113,7 @@
             <td>Top Supplies Ltd</td>
             <td>2018</td>
             <td class="align-right">9.21</td>
-            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
             <td>from 9 submissions</td>
         </tr>
         <tr>
@@ -121,7 +121,7 @@
             <td>Top Supplies Ltd</td>
             <td>2018</td>
             <td class="align-right">7.89</td>
-            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
             <td>from 9 submissions</td>
         </tr>
         <tr>
@@ -129,7 +129,7 @@
             <td>Top Supplies Ltd</td>
             <td>2018</td>
             <td class="align-right">16.64</td>
-            <td>https://publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
+            <td>publish.thewhistle.org/demo/trial/wikirate/metrics/2018?metric=Basic+hourly+wage</td>
             <td>from 9 submissions</td>
         </tr>
     </table>
@@ -154,7 +154,7 @@
             <td>Top Supplies Ltd</td>
             <td>2018</td>
             <td>Tier 1 Supplier</td>
-            <td>https://publish.thewhistle.org/demo/trial/wikirate/supply/2018</td>
+            <td>publish.thewhistle.org/demo/trial/wikirate/supply/2018</td>
             <td>from 23 submissions</td>
         </tr>
         <tr>
@@ -164,20 +164,27 @@
             <td>Megalith Inc</td>
             <td>2018</td>
             <td>Tier 1 Supplier</td>
-            <td>https://publish.thewhistle.org/demo/trial/wikirate/supply/2018</td>
+            <td>publish.thewhistle.org/demo/trial/wikirate/supply/2018</td>
             <td>from 23 submissions</td>
         </tr>
     </table>
 
     <p>Currently available metrics &amp; supply-chain data are available from</p>
     <ul>
-        <li><a href="{{@koa.request.origin}}/metrics.html">publish.thewhistle.org/metrics.html</a></li>
-        <li><a href="{{@koa.request.origin}}/supply.html">publish.thewhistle.org/supply.html</a></li>
+        <li><a href="{{@koa.request.origin}}/metrics">publish.thewhistle.org/metrics</a></li>
+        <li><a href="{{@koa.request.origin}}/supply">publish.thewhistle.org/supply</a></li>
     </ul>
-    or for programmatic use,
+    <p>For programmatic use, all <code>publish.thewhistle.org</code> reports are available in CSV or
+        JSON format:</p>
     <ul>
-        <li>publish.thewhistle.org/metrics.json [TBC]</li>
-        <li>publish.thewhistle.org/supply.json [TBC]</li>
+        <li>to request a CSV format report, make a request with an
+            <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept">Accept header</a>
+            of ‘text/csv’, or provide a <code>type=csv</code> query argument: e.g.
+            <a href="{{@koa.request.origin}}/metrics?type=csv">publish.thewhistle.org/metrics?type=csv</a></li>
+        <li>to request a JSON format report, make a request with a
+            <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept">Accept header</a>
+            of ‘application/json’, or provide a <code>type=json</code> query argument: e.g.
+            <a href="{{@koa.request.origin}}/metrics?type=json">publish.thewhistle.org/metrics?type=json</a></li>
     </ul>
 
 </main>

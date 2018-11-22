@@ -38,26 +38,6 @@ app.use(async function logAccess(ctx, next) {
 });
 
 
-// content negotiation: api will respond with html, csv, or json TODO
-app.use(async function contentNegotiation(ctx, next) {
-    await next();
-
-    if (!ctx.body) return; // no content to return
-
-    // check Accept header or extension for preferred response type
-    const type = ctx.accepts('html', 'csv', 'json');
-
-    switch (type) {
-        case 'csv':
-        default:
-            break; // ... koa takes care of type
-        case false:
-            ctx.throw(406); // "Not acceptable" - can't furnish whatever was requested
-            break;
-    }
-});
-
-
 // handle thrown or uncaught exceptions anywhere down the line
 app.use(async function handleErrors(ctx, next) {
     try {

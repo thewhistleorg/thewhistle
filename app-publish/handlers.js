@@ -27,6 +27,7 @@ class AppPublishHandlers {
 
             for (const rpt of reports) {
                 // limit to WikiRate for the moment - this can be generalised later if required
+                if (!rpt.publish.wikirate) continue;
                 for (const metricName in rpt.publish.wikirate.metrics) {
                     const metric = {
                         org:     org,
@@ -63,6 +64,8 @@ class AppPublishHandlers {
             const reports = await Report.find(org, { publish: { $exists: true } });
 
             for (const rpt of reports) {
+                // limit to WikiRate for the moment - this can be generalised later if required
+                if (!rpt.publish.wikirate) continue;
                 const supply = {
                     org:     org,
                     project: rpt.project,
@@ -92,14 +95,14 @@ class AppPublishHandlers {
         const year = ctx.params.year;
         const metric = ctx.request.query.metric;
 
-        if (!metric) ctx.throw(404, 'No metric specified');
+        if (!metric) ctx.throw(404, 'No metric specified'); // TODO: list availalable metrics?
 
-        // fetch all reports for this organisation/project
-        const rpts = await Report.find(org, { project: project });
+        // fetch all reports with publishable details for this organisation/project
+        const rpts = await Report.find(org, { project: project, publish: { $exists: true } });
 
         // we're only interested in metrics for reports from given year with values for this metric
         const rptMetrics = rpts
-            .filter(rpt => rpt._id.getTimestamp().getFullYear() == year && isNumeric(rpt.publish.wikirate.metrics[metric]))
+            .filter(rpt => rpt._id.getTimestamp().getFullYear()==year && rpt.publish.wikirate && isNumeric(rpt.publish.wikirate.metrics[metric]))
             .map(rpt => rpt.publish.wikirate);
 
         if (rptMetrics.length == 0) ctx.throw(404); // TODO: or CSV with no rows?
@@ -151,15 +154,15 @@ class AppPublishHandlers {
         const project = ctx.params.project;
         const year = ctx.params.year;
 
-        // fetch all reports for this organisation/project
-        const rpts = await Report.find(org, { project: project });
+        // fetch all reports with publishable details for this organisation/project
+        const rpts = await Report.find(org, { project: project, publish: { $exists: true } });
 
         // we're only interested in supplier data for reports from given year
         const supplyData = rpts
-            .filter(rpt => rpt._id.getTimestamp().getFullYear() == year)
+            .filter(rpt => rpt._id.getTimestamp().getFullYear()==year && rpt.publish && rpt.publish.wikirate)
             .map(rpt => rpt.publish.wikirate);
 
-        if (supplyData.length == 0) { ctx.response.status = 404; return; } // TODO: or CSV with no rows?
+        if (supplyData.length == 0) ctx.throw(404); // TODO: or CSV with no rows?
 
         // group reports by company + supplier (use wacky ␟ group separator character to guarantee no conflict
         const groupedRpts = {};

@@ -650,7 +650,9 @@ class Report {
         }
 
         if (userId) {
-            await Update.insert(db, id, userId, { set: values }); // audit trail
+            // kludgy fix for disallowed '.' in field name in MongoDB: replace any dots in key with 'one doe leader' chars
+            const valuesNoDots = Object.keys(values).reduce((obj, key) => { obj[key.replace(/\./g, '\u2022')] = values[key]; return obj; }, {});
+            await Update.insert(db, id, userId, { set: valuesNoDots }); // audit trail
         }
     }
 

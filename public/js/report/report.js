@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // populate any datalists with previously entered values (using /ajax/:db/:project/submitted-values)
     document.querySelectorAll('datalist').forEach(function(datalist) {
-        var input = document.querySelector(`#${datalist.id.replace('-datalist', '')}`);
+        var input = document.querySelector('#'+datalist.id.replace('-datalist', ''));
 
         var db = window.location.pathname.split('/')[1];      // org/db is 1st part of the url path
         var project = window.location.pathname.split('/')[2]; // project is 2nd part of the url path

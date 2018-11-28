@@ -144,8 +144,8 @@ describe(`Report model (${db})`, function() {
                 expect(report.analysis).to.be.an('object');
                 expect(report.analysis.files).to.be.an('array');
                 expect(report.analysis.files[0].exif).to.be.an('object');
-                expect(report.analysis.files[0].exif.GPSLatitude).to.equal(54.98966667);
-                expect(report.analysis.files[0].exif.GPSLongitude).to.equal(-1.91416667);
+                expect(report.analysis.files[0].exif.GPSLatitude.toFixed(6)).to.equal('54.989667');
+                expect(report.analysis.files[0].exif.GPSLongitude.toFixed(6)).to.equal('-1.914167');
             });
         }
     });

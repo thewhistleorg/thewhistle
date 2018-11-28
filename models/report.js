@@ -72,7 +72,18 @@ const schema = {
                 weather: { type: [ 'object' ] },               // ... wunderground weather info from report date/location
             },
         },
-        publish:        { type: 'object' },                    // metrics to be published e.g. for WikiRate
+        publish:        { type: 'object',                      // metrics to be published e.g. for WikiRate
+            properties: {
+                public:   { type: 'boolean' },
+                wikirate: { type: 'object',                    // ... currently wikirate is only target
+                    properties: {
+                        'Company':         { type: 'string' },
+                        'Related company': { type: 'string' },
+                        'metrics':         { type: 'object' },
+                    },
+                },
+            },
+        },
         assignedTo:     { bsonType: [ 'objectId', 'null' ] },  // user report is assigned to
         status:         { type:     [ 'string', 'null' ] },    // free-text status (to accomodate any workflow)
         tags:           { type:     'array',                   // tags to classify/group reports
@@ -184,6 +195,21 @@ class Report {
         const reports = await Db.collection(db, 'reports');
         const rpts = await reports.find(query).toArray();
         return rpts;
+    }
+
+
+    /**
+     * Exposes reports collection for even more flexible querying (e.g. db.collection.distinct()).
+     *
+     * This is of course to be treated with care as it is open to abuse!
+     *
+     * @param   {string} db - Database to use.
+     * @returns {Object} Reports collection
+     */
+    static async collection(db) {
+        debug('Report.collection', 'db:'+db); // trace it as we have no control over what it will be used for!
+        const reports = await Db.collection(db, 'reports');
+        return reports;
     }
 
 
@@ -357,6 +383,7 @@ class Report {
             country:      country,
             location:     { address: '', geocode: null, geojson: null },
             analysis:     {},
+            publish:      {},
             // summary:   null,
             assignedTo:   null,
             status:       null,

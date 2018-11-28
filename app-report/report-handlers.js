@@ -581,6 +581,16 @@ class Handlers {
             ctx.session.reportIds = [ ids.reportId ];
             // TODO: ?? suspend complete/incomplete tags await Report.insertTag(org, ctx.session.reportId, 'incomplete', null);
 
+            // any metrics to be published? save the 'public' setting if so
+            if (FormGenerator.forms[`${org}/${project}`].publish.public) {
+                const publishSpec = FormGenerator.forms[`${org}/${project}`].publish;
+                const publish = {
+                    public: publishSpec.public,
+                };
+                // save the publish data to the db
+                await Report.update(org, ctx.session.reportId, { publish: publish });
+            }
+
             // notify users of 'new report submitted'
             const users = await User.getForDb(org);
             await Notification.notifyMultiple(org, 'new report submitted', users.map(u => u._id), ctx.session.reportId);
@@ -642,10 +652,29 @@ class Handlers {
 
         if (page > FormGenerator.forms[`${org}/${project}`].incidentPages) {
             for (let i = 0; i < ctx.session.reportIds.length; i++) {
-                await Report.submissionDetails(org, ctx.session.reportIds[i], formattedReport, body);    
+                await Report.submissionDetails(org, ctx.session.reportIds[i], formattedReport, body);
             }
         } else if (page > 1 || page=='+') {
             await Report.submissionDetails(org, ctx.session.reportId, formattedReport, body);
+        }
+
+        // any metrics to be published?
+        if (FormGenerator.forms[`${org}/${project}`].publish.public) {
+            const publishSpec = FormGenerator.forms[`${org}/${project}`].publish.wikirate; // only WikiRate for the moment
+
+            const publish = {};
+            // if body includes fields for Company / Related company, add them to the publish object
+            if (body[publishSpec['Company']]) publish['publish.wikirate.Company'] = body[publishSpec['Company']];
+            if (body[publishSpec['Related company']]) publish['publish.wikirate.Related company'] = body[publishSpec['Related company']];
+            // if body includes fields for metrics, add them to the publish object
+            for (const metric in publishSpec.metrics) {
+                if (body[publishSpec.metrics[metric]]) {
+                    publish[`publish.wikirate.metrics.${metric}`] = Number(body[publishSpec.metrics[metric]]);
+                }
+            }
+
+            // save the publish data to the db
+            if (Object.keys(publish).length>0) await Report.update(org, ctx.session.reportId, publish);
         }
 
         // record user-agent

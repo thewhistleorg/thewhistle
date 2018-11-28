@@ -199,6 +199,21 @@ class Report {
 
 
     /**
+     * Exposes reports collection for even more flexible querying (e.g. db.collection.distinct()).
+     *
+     * This is of course to be treated with care as it is open to abuse!
+     *
+     * @param   {string} db - Database to use.
+     * @returns {Object} Reports collection
+     */
+    static async collection(db) {
+        debug('Report.collection', 'db:'+db); // trace it as we have no control over what it will be used for!
+        const reports = await Db.collection(db, 'reports');
+        return reports;
+    }
+
+
+    /**
      * Returns Report details (convenience wrapper for single Report details).
      *
      * @param   {string}   db - Database to use.

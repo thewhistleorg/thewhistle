@@ -1,0 +1,23 @@
+- text: |
+    # Are you reporting on behalf of yourself, someone else or as an observer/witness?
+
+- input:
+    name: on-behalf-of
+    label: On behalf of
+    type: radio
+    options:
+        self:
+            label: Myself
+            attributes: checked
+        else: 
+            label: Someone else
+            branch:
+                in-box: true
+                body:
+                    - text: Please fill in the report to the best of your knowledge following the other person’s request. Do not mind that the form will still use the language ‘you’.
+        witness: 
+            label: As an observer/witness
+            branch:
+                in-box: true
+                body:
+                    - text: Please fill in the report to the best of your knowledge following your observations. Do not mind that the form will still use the language ‘you’.

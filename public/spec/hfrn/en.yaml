@@ -1,0 +1,28 @@
+title: The Whistle / HFRN Incident Report
+
+pages:
+  index:    { $ref: 'en-0' }
+  p1:       { $ref: 'en-1' }
+  p2:       { $ref: 'en-2' }
+  whatnext: { $ref: 'en-whatnext' }
+
+options:
+  incidentPages: 11
+  newIncidentPage: 4
+  pages:
+    index:
+      prev: false
+      step: false
+      next: Next
+    p1:
+      title: The Whistle / HFRN Incident Report
+      prev: false
+    p2:
+      title: The Whistle / HFRN Incident Report
+      next: Submit Your Report
+    whatnext:
+      handler: resources
+      method: get
+      prev: false
+      step: false
+      next: false

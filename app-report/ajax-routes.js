@@ -16,6 +16,8 @@ router.get('/ajax/:db/aliases/:alias', handlers.getAlias);    // currently just 
 
 router.get('/ajax/geocode',            handlers.geocode);     // geocode an address
 
+router.get('/ajax/:db/:project/submitted-values', handlers.submittedValues); // previously submitted values for field
+
 
 /*
  * Return 404 for anything unrecognised

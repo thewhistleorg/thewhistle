@@ -3,7 +3,7 @@
 # Set Heroku config for review app from .env settings
 
 [ $# -ne 2 ] && { echo $0: usage: $0 subapp pr-number; exit 1; }
-[ $1 != admin -a $1 != report ] && { echo $0: subapp must be admin or report; exit 1; }
+[ $1 != admin -a $1 != report -a $1 != publish -a $1 != sms ] && { echo $0: subapp must be admin/report/publish/sms; exit 1; }
 
 subapp=$1
 prnum=$2

@@ -79,6 +79,27 @@ class AjaxHandlers {
     }
 
 
+    /**
+     * GET /ajax/:db/:project/submitted-values?field=:field - Return previously submitted values for
+     * given field.
+     *
+     * Useful for datalist autocomplete functionality - ajax is used to improve page loads if list
+     * of values becomes large.
+     */
+    static async submittedValues(ctx) {
+        const db = ctx.params.db;
+        const project = ctx.params.project;
+        const field = ctx.request.query.field;
+
+        const reports = await Report.collection(db);
+        const submittedDistinct = await reports.distinct(`submittedRaw.${field}`);
+
+        const submittedSorted = submitted.sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' }));
+
+        ctx.response.body = { submitted: submittedSorted };
+    }
+
+
     /*
      * 404 Not Found.
      */

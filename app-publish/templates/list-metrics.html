@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>The Whistle Public Reports – metrics</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/publish.css">
+    <script src="https://www.googletagmanager.com/gtag/js?id=UA-107905163-1" async></script>
+    <script src="/js/admin/ga.js" async></script>
+</head>
+<body>
+
+<header>
+    <nav class="pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item">The Whistle Public Reports</li>
+            <li class="pure-menu-item"><img alt="powered by the Whistle" src="/img/powered-by-the-whistle-horiz-white-180x20.png" height="20" width="180"></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+    <h1>The Whistle Public Reports – metrics</h1>
+
+    <p><a href="{{@koa.request.href}}?type=csv">⇒ CSV</a> <a href="{{@koa.request.href}}?type=json">⇒ JSON</a></p>
+
+    {{#if metrics.length}}
+    <ul>
+        {{#metrics}}
+        <li><a href="{{@koa.request.origin}}/{{organisation}}/{{project}}/wikirate/metrics/{{year}}?metric={{metric}}">publish.thewhistle.org/{{organisation}}/{{project}}/wikirate/metrics/{{year}}?metric={{metric}}</a></li>
+        {{/metrics}}
+    </ul>
+    {{else}}
+    <p>No metrics found.</p>
+    {{/if}}
+
+</main>
+
+</body>
+</html>

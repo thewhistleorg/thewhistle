@@ -9,8 +9,8 @@ describe('EXIF', function() {
     describe('extract EXIF metadata', function() {
         it('returns location & date', async function() {
             const exif = await exiftool.read('test/img/s_gps.jpg');
-            expect(exif.GPSLatitude).to.equal(54.98966667);
-            expect(exif.GPSLongitude).to.equal(-1.91416667);
+            expect(exif.GPSLatitude.toFixed(6)).to.equal('54.989667');
+            expect(exif.GPSLongitude.toFixed(6)).to.equal('-1.914167');
             expect(exif.CreateDate).to.deep.include({
                 year:   2002,
                 month:  7,

@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             sub.querySelectorAll('input,textarea,select').forEach(function(j) { j.disabled = true; });
                         }
                     }
-                
+
                 }
                 // if 'this' is a radio button, hide other subsidiary divs, and uncheck any checkbox
                 // inputs of the same name (eg action-taken 'skip')
@@ -229,6 +229,32 @@ document.addEventListener('DOMContentLoaded', function() {
             altTextsShow.forEach(function (el) { el.classList.remove('hide'); el.classList.add('show'); });
             altTextsHide.forEach(function (el) { el.classList.remove('show'); el.classList.add('hide'); });
         });
+    });
+
+
+    // populate any datalists with previously entered values (using /ajax/:db/:project/submitted-values)
+    document.querySelectorAll('datalist').forEach(function(datalist) {
+        var input = document.querySelector('#'+datalist.id.replace('-datalist', ''));
+
+        var db = window.location.pathname.split('/')[1];      // org/db is 1st part of the url path
+        var project = window.location.pathname.split('/')[2]; // project is 2nd part of the url path
+
+        var url = '/ajax/'+db+'/'+project+'/submitted-values?field='+input.name;
+        fetch(url, { credentials: 'same-origin' })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                for (var v=0; v<data.submitted.length; v++) {
+                    var option = document.createElement('option');
+                    option.value = data.submitted[v];
+                    datalist.appendChild(option);
+                }
+                input.placeholder = '';
+            })
+            .catch(function(e) {
+                input.placeholder = e.message;
+            });
     });
 
 

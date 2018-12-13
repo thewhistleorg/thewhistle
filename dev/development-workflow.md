@@ -38,6 +38,7 @@ for local development. The following `/etc/hosts` entry is suggested:
 
     127.0.0.1 admin.thewhistle.local report.thewhistle.local
 
+
 In more detail
 --------------
 
@@ -148,3 +149,24 @@ When any commit (either a simple commit or a merge commit of topic branch) is pu
 repository `master` branch, it will be automatically deployed to the staging app
 ([admin.staging.thewhistle.org](http://admin.staging.thewhistle.org) /
 [report.staging.thewhistle.org](http://report.staging.thewhistle.org)) for final smoke tests.
+
+
+Heroku organisation
+-------------------
+
+Optimal Heroku organisation for this size of project would probably be [Heroku 
+Teams](https://devcenter.heroku.com/articles/heroku-teams). However, [free dynos are not available 
+to Teams](https://devcenter.heroku.com/articles/heroku-teams#pricing-and-limits). This means that 
+the staging environment and review apps would become chargeable ‘hobby’ dynos, which is currently 
+undesirable (the production app is currently the only paid dyno).
+
+The pipeline is currently owned by chrisv@movable-type.co.uk. [Individual pipelines cannot be
+transferred directly to other 
+individuals](https://devcenter.heroku.com/articles/pipelines#pipelines-ownership-and-transfer), so
+this will continue to be the case until and unless we transition to using Heroku Teams, with paid
+dynos, at which point ownership can be transferred to the team.
+
+Collaborators can perform most actions on apps & pipelines other than [deleting, transferring or 
+renaming the app, adding or removing paid add-ons, or viewing 
+invoices](https://devcenter.heroku.com/articles/collaborating#collaborator-permissions), so this 
+should not present great problems for collaborative working.

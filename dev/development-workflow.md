@@ -7,7 +7,7 @@ The Whistle development workflow uses:
 - continuous integration using [CircleCI](https://circleci.com/)
 - [Heroku GitHub integration](https://devcenter.heroku.com/articles/github-integration) for automatic
   builds of [review apps](https://devcenter.heroku.com/articles/github-integration-review-apps),
-  staging, and production environments.
+  and staging environment.
 
 The [GitHub Flow](https://guides.github.com/introduction/flow/) is a straightforward workflow that
 keeps things simple, and leverages the GitHub pull request mechanism for code review and conversation
@@ -21,9 +21,9 @@ GitHub repositories and should be adequate for The Whistle).
 [Heroku auto-deployment](https://devcenter.heroku.com/articles/github-integration#automatic-deploys)
 means that 
 - a push to a topic branch with a pull request will automatically deploy to a Heroku review app
-- a push to the GitHub ‘staging’ branch will automatically deploy to the Heroku staging site
-- a push to ‘master’ (normally by merging ‘staging’ into master) will automatically deploy to the
-  Heroku production environment
+- a push to ‘master’ (either pushing directly to master or merging a topic branch into master) will 
+  automatically deploy to the Heroku staging environment
+- promotion from staging to master is done within the Heroku control panel
 
 Heroku [review apps](https://devcenter.heroku.com/articles/github-integration-review-apps) are 
 temporary disposable test apps matching topic branches with pull requests. Using review apps means
@@ -38,36 +38,16 @@ for local development. The following `/etc/hosts` entry is suggested:
 
     127.0.0.1 admin.thewhistle.local report.thewhistle.local
 
+
 In more detail
 --------------
 
 ### Minor changes
 
 Smaller changes may not require review apps to be built for evaluation by other team members. In
-this case changes are made directly in the staging branch for sign-off, then staging is merged into
-master. The workflow is as follows:
-
-    $ git pull origin # (refresh local master & staging; local should never be ahead of remote)
-    $ git checkout staging
-    <make changes & commit>
-    $ npm test
-    $ git push origin staging
-    $ npm run test-smoke
-    <optionally do further tests in staging environment>
-    <get sign-off>
-    $ git checkout master
-    $ git merge staging
-    $ git push origin master
-
-If access to the Heroku pipeline dashboard is not available to confirm when the staging app is 
-rebuilt, dyno metadata (including build creation timestamp) is available at 
-[admin.staging.thewhistle.org/dev/dyno](https://admin.staging.thewhistle.org/dev/dyno).
-
-Note that no changes are pushed directly into master, but always via staging, so there should never 
-be a need to rebase staging off master.
-
-To avoid impeding other developers’ workflow, changes should never remain in staging longer than 24
-hours before being promoted to master.
+this case changes are made directly in the master branch (or merged into the master branch from a
+local topic branch). After smoke test, and sign-off if required, the change can be promoted from
+staging to production.
 
 ### Review apps
 
@@ -77,18 +57,18 @@ branches.
 A new topic branch should always be branched from master (after having updated the local master to
 match the GitHub master, of course):
 
-    $ git pull origin
+    $ git checkout master && git pull origin master
     $ git checkout -b my-new-development master
 
-Note that topic branches are normally branched from master rather than from staging, so that should 
-staging changes have to be rolled back, topic branches are not affected. TODO: is this correct?
-
+Always pull from master before committing, to surface any merge conflicts as early as possible.
 In order to minimise merge conflicts, it is worth regularly pulling the current master into the
 topic branch using
 
-    $ git pull origin && git rebase master my-new-development
+    $ git checkout master && git pull origin master
+    $ git rebase master my-new-development
 
-Always pull using rebase in order to keep the commit history clean of spurious merge commits.
+Always rebase the topic branch from master in order to keep the commit history clean of spurious 
+merge commits.
 
 Note that use of a graphical mergetool such as Perforce
 [p4merge](https://www.perforce.com/products/helix-apps/merge-diff-tool-p4merge) makes life _much_
@@ -105,7 +85,7 @@ When development is sufficiently mature for review, the topic branch can be push
     $ git push -u origin my-new-development
 
 Then on GitHub [open a pull request](https://help.github.com/articles/creating-a-pull-request/) to
-merge that branch into staging. Opening the pull request will automatically create a Heroku review 
+merge that branch into master. Opening the pull request will automatically create a Heroku review 
 app.
 
 The review app is named after the GitHub pull request number: for e.g. pull request #99, the Heroku
@@ -137,7 +117,7 @@ GitHub pull request comments can be used for discussion about the proposed devel
 If changes are made as a result of reviews, the procedure for deploying them to the review app
 (after having committed changes to the topic branch) is
 
-    $ git pull origin && git rebase master my-new-development
+    $ git checkout master && git pull origin master && git rebase master my-new-development
     $ git push --force-with-lease origin my-new-development
 
 The `--force-with-lease` option will update the rebased commits, but will refuse to zap any other 
@@ -145,17 +125,13 @@ commits.
 
 Pushing to the topic branch will automatically deploy the new version to the review app.
 
-#### Merge to staging & master
+#### Merge to master
 
-Once review is complete, it can be merged to staging (and deployed) with:
+Once review is complete, it can be merged to  master and deployed to staging with:
 
-    $ git pull origin
-    $ git rebase staging my-new-development
-    $ git checkout staging && git merge my-new-development
+    $ git checkout master && git pull origin master && git rebase master my-new-development
+    $ git checkout master && git merge --no-ff my-new-development
     $ npm test
-    $ git push origin staging
-    $ npm run test-smoke # (and further tests if required)
-    $ git checkout master && git merge staging
     $ git push origin master
     $ git branch -d my-new-development
     $ git push -d origin my-new-development
@@ -166,19 +142,31 @@ merged topic branch.
 If other clones of the repository have the topic branch, they can then delete it by using `git fetch
 origin --prune`.
 
-Note that topic branches are always merged into staging, not vice versa (topic branches are rebased
+Note that topic branches are always merged into master, not vice versa (topic branches are rebased
 from master).
 
 When any commit (either a simple commit or a merge commit of topic branch) is pushed to the GitHub
-repository `staging` branch, it will be automatically deployed to the staging app
+repository `master` branch, it will be automatically deployed to the staging app
 ([admin.staging.thewhistle.org](http://admin.staging.thewhistle.org) /
-[report.staging.thewhistle.org](http://report.staging.thewhistle.org)) for final testing; when
-staging is merged to master (and pushed to the GitHub repository), it will be automatically deployed
-to the production environment.
+[report.staging.thewhistle.org](http://report.staging.thewhistle.org)) for final smoke tests.
 
-### Don’t rewrite history
 
-Forced pushes (`git push --force`) are essentially verboten. If – and only if – there is complete
-confidence that no one else has accessed the updated repo (fetched, pulled, or cloned), and that no
-one had pushed since the last pull, then a forced push might be acceptable – but this should be
-exceptional, and pre-arranged with all members of the team – on force of court martial!
+Heroku organisation
+-------------------
+
+Optimal Heroku organisation for this size of project would probably be [Heroku 
+Teams](https://devcenter.heroku.com/articles/heroku-teams). However, [free dynos are not available 
+to Teams](https://devcenter.heroku.com/articles/heroku-teams#pricing-and-limits). This means that 
+the staging environment and review apps would become chargeable ‘hobby’ dynos, which is currently 
+undesirable (the production app is currently the only paid dyno).
+
+The pipeline is currently owned by chrisv@movable-type.co.uk. [Individual pipelines cannot be
+transferred directly to other 
+individuals](https://devcenter.heroku.com/articles/pipelines#pipelines-ownership-and-transfer), so
+this will continue to be the case until and unless we transition to using Heroku Teams, with paid
+dynos, at which point ownership can be transferred to the team.
+
+Collaborators can perform most actions on apps & pipelines other than [deleting, transferring or 
+renaming the app, adding or removing paid add-ons, or viewing 
+invoices](https://devcenter.heroku.com/articles/collaborating#collaborator-permissions), so this 
+should not present great problems for collaborative working.

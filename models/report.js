@@ -18,7 +18,9 @@ import Submission    from '../models/submission.js';
 import ReportSession from '../models/report-session.js';
 import AwsS3         from '../lib/aws-s3.js';
 import Db            from '../lib/db.js';
+import FormGenerator from '../lib/form-generator.js';
 import Update        from './update.js';
+import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 
 
 /*
@@ -105,6 +107,9 @@ const schema = {
         evidenceToken:    { type:     'string' },                // unique token which is used in a URL for a user to upload evidence
         verificationCode: { type:     'string' },
         verified:         { type:     'boolean' },
+        pages:            { type:     'array',
+            items: { type: 'string' },
+        },
     },
     additionalProperties: false,
 };
@@ -392,7 +397,9 @@ class Report {
             views:        {},
             archived:     false,
         };
-
+        if (FormGenerator.forms[`${db}/${project}`]['page-branching']) {
+            values.pages = FormGenerator.forms[`${db}/${project}`]['initial-pages'];
+        }
         // record user agent for potential later analyses
         const ua = useragent.parse(userAgent);
         values.ua = Object.assign({}, ua, { os: ua.os }); // trigger on-demand parsing of os
@@ -412,6 +419,119 @@ class Report {
         }
     }
 
+    static async getNoOfPages(db, id) {
+        const report = await Report.get(db, id);
+        return report.pages.length;
+    }
+
+
+    /**
+     * 
+     * @param {string} db 
+     * @param {string} id 
+     * @param {Object} report
+     * @param {Object} detailsRaw 
+     */
+    static async updatePages(db, id, report, detailsRaw) {
+        const removedPages = new Set();
+        const addedPages = new Set();
+        let pages = [];
+        for (const field in detailsRaw) {
+            pages = await Report.removePages(db, id, report, field);
+            for (let i = 0; i < pages.length; i++) {
+                removedPages.add(pages[i]);
+            }
+        }
+        report = await Report.get(db, id);
+        for (const field in detailsRaw) {
+            pages = await Report.addPages(db, id, report, field, detailsRaw[field]);
+            for (let i = 0; i < pages.length; i++) {
+                addedPages.add(pages[i]);
+            }
+        }
+        report = await Report.get(db, id);
+        for (const page of addedPages) {
+            if (removedPages.has(page)) {
+                removedPages.delete(page);
+            }
+        }
+        await Report.removePageFields(db, id, report, removedPages);
+    }
+
+
+    /**
+     * Removes from the report's 'pages' field, if the given key can be used for page-branching.
+     * Also removes the responses corresponding to those pages from the report.
+     * 
+     * @param {string} db
+     * @param {string} id
+     * @param {Object} report
+     * @param {string} key
+     */
+    static async removePages(db, id, report, key) {
+        const pagesToRemove = [];
+        const pageBranches = FormGenerator.forms[`${db}/${report.project}`].pageBranches[key];
+        for (const branch in pageBranches) {
+            const pages = pageBranches[branch];
+            for (let i = 0; i < pages.length; i++) {
+                pagesToRemove.push(pages[i]);
+            }
+        }
+
+        const updatedPages = report.pages.filter(p => !pagesToRemove.includes(p));
+
+        await Report.update(db, id, { pages: updatedPages });
+        
+        return pagesToRemove;
+    }
+
+
+    /**
+     * Adds to the report's 'pages' field, if the given key-value pair results in page-branching.
+     * 
+     * @param {string} db
+     * @param {string} id
+     * @param {string} report
+     * @param {string} key
+     * @param {string|string[]} value
+     */
+    static async addPages(db, id, report, key, value) {
+        if (!Array.isArray(value)) {
+            value = [ value ];
+        }
+        const ret = [];
+        if (FormGenerator.forms[`${db}/${report.project}`].pageBranches[key]) {
+            const pages = report.pages;
+            for (let v = 0; v < value.length; v++) {
+                const pagesToAdd = FormGenerator.forms[`${db}/${report.project}`].pageBranches[key][value[v]];
+                if (pagesToAdd) {
+                    for (let p = 0; p < pagesToAdd.length; p++) {
+                        ret.push(pagesToAdd[p]);
+                        if (!pages.includes(pagesToAdd[p])) {
+                            pages.push(pagesToAdd[p]);
+                        }
+                    }
+                }
+            }
+            await Report.update(db, id, { pages: pages });
+        }
+        return ret;
+    }
+
+
+    static async removePageFields(db, id, report, removedPages) {
+        const submittedRaw = report.submittedRaw;
+        const submitted = report.submitted;
+        for (const page of removedPages) {
+            const pageInputs = FormGenerator.forms[`${db}/${report.project}`].inputList[page];
+            for (const input in pageInputs) {
+                delete submittedRaw[input];
+                delete submitted[pageInputs[input]];
+            }
+        }
+        await Report.update(db, id, { submittedRaw: submittedRaw });
+    }
+
 
     /**
      * Sets (or updates) (prettified) report details.
@@ -429,7 +549,10 @@ class Report {
         const reports = await Db.collection(db, 'reports');
 
         try {
-
+            const report = await Report.get(db, id);
+            if (FormGenerator.forms[`${db}/${report.project}`]['page-branching']) {
+                await Report.updatePages(db, id, report, detailsRaw);
+            }
             // TODO: is there any way to do this as atomic updates rather than multiple calls?
             for (const field in details) {
                 if (details[field]) {

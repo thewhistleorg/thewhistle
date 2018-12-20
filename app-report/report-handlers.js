@@ -12,7 +12,6 @@ import Debug                         from 'debug';        // small debugging uti
 import crypto                        from 'crypto';       // nodejs.org/api/crypto.html
 import fs                            from 'fs-extra';     // fs with extra functions & promise interface
 import jwt                           from 'jsonwebtoken'; // JSON Web Token implementation
-import MUUID                         from 'uuid-mongodb'; // generate/parse BSON UUIDs
 
 const debug = Debug('app:report'); // submission process
 
@@ -418,8 +417,28 @@ class Handlers {
             ctx.throw(404, `Form spec ${project}/${ctx.params.page} not found`); // Not Found
         }
 
-        if (!FormGenerator.forms[`${org}/${project}`].inputs[ctx.params.page] && ctx.params.page!='*') {
-            ctx.throw(404); // Not Found
+        // fetch already entered information to fill in defaults for this page if it is being revisited
+        const report = await Report.get(org, ctx.session.reportId);
+        const page = ctx.params.page=='*' ? '+' : Number(ctx.params.page); // note '+' is allowed in windows filenames, '*' is not
+        let pageId = '';
+        let steps = [];
+        let progressText = '';
+        if (FormGenerator.forms[`${org}/${project}`]['page-branching']) {
+            if (report) {
+                pageId = report.pages[page - 1];
+                progressText = `Page ${page} of ${report.pages.length}`;
+            } else {
+                pageId = FormGenerator.forms[`${org}/${project}`]['initial-pages'][page - 1];
+                progressText = `Page ${page}`;
+            }
+        } else {
+            if (!FormGenerator.forms[`${org}/${project}`].inputs[ctx.params.page] && ctx.params.page!='*') {
+                ctx.throw(404); // Not Found
+            }
+            pageId = page;
+            steps = FormGenerator.forms[`${org}/${project}`].steps;
+            if (page != '+' && steps[page]) steps[page].class = 'current'; // to highlight current page
+            progressText = Handlers.getProgressText(steps);
         }
 
         if (ctx.params.page == 'whatnext') {
@@ -429,11 +448,7 @@ class Handlers {
 
         if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.response.redirect(`/${org}/${project}`); }
 
-        const page = ctx.params.page=='*' ? '+' : Number(ctx.params.page); // note '+' is allowed in windows filenames, '*' is not
         if (page > ctx.session.completed+1) { ctx.flash = { error: 'Cannot jump ahead' }; return ctx.response.redirect(`/${org}/${project}/${ctx.session.completed+1}`); }
-
-        // fetch already entered information to fill in defaults for this page if it is being revisited
-        const report = await Report.get(org, ctx.session.reportId);
 
         // default the incident report date to today if 'exactly when it happened' is selected: this
         // is a natural default, is quite easy to change to yesterday, or to any other day
@@ -460,22 +475,19 @@ class Handlers {
         };
 
         // record 'steps' for progress indicator
-        const steps = FormGenerator.forms[`${org}/${project}`].steps;
-        if (page != '+') steps[page].class = 'current'; // to highlight current page
+        
 
         // record 'defaults' for default selections (for alternate texts)
         const defaults = FormGenerator.forms[`${org}/${project}`].defaults;
-
-        const progressText = Handlers.getProgressText(steps);
 
         const context = Object.assign({ steps: steps }, { progressText: progressText }, defaults, submitted, { incidentDate: incidentDate });
 
         // users are not allowed to go 'back' to 'used-before' page
         if (page==1 && ctx.session.saved) { ctx.flash = { error: 'Please continue with your current alias' }; return ctx.response.redirect(`/${org}/${project}/2`); }
-
-        await ctx.render(`../../.generated-reports/${org}/${project}-${page}`, context);
-
-        if (page != '+') delete steps[page].class; // remove highlight for move to another page
+        
+        await ctx.render(`../../.generated-reports/${org}/${project}-${pageId}`, context);
+        
+        if (page != '+' && steps[page]) delete steps[page].class; // remove highlight for move to another page
     }
 
 
@@ -498,8 +510,6 @@ class Handlers {
         if (ctx.session.isNew) { ctx.flash = { error: 'Your session has expired' }; return ctx.response.redirect(`/${org}/${project}`); }
 
         if (ctx.params.page == 'whatnext') return ctx.response.redirect(`/${org}/${project}`); // TODO: generalise whatnext handling!
-
-        const nPages = Object.keys(FormGenerator.forms[`${org}/${project}`].steps).length;
 
         // page number, or '+' for single-page submission
         const page = ctx.params.page=='*' ? '+' : Number(ctx.params.page);
@@ -603,7 +613,7 @@ class Handlers {
 
         // remember if we're going forward or back, then delete nav from body
         const goNum = body['nav-next'] ? page + 1 : body['nav-prev'] ? page - 1 : page; // we should normally have either next or prev, but...
-        const go = goNum==0 ? '' : goNum>nPages || page=='+' ? 'whatnext' : goNum;
+
         delete body['nav-prev'];
         delete body['nav-next'];
 
@@ -621,9 +631,13 @@ class Handlers {
 
         // ---- reformat fields & record submitted details
 
-        const formattedReport = formatReport(org, project, page, body);
+        let pageName = page;
+        if (FormGenerator.forms[`${org}/${project}`]['page-branching']) {
+            const report = await Report.get(org, ctx.session.reportId);
+            pageName = report.pages[page - 1];    
+        }
 
-
+        const formattedReport = formatReport(org, project, pageName, body);
         // any files to upload?
         if (ctx.request.files) {
             //Input name is 'documents' in HTML
@@ -650,7 +664,6 @@ class Handlers {
                 formattedReport['Uploaded file names'] = fileNames.join(', ');
             }
         }
-
         if (page > FormGenerator.forms[`${org}/${project}`].incidentPages) {
             for (let i = 0; i < ctx.session.reportIds.length; i++) {
                 await Report.submissionDetails(org, ctx.session.reportIds[i], formattedReport, body);
@@ -677,7 +690,6 @@ class Handlers {
             // save the publish data to the db
             if (Object.keys(publish).length>0) await Report.update(org, ctx.session.reportId, publish);
         }
-
         // record user-agent
         await UserAgent.log(org, ctx.request.ip, ctx.request.headers);
 
@@ -701,6 +713,15 @@ class Handlers {
             await Report.submissionDetails(org, ctx.session.reportId, { 'On behalf of': onBehalfOf }, { 'on-behalf-of': onBehalfOf });
             return ctx.response.redirect(`/${org}/${project}/${FormGenerator.forms[`${org}/${project}`].newIncidentPage}`);
         }
+        let nPages = 0;
+        if (FormGenerator.forms[`${org}/${project}`]['page-branching']) {
+            nPages = await Report.getNoOfPages(org, ctx.session.reportId);
+        } else {
+            nPages = Object.keys(FormGenerator.forms[`${org}/${project}`].steps).length;
+        }
+
+        const go = goNum==0 ? '' : goNum>nPages || page=='+' ? 'whatnext' : goNum;
+
         ctx.response.redirect(`/${org}/${project}/${go}`);
     }
 
@@ -882,21 +903,19 @@ function formatReport(org, project, page, body) {
             : partials[page];                                                                  // inputs from this page
         Handlers.removeNoStores(pageYamlInputs);
         const rpt = {}; // the processed version of body
-
         for (const partialName in pagePartials) {
             const partialInputs = pagePartials[partialName];
             for (let i = 0; i < partialInputs.length; i++) {
                 rpt[partialInputs[i]] = body[partialInputs[i]];
             }
         }
-
         for (const inputName in pageYamlInputs) {
             if (inputName.match(/-skip$/) && !body[inputName]) continue; // unless 'skip' option is selected, ignore it
             if (inputName == 'used-before') continue;                    // 'used-before' (Alias) is handled separately
             if (inputName == 'address') continue;                        // 'address' (from whatnext) is ignored
 
             const label = pageYamlInputs[inputName].label;
-
+            
             if (Array.isArray(body[inputName])) { // multiple inputs withe same name: multiple response to checkboxes or 'Skip'
                 // note copy body[inputName] rather than reference it otherwise it gets polluted with subsidiary value
                 rpt[label] = body[inputName].slice();

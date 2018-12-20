@@ -265,7 +265,6 @@ class ReportsHandlers {
                 questions.add(question);
             }
         }
-        console.log(questions);
     }
 
 

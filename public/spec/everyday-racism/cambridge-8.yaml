@@ -11,15 +11,24 @@
     label: 'Tick all that apply and please elaborate in the box below:'
     type: checkbox
     options:
-        anger: Anger
-        contempt: Contempt
-        disgust: Disgust
-        fear: Fear
-        hostility: Hostility
-        indifference: Indifference
-        rejection: Rejection
-        resentment: Resentment
-        well-meaning: Well-meaning-ness (feelings of admiration, exoticisation, or too much attention or perceiving humour, ignorance or cluelessness)
+        anger: 
+            label: Anger
+        contempt:
+            label: Contempt
+        disgust:
+            label: Disgust
+        fear:
+            label: Fear
+        hostility:
+            label: Hostility
+        indifference:
+            label: Indifference
+        rejection:
+            label: Rejection
+        resentment:
+            label: Resentment
+        well-meaning:
+            label: Well-meaning-ness (feelings of admiration, exoticisation, or too much attention or perceiving humour, ignorance or cluelessness)
         other:
             label: Prefer to add emotions directed at me to this list
             subsidiary:
@@ -45,20 +54,34 @@
     label: 'Tick all that apply and please elaborate in the box below:'
     type: checkbox
     options:
-        anger: Anger
-        confusion: Confusion
-        embarrassment: Embarrassment
-        disgust: Disgust
-        fear: Fear
-        threatened: Feeling threatened
-        guilt: Guilt
-        humiliation: Humiliation
-        incredulity: Incredulity
-        indignation: Indignation
-        numbness: Numbness
-        panic: Panic
-        sadness: Sadness
-        shame: Shame
+        anger:
+            label: Anger
+        confusion:
+            label: Confusion
+        embarrassment:
+            label: Embarrassment
+        disgust:
+            label: Disgust
+        fear:
+            label: Fear
+        threatened:
+            label: Feeling threatened
+        guilt:
+            label: Guilt
+        humiliation:
+            label: Humiliation
+        incredulity:
+            label: Incredulity
+        indignation:
+            label: Indignation
+        numbness:
+            label: Numbness
+        panic:
+            label: Panic
+        sadness:
+            label: Sadness
+        shame:
+            label: Shame
         other:
             label: Prefer to add feelings and emotions to this list
             subsidiary:
@@ -66,7 +89,6 @@
                 - input:
                     name: emotions-experienced-other
                     type: text
-
 - input:
     name: emotions-experienced-elaborate
     label: Please elaborate
@@ -84,14 +106,22 @@
     label: 'Tick all that apply and please elaborate in the box below:'
     type: checkbox
     options:
-        tension: Bodily tension
-        breathlessness: Breathlessness
-        frozen: Frozen (not able to move)
-        headache: Headache
-        nausea: Nausea
-        nervousness: Nervousness
-        chest: Pressure in your chest
-        stomach: Stomach pain
+        tension:
+            label: Bodily tension
+        breathlessness:
+            label: Breathlessness
+        frozen:
+            label: Frozen (not able to move)
+        headache:
+            label: Headache
+        nausea:
+            label: Nausea
+        nervousness:
+            label: Nervousness
+        chest:
+            label: Pressure in your chest
+        stomach:
+            label: Stomach pain
         other:
             label: Prefer to add one or more bodily reactions to this list
             subsidiary:

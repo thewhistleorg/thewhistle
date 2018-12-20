@@ -16,7 +16,7 @@ pages:
   type: object                                                  # associative array indexed by 'page'
   required: [ index ]                                           # must have an index page
   properties:        { index:              { $ref: '#/page' } } # ... as defined by 'page'
-  patternProperties: { '^[a-z][a-z0-9]+$': { $ref: '#/page' } } # other pages must have alphanumeric keys
+  patternProperties: { '^[a-z][a-z0-9]*$': { $ref: '#/page' } } # other pages must have alphanumeric keys
   additionalProperties: false
 
 page:
@@ -78,8 +78,9 @@ option:
     - type: object                   # option has attributes and/or subsidiary elements
       required: [ label ]            # ... there's always gotta be a label
       properties:
-        label:      { type: string } # ... which is a simple string
-        attributes: { type: string } # ... extra HTML input attributes
-        subsidiary: { type: array }  # TODO { $ref: '#/page' } note 'radio'/'checkbox' subsidiary is attached to option
-        branch:     { type: object } # TODO
+        label:       { type: string } # ... which is a simple string
+        attributes:  { type: string } # ... extra HTML input attributes
+        subsidiary:  { type: array }  # TODO { $ref: '#/page' } note 'radio'/'checkbox' subsidiary is attached to option
+        branch:      { type: object } # TODO
+        page-branch: { type: array }
       additionalProperties: false

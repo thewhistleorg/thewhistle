@@ -397,7 +397,7 @@ class Report {
             views:        {},
             archived:     false,
         };
-        if (FormGenerator.forms[`${db}/${project}`]['page-branching']) {
+        if (FormGenerator.forms[`${db}/${project}`] && FormGenerator.forms[`${db}/${project}`]['page-branching']) {
             values.pages = FormGenerator.forms[`${db}/${project}`]['initial-pages'];
         }
         // record user agent for potential later analyses
@@ -550,7 +550,7 @@ class Report {
 
         try {
             const report = await Report.get(db, id);
-            if (FormGenerator.forms[`${db}/${report.project}`]['page-branching']) {
+            if (report && FormGenerator.forms[`${db}/${report.project}`] && FormGenerator.forms[`${db}/${report.project}`]['page-branching']) {
                 await Report.updatePages(db, id, report, detailsRaw);
             }
             // TODO: is there any way to do this as atomic updates rather than multiple calls?

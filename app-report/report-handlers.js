@@ -426,11 +426,10 @@ class Handlers {
         if (FormGenerator.forms[`${org}/${project}`]['page-branching']) {
             if (report) {
                 pageId = report.pages[page - 1];
-                progressText = `Page ${page} of ${report.pages.length}`;
             } else {
                 pageId = FormGenerator.forms[`${org}/${project}`]['initial-pages'][page - 1];
-                progressText = `Page ${page}`;
             }
+            progressText = `Page ${page}`;
         } else {
             if (!FormGenerator.forms[`${org}/${project}`].inputs[ctx.params.page] && ctx.params.page!='*') {
                 ctx.throw(404); // Not Found

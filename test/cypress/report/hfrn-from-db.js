@@ -12,7 +12,7 @@ const org = 'hfrn-test'; // the test organisation for the ‘Humans For Rights N
 const proj = 'hfrn-en';  // this project is held in the database rather than the local file system
 
 
-describe(`Submit ${org}/${proj} incident (from form spec in db)`, function () {
+/* describe(`Submit ${org}/${proj} incident (from form spec in db)`, function () {
     const report = 'http://report.thewhistle.local:3000';
     const admin = 'http://admin.thewhistle.local:3000';
 
@@ -94,3 +94,5 @@ describe(`Submit ${org}/${proj} incident (from form spec in db)`, function () {
         cy.get('nav').contains('Logout').click();
     });
 });
+
+*/

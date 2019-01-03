@@ -51,46 +51,47 @@ describe(`FormSpecification model (${db})`, function() {
     this.slow(100);
 
     let specId = null;
+    if (db !== 'demo') {
+        describe('successful operations', function() {
+            it('creates form spec', async function() {
+                const spec = { project: 'unit-test', page: '', specification: minimalSpec };
+                specId = await FormSpecification.insert(db, spec);
+                // console.info('\tspec id', specId);
+            });
 
-    describe('successful operations', function() {
-        it('creates form spec', async function() {
-            const spec = { project: 'unit-test', page: '', specification: minimalSpec };
-            specId = await FormSpecification.insert(db, spec);
-            // console.info('\tspec id', specId);
-        });
+            it('gets form spec', async function() {
+                const spec = await FormSpecification.get(db, specId);
+                expect(spec.project).to.equal('unit-test');
+                expect(spec.page).to.equal('');
+                expect(spec.specification).to.equal(minimalSpec);
+            });
 
-        it('gets form spec', async function() {
-            const spec = await FormSpecification.get(db, specId);
-            expect(spec.project).to.equal('unit-test');
-            expect(spec.page).to.equal('');
-            expect(spec.specification).to.equal(minimalSpec);
-        });
+            it('gets all form specs in project', async function() {
+                const specs = await FormSpecification.getBy(db, 'project', 'unit-test');
+                expect(specs.length).to.equal(1);
+                expect(specs.filter(s => s.project=='unit-test' && s.page=='').length).to.equal(1);
+            });
 
-        it('gets all form specs in project', async function() {
-            const specs = await FormSpecification.getBy(db, 'project', 'unit-test');
-            expect(specs.length).to.equal(1);
-            expect(specs.filter(s => s.project=='unit-test' && s.page=='').length).to.equal(1);
-        });
+            it('gets all form specs', async function() {
+                const specs = await FormSpecification.getAll(db);
+                expect(specs.length).to.be.at.least(1);
+                expect(specs.filter(s => s.project=='unit-test' && s.page=='').length).to.equal(1);
+            });
 
-        it('gets all form specs', async function() {
-            const specs = await FormSpecification.getAll(db);
-            expect(specs.length).to.be.at.least(1);
-            expect(specs.filter(s => s.project=='unit-test' && s.page=='').length).to.equal(1);
-        });
+            it('updates form spec', async function() {
+                const spec = { project: 'unit-test-2', page: '', specification: minimalSpec };
+                await FormSpecification.update(db, specId, spec);
+                const updatedSpec = await FormSpecification.get(db, specId);
+                expect(updatedSpec.project).to.equal('unit-test-2');
+            });
 
-        it('updates form spec', async function() {
-            const spec = { project: 'unit-test-2', page: '', specification: minimalSpec };
-            await FormSpecification.update(db, specId, spec);
-            const updatedSpec = await FormSpecification.get(db, specId);
-            expect(updatedSpec.project).to.equal('unit-test-2');
+            it('deletes form spec', async function() {
+                await FormSpecification.delete(db, specId);
+                const deletedSpec = await FormSpecification.get(db, specId);
+                expect(deletedSpec).to.be.null;
+            });
         });
-
-        it('deletes form spec', async function() {
-            await FormSpecification.delete(db, specId);
-            const deletedSpec = await FormSpecification.get(db, specId);
-            expect(deletedSpec).to.be.null;
-        });
-    });
+    }
 
     describe('validation failure', function() {
         it('fails to validate non-parsing spec where page is not an array', async function() {

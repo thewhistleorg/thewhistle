@@ -495,6 +495,8 @@ class Report {
      * @param {string|string[]} value
      */
     static async addPages(db, id, report, key, value) {
+        const spec = await FormGenerator.spec(db, report.project);
+        const orders = spec.options.pages;
         if (!Array.isArray(value)) {
             value = [ value ];
         }
@@ -507,7 +509,11 @@ class Report {
                     for (let p = 0; p < pagesToAdd.length; p++) {
                         ret.push(pagesToAdd[p]);
                         if (!pages.includes(pagesToAdd[p])) {
-                            pages.push(pagesToAdd[p]);
+                            let index = pages.length - 1;
+                            while (orders[pages[index]].order > orders[pagesToAdd[p]].order) {
+                                index--;
+                            }
+                            pages.splice(index + 1, 0, pagesToAdd[p]);
                         }
                     }
                 }

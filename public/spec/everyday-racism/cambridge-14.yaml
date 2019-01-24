@@ -1,4 +1,4 @@
-- text: '# Do you have any feedback on this form?'
+- text: '# Thank you so much for your time and effort in writing a report.  We are very interested in your feedback on the process and the future of the project.  What has the experience of writing the report been like for you?  What ideas do you have for how the data produced through the project could be used?  Do you have any other feedback on the form or project?'
 
 - input:
     name: feedback

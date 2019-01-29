@@ -55,3 +55,11 @@ more useful to keep as a historical document than to use again as a living docum
 ## [Twilio](/dev/notes/twilio)
 
 Very early notes (March 2017) documenting Twilio development.
+
+## [SMS Reporting](/dev/notes/sms)
+
+Overview of the development and use of an SMS reporting system.
+
+## [Verification](/dev/notes/verification)
+
+Notes on the verification options developed for report forms.

@@ -9,18 +9,18 @@ The GitHub README.md file, this gives an introduction to the system from a devel
 and a technical overview of the system architecture. This may be of value in explaining the system
 architecture to external partners, and as a starting point for new developers.
 
-## [Development Workflow](/dev/notes/development-workflow)
+## [Development workflow](/dev/notes/development-workflow)
 
 The app is held in a GitHub repository for source code management and developer collaboration. These
 notes set out in detail the developer workflow used in the project, in order that developers can
 successfully collaborate on development. The notes also explain the use of continuous integration
 tests, and review apps.
 
-## [2018 Work Packages](/dev/notes/2018-work-packages)
+## [2018 Work packages](/dev/notes/2018-work-packages)
 
 Overview of work packages we have in view, for planning division of work among development team.
 
-## [Information Security Risk Assessment](/dev/notes/information-security)
+## [Information security risk assessment](/dev/notes/information-security)
 
 Assessment of controls in place to mitigate InfoSec threats relevant to The Whistle.
 
@@ -47,7 +47,7 @@ generation tool will generate the JSON form specs.
 Technical notes made during the Redgate down-tools week detailing the work done by Redgate staff,
 and its inclusion in the app.
 
-## [Technology Trial notes](/dev/notes/technology-trial-notes)
+## [Technology trial notes](/dev/notes/technology-trial-notes)
 
 Early notes (from April 2017) intended to be a living document, but neglected since then. May now be
 more useful to keep as a historical document than to use again as a living document?
@@ -56,10 +56,14 @@ more useful to keep as a historical document than to use again as a living docum
 
 Very early notes (March 2017) documenting Twilio development.
 
-## [SMS Reporting](/dev/notes/sms)
+## [SMS reporting](/dev/notes/sms)
 
 Overview of the development and use of an SMS reporting system.
 
 ## [Verification](/dev/notes/verification)
 
 Notes on the verification options developed for report forms.
+
+## [Anonymous aliases](/dev/notes/aliases)
+
+Notes on the use of anonymous aliases.

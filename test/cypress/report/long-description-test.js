@@ -66,6 +66,7 @@ describe(`Submit ${org}/${proj} incident report with long description`, function
 
 
     it('sees & deletes report in admin', function() {
+        cy.viewport(2000, 2000);
         const testuser = Cypress.env('TESTUSER');
         const testpass = Cypress.env('TESTPASS');
 

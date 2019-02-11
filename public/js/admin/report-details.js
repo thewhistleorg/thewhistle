@@ -22,8 +22,10 @@ $(document).ready(function() {
 function adjustScreen() {
     if ($(window).width() < 1080) {
         $('.pure-u-2-5').hide();
+        $('.pure-u-3-5').css('width', '100%');
     } else {
         $('.pure-u-2-5').show();
+        $('.pure-u-3-5').css('width', '60%');
     }
 }
 

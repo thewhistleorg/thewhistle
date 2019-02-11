@@ -14,7 +14,18 @@ let selectedGroups = [];
 
 $(document).ready(function() {
     setupGroupSelect();
+    adjustScreen();
+    $(window).resize(adjustScreen);
 });
+
+
+function adjustScreen() {
+    if ($(window).width() < 1080) {
+        $('.pure-u-2-5').hide();
+    } else {
+        $('.pure-u-2-5').show();
+    }
+}
 
 
 function setReportId(id) {

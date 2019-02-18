@@ -20,6 +20,7 @@ const constants = {
     SMS_RESPONSE:    'response',
     SMS_CONTINUE:    'continue',
     SMS_STORE:       'store',
+    SMS_CONSENT:     'consent',
 
     YES:     'yes',
     NO:      'no',
@@ -66,6 +67,7 @@ class SmsApp {
     async parseSpecifications() {
         if (!this.spec) this.spec = await FormGenerator.spec(this.org, this.project);
         this.getInitialSms();
+        this.getUsedBeforeSms();
         this.generateSmsQuestions();
     }
 
@@ -155,13 +157,29 @@ class SmsApp {
      * @param   {Object}   ctx
      * @param   {Object}   twiml
      * @param   {string}   incomingSms - SMS text sent by user
+     */
+    sendConsentText(ctx, twiml, incomingSms) {
+        this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_CONSENT);
+        //Done now, so that we can store this in the database when the user has an alias
+        this.setCookie(ctx, constants.cookies.FIRST_TEXT, incomingSms);
+        //TODO: Set used before sms
+        const message = 'By completing this form, you are giving your consent for anonymous information from it to be shared internally within the Humans for Rights Network and with our relevant partner NGOs. We will ask you a series of questions to establish what happened in the incident you\'re reporting. Do you want to continue?';
+        this.sendSms(twiml, message);
+    }
+
+
+    /**
+     * Sends the user the first SMS and sets the appropriate cookies
+     *
+     * @param   {Object}   ctx
+     * @param   {Object}   twiml
+     * @param   {string}   incomingSms - SMS text sent by user
      * @param   {string}   firstSms - First text the user sent (to start the report)
      */
     askIfUsedBefore(ctx, twiml, incomingSms, firstSms) {
         this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_USED_BEFORE);
-        //Done now, so that we can store this in the database when the user has an alias
-        this.setCookie(ctx, constants.cookies.FIRST_TEXT, incomingSms);
-        const message = firstSms ? this.initialSms : 'Sorry, we didn\'t understand that response. Have you used this service before?';
+        //TODO: Set used before sms
+        const message = firstSms ? this.usedBeforeSms : 'Sorry, we didn\'t understand that response. Have you used this service before?';
         this.sendSms(twiml, message);
     }
 
@@ -178,11 +196,14 @@ class SmsApp {
      */
     askForAlias(ctx, twiml, opening) {
         let message = opening ? opening + ' ': '';
-        message += 'Please enter your anonymous alias. To use a new alias, please reply \'NEW\'';
+        message += 'Please enter your reference number. To use a new reference number, please reply \'NEW\'';
         this.setCookie(ctx, constants.cookies.NEXT_SMS_TYPE, constants.SMS_ALIAS);
         this.sendSms(twiml, message); //TODO: Get this from somewhere else?
     }
 
+    sleep() {
+        return new Promise(resolve => setTimeout(resolve, 500));
+    }
 
     /**
      * Generates the user a new unique alias, sets up the database entry and sends the user the first question
@@ -194,7 +215,8 @@ class SmsApp {
         const alias = await this.generateUniqueAlias();
         await this.initiateSmsReport(ctx, twiml, alias);
         const question = await this.getNextQuestion(ctx, twiml, 0);
-        this.sendSms(twiml, 'Your new anonymous alias is ' + alias + '.\n' + question);
+        const no = Math.floor((Math.random() * 899999) + 100000);
+        this.sendSms(twiml, 'Your new reference number is ' + no + '. Please keep this in a secure place, so any future reports you submit can be anonymously linked.\n' + question);
     }
 
 
@@ -489,8 +511,18 @@ class SmsApp {
      */
     getInitialSms() {
         //TODO: Get initial SMS from this.spec
-        const initialSms = 'By completing this form, you consent to xxxxx.\nPlease reply with the keywords SKIP or HELP at any point.\nHave you used this reporting service before?';
+        const initialSms = 'By completing this form, you are giving your consent for anonymous information from it to be shared internally within the Humans for Rights Network and with our relevant partner NGOs. Do you want to continue with this report? \nPlease reply with the keywords SKIP or HELP at any point.\nHave you used this reporting service before?';
         this.initialSms = initialSms;
+    }
+
+
+    /**
+     * Gets the initial SMS to send from the YAML specification file
+     */
+    getUsedBeforeSms() {
+        //TODO: Get initial SMS from this.spec
+        const usedBeforeSms = 'Have you used this reporting service before?';
+        this.usedBeforeSms = usedBeforeSms;
     }
 
 
@@ -700,7 +732,7 @@ class SmsApp {
     async processFinalText(ctx, twiml, incomingSms) {
         if (this.isRestart(incomingSms)) {
             //Start a new report
-            this.askIfUsedBefore(ctx, twiml, incomingSms, true);
+            this.sendConsentText(ctx, twiml, incomingSms, true);
         } else {
             //Add amendments
             await this.addAmendments(ctx, twiml, incomingSms);
@@ -786,7 +818,7 @@ class SmsApp {
             case undefined:
             case constants.SMS_NEW_REPORT:
                 //Start new report
-                this.askIfUsedBefore(ctx, twiml, incomingSms, true);
+                this.sendConsentText(ctx, twiml, incomingSms, true);
                 break;
 
             case constants.SMS_USED_BEFORE:
@@ -816,7 +848,13 @@ class SmsApp {
             case undefined:
             case constants.SMS_NEW_REPORT:
                 //Start new report
-                this.askIfUsedBefore(ctx, twiml, incomingSms, true);
+                //TODO: implement sendConsentText()
+                this.sendConsentText(ctx, twiml, incomingSms);
+                break;
+            case constants.SMS_CONSENT:
+                if (this.toYesOrNo(incomingSms) === constants.YES) {
+                    this.askIfUsedBefore(ctx, twiml, incomingSms, true);
+                }
                 break;
 
             case constants.SMS_USED_BEFORE:

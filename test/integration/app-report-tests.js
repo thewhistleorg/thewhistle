@@ -349,11 +349,35 @@ describe(`Report app (${org}/${app.env})`, function() {
             //expect(response.body.formattedAddress).to.equal('Akoka, Lagos, Nigeria');
         });
 
-        it('ajax: geocodes address using CORS', async function() {
+        it('ajax: geocodes address using CORS (canonical)', async function() {
             const response = await appReport.get('/ajax/geocode?address=university+of+lagos,+nigeria').set('Origin', 'http://rapeisacrime.org');
             expect(response.status).to.equal(200);
             //expect(response.body.formattedAddress).to.equal('Akoka, Lagos, Nigeria');
             expect(response.headers['access-control-allow-origin']).to.equal('http://rapeisacrime.org');
+        });
+
+        it('ajax: geocodes address using CORS (www)', async function() {
+            const response = await appReport.get('/ajax/geocode?address=university+of+lagos,+nigeria').set('Origin', 'http://www.rapeisacrime.org');
+            expect(response.status).to.equal(200);
+            expect(response.headers['access-control-allow-origin']).to.equal('http://www.rapeisacrime.org');
+        });
+
+        it('ajax: geocodes address using CORS (https)', async function() {
+            const response = await appReport.get('/ajax/geocode?address=university+of+lagos,+nigeria').set('Origin', 'https://rapeisacrime.org');
+            expect(response.status).to.equal(200);
+            expect(response.headers['access-control-allow-origin']).to.equal('https://rapeisacrime.org');
+        });
+
+        it('ajax: fails to geocode address with invalid Origin header', async function() {
+            const response = await appReport.get('/ajax/geocode?address=university+of+lagos,+nigeria').set('Origin', 'http://somerandomsite.com');
+            expect(response.status).to.equal(200);
+            expect(response.headers['access-control-allow-origin']).to.be.undefined;
+        });
+
+        it('ajax: fails to geocode address without Origin header', async function() {
+            const response = await appReport.get('/ajax/geocode?address=university+of+lagos,+nigeria');
+            expect(response.status).to.equal(200);
+            expect(response.headers['access-control-allow-origin']).to.be.undefined;
         });
 
         it('sees whatnext resources', async function() {

@@ -17,12 +17,12 @@ describe('Geocode', function() {
         expect(result).to.be.an('object');
         // expect(result.latitude).to.equal(52.2033924); // google knows the sociology dept has moved,
         // expect(result.longitude).to.equal(0.1189126); // even though the request is Free School Lane!
-        expect(result.latitude).to.equal(52.2017766);
-        expect(result.longitude).to.equal(0.116593);
+        expect(result.latitude).to.equal(52.2042666);
+        expect(result.longitude).to.equal(0.1149085);
         expect(result.country).to.equal('United Kingdom');
         expect(result.city).to.equal('Cambridge');
-        expect(result.streetName).to.equal('Mill Lane');
-        expect(result.formattedAddress).to.equal('16 Mill Ln, Cambridge CB2 1SB, UK');
+        expect(result.streetName).to.equal('Trinity Ln');
+        expect(result.formattedAddress).to.equal('The Old Schools, Trinity Ln, Cambridge CB2 1TN, UK');
     });
 
     it('reverse geocodes Free School Lane', async function() {
@@ -39,20 +39,16 @@ describe('Geocode', function() {
     });
 
 
-    /*
-    REMOVED THIS TEST BECAUSE THE VALUES ARE NO LONGER CONSISTENT WITH GOOGLE'S API
     it('geocodes University of Lagos', async function() {
         const result = await Geocoder.geocode('University of Lagos', 'ng');
         expect(result).to.be.an('object');
-        expect(result.latitude).to.equal(6.519250299999999);
-        expect(result.longitude).to.equal(3.3992594);
+        expect(result.latitude).to.equal(6.512809499999999);
+        expect(result.longitude).to.equal(3.3912026);
         expect(result.country).to.equal('Nigeria');
-        expect(result.administrativeLevels.level1long).to.equal('Lagos');
-        expect(result.extra.neighborhood).to.equal('Akoka');
+        expect(result.extra.neighborhood).to.equal('Yaba');
         expect(result.city).to.equal('Lagos');
-        expect(result.streetName).to.be.undefined;
+        expect(result.streetName).to.equal('Akoka Road');
     });
-    */
 
     /* remove University of Abuja test as google keeps coming back with different results! */
     //it('geocodes University of Abuja', async function() {

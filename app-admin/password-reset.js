@@ -119,8 +119,9 @@ class PasswordResetHandlers {
         }
 
         // set the password and clear the password reset token
-        const password = await Scrypt.kdf(ctx.request.body.password, { logN: 15 });
-        await User.update(user._id, { password: password, passwordResetRequest: null });
+        const keyBuf = await Scrypt.kdf(ctx.request.body.password, { logN: 15 });
+        const keyStr = keyBuf.toString('base64');
+        await User.update(user._id, { password: keyStr, passwordResetRequest: null });
 
         ctx.response.redirect('/password/reset/confirm');
     }

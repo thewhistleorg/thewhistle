@@ -54,21 +54,21 @@ class AjaxHandlers {
      *
      * This only returns the formattedAddress field, as otherwise it could be used as a free
      * authenticated proxy for Google's geolocation service.
-     *
-     * Mirrors similar function in admin app.
      */
     static async geocode(ctx) {
-        const corsAllow = [ 'http://rapeisacrime.org', 'http://www.rapeisacrime.org', 'http://www.movable-type.co.uk', 'http://mtl.local' ];
+        const corsAllow = [ 'rapeisacrime.org', 'movable-type.co.uk', 'mtl.local' ];
         const region = ctx.request.query.region ? ctx.request.query.region : await Ip.getCountry(ctx.request.ip);
         const geocoded = await Geocoder.geocode(ctx.request.query.address, region);
 
         if (geocoded) {
             ctx.response.body = { formattedAddress: geocoded.formattedAddress };
             ctx.response.body.root = 'geocode';
-            // if this is a CORS request, check it comes from acceptable source
-            if (corsAllow.includes(ctx.request.get('Origin'))) {
-                ctx.response.set('Vary', 'Origin');
-                ctx.response.set('Access-Control-Allow-Origin', ctx.request.get('Origin'));
+            // if this is a CORS request, check it comes from acceptable source (accepting any subdomain & http+https protocols)
+            for (const allowed of corsAllow) {
+                if (ctx.request.get('Origin').endsWith(allowed)) {
+                    ctx.response.set('Vary', 'Origin');
+                    ctx.response.set('Access-Control-Allow-Origin', ctx.request.get('Origin'));
+                }
             }
             // if region is specified, treat it as a requirement not just as bias as Google does (after CORS check!)
             if (ctx.request.query.region && ctx.request.query.region.toUpperCase()!=geocoded.countryCode) { ctx.response.status = 404; return; }

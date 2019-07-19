@@ -1,5 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Routes for e-mail verification test                                        C.Veness 2017-2018  */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 /* eslint space-in-parens: off */

@@ -1,5 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* JavaScript for managing filtering functions in reports-list.html                               */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 

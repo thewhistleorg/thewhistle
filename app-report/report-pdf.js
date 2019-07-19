@@ -1,5 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Generate PDF of report.                                                         C.Veness 2018  */
+/*                                                                                                */
+/*                                       © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import pdf          from 'html-pdf';   // HTML to PDF converter

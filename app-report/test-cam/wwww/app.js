@@ -6,6 +6,8 @@
 /*                                                                                                */
 /* This app.js is identical for all databases/projects - if we can work out a mechanism to invoke */
 /* the routes directly from app-report.js this could be factored back there.                      */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 // TODO: before ES modules, directory name of the current module was available in __dirname; moving

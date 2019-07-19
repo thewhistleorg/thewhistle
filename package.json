@@ -2,7 +2,7 @@
   "name": "thewhistle",
   "description": "The Whistle prototype",
   "author": "Chris Veness",
-  "license": "Proprietory",
+  "license": "MIT",
   "version": "0.0.0",
   "main": "app.js",
   "scripts": {

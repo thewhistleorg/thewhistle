@@ -2,6 +2,8 @@
 /* Handlers: test-cam/wwww (what-where-when-who).                                  C.Veness 2017  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
+/*                                                                                                */
+/*                                       © 2017 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Report from '../../../models/report.js';

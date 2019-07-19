@@ -7,6 +7,8 @@
 /*  - publish. (publicly available aggregated metreics)                                           */
 /*  - sms.     (sms incident reporting)                                                           */
 /*  - twilio.  (RESTful API for Twilio webhooks)                                                  */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 /* eslint no-shadow:off *//* app is already declared in the upper scope */

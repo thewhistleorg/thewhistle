@@ -1,5 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Backend code for SMS API. Handles receiving and sending texts.              Louis Slater 2018  */
+/*                                                                                                */
+/*                                       © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
@@ -45,7 +47,7 @@ class SmsApp {
      *
      * @param   {string}   org - Organisation name
      * @param   {string}   project - Project name
-     * 
+     *
      * @returns {Object}   SMS app object
      */
     constructor(org, project) {
@@ -93,7 +95,7 @@ class SmsApp {
      * Determines whether there is an existing report for a given alias.
      *
      * @param   {string}   alias - Alias to check
-     * 
+     *
      * @returns {boolean}  False if there are no reports in the database with the given alias. True otherwise.
      */
     async aliasExists(alias) {
@@ -135,11 +137,11 @@ class SmsApp {
 
     /**
      * Returns the value of a given cookie
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      * @param {string} key - Key for the cookie to get
      * @param {Object} twiml
-     * 
+     *
      * @returns {string} - Value of the given cookie
      */
     getCookie(ctx, key, twiml) {
@@ -250,8 +252,8 @@ class SmsApp {
 
     /**
      * Gets and sends the user the next Question
-     * 
-     * @param   {Object}   ctx 
+     *
+     * @param   {Object}   ctx
      * @param   {Object}   twiml
      * @param   {number}   nextQuestion - Index of the next question
      */
@@ -276,7 +278,7 @@ class SmsApp {
             await this.sendQuestion(ctx, twiml, nextQuestion);
         } catch (e) {
             throw new SmsError('Could not store response.', false, twiml);
-        }        
+        }
     }
 
 
@@ -300,7 +302,7 @@ class SmsApp {
             //Get value for suppliementary information field
             let info = report.submitted['Supplementary information'] ? report.submitted['Supplementary information'] : '';
             info = info ==='' ? incomingSms : info + ' | ' + incomingSms;
-            
+
             //Update supliementary information
             await Report.submissionDetails(this.db, sessionId, { 'Supplementary information': info });
 
@@ -346,8 +348,8 @@ class SmsApp {
 
     /**
      * Asks the user if they would like to store their report
-     * 
-     * @param   {Object}   ctx 
+     *
+     * @param   {Object}   ctx
      * @param   {Object}   twiml
      * @param   {string}   opening - Prefix to text to send
      */
@@ -360,9 +362,9 @@ class SmsApp {
 
     /**
      * Deletes the user's report
-     * 
-     * @param {Object} ctx 
-     * @param {Object} twiml 
+     *
+     * @param {Object} ctx
+     * @param {Object} twiml
      */
     async deleteResponse(ctx, twiml) {
         try {
@@ -406,7 +408,7 @@ class SmsApp {
      *
      * @param   {string}   message - SMS text sent by user
      * @param   {string[]} starts - List of potential message prefixes
-     * 
+     *
      * @returns {boolean}  True if an element of starts is a prefix to message. False otherwise.
      */
     startsWithElement(message, starts) {
@@ -422,7 +424,7 @@ class SmsApp {
      * Processes the user's response to a yes/no question to determine if it can be interpreted as a no
      *
      * @param   {string}   message - SMS text sent by user
-     * 
+     *
      * @returns {boolean}  True if message can be interpreted as a no. False otherwise.
      */
     isNo(message) {
@@ -435,7 +437,7 @@ class SmsApp {
      * Processes the user's response to a yes/no question to determine if it can be interpreted as a yes
      *
      * @param   {string}   message - SMS text sent by user
-     * 
+     *
      * @returns {boolean}  True if message can be interpreted as a yes. False otherwise.
      */
     isYes(message) {
@@ -448,7 +450,7 @@ class SmsApp {
      * Processes the user's response to a yes/no question
      *
      * @param   {string}   message - SMS text sent by user
-     * 
+     *
      * @returns {string}   'yes', 'no' or 'unknown'
      */
     toYesOrNo(message) {
@@ -468,7 +470,7 @@ class SmsApp {
      * Processes the user's response to determine whether it can be interpreted as 'help'
      *
      * @param   {string}   message - SMS text sent by user
-     * 
+     *
      * @returns {string}   True if message can be interpreted as 'help'. False otherwise.
      */
     isHelp(message) {
@@ -480,7 +482,7 @@ class SmsApp {
      * Processes the user's response to determine whether it can be interpreted as 'restart'
      *
      * @param   {string}   message - SMS text sent by user
-     * 
+     *
      * @returns {string}   True if message can be interpreted as 'restart'. False otherwise.
      */
     isRestart(message) {
@@ -494,7 +496,7 @@ class SmsApp {
      * Uses the form's given questions and the given questionNo to return field
      *
      * @param   {number}   questionNo - Question number to return
-     * 
+     *
      * @returns {string}   Field name as it appears in the database
      */
     getField(questionNo, twiml) {
@@ -538,13 +540,13 @@ class SmsApp {
 
             const ids = await Report.startSession(this.org, this.project, alias, false, ctx.headers['user-agent'], null);
             const sessionId = ids.reportId; //TODO: Change naming convention in SMS app so session doesn't mean 2 different things
-            
+
             //Add first text to report
             await Report.submissionDetails(this.db, sessionId, { 'First Text': this.getCookie(ctx, constants.cookies.FIRST_TEXT, twiml) });
-            
+
             //Add last updated field to report
             await Report.update(this.db, sessionId, { 'lastUpdated': new Date() });
-            
+
             //Generate unique evidence token
             //TODO: Accommodate for no free evidence tokens
             let evidenceToken = '';
@@ -567,7 +569,7 @@ class SmsApp {
 
     /**
      * Sets-up the database connection
-     * 
+     *
      * @param   {object}   twiml
      */
     async setupDatabase(twiml) {
@@ -690,10 +692,10 @@ class SmsApp {
 
     /**
      * Process the user's response to whether they have used the reporting service before and act accordingly
-     * 
-     * @param {Object} ctx 
-     * @param {Object} twiml 
-     * @param {string} incomingSms - text sent by user 
+     *
+     * @param {Object} ctx
+     * @param {Object} twiml
+     * @param {string} incomingSms - text sent by user
      */
     async processUsedBeforeText(ctx, twiml, incomingSms) {
         switch (this.toYesOrNo(incomingSms)) {
@@ -724,10 +726,10 @@ class SmsApp {
 
     /**
      * Process the user's final text and act accordingly
-     * 
-     * @param {Object} ctx 
-     * @param {Object} twiml 
-     * @param {string} incomingSms - text sent by user 
+     *
+     * @param {Object} ctx
+     * @param {Object} twiml
+     * @param {string} incomingSms - text sent by user
      */
     async processFinalText(ctx, twiml, incomingSms) {
         if (this.isRestart(incomingSms)) {
@@ -742,10 +744,10 @@ class SmsApp {
 
     /**
      * Process the user's response to whether they want to continue with the report and act accordingly
-     * 
-     * @param {Object} ctx 
-     * @param {Object} twiml 
-     * @param {string} incomingSms - text sent by user 
+     *
+     * @param {Object} ctx
+     * @param {Object} twiml
+     * @param {string} incomingSms - text sent by user
      */
     async processContinueText(ctx, twiml, incomingSms) {
         switch (this.toYesOrNo(incomingSms)) {
@@ -774,10 +776,10 @@ class SmsApp {
 
     /**
      * Process the user's response to whether want to store their report and act accordingly
-     * 
-     * @param {Object} ctx 
-     * @param {Object} twiml 
-     * @param {string} incomingSms - text sent by user 
+     *
+     * @param {Object} ctx
+     * @param {Object} twiml
+     * @param {string} incomingSms - text sent by user
      */
     async processStoreText(ctx, twiml, incomingSms) {
         switch (this.toYesOrNo(incomingSms)) {
@@ -798,7 +800,7 @@ class SmsApp {
                 break;
 
             default:
-                //Didn't fit into one of the predefined categories, so soemthing went wrong  
+                //Didn't fit into one of the predefined categories, so soemthing went wrong
                 throw new SmsError('Could not determine if you want to store your report.', false, twiml);
         }
     }
@@ -807,11 +809,11 @@ class SmsApp {
     /**
      * React accordingly to the user's response text
      * Response is determined by the point in the report
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      * @param {Object} twiml
      * @param {string} nextSmsType - type of the incoming text
-     * @param {string} incomingSms - text sent by user 
+     * @param {string} incomingSms - text sent by user
      */
     processHelpText(ctx, twiml, nextSmsType, incomingSms) {
         switch (nextSmsType) {
@@ -837,11 +839,11 @@ class SmsApp {
 
     /**
      * Process the user's response when they do not require help
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      * @param {Object} twiml
      * @param {string} nextSmsType - type of the incoming text
-     * @param {string} incomingSms - text sent by user 
+     * @param {string} incomingSms - text sent by user
      */
     async processNonHelpText(ctx, twiml, nextSmsType, incomingSms) {
         switch (nextSmsType) {

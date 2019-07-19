@@ -1,5 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Code for the evidence upload page                                           Louis Slater 2018  */
+/*                                                                                                */
+/*                                       © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
@@ -28,7 +30,7 @@ class EvidencePage {
     /**
      * Determines whether the current time is within a week of when the
      * report was submitted
-     * 
+     *
      * @returns {boolean} - False if current time is within a week of
      *                      when the report was submitted. True otherwise.
      */
@@ -42,9 +44,9 @@ class EvidencePage {
 
     /**
      * Responds with either the evidence page, or an appropriate error page
-     * 
-     * 
-     * @param {Object} ctx 
+     *
+     *
+     * @param {Object} ctx
      * @param {string} errorMessage - Text of error message to be displayed to user.
      *                                Null if there is no error.
      */
@@ -68,8 +70,8 @@ class EvidencePage {
 
     /**
      * Stores the files provided in a POST request
-     * 
-     * @param {Object} ctx 
+     *
+     * @param {Object} ctx
      */
     async processEvidence(ctx) {
         //Input name is 'documents' in HTML
@@ -96,7 +98,7 @@ class EvidencePage {
                     await Report.submissionFile(ctx.params.org, this.report._id, file);
                     fileList.push(file.name);
                 }
-                
+
                 ctx.flash = { files: fileList, org: ctx.params.org, token: ctx.params.token };
                 ctx.response.redirect(`/${this.report.project}/evidence-uploaded`);
             } catch (e) {

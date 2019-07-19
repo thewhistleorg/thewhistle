@@ -4,6 +4,8 @@
 /* These tests sit above the test sub-directories, so they are not run by 'npm test' command;     */
 /* they can be run manually (with 'npm run test-smoke' command) after a new Heroku staging app    */
 /* has been built, to confirm the app is not totally broken before promoting it to production.    */
+/*                                                                                                */
+/*                                       © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import supertest  from 'supertest'; // SuperAgent driven library for testing HTTP servers

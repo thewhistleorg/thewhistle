@@ -2,6 +2,8 @@
 /* Password Reset handlers (invoked by router to render templates).                C.Veness 2017  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
+/*                                                                                                */
+/*                                       © 2017 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import crypto from 'crypto';     // nodejs.org/api/crypto.html

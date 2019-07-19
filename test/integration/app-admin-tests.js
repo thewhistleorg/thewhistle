@@ -4,6 +4,8 @@
 /* These tests require admin.thewhistle.local & report.thewhistle.local to be set in /etc/hosts.  */
 /*                                                                                                */
 /* Note that running this test will contribute to Weather Underground API invocation limits.      */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 // TODO: modularise this? How to handle login/logout if so?

@@ -1,6 +1,8 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Route to handle root element: return uri's for available resources & note on authentication.   */
 /*                                                                                 C.Veness 2017  */
+/*                                                                                                */
+/*                                       © 2017 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Router from 'koa-router'; // router middleware for koa

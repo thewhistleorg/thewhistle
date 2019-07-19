@@ -4,6 +4,8 @@
 /* Form specifications can be stored in the file system (easier for forms developed by us), but   */
 /* can also be stored in the database (easier for partners working on their own forms). This      */
 /* model is just for form specs stored in the database.                                           */
+/*                                                                                                */
+/*                                       © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js

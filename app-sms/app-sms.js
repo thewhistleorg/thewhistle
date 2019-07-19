@@ -1,13 +1,15 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* SMS app - Pages and API for running and testing SMS reporting.              Louis Slater 2018  */
+/*                                                                                                */
+/*                                       © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
 import Koa        from 'koa';
-import handlebars from 'koa-handlebars'; 
+import handlebars from 'koa-handlebars';
 import serve      from 'koa-static';
 import flash      from 'koa-flash';
-import convert    from 'koa-convert'; 
+import convert    from 'koa-convert';
 
 
 import Log        from '../lib/log.js';

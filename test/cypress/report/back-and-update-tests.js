@@ -3,6 +3,8 @@
 /*                                                                                                */
 /* GRN report backup and update to cover most permutations of error-free movement back and forth  */
 /* through the reporting process.                                                                 */
+/*                                                                                                */
+/*                                       © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 /* eslint promise/catch-or-return: off, promise/always-return: off */

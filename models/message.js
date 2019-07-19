@@ -2,6 +2,8 @@
 /* Message model; SMS messages.                                               C.Veness 2017-2018  */
 /*                                                                                                */
 /* All database modifications go through the model; most querying is in the handlers.             */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js

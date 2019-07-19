@@ -2,6 +2,8 @@
 /* Handlers for email verification test.                                      C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import nodemailer         from 'nodemailer';   // sends e-mails from Node.js

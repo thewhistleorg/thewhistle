@@ -1,5 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Front-end JavaScript for the SMS testing page           Louis Slater 2018 */
+/*                                                                           */
+/*                  © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
@@ -22,7 +24,7 @@ window.onload = function () {
 
 /**
  * Displays a message being sent/received.
- * 
+ *
  * @param   {string}    message - Text of the message being sent/received.
  * @param   {boolean}   sent - True if the message is being sent by user. False otherwise.
  */
@@ -43,7 +45,7 @@ function addMessage(message, sent) {
 
 /**
  * Sends a post request as if the user had sent an SMS.
- * 
+ *
  * @param   {string}   message - Text of the message the user is sending.
  */
 function postSms(message) {

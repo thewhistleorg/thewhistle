@@ -2,6 +2,8 @@
 /* Login handlers (invoked by router to render templates).                    C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Scrypt from 'scrypt-kdf';   // scrypt key derivation function

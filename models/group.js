@@ -2,6 +2,8 @@
 /* Group model. A group is essentially a sub-organisation. Has a many-to-many relation with both  */
 /* users and reports. One organisation can have many groups, but a group can only have one        */
 /* organisation.                                                               Louis Slater 2018  */
+/*                                                                                                */
+/*                                       © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 

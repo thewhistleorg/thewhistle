@@ -1,8 +1,9 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Form specifications handlers.                                                                  */
-/*                                                                                 C.Veness 2018  */
+/* Form specifications handlers.                                                   C.Veness 2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
+/*                                                                                                */
+/*                                       © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import FormSpecification from '../models/form-specification.js';

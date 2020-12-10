@@ -2,6 +2,8 @@
 /* Handlers for reporting app.                                                C.Veness 2017-2018  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import fetch                         from 'node-fetch';   // window.fetch in node.js
@@ -474,7 +476,7 @@ class Handlers {
         };
 
         // record 'steps' for progress indicator
-        
+
 
         // record 'defaults' for default selections (for alternate texts)
         const defaults = FormGenerator.forms[`${org}/${project}`].defaults;
@@ -483,9 +485,9 @@ class Handlers {
 
         // users are not allowed to go 'back' to 'used-before' page
         if (page==1 && ctx.session.saved) { ctx.flash = { error: 'Please continue with your current alias' }; return ctx.response.redirect(`/${org}/${project}/2`); }
-        
+
         await ctx.render(`../../.generated-reports/${org}/${project}-${pageId}`, context);
-        
+
         if (page != '+' && steps[page]) delete steps[page].class; // remove highlight for move to another page
     }
 
@@ -633,7 +635,7 @@ class Handlers {
         let pageName = page;
         if (FormGenerator.forms[`${org}/${project}`]['page-branching']) {
             const report = await Report.get(org, ctx.session.reportId);
-            pageName = report.pages[page - 1];    
+            pageName = report.pages[page - 1];
         }
 
         const formattedReport = formatReport(org, project, pageName, body);
@@ -914,7 +916,7 @@ function formatReport(org, project, page, body) {
             if (inputName == 'address') continue;                        // 'address' (from whatnext) is ignored
 
             const label = pageYamlInputs[inputName].label;
-            
+
             if (Array.isArray(body[inputName])) { // multiple inputs withe same name: multiple response to checkboxes or 'Skip'
                 // note copy body[inputName] rather than reference it otherwise it gets polluted with subsidiary value
                 rpt[label] = body[inputName].slice();

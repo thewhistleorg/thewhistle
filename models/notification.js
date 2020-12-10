@@ -11,6 +11,8 @@
 /* Note on terminology: 'cancel' cancels a notification for all notified users; 'dismiss'         */
 /* dismisses a user from a notification, the notification may remain for other users - if the     */
 /* notification is  only for the user dismissing the notification, this is equivalent to cancel.  */
+/*                                                                                                */
+/*                                       © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js

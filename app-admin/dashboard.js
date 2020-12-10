@@ -5,6 +5,8 @@
 /*                                                                                                */
 /* Ajax functions set body & status, and should not throw (as that would  invoke the generic      */
 /* admin exception handler which would return an html page).                                      */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { ObjectId } from 'mongodb';    // MongoDB driver for Node.js

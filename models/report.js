@@ -1,5 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Report model.                                                              C.Veness 2017-2018  */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import fs         from 'fs-extra';          // fs with extra functions & promise interface
@@ -425,11 +427,11 @@ class Report {
 
 
     /**
-     * 
-     * @param {string} db 
-     * @param {string} id 
+     *
+     * @param {string} db
+     * @param {string} id
      * @param {Object} report
-     * @param {Object} detailsRaw 
+     * @param {Object} detailsRaw
      */
     static async updatePages(db, id, report, detailsRaw) {
         const removedPages = new Set();
@@ -461,7 +463,7 @@ class Report {
     /**
      * Removes from the report's 'pages' field, if the given key can be used for page-branching.
      * Also removes the responses corresponding to those pages from the report.
-     * 
+     *
      * @param {string} db
      * @param {string} id
      * @param {Object} report
@@ -480,14 +482,14 @@ class Report {
         const updatedPages = report.pages.filter(p => !pagesToRemove.includes(p));
 
         await Report.update(db, id, { pages: updatedPages });
-        
+
         return pagesToRemove;
     }
 
 
     /**
      * Adds to the report's 'pages' field, if the given key-value pair results in page-branching.
-     * 
+     *
      * @param {string} db
      * @param {string} id
      * @param {string} report

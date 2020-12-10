@@ -3,6 +3,8 @@
 /*                                                                                                */
 /* This holds app-specific ajax calls (none specified in this sample app), and passes through     */
 /* other generic requests to the API.                                                             */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Router from 'koa-router'; // router middleware for koa

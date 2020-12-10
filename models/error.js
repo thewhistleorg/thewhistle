@@ -3,6 +3,8 @@
 /*                                                                                                */
 /* For now this just records errors. They will have to be inspected directly in the database, and */
 /* also cleared out manually. In time we will have to devise some notification system.            */
+/*                                                                                                */
+/*                                       © 2017 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Db from '../lib/db.js';

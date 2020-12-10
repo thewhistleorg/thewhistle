@@ -2,6 +2,8 @@
 /* Update model unit tests.                                                   C.Veness 2017-2018  */
 /*                                                                                                */
 /* Note these tests do not mock out database components, but operate on the live 'grn-test' db.   */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { expect } from 'chai';   // BDD/TDD assertion library

@@ -2,6 +2,8 @@
 /* Handlers: test-cam/scr (survivor-centred response.                              C.Veness 2017  */
 /*                                                                                                */
 /* GET functions render template pages; POST functions process post requests then redirect.       */
+/*                                                                                                */
+/*                                       © 2017 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Report from '../../../models/report.js';

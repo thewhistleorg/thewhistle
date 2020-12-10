@@ -1,5 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /* Groups handlers for the admin app                                            Louis Slater 2018 */
+/*                                                                                                */
+/*                                       © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
@@ -56,7 +58,7 @@ class GroupHandlers {
                 ctx.flash = { _error: 'A group requires a name' };
                 ctx.response.redirect('/create-group');
             }
-            
+
         });
     }
 

@@ -8,6 +8,8 @@
 /* ajaxApiPassthrough() function.                                                                 */
 /*                                                                                                */
 /* Being placed after auth test in the middleware stack, ajax calls are password-protected.       */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Report         from '../models/report.js';

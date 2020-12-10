@@ -11,6 +11,8 @@
 /* organisation databases a user had access to. There may be further complications, too; in view  */
 /* of all these considerations, user details continue to be held in a separate database for the   */
 /* time being.                                                                                    */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { ObjectId } from 'mongodb'; // MongoDB driver for Node.js

@@ -4,6 +4,12 @@
 /*                                                                                                */
 /* Ajax functions set body & status, and should not throw (as that would  invoke the generic      */
 /* admin exception handler which would return an html page).                                      */
+/*                                                                                                */
+/* This should be converted to use WebSockets rather than ajax polling:                           */
+/* - developer.mozilla.org/en-US/docs/Web/API/WebSocket                                           */
+/* - www.npmjs.com/package/ws                                                                     */
+/*                                                                                                */
+/*                                       © 2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Notification from '../models/notification.js';

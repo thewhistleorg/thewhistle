@@ -7,6 +7,8 @@
 /* 4xx/5xx responses provide a simple text message in the body.                                   */
 /*                                                                                                */
 /* A GET on a collection which returns no results returns a 204 / No Content response.            */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Koa       from 'koa';          // Koa framework

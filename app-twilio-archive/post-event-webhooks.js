@@ -3,6 +3,8 @@
 /*                                                                                                */
 /* Twilio is configured to POST to e.g. twilio.thewhistle.org/message after it receives an SMS    */
 /* message.                                                                                       */
+/*                                                                                                */
+/*                                       © 2017 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Message from '../models/message.js';

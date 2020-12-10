@@ -5,6 +5,8 @@
 /*                                                                                                */
 /* AWS Free Tier is just 2,000 put requests per month, so tests involving file upload are limited */
 /* to CI tests. To run these locally set environment variable CIRCLECI to true.                   */
+/*                                                                                                */
+/*                                  © 2017-2018 Cambridge University / The Whistle | MIT licence  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import supertest    from 'supertest';  // SuperAgent driven library for testing HTTP servers
